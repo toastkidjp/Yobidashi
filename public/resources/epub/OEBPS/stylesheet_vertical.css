@@ -1,0 +1,209 @@
+/* this was a part of chap03.xhtml as an inline style specification for partial vertical rendering */
+/* now an independent stylesheet file for entire vertical writing mode content */
+/* abun@kobu.com 12/07/05 for japanese epub sample, edition 3 */
+* { line-height: 125%; }
+body {
+  writing-mode: vertical-rl;
+  -epub-writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  line-break: normal;
+  -epub-line-break: normal;
+  -webkit-line-break: normal;
+}
+span.tny {
+  writing-mode: horizontal-tb;
+  -epub-writing-mode: horizontal-tb;
+  -webkit-writing-mode: horizontal-tb;
+}
+span.tny2 {
+  text-combine: horizontal;
+  -epub-text-combine: horizontal;
+  -webkit-text-combine: horizontal;
+}
+span.emph {
+  text-emphasis-style: dot;
+  -epub-text-emphasis-style: dot;
+  -webkit-text-emphasis-style: dot;
+}
+
+/* from stylesheet for horizontal rendering (yoko) */
+body { margin-left: 5%; margin-right: 5%; margin-top: 5%; margin-bottom: 5%; text-align: left }
+th, td { padding: 0.1em 0.2em; background: lightgrey; }
+th { white-space: nowrap; }
+
+/* addition by Toast kid. */
+
+blockquote	{
+	padding-top: 0em;
+	padding-right: 0.5em;
+	padding-left: 0.5em;
+	padding-bottom: 0em;
+	color: black;
+	margin-left: 1em;
+	margin-right: 2em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	white-space: pre;
+	background-color: lightcyan;
+	border-top: #646464 1px dashed;
+	border-left: #646464 1px dashed;
+	border-bottom: #646464 1px dashed;
+	border-right: #646464 1px dashed;
+}
+dd {
+	margin-top: 2px;
+	margin-bottom: 4px;
+}
+dl {
+	margin-left: 10px;
+}
+dt {
+	border-style: dashed;
+	border-color: gray;
+	border-width: 0px 0px 1px 0px;
+}
+h1 {
+	border-right: 1em;
+	border-top: medium none;
+	font-weight: bold;
+	font-size: 1.8em;
+	border-left: 1em;
+	color: #6633ff;
+	border-bottom: 0em;
+	font-style: italic;
+	font-family: 'comic sans ms', verdana, arial, helvetica, sans-serif;
+	background-color: #ffffff;
+	text-align: center;
+	text-shadow: 1px 1px 3px #000;
+}
+h2 {
+	border-style: solid;
+	border-width: 1px 1px 1px 10px;
+	border-color: #6633ff;
+	padding: 4px 0px 3px 10px;
+	background-color: mintcream;
+	font-size: 150%;
+	font-weight: normal;
+	text-shadow: 1.5px 2.5px 2.5px #609d4f;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+h3 {
+	border-style: solid;
+	border-width: 0px 0px 1px 10px;
+	border-color: darkblue;
+	padding: 4px 0px 3px 10px;
+	font-size: 100%;
+	font-weight: normal;
+}
+/* (121025) */
+h3:first-letter {
+	font-size:     1.5em;
+	font-weight:   bold;
+	padding-right: 0.1em;
+	display:       block;
+}
+h4 {
+/*
+	border-style: solid;
+	border-width: 0px 1px 1px 8px;
+	border-color: navy;
+	*/
+	padding: 4px 0px 3px 8px;
+	font-size: 100%;
+	font-weight: bold;
+}
+h5 {
+	padding: 4px 0px 3px 6px;
+	font-size: 90%;
+	font-weight: normal;
+}
+img {
+	border-style: none;
+}
+ol.list1 {
+	list-style-type: decimal;
+}
+ol.list2 {
+	list-style-type: lower-roman;
+}
+ol.list3 {
+	list-style-type: lower-alpha;
+}
+p {
+	margin-bottom: 0.7em;
+	margin-top: 0.7em;
+	margin-left: 10px;
+	text-indent: 1em
+}
+pre {
+	border-style: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color: lightsteelblue;
+	margin-left: 10px;
+	padding: 5px;
+}
+span.footnote {
+	font-size: 75%;
+	vertical-align: super;
+}
+span.footnote_caption {
+	font-size: 80%;
+	margin-left: 0.25em;
+}
+span.marker {
+	background-color: #ffff00;
+}
+table {
+	margin: 10px;
+	border-collapse: collapse;
+	border-style: solid;
+	border-width: 2px;
+	border:0.5px solid #0099cc;
+	border-radius:0.5em;
+	/* Firefox騾包ｽｨ */
+	-moz-box-shadow: 1px 1px 3px #000;
+	/* Safari,Google Chrome騾包ｽｨ */
+	-webkit-box-shadow: 1px 1px 3px #000;
+}
+/* (140321) */
+tr:hover {
+  color: #19197c; /* 譁�蟄苓牡 */
+  background-color: #e5ecff; /* 閭梧勹濶ｲ */
+}
+td {
+	border-style: solid;
+	border-width: 1px;
+	border:0.5px solid #0099cc;
+	padding: 3pt;
+	vertical-align: top;
+}
+td.center {
+	text-align: center;
+}
+td.right {
+	text-align: right;
+}
+th {
+	/* Firefox */
+	background: -moz-linear-gradient(top, #004da0, #FFF);
+	/* Safari,Google Chrome */
+	background: -webkit-gradient(linear, left top, left bottom, from(#004da0), to(#FFF));
+	color:white;
+	text-shadow: 1.5px 2.5px 2.5px #004da0;
+	border-style: solid;
+	border-width: 1px;
+	border:0.5px solid #0099cc;
+	padding: 3pt;
+	vertical-align: top;
+}
+ul.list1 {
+	list-style-type: disc;
+}
+ul.list2 {
+	list-style-type: circle;
+}
+ul.list3 {
+	list-style-type: square;
+}
+

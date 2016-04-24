@@ -1,0 +1,44 @@
+td{
+	text-align: right
+}
+td.saturday{
+	color: blue
+}
+td.sunday{
+	color: red
+}
+td.sunday a{
+	color: red
+}
+td.holiday{
+	color: red
+}
+td.holiday a{
+	color: red
+}
+#today{
+	/*background-color: #ccffff*/
+	/* Firefox —p */
+	background: -moz-linear-gradient(top, #006da0, #FFF);
+	/* Safari,Google Chrome —p */
+	background: -webkit-gradient(linear, left top, left bottom, from(#00Fda0), to(#FFF));
+}
+#title {
+	text-align: center
+}
+span.todayTitle {
+	margin-left  : auto ;
+	margin-right : auto ;
+}
+table.calendars {
+	border: 0;
+	border-color: transparent;
+	margin-left  : auto ;
+	margin-right : auto ;
+}
+a:hover{
+}
+table.calendar {
+	vertical-align: middle;
+	float: center;
+}

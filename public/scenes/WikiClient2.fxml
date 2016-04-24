@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<?import com.jfoenix.controls.*?>
+
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+    fx:controller="jp.toastkid.gui.jfx.wiki.Controller">
+  <children>
+    <HBox prefHeight="25.0" prefWidth="900.0" fx:id="header">
+      <children>
+        <MenuBar minWidth="320.0" prefHeight="25.0" prefWidth="330.0" VBox.vgrow="NEVER">
+          <menus>
+            <Menu text="File">
+              <items>
+                <MenuItem onAction="#setHome" text="ホームに設定する" />
+                <MenuItem accelerator="Ctrl+H" mnemonicParsing="true" onAction="#callHome" text="ホームに戻る" />
+                <MenuItem accelerator="Ctrl+T" mnemonicParsing="true" onAction="#openWebTab" text="タブを開く" />
+                <MenuItem accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="タブを閉じる" />
+                <MenuItem accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="スライドショー"/>
+                <MenuItem accelerator="Alt+F" mnemonicParsing="true" onAction="#callTabFullScreen" text="タブを全画面表示" />
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+R" mnemonicParsing="true" onAction="#loadArticleList" text="記事一覧の更新" />
+                <MenuItem onAction="#clearBackup" text="バックアップの削除" />
+                <MenuItem onAction="#clearHistory" text="閲覧履歴の削除" />
+                <SeparatorMenuItem />
+                <Menu text="フォルダを開く">
+                    <items>
+                        <MenuItem onAction="#openFolder" text="現在のフォルダ" />
+                        <MenuItem onAction="#openFolder" text="記事" />
+                        <MenuItem onAction="#openFolder" text="画像" />
+                        <MenuItem onAction="#openFolder" text="音楽" />
+                    </items>
+                </Menu>
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="記事のバックアップ" />
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="印刷" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#closeApplication" text="終了" />
+              </items>
+            </Menu>
+            <Menu text="Edit">
+              <items>
+                <Menu text="新規作成" accelerator="Ctrl+N">
+                  <items>
+                    <MenuItem onAction="#makeArticle" text="記事" />
+                  </items>
+                </Menu>
+                <MenuItem accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="コピー" />
+                <MenuItem onAction="#callRename" text="記事名変更" />
+                <MenuItem accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="エディタで開く" />
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTMLソース" />
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="全記事から検索" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#callDelete" text="削除" />
+              </items>
+            </Menu>
+            <Menu text="Tool">
+              <items>
+                <MenuItem accelerator="Ctrl+1" mnemonicParsing="true" onAction="#callCalc" text="電卓" />
+                <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="文字数カウンタ" />
+                <MenuItem onAction="#callMorphAnalyzer" text="形態素解析" />
+                <MenuItem onAction="#callCmd" text="コマンドプロンプト" />
+                <SeparatorMenuItem />
+                <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawGraph" text="グラフ描画" />
+                <MenuItem onAction="#callGallery" text="Gallery" />
+                <MenuItem accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" />
+                <MenuItem accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
+                <MenuItem onAction="#callRssFeeder" text="RSS Feeder" />
+                <MenuItem onAction="#openScripter" text="Script Runner" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#callConvertMd" text="Markdown に変換" />
+                <MenuItem onAction="#callConvertAobun" text="青空文庫形式で出力" />
+                <MenuItem onAction="#callConvertEpub" text="ePub で出力" />
+                <MenuItem onAction="#callSimpleBachup" text="Simple article backup" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#callGenerateEpubs" text="まとめてePub生成" />
+              </items>
+            </Menu>
+            <Menu text="Window">
+              <items>
+                <MenuItem accelerator="F11" mnemonicParsing="true" onAction="#fullScreen" text="Full screen" />
+                <MenuItem accelerator="F5" mnemonicParsing="true" onAction="#reload" text="Reload" />
+                <MenuItem onAction="#callConfig" text="Config" />
+              </items>
+            </Menu>
+            <Menu text="Help">
+              <items>
+                <MenuItem onAction="#callApplicationState" text="Application state" />
+                <MenuItem text="About" />
+              </items>
+            </Menu>
+          </menus>
+        </MenuBar>
+        <HBox prefHeight="25.0">
+            <children>
+            <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0">
+                <tooltip><Tooltip text="URL" /></tooltip>
+            </JFXTextField>
+            <JFXButton fx:id="reload" minWidth="40.0" onAction="#reload" prefWidth="40.0">
+                <tooltip><Tooltip text="reload this page." /></tooltip>
+            </JFXButton>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="500.0">
+          <children>
+            <ComboBox fx:id="searchKind">
+              <tooltip><Tooltip text="Web検索の種類を選択します。" /></tooltip>
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Y!" />
+                  <String fx:value="Y!RTS" />
+                  <String fx:value="Wikipe" />
+                  <String fx:value="Y!辞書" />
+                  <String fx:value="Weblio" />
+                  <String fx:value="食べログ" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+            <JFXTextField fx:id="webQuery" promptText="Web検索" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0">
+              <tooltip><Tooltip text="Web検索のキーワードをここに入力します。" /></tooltip>
+            </JFXTextField>
+            <JFXButton fx:id="webSearch" minWidth="40.0" onAction="#webSearch">
+              <tooltip><Tooltip text="execute search." /></tooltip>
+            </JFXButton>
+          </children>
+        </HBox>
+      </children>
+    </HBox>
+    <SplitPane fx:id="splitter" dividerPositions="0.10022271714922049" VBox.vgrow="ALWAYS">
+      <items>
+        <TabPane fx:id="leftTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
+          <tabs>
+            <Tab text="Articles">
+              <tooltip><Tooltip text="記事一覧リストです。" /></tooltip>
+              <content>
+                <ListView fx:id="articleList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+              </content>
+            </Tab>
+            <Tab text="History">
+              <tooltip><Tooltip text="閲覧履歴リストです。" /></tooltip>
+              <content>
+                <ListView fx:id="historyList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+              </content>
+            </Tab>
+            <Tab text="Tools">
+              <tooltip><Tooltip text="ツールです。" /></tooltip>
+                <content>
+                  <VBox prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="MP3 Player">
+                        <content>
+                          <AnchorPane><children><fx:include fx:id="music" source="MusicPlayer.fxml"/></children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Name Generator">
+                        <content>
+                          <AnchorPane><children><fx:include fx:id="name" source="NameMaker.fxml"/></children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
+                        <content>
+                          <AnchorPane><children><fx:include fx:id="loto6" source="Loto6.fxml"/></children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
+                        <content>
+                          <AnchorPane><children><fx:include fx:id="bmi" source="Bmi.fxml"/></children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                    </children>
+                  </VBox>
+                </content>
+            </Tab>
+          </tabs>
+        </TabPane>
+        <VBox fx:id="mainArea">
+          <children>
+            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
+            <AnchorPane><children><fx:include fx:id="script" source="Script.fxml"/></children></AnchorPane>
+          </children>
+        </VBox>
+      </items>
+    </SplitPane>
+    <HBox fx:id="searcherArea" prefHeight="0.0" spacing="5.0">
+      <children>
+        <JFXButton minWidth="40.0" onAction="#hideSearcher" prefHeight="25.0" prefWidth="40.0" text="x" />
+        <JFXTextField fx:id="searcherInput" promptText="ページ内検索" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown">
+          <tooltip><Tooltip text="input search words." /></tooltip>
+        </JFXTextField>
+        <JFXButton minWidth="40.0" onAction="#searchUp" prefHeight="25.0" prefWidth="40.0" text="↑" />
+        <JFXButton minWidth="40.0" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
+      </children>
+    </HBox>
+    <HBox fx:id="footer" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+      <children>
+        <HBox alignment="CENTER_LEFT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+          <children>
+            <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+              <font><Font size="12.0" fx:id="x3" /></font>
+              <textFill><Color blue="0" green="0.11" red="0" fx:id="x4" /></textFill>
+            </Label>
+          </children>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+            <children>
+                <ComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="日記の文字数" />
+                            <String fx:value="出費" />
+                            <String fx:value="日経平均株価" />
+                        </FXCollections>
+                    </items>
+                    <tooltip><Tooltip text="select graph kind." /></tooltip>
+                </ComboBox>
+                <ComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
+                <JFXButton minWidth="70.0" onAction="#drawGraph" prefHeight="25.0" prefWidth="60.0" text="Draw">
+                    <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
+                </JFXButton>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+          <children>
+            <JFXButton minWidth="80.0" onAction="#callFileLength" prefHeight="25.0" prefWidth="80.0" text="Length">
+              <tooltip><Tooltip text="記事の文字数を表示します。" /></tooltip>
+            </JFXButton>
+          </children>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+          <children>
+            <Slider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="150.0" showTickLabels="true" showTickMarks="true" value="1.0">
+              <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
+            </Slider>
+            <JFXTextField fx:id="zoomInput" promptText="zoom" onAction="#setZoom" prefHeight="25.0" prefWidth="100.0">
+              <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
+            </JFXTextField>
+            <JFXButton minWidth="80.0" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+              <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
+            </JFXButton>
+          </children>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+          <children>
+            <JFXDatePicker fx:id="calendar" minWidth="100.0" prefHeight="25.0" prefWidth="100.0" onAction="#callCalendar">
+                  <tooltip><Tooltip text="カレンダーを表示します。" /></tooltip>
+            </JFXDatePicker>
+            <ComboBox fx:id="style" minWidth="140.0" onAction="#callSetOnStyle">
+              <tooltip><Tooltip text="Style を選択します。" /></tooltip>
+              <items>
+                <FXCollections fx:factory="observableArrayList" >
+                  <String fx:value="CASPIAN" />
+                  <String fx:value="MODENA" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+          </children>
+        </HBox>
+      </children>
+    </HBox>
+  </children>
+</VBox>

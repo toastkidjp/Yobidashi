@@ -1,0 +1,248 @@
+package jp.toastkid.libs.epub;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.models.Article;
+import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
+import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.wiki.WikiConverter;
+import net.arnx.jsonic.JSON;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.factory.Maps;
+
+/**
+ * 記事を epub に変換して出力する.
+ * @author Toast kid
+ *
+ */
+public final class DocToEpub {
+    /** path/to/articles. */
+	private static final String ARTICLE_PATH = Config.get("articleDir");
+    /** ファイル名の制限. */
+    public static final int FILE_NAME_LENGTH = 50;
+    /** 記事名一覧. */
+    private static final List<File> ARTICLES
+        = Arrays.asList(new File(ARTICLE_PATH).listFiles());
+
+    /**
+     * ひとりWiki のハイパーリンクを再現するための検出用正規表現.
+     * ひとりWiki プラグインとの互換性を持たせるためのもの
+     */
+    private static final Pattern HYPERLINK_PAT = Pattern.compile(
+            "\\[\\[(.+?)\\]\\]",
+            Pattern.DOTALL
+            );
+    /** 削除対象ファイルのパス一覧. */
+    private static List<String> cleanTargets = new ArrayList<String>();
+
+    /**
+     *
+     * @param args
+     */
+    public static final void main(final String[] args) {
+        run(args);
+    }
+    /**
+     * 生成メソッド.
+     * @param args jsonファイル名
+     */
+    public static void run(final String[] args) {
+        Arrays.asList(args).parallelStream().forEach(
+                (json) -> {
+                    generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE));
+                    }
+                );
+        clean();
+    }
+    /**
+     * 1ファイルのみのePub生成メソッド.
+     * @param json jsonで定義したレシピ
+     */
+    public static void run(final String json) {
+        generate(json);
+        clean();
+    }
+    /**
+     * epubを1つ生成する.
+     * @param json 設定ファイル
+     */
+    private static void generate(final String json) {
+        final EpubMetaData meta = JSON.decode(
+                json,
+                EpubMetaData.class
+                );
+        /**
+         * 処理の流れ
+         * プレフィックス回収
+         * 指定回収
+         * 指定静的コンテンツ回収
+         */
+        final EpubMaker eMaker = new EpubMaker(meta);
+        final List<ContentMetaData> targetContents = new ArrayList<ContentMetaData>();
+        if (StringUtils.isNotEmpty(meta.targetPrefix)) {
+            targetContents.addAll(
+            		getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
+            	);
+        }
+        if (meta.targets != null && meta.targets.size() != 0) {
+            targetContents.addAll(
+            		getTargetContents(getTargets(meta.targets), meta.layout)
+            	);
+        }
+        eMaker.setContentPairs(targetContents);
+        eMaker.generateEpub();
+    }
+    /**
+     * epub に入れる記事を前方一致で選択する.
+     * @param prefix 記事の接頭辞
+     * @return 記事ファイルオブジェクトの一覧
+     */
+    private static final List<File> selectTargetsByPrefix(
+            final String  prefix,
+            final boolean recursive
+        ) {
+        final List<File> targets = ARTICLES.parallelStream().filter((file) -> {
+            return file.getName().startsWith(Functions.toBytedString_EUC_JP(prefix));
+        }).collect(Collectors.toList());
+        if (recursive) {
+            final List<File> recursiveFiles = new ArrayList<File>();
+            targets.forEach((file) ->{
+                recursiveFiles.add(file);
+                final List<String> contents = FileUtil.readLines(
+                        file.getAbsolutePath(),
+                        Defines.ARTICLE_ENCODE
+                    );
+                Matcher matcher;
+                for (final String content : contents) {
+                    if (content.contains("[[") && content.contains("]]")) {
+                        matcher = HYPERLINK_PAT.matcher(content);
+                        while (matcher.find()) {
+                            final File f = new File(
+                                    ARTICLE_PATH,
+                                    Functions.toBytedString_EUC_JP(matcher.group(1)).concat(".txt")
+                                );
+                            if (f.exists() && !recursiveFiles.contains(f)) {
+                                recursiveFiles.add(f);
+                            }
+                        }
+                    };
+                }
+            });
+            return recursiveFiles;
+        }
+        return targets;
+    }
+    /**
+     * epub に入れる記事を完全一致で選択する.
+     * @param targets 記事名
+     * @return 記事ファイルオブジェクトの一覧
+     */
+    private static final List<File> getTargets(final List<String> targets) {
+        final List<File> files = new ArrayList<File>(targets.size());
+        for (final String prefix : targets) {
+            final File f = new File(
+                    ARTICLE_PATH,
+                    Functions.toBytedString_EUC_JP(prefix).concat(".txt")
+                );
+            if (ARTICLES.contains(f)) {
+                files.add(f);
+            }
+        }
+        return files;
+    }
+    /**
+     * 処理対象のコンテンツのパス一覧を返す.
+     * @param targets
+     * @return 処理対象のコンテンツのパス一覧
+     */
+    private static final List<ContentMetaData> getTargetContents(
+    		final List<File> targets,
+    		final PageLayout layout
+    		) {
+        final List<ContentMetaData> targetPaths = new ArrayList<ContentMetaData>();
+        final WikiConverter converter = new WikiConverter("", ARTICLE_PATH);
+        final String imageDir = Config.get("imageDir").replace("\\", "/");
+        converter.containsMenubar = false;
+        targets.forEach((file) -> {
+            final ContentMetaData cmeta = new ContentMetaData();
+            final String content = converter.convert(
+                        file.getAbsolutePath(),
+                        Defines.ARTICLE_ENCODE
+                    );
+            final String title = Article.convertTitle(file.getName());
+            String baseName = file.getName();
+            baseName = baseName.substring(0, baseName.length() - 4);
+            baseName = (FILE_NAME_LENGTH < baseName.length())
+            		? baseName.substring(0, FILE_NAME_LENGTH)
+            		: baseName;
+            final String outputName = baseName.concat(EpubDefine.FILE_SUFFIX);
+            //System.out.println(title + " - " + outputName);
+            final String style = layout.equals(PageLayout.VERTICAL)
+            		? EpubDefine.STYLESHEET_VERTICAL
+            		: EpubDefine.STYLESHEET_HORIZONTAL;
+            final String convertedSource = Functions.bindArgs(
+                    "public/resources/epub/OEBPS/template.xhtml",
+                    Maps.mutable.of(
+                            "title", title,
+                            "content", content.toString(),
+                            "stylesheet", style
+                            )
+            );
+            // img
+            final Set<String> imgs = converter.latestImagePaths;
+            imgs.parallelStream().forEach((path) -> {
+                if (new File(imageDir + path).exists()) {
+                    final ContentMetaData imgCMeta = new ContentMetaData();
+                    final String parentPath
+                    	= new File(path.replace(
+                    			FileUtil.FILE_PROTOCOL.concat(imageDir),
+                    			""
+                    		)
+                    	).getParent() + "/";
+                    imgCMeta.source = (imageDir + path);
+                    imgCMeta.entry  = path;
+                    imgCMeta.dest   = parentPath.replace("\\", "/");
+                    targetPaths.add(imgCMeta);
+                }
+            });
+            cmeta.entry  = outputName;
+            cmeta.source = outputName;
+            cmeta.title  = title;
+            cmeta.dest   = "";
+            FileUtil.outPutStr(
+                    convertedSource.replace(
+                        FileUtil.FILE_PROTOCOL.concat(imageDir),
+                        "OEBPS/"
+                    ),
+                    outputName,
+                    Defines.ARTICLE_ENCODE
+            );
+            targetPaths.add(cmeta);
+            cleanTargets.add(outputName);
+        });
+        return targetPaths;
+    }
+
+    /**
+     * 不要となった生成ファイルを削除する.
+     * @param pathList ファイルパスの一覧
+     */
+    private static final void clean() {
+        cleanTargets.parallelStream().forEach((path) -> {
+            final File file = new File(path);
+            if (file.exists()) {
+                file.delete();
+            }
+        });
+    }
+}

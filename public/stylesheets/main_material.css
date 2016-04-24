@@ -1,0 +1,68 @@
+.header {
+    background-color: navy;
+}
+.header.fixed, .header.open, .menu-open .header {
+  background-color: #90CAF9;
+}
+.menu-right {
+  overflow: scroll;
+  height: 100%;
+}
+.menu-right li {
+  line-height: 5px !important;
+}
+pre {
+  font-size: 120%;
+}
+
+
+.tooltip {
+    position: relative;
+}
+.tooltip .tooltipBody {
+    border: solid 2px #f98325;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    position: absolute;
+    left: 1em;
+    top: -2.7em;
+    text-decoration: none;
+    visibility: hidden;
+    padding: 3px 5px;
+    width: 200px;
+    zoom: 1;
+}
+.tooltip:hover ,
+.tooltip:hover .tooltipBody {
+    background-color: white;
+    visibility: visible;
+    z-index: 10;
+}
+.tooltip .tooltipBody .tooltipAngle {
+    border-right: solid 10px transparent;
+    border-left-width: 0;
+    border-top: solid 10px #f98325;
+    line-height: 0;
+    position: absolute;
+    left: 1em;
+    bottom: -10px;
+}
+.tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {
+    border-right: solid 5px transparent;
+    border-left-width: 0;
+    border-top: solid 5px white;
+    line-height: 0;
+    position: absolute;
+    left: 2px;
+    bottom: 5px;
+}
+
+/*	not supported tanseparent for border by IE6. */
+* html .tooltip .tooltipBody .tooltipAngle {
+    border-right-color: white;
+    bottom: -11px;
+}
+* html .tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {
+    border-right-color: #f98325;
+}

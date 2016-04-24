@@ -1,0 +1,117 @@
+.root {
+    -fx-base: rgba(100, 100, 200, 0.1);
+    -fx-background: #C5CAE9;
+}
+
+.text {
+    -fx-font-family: 'Roboto';
+}
+
+.menu {
+    -fx-base: rgba(0, 100, 200, 0.4);
+    -fx-text-fill: white;
+}
+
+.text-field {
+    -fx-background: #002255;
+    -fx-text-fill: white;
+    -fx-opacity: 0.5;
+}
+
+.text-field:focused {
+    -fx-base: gray;
+    -fx-text-fill: #003311;
+}
+
+.text-area {
+    -fx-background: white;
+}
+
+.text-area:focused {
+    -fx-base: gray;
+}
+
+.tab-pane {
+    -fx-text-fill: white;
+    -fx-background-color: rgba(0, 0, 150, 0.0);
+}
+.list-view {
+    -fx-background-color: rgba(0, 0, 100, 0.1);
+}
+.left-tabs .list-cell{
+    -fx-text-fill: black;
+}
+
+.left-tabs .list-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #002277;
+}
+
+.left-tabs .list-cell:even {
+    -fx-text-fill: black;
+    -fx-background-color: rgba(0, 0, 100, 0.15);
+}
+
+.left-tabs .list-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #002277;
+}
+
+.left-tabs .list-cell:hover {
+    -fx-text-fill: white;
+    -fx-background-color: #002277;
+}
+
+.left-tabs {
+    -fx-background-color: #C5CAE9;
+}
+.scroll-pane {
+    -fx-opacity: 0.5;
+}
+.scroll-bar .thumb{
+    -fx-background-color: #C5CAE9;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+.scroll-bar {
+    -fx-background-color: navy;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+.scroll-bar:horizontal .increment-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+    -fx-shape: "M7.626,12.876L4.251,8.751H7.14L11,12.876L7.14,17H4.251L7.626,12.876z";
+}
+
+.scroll-bar:vertical .increment-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+    -fx-shape: "M8.124,13.625l4.125-3.375v2.889l-4.125,3.86L4,13.139V10.25L8.124,13.625z";
+}
+.scroll-bar .increment-button:pressed .increment-arrow {
+    -fx-background-color: white, white;
+}
+.scroll-bar:horizontal .decrement-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+    -fx-shape: "M11,17H8.111l-3.86-4.124l3.86-4.125H11l-3.375,4.125L11,17z";
+}
+
+.scroll-bar:vertical .decrement-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+    -fx-shape: "M4,17v-2.889l4.124-3.86l4.125,3.86V17l-4.125-3.375L4,17z";
+}
+.scroll-bar .decrement-button:pressed .decrement-arrow {
+    -fx-background-color: white, white;
+}
+
+.menu .label {
+    -fx-text-fill: white;
+    -fx-background: rgba(0, 0, 100, 0.4);
+}

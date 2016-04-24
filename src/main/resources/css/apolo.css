@@ -1,0 +1,27 @@
+.root {
+    -fx-base: #FECAFC;
+    -fx-background: #000000;
+    -fx-control-inner-background: #FECAFC;
+}
+
+.button {
+    -fx-border-style: null; 
+    -fx-background-radius: 0;
+}
+.toggle-button {
+    -fx-border-style: null; 
+    -fx-background-radius: 0;
+}
+.combo-box-base  {
+    -fx-border-style: null; 
+    -fx-background-radius: 0, 0, 0, 0;
+}
+.menu .label {
+    -fx-text-fill: #000000;
+}
+.label {
+    -fx-text-fill: #FECAFC;
+}
+.tab-label {
+    -fx-text-fill: #FFFFFF;
+}

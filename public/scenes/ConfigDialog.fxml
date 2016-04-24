@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
+
+<?import com.jfoenix.controls.*?>
+
+<VBox prefHeight="411.0" prefWidth="591.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+	fx:controller="jp.toastkid.gui.jfx.wiki.dialog.ConfigDialogController">
+	<children>
+		<Label text="Wiki title" />
+		<JFXTextField fx:id="wikiTitle" onAction="#storeConfig" />
+		<Label text="Wiki icon" />
+		<JFXTextField fx:id="wikiIcon" onAction="#storeConfig" />
+		<Label text="Article folder" />
+		<JFXTextField fx:id="articleFolder" onAction="#storeConfig" />
+		<Label text="Picture folder" />
+		<JFXTextField fx:id="pictureFolder" onAction="#storeConfig" />
+		<Label text="Music folder" />
+		<JFXTextField fx:id="musicFolder" onAction="#storeConfig" />
+		<Label text="Home" />
+		<JFXTextField fx:id="home" onAction="#storeConfig" />
+		<Label text="View Template" />
+		<ComboBox fx:id="viewTemplate" prefWidth="150.0" promptText="Select" >
+			<tooltip>
+				<Tooltip text="テンプレートの種類を選択します。" />
+			</tooltip>
+			<items>
+				<FXCollections fx:factory="observableArrayList">
+		              <String fx:value="SECOND" />
+		              <String fx:value="CLASSIC" />
+		              <String fx:value="MATERIAL" />
+				</FXCollections>
+			</items>
+		</ComboBox>
+		<HBox alignment="BOTTOM_RIGHT" prefHeight="92.0" prefWidth="600.0">
+			<children>
+				<JFXButton defaultButton="true" mnemonicParsing="false" onAction="#storeConfig" text="OK" />
+				<JFXButton cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+			</children>
+		</HBox>
+	</children>
+</VBox>

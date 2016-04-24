@@ -1,0 +1,97 @@
+apply plugin: 'application'
+apply plugin: 'eclipse'
+apply plugin: 'jacoco'
+
+/**
+ * @see
+ * <a href="http://patrickmoule.net/2012/12/16/
+ *building-and-packaging-of-javafx-applications-with-gradle/">
+ * building-and-packaging-of-javafx-applications-with-gradle</a>
+ */
+sourceCompatibility = 1.8
+
+version = '0.0.1'
+
+def mainClassName   = 'jp.toastkid.gui.jfx.wiki.Main'
+def defaultEncoding = 'UTF-8'
+def jdkVersion      = '1.8'
+def javafxHome      = System.getenv('JAVA_HOME')
+
+[compileJava, compileTestJava]*.options*.encoding = defaultEncoding
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
+
+//this one works with file dependencies. If you prefer
+
+configurations {
+    //we do not want to have jfxrt.jar in the classpath when creating the jar,
+    //therefore a seperate configuration is required
+    providedCompile
+}
+
+dependencies {
+
+    providedCompile files("${javafxHome}/jre/lib/ext/jfxrt.jar")
+    compile fileTree(dir: 'libs', include: '*.jar')
+
+    // Dependencies for use Script Engine.
+    compile 'org.python:jython-standalone:2.7.0'
+    compile 'org.codehaus.groovy:groovy-all:1.8.6'
+    compile 'org.clojure:clojure:1.8.0'
+
+    compile 'org.eclipse.collections:eclipse-collections:7.0.2'
+    compile 'net.arnx:jsonic:1.3.10'
+    compile 'org.apache.commons:commons-lang3:3.4'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+}
+compileJava {
+    //add required JavaFX libs to compile classpath
+    sourceSets.main.compileClasspath += configurations.providedCompile
+    sourceSets.main.compileClasspath += configurations.runtime
+    sourceSets.main.compileClasspath += configurations.testCompile
+}
+
+run {
+    //add required JavaFX libs to runtime classpath
+    classpath += configurations.providedCompile
+    classpath += configurations.runtime
+}
+eclipse {
+    classpath.defaultOutputDir = file('build')
+}
+
+
+//clear existing task actions and call ant task
+jar {
+    manifest {
+        attributes 'Main-Class' : mainClassName
+    }
+    destinationDir = projectDir
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+//create some smarter looking start scripts
+startScripts {
+    doLast {
+        unixScript.text = "java -jar ../libs/$jar.archiveName"
+        windowsScript.text = "java -jar ..\\libs\\$jar.archiveName"
+    }
+}
+
+task del(type:Exec) {
+    executable "rm"
+    args "-r", "build/*"
+}

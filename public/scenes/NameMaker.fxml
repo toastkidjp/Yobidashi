@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+    prefHeight="260.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="jp.toastkid.gui.jfx.wiki.name.Controller"
+    >
+    <children>
+      <HBox prefHeight="60.0" prefWidth="300.0">
+         <HBox.margin>
+           <Insets left="20.0" />
+         </HBox.margin>
+         <children>
+            <VBox prefHeight="60.0" prefWidth="200.0">
+               <children>
+                  <Label text="Nationality" />
+                  <ComboBox fx:id="nationalities" minWidth="200.0" />
+               </children>
+            </VBox>
+            <VBox prefHeight="60.0" prefWidth="100.0">
+               <children>
+                  <Label text="Num" />
+                  <ComboBox fx:id="nameNums" prefWidth="100.0">
+                    <items>
+                      <FXCollections fx:factory="observableArrayList">
+                        <Integer fx:value="1" />
+                        <Integer fx:value="5" />
+                        <Integer fx:value="10" />
+                        <Integer fx:value="20" />
+                        <Integer fx:value="50" />
+                        <Integer fx:value="100" />
+                        <Integer fx:value="200" />
+                        <Integer fx:value="500" />
+                        <Integer fx:value="1000" />
+                      </FXCollections>
+                    </items>
+                    <value>
+                        <Integer fx:value="50" />
+                    </value>
+                  </ComboBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox prefHeight="30.0" prefWidth="200.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#generateNames" text="Generate">
+               <HBox.margin>
+                  <Insets left="80.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+      <TextArea fx:id="nameOutput" prefHeight="200.0" prefWidth="300.0">
+         <HBox.margin>
+           <Insets left="20.0" />
+         </HBox.margin>
+        <tooltip><Tooltip text="this area appears generated names." /></tooltip>
+      </TextArea>
+   </children>
+</VBox>

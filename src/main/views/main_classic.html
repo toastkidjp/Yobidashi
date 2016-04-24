@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>${title}</title>
+        <script src="public/javascripts/expander.js" charset="utf-8"></script>
+        <!--Import jQuery before materialize.js-->
+        <script src="public/javascripts/jquery-2.1.1.min.js" charset="utf-8"></script>
+        <script src="public/stylesheets/materialize/js/materialize.min.js" charset="utf-8"></script>
+        <script src="public/javascripts/GitHub-jQuery-Repo-Widget/jquery.githubRepoWidget.min.js" charset="utf-8"></script>
+        <script src="public/javascripts/highlightjs/highlight.pack.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="public/javascripts/highlightjs/styles/github.css">
+        <!--script src="${installDir}public/stylesheets/materialize/js/materialize.min.js" charset="utf-8"></script-->
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/main.css" />
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/football.css" />
+        <!--link rel="stylesheet" type="text/css" href="${installDir}public/stylesheets/materialize/css/materialize.css" /-->
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/wiki.css" id="current_style"/>
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/ascii_art.css" />
+        <link rel="stylesheet" type="text/css" href="user/css/html/user.css" />
+    </head>
+    <body>
+        <header>
+            <img id="wikiIcon" src="${wikiIcon}">
+            <div id="logo">
+                ${wikiTitle}
+            </div>
+            <span class="nav" id="pageTitle">
+                <marquee scrollamount="3">${title}</marquee>
+            </span>
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </header>
+        <div id="main">
+            ${content}
+            <br/>
+            ${menu}
+        </div>
+        <p id="footer">This application is generate Wiki like document. This is built by Toast kid.</p>
+    </body>
+    <script type="text/javascript">
+        // for highlighting
+        hljs.initHighlightingOnLoad();
+    </script>
+</html>

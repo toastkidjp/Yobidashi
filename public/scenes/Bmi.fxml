@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<?import com.jfoenix.controls.*?>
+<?import jp.toastkid.gui.jfx.common.control.NumberTextField?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+   prefHeight="250.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="jp.toastkid.gui.jfx.wiki.bmi.Controller"
+    >
+    <children>
+      <Label text="  BMIを計算するツールです" />
+      <HBox prefHeight="18.0" prefWidth="300.0">
+         <children>
+            <Label text="  身長：" />
+            <NumberTextField fx:id="height" onAction="#calculate" />
+            <Label text=" [ ㎝ ]" />
+         </children>
+      </HBox>
+      <HBox prefHeight="18.0" prefWidth="300.0">
+         <children>
+            <Label text="  体重：" />
+            <NumberTextField fx:id="weight" onAction="#calculate" />
+            <Label text=" [ ㎏ ]" />
+         </children>
+      </HBox>
+      <JFXButton mnemonicParsing="false" text="Calculate" onAction="#calculate"/>
+      <Label text="  BMIの計算式：体重(㎏) / (身長(㎝)^2)" />
+      <Label text="  ここに結果を表示します。" />
+      <TextArea fx:id="result" text="標準値は22です。"/>
+   </children>
+</VBox>

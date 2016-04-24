@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>${title}</title>
+        <script src="public/javascripts/expander.js" charset="utf-8"></script>
+        <!--Import jQuery before materialize.js-->
+        <script src="public/javascripts/jquery-2.1.1.min.js" charset="utf-8"></script>
+        <script src="public/javascripts/GitHub-jQuery-Repo-Widget/jquery.githubRepoWidget.min.js" charset="utf-8"></script>
+        <script src="public/javascripts/pushy/js/pushy.min.js" charset="utf-8"></script>
+        <script src="public/javascripts/highlightjs/highlight.pack.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="public/javascripts/highlightjs/styles/github.css">
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/football.css" />
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/main_2nd.css" />
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/wiki.css" id="current_style"/>
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/ascii_art.css" />
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/additional.css" />
+        <link rel="stylesheet" type="text/css" href="user/css/html/user.css" />
+    </head>
+    <body>
+        <header>
+          <img id="wikiIcon" src="${wikiIcon}">
+            <div id="logo">
+                ${wikiTitle}
+            </div>
+            <span class="nav" id="pageTitle">
+                <marquee scrollamount="3">${title}</marquee>
+            </span>
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span>
+				<!-- Menu Button -->
+				<span id="container" class="menu-btn">&#9776; Menu</span>
+            </span>
+            <!-- Site Overlay -->
+			<div class="site-overlay"></div>
+			<nav>
+		        ${menu}
+			</nav>
+        </header>
+        <a id="head"></a>
+        <div id="main">
+            <h2><a href="JavaScript:open('subheadings')">Subheadings</a></h2>
+			<div class="expander" id="subheadings">
+				${subheadings}
+			</div><script>close("subheadings");</script>
+            ${content}
+        </div>
+        <p id="footer">This application is generate Wiki like document. This is built by Toast kid.</p>
+        <span id="jump2head"><a href="#head">Jump to head</a></span>
+    </body>
+    <script type="text/javascript">
+        // for highlighting
+        hljs.initHighlightingOnLoad();
+    </script>
+</html>

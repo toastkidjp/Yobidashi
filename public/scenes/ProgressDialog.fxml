@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+  prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="jp.toastkid.gui.jfx.dialog.ProgressDialogController" fx:id="background"
+  >
+	<children>
+      <ProgressIndicator fx:id="pin" progress="0.0" VBox.vgrow="ALWAYS" />
+      <Label fx:id="label" prefHeight="29.0" prefWidth="350.0" VBox.vgrow="ALWAYS" text="Now loading..." />
+      <ProgressBar fx:id="pb" prefHeight="30.0" prefWidth="350.0" progress="0.0" VBox.vgrow="ALWAYS">
+        <VBox.margin><Insets top="100.0" /></VBox.margin>
+      </ProgressBar>
+	</children>
+</VBox>
