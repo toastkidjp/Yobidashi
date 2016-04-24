@@ -122,6 +122,12 @@ public final class WikiConverter {
     private static final Pattern DEL_PAT = Pattern.compile("&del\\((.+?)\\)", Pattern.DOTALL);
 
     /**
+     * Markdown での取り消し線検出用正規表現.
+     */
+    private static final Pattern DELETE_MARKDOWN_PATTERN
+        = Pattern.compile("~~(.+?)~~", Pattern.DOTALL);
+
+    /**
      * 下線検出用正規表現.
      */
     private static final Pattern UNDERLINE_PATTERN = Pattern.compile("\\+(.+?)\\+", Pattern.DOTALL);
@@ -760,10 +766,38 @@ public final class WikiConverter {
                         .append(">").append(strList.get(++i)).toString();
                 isInCodeBlock = true;
             }
-            if (isInCodeBlock && str.trim().startsWith("{code}") ) {
+
+            // Markdown code block
+            if (!isInCodeBlock && str.trim().startsWith("```")) {
+
+                if (isInP) {
+                    contents.add("</p>");
+                    isInP = false;
+                }
+
+                String title = null;
+                String type = null;
+                final String substr = str.substring(3, str.length());
+                if (1 < substr.length()) {
+                    final String[] properties = substr.split("\\:");
+                    if (0 < properties.length) {
+                        type = properties[0];
+                    }
+                    if (1 < properties.length) {
+                        title = "<span class=\"code-title\">"+ properties[1] + "</span>";
+                    }
+                }//title
+                str = new StringBuilder("<pre>")
+                        .append(StringUtils.isNotBlank(title) ? title : "").append("<code")
+                        .append(StringUtils.isNotBlank(type) ? String.format(" class=\"%s\"", type) : "")
+                        .append(">").append(strList.get(++i)).toString();
+                isInCodeBlock = true;
+            }
+            if (isInCodeBlock && (str.trim().startsWith("{code}") || str.trim().startsWith("```")) ) {
                 str = "</code></pre>";
                 isInCodeBlock = false;
             }
+
 
             // map.
             if (str.startsWith("{map:") && !isInMap) {
@@ -975,7 +1009,16 @@ public final class WikiConverter {
                 str = str.replaceAll(DEL_PAT.pattern(), "<del>" + matcher.group(1) + "</del>");
             }
         }
-        // TODO italic(文字列)
+
+        if (str.contains("~~")) {
+            matcher = DELETE_MARKDOWN_PATTERN.matcher(str);
+            while (matcher.find()) {
+                str = str.replaceAll(DELETE_MARKDOWN_PATTERN.pattern(),
+                        "<del>" + matcher.group(1) + "</del>");
+            }
+        }
+
+        // italic(文字列)
         if (str.indexOf("'''") != -1) {
             matcher = ITALIC_PATTERN.matcher(str);
             while (matcher.find()) {
