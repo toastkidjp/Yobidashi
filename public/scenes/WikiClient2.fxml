@@ -107,7 +107,7 @@
             <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0">
                 <tooltip><Tooltip text="URL" /></tooltip>
             </JFXTextField>
-            <JFXButton fx:id="reload" minWidth="40.0" onAction="#reload" prefWidth="40.0">
+            <JFXButton fx:id="reload" minWidth="25.0" onAction="#reload" prefWidth="25.0" prefHeight="25.0">
                 <tooltip><Tooltip text="reload this page." /></tooltip>
             </JFXButton>
             </children>
@@ -130,7 +130,7 @@
             <JFXTextField fx:id="webQuery" promptText="Web検索" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0">
               <tooltip><Tooltip text="Web検索のキーワードをここに入力します。" /></tooltip>
             </JFXTextField>
-            <JFXButton fx:id="webSearch" minWidth="40.0" onAction="#webSearch">
+            <JFXButton fx:id="webSearch" minWidth="25.0" prefHeight="25.0" onAction="#webSearch">
               <tooltip><Tooltip text="execute search." /></tooltip>
             </JFXButton>
           </children>

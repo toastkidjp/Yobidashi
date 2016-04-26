@@ -76,7 +76,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.gui.jfx.common.Style;
 import jp.toastkid.gui.jfx.common.control.AutoCompleteTextField;
-import jp.toastkid.gui.jfx.common.control.Stopwatch;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.dialog.ProgressDialog;
 import jp.toastkid.gui.jfx.wiki.chart.ChartPane;
@@ -115,11 +114,11 @@ public final class Controller implements Initializable {
 
     /** WebView's highliting. */
     private static final String WINDOW_FIND_DOWN
-        = "window.find(\"{0}\", false, false, true, false, true, false)";
+    = "window.find(\"{0}\", false, false, true, false, true, false)";
 
     /** WebView's highliting. */
     private static final String WINDOW_FIND_UP
-        = "window.find(\"{0}\", false, true, true, false, true, false)";
+    = "window.find(\"{0}\", false, true, true, false, true, false)";
 
     /** 左のリストで中心をいくつずらすか. */
     private static final int FOCUS_MARGIN = 10;
@@ -128,35 +127,35 @@ public final class Controller implements Initializable {
     private static final Pattern paramPat = Pattern.compile(
             "map\\.get\\(\"(.+?)\"\\)",
             Pattern.DOTALL
-        );
+            );
 
     /** searcher appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SEARCHER
-        = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
 
     /** scripter appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SCRIPTER
-        = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
 
     /** run script keyboard shortcut. */
     private static final KeyCodeCombination RUN_SCRIPT
-        = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
-        = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
 
     /** Zoom decrement keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_DECREMENT
-        = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
 
     /** Show left pane. */
     private static final KeyCodeCombination SHOW_LEFT_PANE
-        = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
 
     /** Hide left pane. */
     private static final KeyCodeCombination HIDE_LEFT_PANE
-        = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+    = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
 
     /** header. */
     @FXML
@@ -298,7 +297,7 @@ public final class Controller implements Initializable {
         pd.addText("availableProcessors = " + availableProcessors);
 
         final ExecutorService es
-            = Executors.newFixedThreadPool(availableProcessors + availableProcessors + availableProcessors);
+        = Executors.newFixedThreadPool(availableProcessors + availableProcessors + availableProcessors);
 
         es.execute(() -> {
             final long start = System.currentTimeMillis();
@@ -362,7 +361,7 @@ public final class Controller implements Initializable {
                         }
                         urlText.setText(
                                 Defines.ARTICLE_URL_PREFIX
-                                    + Functions.toBytedString_EUC_JP(text) + Article.Extension.WIKI.text()
+                                + Functions.toBytedString_EUC_JP(text) + Article.Extension.WIKI.text()
                                 );
                         // (130317) 「現在選択中のファイル名」にセット
                         final File selected = new File(
@@ -374,11 +373,11 @@ public final class Controller implements Initializable {
                             focusOn();
                         }
                     }
-                );
+                    );
             Platform.runLater( () -> {
                 openWebTab();
                 callHome();
-                });
+            });
             pd.addProgress(11);
             pd.addText(Thread.currentThread().getName() + " Ended initialize right tabs. "
                     + (System.currentTimeMillis() - start) + "ms");
@@ -388,8 +387,8 @@ public final class Controller implements Initializable {
             final long start = System.currentTimeMillis();
             scriptController.scriptLanguage.getSelectionModel().select(0);
             searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
-                highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN)
-            );
+            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN)
+                    );
             final DoubleProperty valueProperty = zoom.valueProperty();
             valueProperty.addListener( (value, arg1, arg2) -> {
                 getCurrentWebView().ifPresent(wv -> {wv.zoomProperty().bindBidirectional(valueProperty);});
@@ -407,10 +406,6 @@ public final class Controller implements Initializable {
         // move to top.
         header.setOnMousePressed((event) -> {moveToTop();});
         footer.setOnMousePressed((event) -> {moveToBottom();});
-        final Button reset = new JFXButton("Reset");
-        final Stopwatch stopwatch = new Stopwatch();
-        reset.setOnAction(eve -> {stopwatch.reset();});
-        footer.getChildren().addAll(stopwatch, reset);
         pd.addProgress(11);
 
         reload.setGraphic(   new ImageView(FileUtil.getUrl(Resources.PATH_IMG_RELOAD).toString()));
@@ -610,8 +605,8 @@ public final class Controller implements Initializable {
         try {
             final String prefix = "日記" + date.toString();
             final Optional<Article> opt = articleList.getItems().stream()
-                .filter(item -> item.title.startsWith(prefix))
-                .findFirst();
+                    .filter(item -> item.title.startsWith(prefix))
+                    .findFirst();
             if (opt.isPresent()) {
                 loadUrl(Article.convertArticleUrl(opt.get().title));
                 return;
@@ -642,9 +637,9 @@ public final class Controller implements Initializable {
         final String absolutePath = Config.article.file.getAbsolutePath();
         AobunUtils.docToTxt(absolutePath);
         new AlertDialog.Builder().setParent(getParent())
-            .setTitle("変換完了")
-            .setMessage(Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath))
-            .build().show();
+        .setTitle("変換完了")
+        .setMessage(Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath))
+        .build().show();
     }
 
     /**
@@ -653,15 +648,15 @@ public final class Controller implements Initializable {
     @FXML
     public final void callConvertEpub() {
         new AlertDialog.Builder().setParent(getParent())
-                .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
-                .setOnPositive("OK", () -> {
-                    final ProgressDialog pd = new ProgressDialog.Builder()
-                            .setScene(this.getParent().getScene())
-                            .setText("ePub 生成中……").build();
-                    pd.start(stage);
-                    func.toEpub();
-                    pd.stop();
-                }).build().show();
+        .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
+        .setOnPositive("OK", () -> {
+            final ProgressDialog pd = new ProgressDialog.Builder()
+                    .setScene(this.getParent().getScene())
+                    .setText("ePub 生成中……").build();
+            pd.start(stage);
+            func.toEpub();
+            pd.stop();
+        }).build().show();
     }
 
     /**
@@ -670,15 +665,15 @@ public final class Controller implements Initializable {
     @FXML
     public final void callGenerateEpubs() {
         new AlertDialog.Builder().setParent(getParent())
-                .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
-                .setOnPositive("OK", () -> {
-                    final ProgressDialog pd = new ProgressDialog.Builder()
-                            .setScene(this.getParent().getScene())
-                            .setText("ePub 生成中……").build();
-                    pd.start(stage);
-                    func.runEpubGenerator();
-                    pd.stop();
-                }).build().show();
+        .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
+        .setOnPositive("OK", () -> {
+            final ProgressDialog pd = new ProgressDialog.Builder()
+                    .setScene(this.getParent().getScene())
+                    .setText("ePub 生成中……").build();
+            pd.start(stage);
+            func.runEpubGenerator();
+            pd.stop();
+        }).build().show();
     }
 
     /**
@@ -690,17 +685,17 @@ public final class Controller implements Initializable {
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
         new AlertDialog.Builder().setParent(getParent()).addControl(datePicker)
-            .setTitle("日付選択")
-            .setMessage("バックアップする最初の日を選択してください。")
-            .setOnPositive("Backup", () -> {
-                final LocalDate value = datePicker.getValue();
-                if (value == null) {
-                    return;
-                }
-                final long epochDay = CalendarUtil.zoneDateTime2long(
-                        value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                func.simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
-            }).build().show();
+        .setTitle("日付選択")
+        .setMessage("バックアップする最初の日を選択してください。")
+        .setOnPositive("Backup", () -> {
+            final LocalDate value = datePicker.getValue();
+            if (value == null) {
+                return;
+            }
+            final long epochDay = CalendarUtil.zoneDateTime2long(
+                    value.atStartOfDay().atZone(ZoneId.systemDefault()));
+            func.simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+        }).build().show();
     }
 
     /**
@@ -710,13 +705,13 @@ public final class Controller implements Initializable {
     public final void callHtmlSource() {
         getCurrentWebView().ifPresent(wv -> {
             final String htmlSource = wv.getEngine()
-                .executeScript(
-                        "document.getElementsByTagName('html')[0].innerHTML;"
-                        )
-                .toString()
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace(System.lineSeparator(), "<BR>");
+                    .executeScript(
+                            "document.getElementsByTagName('html')[0].innerHTML;"
+                            )
+                    .toString()
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace(System.lineSeparator(), "<BR>");
             final String title = tabPane.getSelectionModel().getSelectedItem().getText();
             openWebTab(title.concat("'s HTML Source"));
             wv.getEngine().loadContent(htmlSource);
@@ -733,7 +728,7 @@ public final class Controller implements Initializable {
         final List<String> content = FileUtil.readLinesFromStream(
                 Resources.PATH_APPLICATION_STATE,
                 Defines.ARTICLE_ENCODE
-            );
+                );
         content.forEach(str -> {
             final Matcher matcher = paramPat.matcher(str);
             if (matcher.find()){
@@ -755,28 +750,28 @@ public final class Controller implements Initializable {
     private final void callBackUp(final ActionEvent event) {
         final Window parent = getParent();
         new AlertDialog.Builder().setParent(parent)
-                .setTitle("バックアップ")
-                .setMessage("この処理には時間がかかります。")
-                .setOnPositive("OK", () -> {
-                    final ProgressDialog pd = new ProgressDialog.Builder()
-                            .setScene(this.getParent().getScene())
-                            .setText("バックアップ中……").build();
-                    final long start = System.currentTimeMillis();
-                    String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
-                    try {
-                        new ZipArchiver().doDirectory(sArchivePath);
-                        //new ZipArchiver().doDirectory(iArchivePath);
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
-                    final long end = System.currentTimeMillis() - start;
-                    pd.stop();
-                    sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                                    .concat(ZipArchiver.EXTENSION_ZIP);
-                    final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
-                            sArchivePath, System.lineSeparator(), end);
-                    AlertDialog.showMessage(parent, "バックアップ完了", message);
-                }).build().show();
+        .setTitle("バックアップ")
+        .setMessage("この処理には時間がかかります。")
+        .setOnPositive("OK", () -> {
+            final ProgressDialog pd = new ProgressDialog.Builder()
+                    .setScene(this.getParent().getScene())
+                    .setText("バックアップ中……").build();
+            final long start = System.currentTimeMillis();
+            String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
+            try {
+                new ZipArchiver().doDirectory(sArchivePath);
+                //new ZipArchiver().doDirectory(iArchivePath);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+            final long end = System.currentTimeMillis() - start;
+            pd.stop();
+            sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
+                    .concat(ZipArchiver.EXTENSION_ZIP);
+            final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
+                    sArchivePath, System.lineSeparator(), end);
+            AlertDialog.showMessage(parent, "バックアップ完了", message);
+        }).build().show();
     }
 
     /**
@@ -800,11 +795,11 @@ public final class Controller implements Initializable {
                 ){
             final String homeTitle = tabPane.getSelectionModel().getSelectedItem().getText();
             new AlertDialog.Builder().setParent(parent).setTitle("ホーム設定")
-                .setMessage(homeTitle + "をホームに設定しますか？")
-                .setOnPositive("YES", () -> {
-                    Config.store(Config.Key.HOME, currentURL);
-                    Config.reload();
-                }).build().show();;
+            .setMessage(homeTitle + "をホームに設定しますか？")
+            .setOnPositive("YES", () -> {
+                Config.store(Config.Key.HOME, currentURL);
+                Config.reload();
+            }).build().show();;
         } else {
             AlertDialog.showMessage(parent, "設定不可", "現在のページはホームに設定できません。");
         }
@@ -846,8 +841,8 @@ public final class Controller implements Initializable {
     @FXML
     private final void webSearch(final ActionEvent event) {
         final String kind  = searchKind.getItems()
-                                .get(searchKind.getSelectionModel().getSelectedIndex())
-                                .toString();
+                .get(searchKind.getSelectionModel().getSelectedIndex())
+                .toString();
         final String query = webQuery.getText();
         if (StringUtils.isEmpty(query)){
             return ;
@@ -936,12 +931,12 @@ public final class Controller implements Initializable {
         final WebEngine engine = wv.getEngine();
         // 新規タブで開く場合
         engine.setCreatePopupHandler(
-            popupFeature -> {
-                openWebTab();
-                tabPane.getSelectionModel().selectLast();
-                return getCurrentWebView().get().getEngine();
-            }
-        );
+                popupFeature -> {
+                    openWebTab();
+                    tabPane.getSelectionModel().selectLast();
+                    return getCurrentWebView().get().getEngine();
+                }
+                );
         //engine.setJavaScriptEnabled(true);
         engine.setOnAlert(e -> System.out.println(e.getData()));
         final Worker<Void> loadWorker = engine.getLoadWorker();
@@ -970,7 +965,7 @@ public final class Controller implements Initializable {
                         engine.executeScript(String.format("window.scrollTo(0, %d);", j));
                     }
                 }
-        );
+                );
         openTab(tab);
     }
 
@@ -1017,7 +1012,7 @@ public final class Controller implements Initializable {
             }
             final Node bridge = popup.lookup(".context-menu");
             final ContextMenuContent cmc
-                = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
+            = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
 
             final VBox itemsContainer = cmc.getItemsContainer();
             for (final Node n: itemsContainer.getChildren()) {
@@ -1072,7 +1067,7 @@ public final class Controller implements Initializable {
                     cmc.new MenuItemContainer(moveToBottom),
                     cmc.new MenuItemContainer(searchAll),
                     cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft)
-                );
+                    );
 
             return (PopupWindow)window;
         }
@@ -1176,8 +1171,8 @@ public final class Controller implements Initializable {
                         tabPane.getSelectionModel().getSelectedItem().getText(),
                         Config.article.file,
                         Defines.ARTICLE_ENCODE
-                    )
-        );
+                        )
+                );
     }
 
     /**
@@ -1196,64 +1191,64 @@ public final class Controller implements Initializable {
     private void searchArticle(final String q, final String f) {
         final CheckBox  isTitleOnly = new JFXCheckBox("記事名で検索");
         new AlertDialog.Builder().setParent(getParent())
-            .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
-            //"記事名のみを対象に検索"
-            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly)
-            .setOnPositive("OK", () -> {
-                final String query = queryInput.getText().trim();
-                if (StringUtils.isEmpty(query)) {
-                    return;
-                }
-                ((AutoCompleteTextField) queryInput).getEntries().add(query);
+        .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
+        //"記事名のみを対象に検索"
+        .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly)
+        .setOnPositive("OK", () -> {
+            final String query = queryInput.getText().trim();
+            if (StringUtils.isEmpty(query)) {
+                return;
+            }
+            ((AutoCompleteTextField) queryInput).getEntries().add(query);
 
-                // 入っていない時もあるので.
-                final String filter = filterInput.getText();
-                if (StringUtils.isNotBlank(filter)) {
-                    ((AutoCompleteTextField) filterInput).getEntries().add(filter);
-                }
+            // 入っていない時もあるので.
+            final String filter = filterInput.getText();
+            if (StringUtils.isNotBlank(filter)) {
+                ((AutoCompleteTextField) filterInput).getEntries().add(filter);
+            }
 
-                final long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
 
-                final FileSearcher fileSearcher = new FileSearcher.Builder()
-                            .setHomeDirPath(Config.get("articleDir"))
-                            .setAnd(query.contains(" "))
-                            .setTitleOnly(isTitleOnly.isSelected())
-                            .setSelectName(filter)
-                            .build();
+            final FileSearcher fileSearcher = new FileSearcher.Builder()
+                    .setHomeDirPath(Config.get("articleDir"))
+                    .setAnd(query.contains(" "))
+                    .setTitleOnly(isTitleOnly.isSelected())
+                    .setSelectName(filter)
+                    .build();
 
-                final Map<String, SearchResult> map = fileSearcher.search(query);
-                if (map.isEmpty()){
-                    AlertDialog.showMessage(
-                            getParent(), "見つかりませんでした。", "見つかりませんでした。");
-                    searchArticle(queryInput.getText(), filterInput.getText());
-                    return;
-                }
+            final Map<String, SearchResult> map = fileSearcher.search(query);
+            if (map.isEmpty()){
+                AlertDialog.showMessage(
+                        getParent(), "見つかりませんでした。", "見つかりませんでした。");
+                searchArticle(queryInput.getText(), filterInput.getText());
+                return;
+            }
 
-                final Tab tab = Functions.makeClosableTab(query + "の検索結果", leftTabs);
-                // prepare tab's content.
-                final VBox box = new VBox();
-                leftTabs.getTabs().add(tab);
-                leftTabs.getSelectionModel().select(tab);
-                final ObservableList<Node> children = box.getChildren();
-                children.add(new Label(
-                        String.format("実行時間: %d[ms]", fileSearcher.getLastSearchTime())));
-                children.add(new Label(String.format("%dファイル / %dファイル中",
-                        map.size(), fileSearcher.getLastFilenum())));
-                // set up ListView.
-                final ListView<Article> listView = new ListView<Article>();
-                initArticleList(listView);
-                listView.getItems().addAll(
-                        map.entrySet().stream()
-                            .map(entry -> {return new Article(new File(entry.getValue().filePath));})
-                            .sorted()
-                            .collect(Collectors.toList())
-                            );
-                listView.setMinHeight(articleList.getHeight());
+            final Tab tab = Functions.makeClosableTab(query + "の検索結果", leftTabs);
+            // prepare tab's content.
+            final VBox box = new VBox();
+            leftTabs.getTabs().add(tab);
+            leftTabs.getSelectionModel().select(tab);
+            final ObservableList<Node> children = box.getChildren();
+            children.add(new Label(
+                    String.format("実行時間: %d[ms]", fileSearcher.getLastSearchTime())));
+            children.add(new Label(String.format("%dファイル / %dファイル中",
+                    map.size(), fileSearcher.getLastFilenum())));
+            // set up ListView.
+            final ListView<Article> listView = new ListView<Article>();
+            initArticleList(listView);
+            listView.getItems().addAll(
+                    map.entrySet().stream()
+                    .map(entry -> {return new Article(new File(entry.getValue().filePath));})
+                    .sorted()
+                    .collect(Collectors.toList())
+                    );
+            listView.setMinHeight(articleList.getHeight());
 
-                children.add(listView);
-                tab.setContent(box);
-                setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
-            }).build().show();
+            children.add(listView);
+            tab.setContent(box);
+            setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
+        }).build().show();
     }
 
     /**
@@ -1372,14 +1367,14 @@ public final class Controller implements Initializable {
     private void slideShow() {
         FileUtil.outPutStr(
                 Functions.bindArgs(
-                    Resources.PATH_SLIDE,
-                    Maps.fixedSize.of(
-                            "title",   Config.article.title,
-                            "content", func.convertArticle2Slide())
-                ),
+                        Resources.PATH_SLIDE,
+                        Maps.fixedSize.of(
+                                "title",   Config.article.title,
+                                "content", func.convertArticle2Slide())
+                        ),
                 Defines.TEMP_FILE_NAME,
                 Defines.ARTICLE_ENCODE
-            );
+                );
         callTabFullScreen();
     }
 
@@ -1415,7 +1410,7 @@ public final class Controller implements Initializable {
             }
             final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
                     ? dir
-                    : FileUtil.FILE_PROTOCOL + dir;
+                            : FileUtil.FILE_PROTOCOL + dir;
             RuntimeUtil.callExplorer(openPath);
         }
     }
@@ -1444,7 +1439,7 @@ public final class Controller implements Initializable {
     private void initArticleList(final ListView<Article> listView) {
         listView.setCellFactory((lv) -> {return new ArticleListCell();});
         final MultipleSelectionModel<Article> selectionModel
-            = listView.getSelectionModel();
+        = listView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         selectionModel.selectedItemProperty().addListener((property, oldVal, newVal) -> {
             if (property.getValue() == null) {
@@ -1548,7 +1543,7 @@ public final class Controller implements Initializable {
             // タブが入れ替わった可能性があるので、もう1回取得.
             final WebEngine engine = getCurrentWebView().get().getEngine();
             final int yOffset
-                = MathUtil.parseOrZero(engine.executeScript("window.pageYOffset;").toString());
+            = MathUtil.parseOrZero(engine.executeScript("window.pageYOffset;").toString());
             engine.load(Functions.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
             // deep copy を渡す.
             addHistory(Config.article.clone());
@@ -1576,23 +1571,23 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearBackup() {
         new AlertDialog.Builder().setParent(stage)
-                .setTitle("Clear History").setMessage("バックアップを削除します。")
-                .setOnPositive("OK", () -> {
+        .setTitle("Clear History").setMessage("バックアップを削除します。")
+        .setOnPositive("OK", () -> {
+            try {
+                Files.list(Paths.get("backup/")).parallel()
+                .forEach(p -> {
                     try {
-                        Files.list(Paths.get("backup/")).parallel()
-                            .forEach(p -> {
-                                try {
-                                    Files.deleteIfExists(p);
-                                } catch (final Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
+                        Files.deleteIfExists(p);
                     } catch (final Exception e) {
                         e.printStackTrace();
                     }
-                    FILE_WATCHER_JOB.clear();
-                })
-                .build().show();
+                });
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            FILE_WATCHER_JOB.clear();
+        })
+        .build().show();
     }
 
     /**
@@ -1601,12 +1596,12 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearHistory() {
         new AlertDialog.Builder().setParent(stage)
-                .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
-                .setOnPositive("OK", () -> {
-                    historyList.getItems().clear();
-                    FILE_WATCHER_JOB.clear();
-                    })
-                .build().show();
+        .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
+        .setOnPositive("OK", () -> {
+            historyList.getItems().clear();
+            FILE_WATCHER_JOB.clear();
+        })
+        .build().show();
     }
 
     /**
@@ -1620,10 +1615,10 @@ public final class Controller implements Initializable {
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
         input.setPromptText(newArticleMessage);
         new AlertDialog.Builder().setParent(getParent())
-                .setTitle("新記事作成")
-                .setMessage(newArticleMessage)
-                .addControl(input)
-                .build().show();
+        .setTitle("新記事作成")
+        .setMessage(newArticleMessage)
+        .addControl(input)
+        .build().show();
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
             Config.article = Article.find(Functions.toBytedString_EUC_JP(newFileName) + Article.Extension.WIKI.text());
@@ -1673,55 +1668,55 @@ public final class Controller implements Initializable {
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
         new AlertDialog.Builder().setParent(parent)
-            .setTitle("記事名変更").setMessage(renameMessage)
-            .addControl(input)
-            .setOnPositive("OK", () ->{
-                final String newTitle = input.getText();
-                if (StringUtils.isBlank(newTitle)) {
-                    return;
-                }
-                final File dest = new File(
-                        Config.get(Config.Key.ARTICLE_DIR),
-                        Functions.toBytedString_EUC_JP(newTitle) + Config.article.extention()
-                        );
-                if (dest.exists()){
-                    AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
-                }
-                final File file = Config.article.file;
-                boolean success = false;
-                try {
-                    success = isCopy
-                            ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
-                            : file.renameTo(dest);
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-                final String title;
-                final String message;
-                if (success){
-                    if (isCopy) {
-                        title   = "コピー";
-                        message = "新規ファイル「" + newTitle  + "」を作成しました。";
-                    } else {
-                        title   = "変更";
-                        message = "ファイル名を「" + newTitle  + "」に変更しました。";
-                    }
-                    AlertDialog.showMessage(parent, title, message);
-                    Config.article.replace(dest);
-                    loadUrl(Config.article.toInternalUrl());
-                    removeHistory(new Article(file));
-                    loadArticleList();
-                    return;
-                }
+        .setTitle("記事名変更").setMessage(renameMessage)
+        .addControl(input)
+        .setOnPositive("OK", () ->{
+            final String newTitle = input.getText();
+            if (StringUtils.isBlank(newTitle)) {
+                return;
+            }
+            final File dest = new File(
+                    Config.get(Config.Key.ARTICLE_DIR),
+                    Functions.toBytedString_EUC_JP(newTitle) + Config.article.extention()
+                    );
+            if (dest.exists()){
+                AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
+            }
+            final File file = Config.article.file;
+            boolean success = false;
+            try {
+                success = isCopy
+                        ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
+                                : file.renameTo(dest);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+            final String title;
+            final String message;
+            if (success){
                 if (isCopy) {
-                    title   = "コピー失敗";
-                    message = "ファイルのコピーに失敗しました。";
+                    title   = "コピー";
+                    message = "新規ファイル「" + newTitle  + "」を作成しました。";
                 } else {
-                    title   = "変更失敗";
-                    message = "ファイル名の変更に失敗しました。";
+                    title   = "変更";
+                    message = "ファイル名を「" + newTitle  + "」に変更しました。";
                 }
                 AlertDialog.showMessage(parent, title, message);
-            }).build().show();;
+                Config.article.replace(dest);
+                loadUrl(Config.article.toInternalUrl());
+                removeHistory(new Article(file));
+                loadArticleList();
+                return;
+            }
+            if (isCopy) {
+                title   = "コピー失敗";
+                message = "ファイルのコピーに失敗しました。";
+            } else {
+                title   = "変更失敗";
+                message = "ファイル名の変更に失敗しました。";
+            }
+            AlertDialog.showMessage(parent, title, message);
+        }).build().show();;
     }
 
     /**
@@ -1745,18 +1740,18 @@ public final class Controller implements Initializable {
             return;
         }
         new AlertDialog.Builder().setParent(parent).setTitle("ファイルの削除")
-                .setMessage(deleteTarget + " を削除しますか？")
-                .setOnPositive("OK", () -> {
-                    article.file.delete();
-                    AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                    // (130317)
-                    final String homePath = Config.get(Config.Key.HOME);
-                    // 削除後はホーム画面に戻す
-                    loadUrl(homePath);
-                    // (130309) そしてファイル一覧から削除
-                    articleList.getItems().remove(deleteTarget);
-                    removeHistory(article);
-                }).build().show();
+        .setMessage(deleteTarget + " を削除しますか？")
+        .setOnPositive("OK", () -> {
+            article.file.delete();
+            AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
+            // (130317)
+            final String homePath = Config.get(Config.Key.HOME);
+            // 削除後はホーム画面に戻す
+            loadUrl(homePath);
+            // (130309) そしてファイル一覧から削除
+            articleList.getItems().remove(deleteTarget);
+            removeHistory(article);
+        }).build().show();
     }
 
     /**
@@ -1827,7 +1822,7 @@ public final class Controller implements Initializable {
                 .getSelectedIndex()).getContent();
         return content instanceof WebView
                 ? Optional.of((WebView) content)
-                : Optional.empty();
+                        : Optional.empty();
     }
 
     /**
@@ -1845,24 +1840,24 @@ public final class Controller implements Initializable {
     public final void callPrinterJob() {
         final PrinterJob job = PrinterJob.createPrinterJob();
         new AlertDialog.Builder().setParent(getParent())
-                .setTitle("印刷").setMessage("印刷を実行しますか？")
-                .setOnPositive("OK", () -> {
-                    if (job == null) {
-                        return;
-                    }
-                    //PrinterAttributes attr = new PrinterAttributes(job);
-                    func.generateHtmlForPrint(this.tabPane.getSelectionModel().getSelectedItem().getText());
-                    final Optional<WebView> wv = getCurrentWebView();
-                    if (!wv.isPresent()) {
-                        return;
-                    }
-                    loadUrl(Defines.TEMP_FILE_NAME);
-                    //getCurrentWebView().getEngine().print(job);
-                    if (job.showPrintDialog(null)) {
-                        job.printPage(wv.get());
-                        job.endJob();
-                    }
-                });
+        .setTitle("印刷").setMessage("印刷を実行しますか？")
+        .setOnPositive("OK", () -> {
+            if (job == null) {
+                return;
+            }
+            //PrinterAttributes attr = new PrinterAttributes(job);
+            func.generateHtmlForPrint(this.tabPane.getSelectionModel().getSelectedItem().getText());
+            final Optional<WebView> wv = getCurrentWebView();
+            if (!wv.isPresent()) {
+                return;
+            }
+            loadUrl(Defines.TEMP_FILE_NAME);
+            //getCurrentWebView().getEngine().print(job);
+            if (job.showPrintDialog(null)) {
+                job.printPage(wv.get());
+                job.endJob();
+            }
+        });
     }
 
     /**
@@ -1880,7 +1875,7 @@ public final class Controller implements Initializable {
     @FXML
     public void callSetOnStyle() {
         final String styleName = style.getItems().get(style.getSelectionModel().getSelectedIndex())
-                                    .toString();
+                .toString();
         if (StringUtils.isEmpty(styleName)) {
             return;
         }
