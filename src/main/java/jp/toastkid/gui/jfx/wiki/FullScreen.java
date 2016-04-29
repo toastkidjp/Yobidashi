@@ -6,10 +6,12 @@ import com.jfoenix.controls.JFXButton;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
@@ -35,7 +37,8 @@ import jp.toastkid.libs.utils.MathUtil;
 public class FullScreen {
 
     /** stage. */
-    private final Stage stage = new Stage();
+    private final Stage stage
+        = new Stage();
 
     /** WebView. */
     private WebView webView;
@@ -73,10 +76,7 @@ public class FullScreen {
         final NumberTextField page = new NumberTextField();
         page.setOnAction(e -> {jump(page.getText());});
 
-        final HBox timer = initTimer();
-        final VBox vb = new VBox();
-        vb.getChildren().addAll(ap, new HBox(){{getChildren().addAll(page, timer);}});
-        final Scene scene = new Scene(vb);
+        final Scene scene = new Scene(new VBox(ap, new HBox(page, makeFooter())));
         scene.setOnKeyTyped(e -> {
             if (e.getCode().equals(KeyCode.J)) {
                 callJump();
@@ -91,7 +91,7 @@ public class FullScreen {
      * initialize timer components.
      * @return HBox.
      */
-    private HBox initTimer() {
+    private HBox makeFooter() {
         final Stopwatch stopwatch = new Stopwatch();
         stopwatch.setTextFill(Color.NAVY);
         stopwatch.setStyle("-fx-font-size: 2em;");
@@ -105,7 +105,15 @@ public class FullScreen {
         final Button reset = new JFXButton("Reset");
         reset.setOnAction(eve -> {stopwatch.reset();});
 
-        return new HBox(stopwatch, start, reset);
+        final ComboBox<String> styles = new ComboBox<>();
+        final ObservableList<String> items = styles.<String>getItems();
+       /* ArrayAdapter.adapt(
+                new File("public/javascripts/reveal/css/theme").list((dir, name) -> {return name.endsWith(".css");}))
+        .collect(f -> {return FileUtil.removeExtension(f.getName());});
+       */ items.addAll();
+        // 初期値セット
+        styles.getSelectionModel().select(0);
+        return new HBox(stopwatch, start, reset, styles);
     }
 
     /**
@@ -132,11 +140,11 @@ public class FullScreen {
     private void callJump() {
         final NumberTextField num = new NumberTextField();
         new AlertDialog.Builder().setParent(stage.getScene().getWindow())
-            .setTitle("ジャンプ")
-            .setMessage("何ページ目に移動しますか？")
-            .addControl(num)
-            .setOnPositive("Jump", () -> { jump(num.getText());})
-            .build().show();
+        .setTitle("ジャンプ")
+        .setMessage("何ページ目に移動しますか？")
+        .addControl(num)
+        .setOnPositive("Jump", () -> { jump(num.getText());})
+        .build().show();
     }
 
     /**
@@ -154,7 +162,7 @@ public class FullScreen {
      * @param url URL
      * @return # 以下を消したURL
      */
-    private String deleteFragment(String url) {
+    private String deleteFragment(final String url) {
         return url.contains("#/") ? url.substring(0, url.lastIndexOf("#/")) : url;
     }
 
@@ -188,7 +196,7 @@ public class FullScreen {
             }
             final Node bridge = popup.lookup(".context-menu");
             final ContextMenuContent cmc
-                = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
+            = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
 
             final VBox itemsContainer = cmc.getItemsContainer();
             for (final Node n: itemsContainer.getChildren()) {
@@ -209,7 +217,7 @@ public class FullScreen {
             cmc.getItemsContainer().getChildren().addAll(
                     cmc.new MenuItemContainer(jump),
                     cmc.new MenuItemContainer(length)
-                );
+                    );
 
             return (PopupWindow)window;
         }

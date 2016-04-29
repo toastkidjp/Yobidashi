@@ -33,7 +33,7 @@
                 <FXCollections fx:factory="observableArrayList">
                   <String fx:value="Groovy" />
                   <String fx:value="Clojure" />
-                  <String fx:value="Python" />
+                  <!--String fx:value="Python" /-->
                   <String fx:value="JavaScript" />
                 </FXCollections>
               </items>

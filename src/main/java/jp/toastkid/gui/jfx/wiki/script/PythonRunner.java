@@ -10,7 +10,6 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.python.jsr223.PyScriptEngineFactory;
 
 /**
  * Python's script runner.
@@ -23,7 +22,7 @@ public class PythonRunner extends ScriptRunner {
      * init ScriptEngine.
      */
     public PythonRunner() {
-        engine = new PyScriptEngineFactory().getScriptEngine();
+        //engine = new PyScriptEngineFactory().getScriptEngine();
     }
 
     @Override

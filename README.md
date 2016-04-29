@@ -32,7 +32,6 @@ This software contains following open source softwares. Thanks a lot. :bow:
 |:---|:---|:---|
 | jamon-2.81 | [3-Clause BSD License](http://jamonapi.sourceforge.net/JAMonLicense.html) 
 | Eclipse Collections | Eclipse Public License ver 1.0 | Fantastic Java Collection library.
-| Jython | Python Software Foundation License version 2 | Use at ScriptRunner.
 | Clojure | Eclipse Public License ver 1.0 | Use at ScriptRunner.
 | org.codehaus.groovy:groovy-all:1.8.6 | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.
 | net.arnx:jsonic:1.3.10 | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
