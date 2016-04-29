@@ -10,6 +10,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +37,6 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
-import org.python.google.common.io.Files;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -181,7 +183,7 @@ public final class Functions {
      * @param content HTML content.
      * @param title title.
      */
-    private void generateSlide(String content, String title) {
+    private void generateSlide(final String content, final String title) {
         FileUtil.outPutStr(
                 Functions.bindArgs(
                     Resources.PATH_SLIDE,
@@ -245,12 +247,12 @@ public final class Functions {
      * @return 変換後の HTML 文字列
      */
     public String md2Html(final String absolutePath) {
-        final File file = new File(absolutePath);
         try {
-            final List<String> source = Files.readLines(file, StandardCharsets.UTF_8);
+            final Path path = Paths.get(absolutePath);
+            final List<String> source = Files.readAllLines(path, StandardCharsets.UTF_8);
             source.add("");
             source.add("----");
-            source.add("最終更新： " + Strings.toYmdhmsse(file.lastModified()));
+            source.add("最終更新： " + Strings.toYmdhmsse(Files.getLastModifiedTime(path).toMillis()));
             return new MarkdownConverter().convert(source);
         } catch (final IOException e) {
             e.printStackTrace();
