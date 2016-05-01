@@ -29,7 +29,7 @@ import jp.toastkid.libs.utils.FileUtil;
  * @author Toast kid
  *
  */
-public final class CashFlowExtractor implements GraphDataExtractor {
+public final class CashFlowExtractor implements ChartDataExtractor {
 
     /**
      * 月間の消費額を計算する.

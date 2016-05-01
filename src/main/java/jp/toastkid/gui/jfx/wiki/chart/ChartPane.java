@@ -37,6 +37,8 @@ import jp.toastkid.libs.utils.CalendarUtil;
  */
 public class ChartPane extends AnchorPane {
 
+    private static final double DEFAULT_WIDTH = 1200.0;
+
     /** 「日記の文字数」.  (130406)*/
     public static final String DIARY     = "日記の文字数";
 
@@ -52,7 +54,7 @@ public class ChartPane extends AnchorPane {
      * @param prefix ex: "日記2012-11".
      * @return pane contains chart.
      */
-    public static Pane makeChart(final String category, final String prefix) {
+    public static Pane make(final String category, final String prefix) {
 
         final LineChart<String,Number> chart = drawChart(category, prefix);
         final Label dataLabel = new Label();
@@ -60,13 +62,12 @@ public class ChartPane extends AnchorPane {
         return new ChartPane(){{getChildren().add(new VBox(dataLabel, chart));}};
     }
 
-    private static LineChart<String, Number> drawChart(String category, String prefix) {
+    private static LineChart<String, Number> drawChart(final String category, final String prefix) {
         final String title = category + ": " + prefix.substring(2);
 
         // Prepare drawing chart.
         final NumberAxis yAxis = new NumberAxis();
         yAxis.setAutoRanging(true);
-        final LineChart<String, Number> chart = initChartArea(title, yAxis);
 
         final XYChart.Series<String, Number> series = new Series<>();
         series.setName(title);
@@ -86,6 +87,8 @@ public class ChartPane extends AnchorPane {
             = FXCollections.observableArrayList();
         seriesList.add(series);
 
+        final double width = Math.max(series.getData().size() * 50.0, DEFAULT_WIDTH);
+        final LineChart<String, Number> chart = initChartArea(title, yAxis, width);
         chart.setData(seriesList);
 
         yAxis.setForceZeroInRange(false);
@@ -120,12 +123,14 @@ public class ChartPane extends AnchorPane {
      * init chart.
      * @param title
      * @param yAxis
+     * @param width
      * @return
      */
-    private static LineChart<String, Number> initChartArea(final String title, final NumberAxis yAxis) {
+    private static LineChart<String, Number> initChartArea(
+            final String title, final NumberAxis yAxis, final double width) {
         final LineChart<String, Number> chart = new LineChart<>(new CategoryAxis(), yAxis);
         chart.setPrefHeight(600.0);
-        chart.setPrefWidth(1200.0);
+        chart.setPrefWidth(width);
         chart.setStyle("-fx-background-color: #FCFCFC;");
         chart.setTitle(title);
         return chart;
@@ -157,7 +162,7 @@ public class ChartPane extends AnchorPane {
      * @param category
      * @return Extractor.
      */
-    private static GraphDataExtractor findExtractor(final String category) {
+    private static ChartDataExtractor findExtractor(final String category) {
         switch (category) {
             case DIARY:
                 return new FilesLengthExtractor();

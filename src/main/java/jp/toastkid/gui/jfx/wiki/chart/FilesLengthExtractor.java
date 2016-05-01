@@ -19,7 +19,7 @@ import jp.toastkid.libs.utils.FileUtil;
  * @author Toast kid
  *
  */
-public final class FilesLengthExtractor implements GraphDataExtractor {
+public final class FilesLengthExtractor implements ChartDataExtractor {
 
     /** 「月合計」のキー */
     public static final String TOTAL_KEY = "合計";

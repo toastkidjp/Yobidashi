@@ -20,7 +20,7 @@ import jp.toastkid.libs.utils.FileUtil;
  * @author Toast kid
  *
  */
-public final class Nikkei225Extractor implements GraphDataExtractor {
+public final class Nikkei225Extractor implements ChartDataExtractor {
 
     private static String[] list;
 

@@ -884,8 +884,9 @@ public final class Controller implements Initializable {
     @FXML
     private final void drawGraph(final boolean openNew) {
         final String graphTitle = graphKind.getSelectionModel().getSelectedItem().toString();
-        final ScrollPane scrollPane = new ScrollPane(ChartPane.makeChart(graphTitle,
+        final ScrollPane scrollPane = new ScrollPane(ChartPane.make(graphTitle,
                 "日記" + month.getSelectionModel().getSelectedItem().toString()));
+
         if (openNew) {
             final Tab tab = makeClosableTab(graphTitle);
             tab.setContent(scrollPane);
