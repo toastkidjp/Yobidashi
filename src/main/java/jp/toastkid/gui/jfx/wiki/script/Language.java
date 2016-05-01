@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public enum Language {
-    JAVASCRIPT, GROOVY, PYTHON, CLOJURE;
+    JAVASCRIPT, GROOVY, PYTHON, CLOJURE, SHELL;
 
     /**
      * 文字列に合った拡張子を返す.
@@ -38,6 +38,8 @@ public enum Language {
                 return ".py";
             case CLOJURE:
                 return ".clj";
+            case SHELL:
+                return ".sh";
             case GROOVY:
             default:
                 return ".groovy";

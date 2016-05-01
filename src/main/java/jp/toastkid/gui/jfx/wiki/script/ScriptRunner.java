@@ -16,11 +16,20 @@ public abstract class ScriptRunner {
     /** System line separator. */
     protected static final String LINE_SEPARATOR = System.lineSeparator();
 
+    /** Groovy's runner. */
     private static final ScriptRunner GROOVY  = new GroovyRunner();
+
+    /** JavaScript's runner. */
     private static final ScriptRunner JS      = new JavaScriptRunner();
+
+    /** Python's runner. */
     private static final ScriptRunner PYTHON  = new PythonRunner();
 
+    /** Clojure's runner. */
     private static final ScriptRunner CLOJURE = new ClojureRunner();
+
+    /** Shell's runner. */
+    private static final ScriptRunner SHELL   = new ShellRunner();
 
     /** ScriptEngine. */
     protected ScriptEngine engine;
@@ -44,6 +53,8 @@ public abstract class ScriptRunner {
                 return CLOJURE;
             case PYTHON:
                 return PYTHON;
+            case SHELL:
+                return SHELL;
             case GROOVY:
             default:
                 return GROOVY;
