@@ -8,21 +8,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * check {@link ShellRunner}.
+ * {@link JavaScriptRunner}'s test.
  * @author Toast kid
  *
  */
-public class ShellRunnerTest {
+public class JavaScriptRunnerTest {
 
     /** test object. */
-    private ShellRunner runner;
+    private JavaScriptRunner runner;
 
     /**
-     * set up.
+     * initialize test object.
      */
     @Before
     public void setUp() {
-        runner = new ShellRunner();
+        runner = new JavaScriptRunner();
     }
 
     /**
@@ -42,13 +42,11 @@ public class ShellRunnerTest {
     }
 
     /**
-     * check printable.
+     * check {@link JavaScriptRunner#run(String)}.
      */
     @Test
-    public void test() {
-        System.out.println(new ShellRunner().run("ls").get());
-        System.out.println(new ShellRunner().run("echo \"tomato\" | sed 's/o/a/g'").get());
-        System.out.println(new ShellRunner().run("curl 'http://www.yahoo.co.jp'").get());
+    public void testRun() {
+        assertEquals("Hello world.", runner.run("print('Hello world.');").get().trim());
     }
 
     /**

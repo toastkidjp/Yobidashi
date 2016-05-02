@@ -21,7 +21,7 @@ public class ShellRunner extends ScriptRunner {
         final ProcessBuilder b = new ProcessBuilder("sh", "-c", script);
 
         if (StringUtils.isEmpty(script)) {
-            return Optional.of("");
+            return Optional.empty();
         }
         final StringBuilder result = new StringBuilder()
                 .append("$ ").append(script).append(LINE_SEPARATOR);

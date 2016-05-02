@@ -8,25 +8,25 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * check {@link ShellRunner}.
+ * {@link GroovyRunner}'s test.
  * @author Toast kid
  *
  */
-public class ShellRunnerTest {
+public class GroovyRunnerTest {
 
     /** test object. */
-    private ShellRunner runner;
+    private GroovyRunner runner;
 
     /**
-     * set up.
+     * initialize test object.
      */
     @Before
     public void setUp() {
-        runner = new ShellRunner();
+        runner = new GroovyRunner();
     }
 
     /**
-     * check {@link JavaScriptRunner#run(String)}.
+     * check {@link GroovyRunner#run(String)}.
      */
     @Test
     public void testRunNullable() {
@@ -34,7 +34,7 @@ public class ShellRunnerTest {
     }
 
     /**
-     * check {@link JavaScriptRunner#run(String)}.
+     * check {@link GroovyRunner#run(String)}.
      */
     @Test
     public void testRunWithEmpty() {
@@ -42,13 +42,11 @@ public class ShellRunnerTest {
     }
 
     /**
-     * check printable.
+     * check {@link GroovyRunner#run(String)}.
      */
     @Test
-    public void test() {
-        System.out.println(new ShellRunner().run("ls").get());
-        System.out.println(new ShellRunner().run("echo \"tomato\" | sed 's/o/a/g'").get());
-        System.out.println(new ShellRunner().run("curl 'http://www.yahoo.co.jp'").get());
+    public void testRun() {
+        assertEquals("Hello world.", runner.run("print 'Hello world.'").get().trim());
     }
 
     /**
@@ -58,4 +56,5 @@ public class ShellRunnerTest {
     public void testRunByMonkey() {
         runner.run("jaisdfe");
     }
+
 }

@@ -110,7 +110,7 @@ public final class HtmlUtilTest {
     @Test
     public final void testGetColorStringString() {
         assertEquals(
-                "<span style=\"color: white; background-color: \">くろ</span>",
+                "<span style=\"color: white; \">くろ</span>",
                 HtmlUtil.getColor("white", "くろ")
                 );
     }

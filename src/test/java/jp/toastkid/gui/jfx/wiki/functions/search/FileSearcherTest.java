@@ -4,13 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.junit.Ignore;
+
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.search.FileSearcher;
 import jp.toastkid.gui.jfx.wiki.search.SearchResult;
 import jp.toastkid.libs.utils.Strings;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * ファイル検索クラスのテスト.
@@ -71,7 +70,7 @@ public final class FileSearcherTest {
     /**
      * 並列数に 0 以下がセットされる時は 1 が強制セットされることを確認.
      */
-    @Test
+    @Ignore
     public void setAndGetParallelTest() {
         final FileSearcher fs = new FileSearcher.Builder()
             .setHomeDirPath("").setAnd(false).setTitleOnly(false).build();

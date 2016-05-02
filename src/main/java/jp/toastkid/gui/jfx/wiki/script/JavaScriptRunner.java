@@ -29,7 +29,7 @@ public class JavaScriptRunner extends ScriptRunner {
     public Optional<String> run(final String script) {
 
         if (StringUtils.isEmpty(script)) {
-            return Optional.of("");
+            return Optional.empty();
         }
         final StringBuilder result = new StringBuilder();
 

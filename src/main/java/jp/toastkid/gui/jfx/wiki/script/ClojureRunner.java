@@ -31,7 +31,7 @@ public class ClojureRunner extends ScriptRunner {
     public Optional<String> run(final String script) {
 
         if (StringUtils.isEmpty(script)) {
-            return Optional.of("");
+            return Optional.empty();
         }
         final StringBuilder result = new StringBuilder();
 
@@ -57,7 +57,7 @@ public class ClojureRunner extends ScriptRunner {
         engine.put(key, value);
     }
 
-    public void get(final String key) {
-        engine.get(key);
+    public Object get(final String key) {
+        return engine.get(key);
     }
 }

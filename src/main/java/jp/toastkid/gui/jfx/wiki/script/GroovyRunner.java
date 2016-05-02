@@ -28,7 +28,7 @@ public class GroovyRunner extends ScriptRunner {
     @Override
     public Optional<String> run(final String script) {
         if (StringUtils.isEmpty(script)) {
-            return Optional.of("");
+            return Optional.empty();
         }
         if (engine == null) {
             System.out.println("groovy null");

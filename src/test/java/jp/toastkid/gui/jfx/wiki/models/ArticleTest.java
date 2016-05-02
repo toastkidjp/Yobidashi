@@ -96,7 +96,7 @@ public class ArticleTest {
      */
     @Test
     public final void testLastModifiedText() {
-        assertEquals("2016/3/24(木) 07:27:47", a.lastModifiedText());
+        assertEquals("2016/4/24(日) 11:27:32", a.lastModifiedText());
     }
 
     /**
