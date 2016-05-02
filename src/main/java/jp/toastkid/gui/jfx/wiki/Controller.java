@@ -282,8 +282,7 @@ public final class Controller implements Initializable {
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
-        final ProgressDialog pd = new ProgressDialog.Builder()
-                .setText("起動中です……").build();
+        final ProgressDialog pd = new ProgressDialog.Builder().setText("起動中です……").build();
         pd.start(stage);
 
         urlText.setText(Defines.DEFAULT_HOME);
@@ -296,8 +295,8 @@ public final class Controller implements Initializable {
         final int availableProcessors = Runtime.getRuntime().availableProcessors();
         pd.addText("availableProcessors = " + availableProcessors);
 
-        final ExecutorService es
-        = Executors.newFixedThreadPool(availableProcessors + availableProcessors + availableProcessors);
+        final ExecutorService es = Executors.newFixedThreadPool(
+                availableProcessors + availableProcessors + availableProcessors);
 
         es.execute(() -> {
             final long start = System.currentTimeMillis();

@@ -1,6 +1,5 @@
 package jp.toastkid.gui.jfx.dialog;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import jp.toastkid.gui.jfx.wiki.ImageChooser;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -47,6 +47,9 @@ public final class ProgressDialog extends Application{
     private final Stage dialogStage;
 
     private final ProgressDialogController controller;
+
+    /** splash image file chooser. */
+    private final ImageChooser chooser;
 
     /**
      * Builder.
@@ -100,6 +103,7 @@ public final class ProgressDialog extends Application{
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
 
+        this.chooser = new ImageChooser("public/images/splash/", "user/res/images/splash/");
         // 画像をランダムで選択して設定.
         findStyle().ifPresent(style -> { controller.background.setStyle(style); });
 
@@ -120,14 +124,7 @@ public final class ProgressDialog extends Application{
      * @return optional string.
      */
     private Optional<String> findStyle() {
-        final File imageDir = new File("public/images/splash/");
-        if (!imageDir.exists() || !imageDir.canRead()) {
-            return Optional.empty();
-        }
-        final File[] files = imageDir.listFiles(f -> {return FileUtil.isImageFile(f.getName());});
-        final String image
-            = files[(int) Math.round((files.length - 1) * Math.random())].toURI().toString();
-        final String style = "-fx-background-image: url('" + image + "'); "
+        final String style = "-fx-background-image: url('" + chooser.choose() + "'); "
                 +"-fx-background-position: center center; "
                 +"-fx-background-repeat: stretch;";
         return Optional.of(style);
@@ -214,9 +211,7 @@ public final class ProgressDialog extends Application{
      * @return
      */
     private String getText() {
-        final String result = this.text.toString();
-        //this.text.setLength(0);
-        return result;
+        return this.text.toString();
     }
 
     public void activate(final Service<?> service)  {
