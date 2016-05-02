@@ -1,6 +1,11 @@
 package jp.toastkid.gui.jfx.wiki;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Iterator;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import com.jfoenix.controls.JFXButton;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
@@ -27,6 +32,8 @@ import javafx.stage.Window;
 import jp.toastkid.gui.jfx.common.control.NumberTextField;
 import jp.toastkid.gui.jfx.common.control.Stopwatch;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
+import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 
 /**
@@ -36,12 +43,19 @@ import jp.toastkid.libs.utils.MathUtil;
  */
 public class FullScreen {
 
+    /** path to theme's css dir. */
+    private static final String THEME_DIR = "public/javascripts/reveal/css/theme/";
+
+    /** css file name filter. */
+    private static final FilenameFilter CSS_FILTER = (dir, name) -> {return name.endsWith(".css");};
+
     /** stage. */
     private final Stage stage
         = new Stage();
 
     /** WebView. */
-    private WebView webView;
+    private final WebView webView;
+    private final ComboBox<String> styles;
 
     /** Width. */
     private final double width;
@@ -56,6 +70,8 @@ public class FullScreen {
     public FullScreen(final double width, final double height) {
         this.width = width;
         this.height = height;
+        webView = new WebView();
+        styles = new ComboBox<>();
     }
 
     /**
@@ -75,6 +91,10 @@ public class FullScreen {
 
         final NumberTextField page = new NumberTextField();
         page.setOnAction(e -> {jump(page.getText());});
+
+        // 初期値セット
+        final String theme = Config.get(Config.Key.SLIDE_THEME);
+        styles.getSelectionModel().select(StringUtils.isNotBlank(theme) ? theme : "white");
 
         final Scene scene = new Scene(new VBox(ap, new HBox(page, makeFooter())));
         scene.setOnKeyTyped(e -> {
@@ -105,15 +125,29 @@ public class FullScreen {
         final Button reset = new JFXButton("Reset");
         reset.setOnAction(eve -> {stopwatch.reset();});
 
-        final ComboBox<String> styles = new ComboBox<>();
-        final ObservableList<String> items = styles.<String>getItems();
-       /* ArrayAdapter.adapt(
-                new File("public/javascripts/reveal/css/theme").list((dir, name) -> {return name.endsWith(".css");}))
-        .collect(f -> {return FileUtil.removeExtension(f.getName());});
-       */ items.addAll();
-        // 初期値セット
-        styles.getSelectionModel().select(0);
-        return new HBox(stopwatch, start, reset, styles);
+        return new HBox(stopwatch, start, reset, makeThemeChooser());
+    }
+
+    /**
+     * make theme chooser.
+     * @return ComboBox
+     */
+    private ComboBox<String> makeThemeChooser() {
+        final ObservableList<String> items = styles.getItems();
+        items.addAll(ArrayAdapter.adapt(new File(THEME_DIR).list(CSS_FILTER))
+                .collect(name -> {return FileUtil.removeExtension(name);}));
+        styles.setOnAction(event -> {setTheme(styles.getSelectionModel().getSelectedItem());});
+        return styles;
+    }
+
+    /**
+     * set theme css.
+     * @param theme css name without extension.
+     */
+    private void setTheme(final String theme) {
+        webView.getEngine().executeScript(
+                String.format("document.getElementById('theme').href = '%s%s.css';", THEME_DIR, theme));
+        Config.store(Config.Key.SLIDE_THEME, theme);
     }
 
     /**
@@ -122,7 +156,6 @@ public class FullScreen {
      * @return WebView オブジェクト
      */
     private void initWebView() {
-        webView = new WebView();
         webView.setPrefHeight(height);
         webView.setPrefWidth(width);
         webView.setOnContextMenuRequested(event -> {showContextMenu();});
@@ -140,11 +173,11 @@ public class FullScreen {
     private void callJump() {
         final NumberTextField num = new NumberTextField();
         new AlertDialog.Builder().setParent(stage.getScene().getWindow())
-        .setTitle("ジャンプ")
-        .setMessage("何ページ目に移動しますか？")
-        .addControl(num)
-        .setOnPositive("Jump", () -> { jump(num.getText());})
-        .build().show();
+            .setTitle("ジャンプ")
+            .setMessage("何ページ目に移動しますか？")
+            .addControl(num)
+            .setOnPositive("Jump", () -> { jump(num.getText());})
+            .build().show();
     }
 
     /**

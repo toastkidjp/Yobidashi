@@ -2,7 +2,7 @@
  * A simple theme for reveal.js presentations, similar
  * to the default theme. The accent color is darkblue.
  *
- * This theme is Copyright (C) 2012 Owen Versteeg, https://github.com/StereotypicalApps. It is MIT licensed.
+ * This theme is Copyright (C) 2016 Toast kid, It is EPL v1.0 licensed.
  * reveal.js is Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
  */
 @import url(https://fonts.googleapis.com/css?family=News+Cycle:400,700);
@@ -12,7 +12,7 @@
  *********************************************/
 body {
   background: #fff;
-  background-color: #fff; }
+  background-color: #D1D1D1; }
 
 .reveal {
   font-family: "Lato", sans-serif;
@@ -50,10 +50,10 @@ body {
   word-wrap: break-word; }
 
 .reveal h1 {
-  font-size: 3.77em; }
+  font-size: 2.57em; }
 
 .reveal h2 {
-  font-size: 2.11em; }
+  font-size: 1.91em; }
 
 .reveal h3 {
   font-size: 1.55em; }

@@ -44,7 +44,6 @@ public final class Main extends Application {
     @Override
     public void start(final Stage stage) {
         final long start = System.currentTimeMillis();
-        //preLoad(stage);
         try {
             initialize(stage);
         } catch (final Throwable e) {

@@ -39,6 +39,7 @@ public final class Config {
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
         VIEW_TEMPLATE("viewTemplate"),
+        SLIDE_THEME("slideTheme"),
         HOME("home"),
         MUSIC_DIR("musicDir"),
         IMAGE_DIR("imageDir");
@@ -90,11 +91,20 @@ public final class Config {
 
     /**
      * get property value by key.
-     * @param key string
+     * @param key key
      * @return property value object
      */
     public static final String get(final Key key) {
         return get(key.text, "");
+    }
+
+    /**
+     * get property value by key.
+     * @param key key
+     * @return property value object
+     */
+    public static final String get(final Key key, final String substitute) {
+        return get(key.text, substitute);
     }
 
     /**
@@ -183,4 +193,5 @@ public final class Config {
     public static void store(final String key, final String value) {
         store(Maps.fixedSize.of(key, value));
     }
+
 }

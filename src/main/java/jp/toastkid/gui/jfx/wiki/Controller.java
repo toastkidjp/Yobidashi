@@ -1370,7 +1370,9 @@ public final class Controller implements Initializable {
                         Resources.PATH_SLIDE,
                         Maps.fixedSize.of(
                                 "title",   Config.article.title,
-                                "content", func.convertArticle2Slide())
+                                "content", func.convertArticle2Slide(),
+                                "theme",   Config.get(Config.Key.SLIDE_THEME, "white")
+                                )
                         ),
                 Defines.TEMP_FILE_NAME,
                 Defines.ARTICLE_ENCODE
