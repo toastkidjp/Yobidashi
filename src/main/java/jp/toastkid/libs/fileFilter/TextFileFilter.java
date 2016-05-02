@@ -8,11 +8,14 @@ import java.io.FilenameFilter;
  * @author Toast kid
  *
  */
-public final class TextFileFilter  implements FilenameFilter {
+public final class TextFileFilter implements FilenameFilter {
+
     /** フィルタ対象文字列 */
     private static final String FILTER_KEYWORD = ".txt";
+
     /** このフラグが立っている時はフォルダも可とする。 */
     private boolean isArrawDir = false;
+
     /**
      * フォルダを許可するか否かを指定して初期化
      * @param pIsArrawDir true ならフォルダも許可する。
@@ -20,6 +23,7 @@ public final class TextFileFilter  implements FilenameFilter {
     public TextFileFilter(final boolean pIsArrawDir){
         this.isArrawDir = pIsArrawDir;
     }
+
     /**
      * FilenameFilterインタフェースで宣言されているacceptメソッドを記述
      *
@@ -32,11 +36,15 @@ public final class TextFileFilter  implements FilenameFilter {
      */
     @Override
     public boolean accept(final File dir, final String name){
+
+        if (name == null) {
+            return false;
+        }
+
         if(isArrawDir && new File(dir + "/" + name).isDirectory()){
             return true;
-        } else{
-            return (name.endsWith(FILTER_KEYWORD));
         }
+        return (name.endsWith(FILTER_KEYWORD));
     }
 
 }
