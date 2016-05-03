@@ -762,11 +762,14 @@ public final class Functions {
         final StringBuilder sb = new StringBuilder();
         converter.convertToLines(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE)
             .forEach(str -> {
-                if (str.matches("^<h[1-6]>.*") && sb.length() != 0) {
+                if ((str.contains("<hr/>") || str.matches("^<h[1-6r]>.*")) && sb.length() != 0) {
                     converted.add(String.format("<section>%s</section>", sb.toString()));
                     sb.setLength(0);
                 }
-                sb.append(str).append(LINE_SEPARATOR);
+                final String trimmed = str.startsWith("<") ? str.replace("<hr/>", "") : str;
+                if (trimmed.length() != 0) {
+                    sb.append(trimmed).append(LINE_SEPARATOR);
+                }
             });
         if (sb.length() != 0) {
             converted.add(String.format("<section>%s</section>", sb.toString()));
