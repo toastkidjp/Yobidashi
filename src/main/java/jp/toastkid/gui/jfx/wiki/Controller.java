@@ -1916,14 +1916,11 @@ public final class Controller implements Initializable {
     @FXML
     public final void closeApplication() {
         try {
-            final File tempFile = new File(Defines.TEMP_FILE_NAME);
-            if (tempFile.exists()){
-                tempFile.delete();
-            }
             if (BACKUP != null) {
                 BACKUP.shutdownNow();
             }
         } finally {
+            this.stage.close();
             System.exit(0);
         }
     }

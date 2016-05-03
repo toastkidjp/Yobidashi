@@ -44,13 +44,18 @@ public final class Main extends Application {
     @Override
     public void start(final Stage stage) {
         final long start = System.currentTimeMillis();
+
+        // It must delete lock file when this process was shutdown.
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (LOCK_FILE.exists()) {
+                LOCK_FILE.delete();
+                System.out.println("Lock file was deleted.");
+            }
+        }));
         try {
             initialize(stage);
         } catch (final Throwable e) {
             e.printStackTrace();
-            if (LOCK_FILE.exists()) {
-                LOCK_FILE.delete();
-            }
         }
         controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
     }
@@ -129,12 +134,6 @@ public final class Main extends Application {
      *
      */
     public static void main(final String[] args) {
-        try {
-            Application.launch(Main.class);
-        } finally {
-            if (LOCK_FILE.exists()) {
-                LOCK_FILE.delete();
-            }
-        }
+        Application.launch(Main.class);
     }
 }
