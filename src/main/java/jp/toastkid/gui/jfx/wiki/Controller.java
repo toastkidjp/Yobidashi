@@ -874,25 +874,26 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void drawGraph() {
-        drawGraph(true);
+        drawChart(true);
     }
 
     /**
      * グラフを描画する.
      */
     @FXML
-    private final void drawGraph(final boolean openNew) {
+    private final void drawChart(final boolean openNew) {
         final String graphTitle = graphKind.getSelectionModel().getSelectedItem().toString();
-        final ScrollPane scrollPane = new ScrollPane(ChartPane.make(graphTitle,
-                "日記" + month.getSelectionModel().getSelectedItem().toString()));
+        final SplitPane content = ChartPane.make(graphTitle,
+                "日記" + month.getSelectionModel().getSelectedItem().toString());
 
         if (openNew) {
             final Tab tab = makeClosableTab(graphTitle);
-            tab.setContent(scrollPane);
+            tab.setContent(content);
             openTab(tab);
             return;
         }
-        getCurrentTab().setContent(scrollPane);
+
+        getCurrentTab().setContent(content);
     }
 
     /**

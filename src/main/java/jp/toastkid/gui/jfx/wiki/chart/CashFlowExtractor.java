@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.factory.Lists;
 
 import jp.toastkid.gui.jfx.wiki.Functions;
 import jp.toastkid.gui.jfx.wiki.models.Article;
@@ -30,6 +31,13 @@ import jp.toastkid.libs.utils.FileUtil;
  *
  */
 public final class CashFlowExtractor implements ChartDataExtractor {
+
+    private final List<KeyValue> values;
+
+    public CashFlowExtractor() {
+        values = Lists.mutable.empty();
+    }
+
 
     /**
      * 月間の消費額を計算する.
@@ -87,6 +95,8 @@ public final class CashFlowExtractor implements ChartDataExtractor {
                                 price = Integer.parseInt(priceStr);
                             }
                             map.put(date +  line[1].trim(), price);
+                            values.add(new KeyValue.Builder().setKey(date)
+                                    .setMiddle(line[1].trim()).setValue(price).build());
                         }
                         gross.addAndGet(price);
                     }
@@ -99,5 +109,14 @@ public final class CashFlowExtractor implements ChartDataExtractor {
             }
         });
         return daily;
+    }
+
+    /**
+     * return KeyValues.
+     * @return
+     */
+    @Override
+    public List<KeyValue> getTableValues() {
+        return values;
     }
 }

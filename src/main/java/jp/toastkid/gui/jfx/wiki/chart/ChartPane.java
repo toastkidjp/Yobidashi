@@ -2,6 +2,7 @@ package jp.toastkid.gui.jfx.wiki.chart;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
@@ -20,7 +22,12 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -54,16 +61,63 @@ public class ChartPane extends AnchorPane {
      * @param prefix ex: "日記2012-11".
      * @return pane contains chart.
      */
-    public static Pane make(final String category, final String prefix) {
+    public static SplitPane make(final String category, final String prefix) {
 
-        final LineChart<String,Number> chart = drawChart(category, prefix);
+        final ChartDataExtractor extractor = findExtractor(category);
+        final Map<String, Number> dataMap
+            = extractor.extract(Config.get(Key.ARTICLE_DIR), prefix);
+        final String title = category + ": " + prefix.substring(2);
+
+        final LineChart<String,Number> chart = makeChart(title, dataMap, findThreshold(category));
         final Label dataLabel = new Label();
         initBackground(chart, dataLabel);
-        return new ChartPane(){{getChildren().add(new VBox(dataLabel, chart));}};
+
+        final Pane mainContent = new VBox(dataLabel, new ScrollPane(chart));
+        final List<KeyValue> tableValues = extractor.getTableValues();
+        if (!tableValues.isEmpty()) {
+            final SplitPane content = new SplitPane();
+            content.setOrientation(Orientation.VERTICAL);
+            content.getItems().addAll(mainContent, makeTable(tableValues));
+            content.setDividerPosition(0, 0.8);
+            return content;
+        }
+        return new SplitPane(){{getItems().addAll(mainContent);}};
     }
 
-    private static LineChart<String, Number> drawChart(final String category, final String prefix) {
-        final String title = category + ": " + prefix.substring(2);
+    /**
+     * outgo chart has detail table.
+     * @param tableValues
+     * @return TableView.
+     */
+    private static TableView<KeyValue> makeTable(final Collection<KeyValue> tableValues) {
+        final TableView<KeyValue> table = new TableView<>();
+        final TableColumn<KeyValue, String> keys = new TableColumn<>("Date");
+        keys.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("key"));
+        keys.setPrefWidth(300.0);
+        final TableColumn<KeyValue, String> items = new TableColumn<>("Item");
+        items.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("middle"));
+        items.setPrefWidth(500.0);
+        final TableColumn<KeyValue, String> costs = new TableColumn<>("Cost");
+        costs.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("value"));
+        table.getColumns().addAll(keys, items, costs);
+        costs.setPrefWidth(100.0);
+
+        table.getItems().addAll(tableValues);
+        return table;
+    }
+
+    /**
+     *
+     * @param title chart value.
+     * @param dataMap map contains data.
+     * @param threshold If value is less than threshold, value's color red.
+     * @return
+     */
+    private static LineChart<String, Number> makeChart(
+            final String title,
+            final Map<String, Number> dataMap,
+            final Number threshold
+            ) {
 
         // Prepare drawing chart.
         final NumberAxis yAxis = new NumberAxis();
@@ -72,14 +126,12 @@ public class ChartPane extends AnchorPane {
         final XYChart.Series<String, Number> series = new Series<>();
         series.setName(title);
 
-        final Map<String, Number> dataMap
-            = findExtractor(category).extract(Config.get(Key.ARTICLE_DIR), prefix);
         dataMap.entrySet().stream()
             .filter( entry -> {return !entry.getKey().equals(FilesLengthExtractor.TOTAL_KEY);})
             .forEach(entry -> {
                 final Data<String, Number> d = new Data<String, Number>(entry.getKey(), entry.getValue());
                 final String text = entry.getKey() + ": " + entry.getValue().intValue();
-                d.setNode(new HoveredThresholdNode(findThreshold(category), entry.getValue().intValue(), text));
+                d.setNode(new HoveredThresholdNode(threshold, entry.getValue().intValue(), text));
                 series.getData().add(d);
             });
 
