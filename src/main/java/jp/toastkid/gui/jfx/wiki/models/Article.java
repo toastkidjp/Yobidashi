@@ -89,8 +89,8 @@ public class Article implements Comparable<Article> {
      * @return 記事ファイルへのパス
      */
     public String toInternalUrl() {
-        return Defines.ARTICLE_URL_PREFIX + Functions.toBytedString_EUC_JP(this.title)
-        + this.extention();
+        return String.format("/%s/%s%s", this.extention().substring(1),
+                Functions.toBytedString_EUC_JP(this.title), this.extention());
     }
 
     /**
@@ -158,18 +158,6 @@ public class Article implements Comparable<Article> {
             return false;
         }
         return EXTENSIONS.contains(ext.get());
-    }
-
-    /**
-     * 記事ファイルへのパスを取得する.
-     * <HR>
-     * (130512) メソッドに抽出<BR>
-     * @param selectedDocTitle 平文の記事名
-     * @return 記事ファイルへのパス
-     */
-    public static final String convertArticleUrl(final String selectedDocTitle) {
-        return Defines.ARTICLE_URL_PREFIX
-                                        + Functions.toBytedString_EUC_JP(selectedDocTitle) + ".txt";
     }
 
     /**

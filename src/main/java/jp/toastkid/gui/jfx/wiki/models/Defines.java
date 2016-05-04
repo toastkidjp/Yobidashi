@@ -36,8 +36,6 @@ public final class Defines {
     public static final String TEMP_FILE_NAME     = "temp.html";
     /** Windows デフォルトのエディタ. */
     public static final String NOTEPAD_EXE        = "notepad.exe";
-    /** 記事の擬似URLのプレフィクス. */
-    public static final String ARTICLE_URL_PREFIX = "/wiki/";
     /** デフォルトの URL. */
     public static final String DEFAULT_HOME       = "http://www.yahoo.co.jp";
     /** 個人的な使用か否か. */

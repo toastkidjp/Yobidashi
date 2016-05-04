@@ -58,7 +58,9 @@ public class ArticleListCell extends ListCell<Article> {
             setText(null);
             setGraphic(null);
         } else {
-            setText(article.title + "\n最終更新：" + article.lastModifiedText());
+            setText(new StringBuilder().append(article.extention().substring(1) ).append(" | ")
+                        .append(article.title).append("\n最終更新：")
+                        .append(article.lastModifiedText()).toString());
         }
     }
 

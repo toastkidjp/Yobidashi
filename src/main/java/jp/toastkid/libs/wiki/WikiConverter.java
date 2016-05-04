@@ -1304,7 +1304,7 @@ public final class WikiConverter {
         if (!isExist) {
             generatedLink.append("class=\"redLink\" ");
         }
-        generatedLink.append("href=\"/wiki/");
+        generatedLink.append("href=\"/txt/");
         generatedLink.append(bytedStr);
         generatedLink.append(".txt");
         if (StringUtils.isNotEmpty(innerLink)) {

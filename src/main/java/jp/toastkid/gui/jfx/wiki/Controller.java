@@ -83,6 +83,7 @@ import jp.toastkid.gui.jfx.wiki.control.ArticleListCell;
 import jp.toastkid.gui.jfx.wiki.dialog.ConfigDialog;
 import jp.toastkid.gui.jfx.wiki.jobs.FileWatcherJob;
 import jp.toastkid.gui.jfx.wiki.models.Article;
+import jp.toastkid.gui.jfx.wiki.models.Article.Extension;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.gui.jfx.wiki.models.Resources;
@@ -358,10 +359,7 @@ public final class Controller implements Initializable {
                         if (StringUtils.isEmpty(text)) {
                             return;
                         }
-                        urlText.setText(
-                                Defines.ARTICLE_URL_PREFIX
-                                + Functions.toBytedString_EUC_JP(text) + Article.Extension.WIKI.text()
-                                );
+
                         // (130317) 「現在選択中のファイル名」にセット
                         final File selected = new File(
                                 Config.get(Config.Key.ARTICLE_DIR),
@@ -369,6 +367,7 @@ public final class Controller implements Initializable {
                                 );
                         if (selected.exists()){
                             Config.article = new Article(selected);
+                            urlText.setText(Config.article.toInternalUrl());
                             focusOn();
                         }
                     }
@@ -606,11 +605,11 @@ public final class Controller implements Initializable {
             final Optional<Article> opt = articleList.getItems().stream()
                     .filter(item -> item.title.startsWith(prefix))
                     .findFirst();
-            if (opt.isPresent()) {
-                loadUrl(Article.convertArticleUrl(opt.get().title));
+            if (!opt.isPresent()) {
+                new JFXSnackbar(mainArea).show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
-            new JFXSnackbar(mainArea).show(prefix + "'s diary is not exist.", 4000L);
+            opt.ifPresent(article -> {loadUrl(article.toInternalUrl());});
         } catch (final Exception e) {
             System.err.println("no such element" + e.getMessage());
         }
@@ -788,7 +787,7 @@ public final class Controller implements Initializable {
     private final void setHome() {
         final String currentURL = urlText.getText();
         final Window parent = getParent();
-        if (currentURL.startsWith(Defines.ARTICLE_URL_PREFIX)
+        if (currentURL.startsWith("/")
                 || currentURL.startsWith("http://")
                 || currentURL.startsWith("https://")
                 ){
@@ -823,7 +822,7 @@ public final class Controller implements Initializable {
                 engine.reload();
                 return;
             }
-            loadUrl(Defines.ARTICLE_URL_PREFIX.concat(Config.article.file.getName()), true);
+            loadUrl(Config.article.toInternalUrl(), true);
             return;
         }
         // webView でなければそれぞれ reload.
@@ -1272,7 +1271,6 @@ public final class Controller implements Initializable {
         final Tab tab = makeClosableTab("(MD)" + Config.article.title);
         final TextArea pane = new JFXTextArea();
         final double prefWidth = tabPane.getWidth();
-        System.out.println(prefWidth);
         pane.setPrefWidth(prefWidth);
         pane.setPrefHeight(tabPane.getPrefHeight());
         try {
@@ -1413,7 +1411,7 @@ public final class Controller implements Initializable {
             }
             final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
                     ? dir
-                            : FileUtil.FILE_PROTOCOL + dir;
+                    : FileUtil.FILE_PROTOCOL + dir;
             RuntimeUtil.callExplorer(openPath);
         }
     }
@@ -1470,16 +1468,19 @@ public final class Controller implements Initializable {
      * @param items ObservableList
      */
     private void focusOn() {
-        int indexOf = articleList.getItems().indexOf(Config.article);
-        if (indexOf != -1){
-            articleList.getSelectionModel().select(indexOf);
-            articleList.scrollTo(indexOf - FOCUS_MARGIN);
-        }
-        indexOf = historyList.getItems().indexOf(Config.article);
-        if (indexOf != -1){
-            historyList.getSelectionModel().select(indexOf);
-            historyList.scrollTo(indexOf - FOCUS_MARGIN);
-        }
+
+        Platform.runLater(() -> {
+            final int indexOf = articleList.getItems().indexOf(Config.article);
+            if (indexOf != -1){
+                articleList.getSelectionModel().select(indexOf);
+                articleList.scrollTo(indexOf - FOCUS_MARGIN);
+            }
+            final int indexOfHistory = historyList.getItems().indexOf(Config.article);
+            if (indexOfHistory != -1){
+                historyList.getSelectionModel().select(indexOfHistory);
+                historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
+            }
+        });
     }
 
     /**
@@ -1516,11 +1517,11 @@ public final class Controller implements Initializable {
 
         // (121229) ファイルパスを取得するための処理
         String fileName  = Functions.findFileNameFromUrl(url);
-        String innerLink = "";
         final int lastIndexOf = fileName.lastIndexOf("#");
+        final String innerLink = lastIndexOf != -1
+                ? HtmlUtil.tagEscape(fileName.substring(lastIndexOf)) : "";
         // (140112) 内部リンク追加
         if (lastIndexOf != -1) {
-            innerLink = HtmlUtil.tagEscape(fileName.substring(lastIndexOf));
             fileName  = fileName.substring(0, lastIndexOf);
         }
         final File file = new File(Config.get(Config.Key.ARTICLE_DIR), fileName);
@@ -1545,13 +1546,16 @@ public final class Controller implements Initializable {
             urlText.setText(Config.article.toInternalUrl());
             // タブが入れ替わった可能性があるので、もう1回取得.
             final WebEngine engine = getCurrentWebView().get().getEngine();
-            final int yOffset
-            = MathUtil.parseOrZero(engine.executeScript("window.pageYOffset;").toString());
-            engine.load(Functions.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+            Platform.runLater(() -> {
+                final Object script = engine.executeScript("window.pageYOffset;");
+                final int yOffset
+                    = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
+                engine.load(Functions.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+                Config.article.yOffset = isReload ? yOffset : 0;
+            });
             // deep copy を渡す.
             addHistory(Config.article.clone());
-            focusOn();
-            Config.article.yOffset = isReload ? yOffset : 0;
+            //focusOn();
         }
     }
 
@@ -1614,17 +1618,34 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void makeArticle() {
+        makeContent(Article.Extension.WIKI);
+    }
+
+    /**
+     * make new Markdown.
+     * .
+     */
+    @FXML
+    private final void makeMarkdown() {
+        makeContent(Article.Extension.MD);
+    }
+
+    /**
+     * make content file.
+     * @param ext.
+     */
+    private final void makeContent(final Extension ext) {
         final TextField input = new TextField();
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
         input.setPromptText(newArticleMessage);
         new AlertDialog.Builder().setParent(getParent())
-        .setTitle("新記事作成")
-        .setMessage(newArticleMessage)
-        .addControl(input)
-        .build().show();
+                .setTitle("新記事作成")
+                .setMessage(newArticleMessage)
+                .addControl(input)
+                .build().show();
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
-            Config.article = Article.find(Functions.toBytedString_EUC_JP(newFileName) + Article.Extension.WIKI.text());
+            Config.article = Article.find(Functions.toBytedString_EUC_JP(newFileName) + ext.text());
             callEditor();
         }
     }

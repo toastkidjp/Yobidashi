@@ -52,6 +52,7 @@
                 <Menu text="新規作成" accelerator="Ctrl+N">
                   <items>
                     <MenuItem onAction="#makeArticle" text="記事" />
+                    <MenuItem onAction="#makeMarkdown" text="Markdown" />
                   </items>
                 </Menu>
                 <MenuItem accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="コピー" />

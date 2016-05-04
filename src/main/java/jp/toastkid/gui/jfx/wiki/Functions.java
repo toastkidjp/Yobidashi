@@ -38,6 +38,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
+import am.ik.marked4j.Marked;
+import am.ik.marked4j.MarkedBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -56,6 +58,7 @@ import jp.toastkid.libs.fileFilter.ImageFileFilter;
 import jp.toastkid.libs.markdown.MarkdownConverter;
 import jp.toastkid.libs.tinysegmenter.TinySegmenter;
 import jp.toastkid.libs.utils.CalendarUtil;
+import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.libs.wiki.WikiConverter;
@@ -69,6 +72,9 @@ public final class Functions {
     /** テンプレート内パラメータの検出用パターン. */
     private static final Pattern PARAM_TEMPLATE_PATTERN
         = Pattern.compile("\\$\\{(.+?)\\}", Pattern.DOTALL);
+
+    /** Markdown Converter. */
+    private static final Marked MARKED = new MarkedBuilder().gfm(true).build();
 
     /** line separator. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
@@ -93,7 +99,6 @@ public final class Functions {
         ts.isAllowChar     = false;
         ts.isAllowHiragana = false;
         ts.isAllowNum      = false;
-        prefix             = Defines.ARTICLE_URL_PREFIX;
     }
 
     /**
@@ -251,9 +256,9 @@ public final class Functions {
             final Path path = Paths.get(absolutePath);
             final List<String> source = Files.readAllLines(path, StandardCharsets.UTF_8);
             source.add("");
-            source.add("----");
+            source.add("---");
             source.add("最終更新： " + Strings.toYmdhmsse(Files.getLastModifiedTime(path).toMillis()));
-            return new MarkdownConverter().convert(source);
+            return MARKED.marked(CollectionUtil.implode(source));
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -316,11 +321,9 @@ public final class Functions {
                 e.printStackTrace();
             }
         }
-        if (Article.Extension.SLIDE.text().equals(ext.get())) {
+        if (Article.Extension.MD.text().equals(ext.get())) {
             try {
-                return new StringBuilder()
-                        .append("h1.").append(Config.article.title)
-                        .toString().getBytes(Defines.ARTICLE_ENCODE);
+                return newMarkdown(Config.article.title).getBytes(Defines.ARTICLE_ENCODE);
             } catch (final UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -364,6 +367,51 @@ public final class Functions {
             }
             // 家計簿欄を追加
             newContent.append("** 家計簿").append(LINE_SEPARATOR);
+            newContent.append("| | 円").append(LINE_SEPARATOR);
+            newContent.append("| | 円").append(LINE_SEPARATOR);
+            newContent.append(LINE_SEPARATOR);
+        }
+        return newContent.toString();
+    }
+
+    /**
+     * Markdownのひな型を生成して返す.
+     * <HR>
+     * (130324) ひな型を一部修正<BR>
+     * (130112) 無駄に長い処理だったのでメソッドに分離<BR>
+     * @param convertedName 自然言語に戻したファイル名
+     * @return 記事のひな型
+     */
+    private static final String newMarkdown(final String convertedName){
+        final StringBuilder newContent = new StringBuilder(2000);
+        newContent.append("# ");
+        // (130112) 修正
+        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
+            newContent.append(convertedName.substring(2,convertedName.length()));
+        } else {
+            newContent.append(convertedName);
+        }
+
+        newContent.append(LINE_SEPARATOR);
+        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
+            newContent.append("未記入").append(LINE_SEPARATOR);
+            newContent.append(LINE_SEPARATOR);
+            newContent.append("## 消灯").append(LINE_SEPARATOR);
+            newContent.append("時分に消灯し、寝る。").append(LINE_SEPARATOR);
+            newContent.append(LINE_SEPARATOR);
+            // 土日祝分でなければ日経平均記入欄を追加
+            if (!convertedName.endsWith("(土)")
+                && !convertedName.endsWith("(日)")
+                && !convertedName.endsWith("祝)")
+                ){
+                newContent.append("## 今日の日経平均株価終値").append(LINE_SEPARATOR);
+                newContent.append("円(円高安)").append(LINE_SEPARATOR);
+                newContent.append(LINE_SEPARATOR);
+            }
+            // 家計簿欄を追加
+            newContent.append("## 家計簿").append(LINE_SEPARATOR);
+            newContent.append("| 品目 | 金額 |").append(LINE_SEPARATOR);
+            newContent.append("|:---|:---|").append(LINE_SEPARATOR);
             newContent.append("| | 円").append(LINE_SEPARATOR);
             newContent.append("| | 円").append(LINE_SEPARATOR);
             newContent.append(LINE_SEPARATOR);
@@ -551,8 +599,7 @@ public final class Functions {
      * @return Wiki 記事なら true
      */
     public static final boolean isWikiArticleUrl(final String url) {
-        return url.contains(Defines.ARTICLE_URL_PREFIX)
-                && (url.contains(".txt") || url.contains(".md"));
+        return (url.contains("/txt/") || url.contains("/md/"));
     }
 
     /**
