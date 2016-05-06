@@ -43,5 +43,5 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | jquery.lazyload.js | [MIT License](https://github.com/tuupola/jquery_lazyload/blob/master/LICENSE.md)
 | [bootstrap](http://getbootstrap.com/) | Apache License 2.0 | bootstrap
 | [Material](https://github.com/daemonite/material) | MIT | CSS Framework of Material design.
-| [Marked4J|https://github.com/making/marked4j] |  [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Markdown parser for Java |
+| [Marked4J](https://github.com/making/marked4j) |  [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Markdown parser for Java |
 | Mockito | MIT | Mock lib for testing.
