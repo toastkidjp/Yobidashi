@@ -30,15 +30,14 @@ public final class Resources {
     public static final String PATH_IMG_SEARCH        = "public/images/search.png";
 
     /** Readme ファイルのファイル名 (130512) */
-    public static final String READ_ME_NAME           = "ReadMe.txt";
+    public static final String READ_ME_NAME           = "README.md";
+
     /** RSS取得対象のURLリスト. */
     public static final String PATH_RSS_TARGETS       = "user/res/rss";
 
     /** path/to/dir/view/template. */
     private static final String VIEW_DIR = "src/main/views/";
 
-    /** アプリケーション状態を表示する HTMLファイルのパス */
-    public static final String PATH_APPLICATION_STATE = VIEW_DIR + "applicationState.html";
     /** Gallery 全体のView. */
     public static final String PATH_GALLERY           = VIEW_DIR + "gallery.html";
     /** Gallery 1section分のTemplate. */

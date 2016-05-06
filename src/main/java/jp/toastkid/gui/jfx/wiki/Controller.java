@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -722,23 +721,19 @@ public final class Controller implements Initializable {
     @FXML
     private final void callApplicationState() {
         final Map<String, String> map = ApplicationState.getConfigMap();
-        final StringBuilder bld = new StringBuilder();
+        final StringBuilder bld = new StringBuilder();/*
         final List<String> content = FileUtil.readLinesFromStream(
                 Resources.PATH_APPLICATION_STATE,
                 Defines.ARTICLE_ENCODE
-                );
-        content.forEach(str -> {
-            final Matcher matcher = paramPat.matcher(str);
-            if (matcher.find()){
-                final String key = matcher.group(1);
-                bld.append(str.replace("${map.get(\"" + key + "\")}", map.get(key)));
-            } else {
-                bld.append(str);
-            }
+                );*/
+        final String lineSeparator = System.lineSeparator();
+        map.forEach((key, value) -> {
+            bld.append(key).append("\t").append(value).append(lineSeparator);
         });
-        openWebTab("状態");
-        func.generateHtml(bld.toString(), "状態");
-        loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+        AlertDialog.showMessage(getParent(), "状態", bld.toString());
+//        openWebTab("状態");
+//        func.generateHtml(bld.toString(), "状態");
+//        loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
