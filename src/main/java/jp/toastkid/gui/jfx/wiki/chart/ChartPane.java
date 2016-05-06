@@ -28,7 +28,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -42,7 +41,7 @@ import jp.toastkid.libs.utils.CalendarUtil;
  * @author Toast kid
  *
  */
-public class ChartPane extends AnchorPane {
+public class ChartPane extends VBox {
 
     private static final double DEFAULT_WIDTH = 1200.0;
 
@@ -56,12 +55,20 @@ public class ChartPane extends AnchorPane {
     public static final String NIKKEI225 = "日経平均株価";
 
     /**
+     * call super constructor.
+     * @param content.
+     */
+    public ChartPane(final Node... content) {
+        super(content);
+    }
+
+    /**
      * make chart view.
      * @param category
      * @param prefix ex: "日記2012-11".
      * @return pane contains chart.
      */
-    public static SplitPane make(final String category, final String prefix) {
+    public static ChartPane make(final String category, final String prefix) {
 
         final ChartDataExtractor extractor = findExtractor(category);
         final Map<String, Number> dataMap
@@ -79,9 +86,9 @@ public class ChartPane extends AnchorPane {
             content.setOrientation(Orientation.VERTICAL);
             content.getItems().addAll(mainContent, makeTable(tableValues));
             content.setDividerPosition(0, 0.8);
-            return content;
+            return new ChartPane(content);
         }
-        return new SplitPane(){{getItems().addAll(mainContent);}};
+        return new ChartPane(new SplitPane(){{getItems().addAll(mainContent);}});
     }
 
     /**

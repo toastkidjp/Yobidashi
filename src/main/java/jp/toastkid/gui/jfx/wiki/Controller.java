@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.impl.factory.Maps;
 
 import com.jfoenix.controls.JFXButton;
@@ -66,6 +67,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
@@ -792,6 +794,7 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * TODO modifying when chart reload.
      * 現在のタブをリロードする.
      * Wiki 記事の場合は再読み込み(というより一時HTMLの再生成)を実施する.
      */
@@ -814,10 +817,10 @@ public final class Controller implements Initializable {
             return;
         }
         // webView でなければそれぞれ reload.
+        System.out.println(node.getClass().equals(ChartPane.class) + " " + node.getClass().getName() + " " + ToStringBuilder.reflectionToString(node));
         if (node instanceof ChartPane) {
-            drawGraph();
+            drawChart(false);
         }
-
     }
 
     /**
@@ -860,7 +863,7 @@ public final class Controller implements Initializable {
      * グラフを描画する.
      */
     @FXML
-    private final void drawGraph() {
+    private final void drawChart() {
         drawChart(true);
     }
 
@@ -870,7 +873,7 @@ public final class Controller implements Initializable {
     @FXML
     private final void drawChart(final boolean openNew) {
         final String graphTitle = graphKind.getSelectionModel().getSelectedItem().toString();
-        final SplitPane content = ChartPane.make(graphTitle,
+        final Pane content = ChartPane.make(graphTitle,
                 "日記" + month.getSelectionModel().getSelectedItem().toString());
 
         if (openNew) {
@@ -1524,9 +1527,8 @@ public final class Controller implements Initializable {
             }
 
             if (!file.exists()){
-                // TODO 存在しないファイルの場合はエディタを呼び出す。
+                // 存在しないファイルの場合はエディタを呼び出す。
                 callEditor();
-                //openWebTab(Config.article.title);
             }
 
             // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示

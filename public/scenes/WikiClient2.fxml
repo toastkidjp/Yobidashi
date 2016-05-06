@@ -73,7 +73,7 @@
                 <MenuItem onAction="#callMorphAnalyzer" text="形態素解析" />
                 <MenuItem onAction="#callCmd" text="コマンドプロンプト" />
                 <SeparatorMenuItem />
-                <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawGraph" text="グラフ描画" />
+                <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="グラフ描画" />
                 <MenuItem onAction="#callGallery" text="Gallery" />
                 <MenuItem accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" />
                 <MenuItem accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
@@ -226,7 +226,7 @@
                     <tooltip><Tooltip text="select graph kind." /></tooltip>
                 </ComboBox>
                 <ComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
-                <JFXButton minWidth="70.0" onAction="#drawGraph" prefHeight="25.0" prefWidth="60.0" text="Draw">
+                <JFXButton minWidth="70.0" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
                     <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
                 </JFXButton>
             </children>
