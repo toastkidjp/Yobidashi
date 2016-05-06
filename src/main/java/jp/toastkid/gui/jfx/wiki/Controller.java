@@ -721,19 +721,12 @@ public final class Controller implements Initializable {
     @FXML
     private final void callApplicationState() {
         final Map<String, String> map = ApplicationState.getConfigMap();
-        final StringBuilder bld = new StringBuilder();/*
-        final List<String> content = FileUtil.readLinesFromStream(
-                Resources.PATH_APPLICATION_STATE,
-                Defines.ARTICLE_ENCODE
-                );*/
+        final StringBuilder bld = new StringBuilder();
         final String lineSeparator = System.lineSeparator();
         map.forEach((key, value) -> {
             bld.append(key).append("\t").append(value).append(lineSeparator);
         });
         AlertDialog.showMessage(getParent(), "状態", bld.toString());
-//        openWebTab("状態");
-//        func.generateHtml(bld.toString(), "状態");
-//        loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1791,7 +1784,6 @@ public final class Controller implements Initializable {
     public final void callEditor() {
         final File openTarget = Config.article.file;
         if (openTarget.exists()){
-            loadArticleList();
             openFileByEditor(openTarget);
             return;
         }
