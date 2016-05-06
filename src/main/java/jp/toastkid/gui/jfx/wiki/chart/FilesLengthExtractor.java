@@ -7,9 +7,8 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import jp.toastkid.gui.jfx.wiki.Functions;
-import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.libs.fileFilter.TextFileFilter;
+import jp.toastkid.libs.fileFilter.ArticleFileFilter;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -36,13 +35,13 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
     public Map<String, Number> extract(final String pathToDir, final String pPrefix) {
         final Map<String, Number> resultMap = new TreeMap<String, Number>();
         if (list == null) {
-            list = new File(pathToDir).list(new TextFileFilter(false));
+            list = new File(pathToDir).list(new ArticleFileFilter(false));
         }
         int overall = 0;
         final int length = list.length;
         for (int i = 0; i < length; i++) {
             final String name = Functions.decodeBytedStr(
-                    list[i].replace(Article.Extension.WIKI.text(),""), Defines.TITLE_ENCODE);
+                    FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
             if (name.startsWith(pPrefix)){
                 String putKey = name;
                 // (130503) 修正

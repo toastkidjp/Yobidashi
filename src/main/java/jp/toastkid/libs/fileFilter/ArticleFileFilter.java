@@ -2,13 +2,15 @@ package jp.toastkid.libs.fileFilter;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
+import jp.toastkid.gui.jfx.wiki.models.Article;
 /**
  *
  * @see <a href="http://qingdao.jugem.jp/?eid=103">【Java】Fileクラスのlist(FilenameFilter filter)メソッド</a>
  * @author Toast kid
  *
  */
-public final class TextFileFilter implements FilenameFilter {
+public final class ArticleFileFilter implements FilenameFilter {
 
     /** フィルタ対象文字列 */
     private static final String FILTER_KEYWORD = ".txt";
@@ -20,7 +22,7 @@ public final class TextFileFilter implements FilenameFilter {
      * フォルダを許可するか否かを指定して初期化
      * @param pIsArrawDir true ならフォルダも許可する。
      */
-    public TextFileFilter(final boolean pIsArrawDir){
+    public ArticleFileFilter(final boolean pIsArrawDir){
         this.isArrawDir = pIsArrawDir;
     }
 
@@ -44,7 +46,7 @@ public final class TextFileFilter implements FilenameFilter {
         if(isArrawDir && new File(dir + "/" + name).isDirectory()){
             return true;
         }
-        return (name.endsWith(FILTER_KEYWORD));
+        return name.endsWith(FILTER_KEYWORD) || name.endsWith(Article.Extension.MD.text());
     }
 
 }

@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * {@link TextFileFilter}'s test.
+ * {@link ArticleFileFilter}'s test.
  * @author Toast kid
  *
  */
@@ -35,7 +35,7 @@ public class ImageFileFilterTest {
     }
 
     /**
-     * {@link TextFileFilter#accept(File, String)}.
+     * {@link ArticleFileFilter#accept(File, String)}.
      */
     @Test
     public void testAccept() {

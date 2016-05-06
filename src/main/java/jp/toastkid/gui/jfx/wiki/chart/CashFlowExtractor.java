@@ -55,32 +55,30 @@ public final class CashFlowExtractor implements ChartDataExtractor {
         }
 
         final String prefix = Functions.toBytedString_EUC_JP(pPrefix);
-        final List<String> list
+        final List<String> articleTitles
             = Arrays.asList(new File(pathToDir).list())
                 .stream()
                 .filter((item) -> item.startsWith(prefix))
                 .collect(Collectors.toList());
 
-        final AtomicInteger gross = new AtomicInteger(0);
-        final Map<String, Number> map   = new TreeMap<>();
-        final Map<String, Number> daily = new TreeMap<>();
-        if (list.size() < 1) {
+        if (articleTitles.size() < 1) {
             return Collections.emptyMap();
         }
 
-        list.forEach(item -> {
+        final Map<String, Number> map   = new TreeMap<>();
+        final Map<String, Number> daily = new TreeMap<>();
+        final AtomicInteger gross = new AtomicInteger(0);
+        articleTitles.forEach(item -> {
             final String readTarget = pathToDir + "/" + item;
-            final BufferedReader fileReader = FileUtil.makeFileReader(
-                        readTarget,
-                        Defines.ARTICLE_ENCODE
-                );
+
             boolean isCashFlowArea = false;
             final String date = Article.convertTitle(item).replace("日記", "");
             String str = "";
-            try {
+            try (final BufferedReader fileReader
+                   = FileUtil.makeFileReader(readTarget, Defines.ARTICLE_ENCODE); ) {
                 str = fileReader.readLine();
                 while (str != null) {
-                    if (str.startsWith("*") && str.endsWith("家計簿")) {
+                    if ((str.startsWith("*") || str.startsWith("#")) && str.endsWith("家計簿")) {
                         isCashFlowArea = true;
                     }
                     if (isCashFlowArea && str.startsWith("|")) {

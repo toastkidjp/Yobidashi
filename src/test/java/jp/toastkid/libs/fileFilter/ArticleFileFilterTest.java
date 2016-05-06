@@ -9,21 +9,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * {@link TextFileFilter}'s test.
+ * {@link ArticleFileFilter}'s test.
  * @author Toast kid
  *
  */
-public class TextFileFilterTest {
+public class ArticleFileFilterTest {
 
     /** test oject. */
-    private TextFileFilter filter;
+    private ArticleFileFilter filter;
 
     /**
      * init test oject.
      */
     @Before
     public void setUp() {
-        filter = new TextFileFilter(true);
+        filter = new ArticleFileFilter(true);
     }
 
     /**
@@ -35,12 +35,15 @@ public class TextFileFilterTest {
     }
 
     /**
-     * {@link TextFileFilter#accept(File, String)}.
+     * {@link ArticleFileFilter#accept(File, String)}.
      */
     @Test
     public void testAccept() {
         assertTrue(filter.accept(new File("temp"), "tomato.txt"));
         assertTrue(filter.accept(new File("temp"), ".txt"));
+        assertTrue(filter.accept(new File("temp"), ".md"));
+        assertFalse(filter.accept(new File("temp"), "tomato.scala"));
+        assertFalse(filter.accept(new File("temp"), "tomato.wiki"));
         assertFalse(filter.accept(new File("temp"), "tomato"));
     }
 

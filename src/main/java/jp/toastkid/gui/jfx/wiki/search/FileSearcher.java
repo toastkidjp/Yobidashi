@@ -115,10 +115,8 @@ public final class FileSearcher {
      * (111231) 作成
      */
     public Map<String, SearchResult> search(final String pQuery) {
-        //pd.showLoop("検索中です...");
         try {
             pd.start(new Stage());
-            //pd.setProgress(0);
             final long start = System.currentTimeMillis();
             lastFilenum      = 0;
             searchResultMap  = Maps.mutable.empty();
@@ -155,23 +153,22 @@ public final class FileSearcher {
         final List<Future<?>> fList = new ArrayList<Future<?>>();
         // 検索の Runnable を初期化する
         for (int i = 0; i < runnableList.size(); i++) {
-            //pd.setProgress((int) Math.round(((double) i / (double) runnableList.size()) * 100.0));
             final File readingFile = files[i];
             if (readingFile.isDirectory()) {
                 dirSearch(readingFile.getAbsolutePath(), pQuery);
-            } else {// if (readingFile.getName().endsWith(".txt")) {
-                lastFilenum++;
-                if (!isTitleOnly) {
-                    fList.add(exs.submit(runnableList.get(i)));
-                    continue;
-                }
-                // 記事名検索の場合、ここで結果を入れる.
-                if (Article.convertTitle(readingFile.getName()).indexOf(pQuery) != -1) {
-                    searchResultMap.put(
-                            readingFile.getName(),
-                            SearchResult.makeSimple(readingFile.getAbsolutePath())
-                    );
-                }
+                continue;
+            }
+            lastFilenum++;
+            if (!isTitleOnly) {
+                fList.add(exs.submit(runnableList.get(i)));
+                continue;
+            }
+            // 記事名検索の場合、ここで結果を入れる.
+            if (Article.convertTitle(readingFile.getName()).indexOf(pQuery) != -1) {
+                searchResultMap.put(
+                        readingFile.getName(),
+                        SearchResult.makeSimple(readingFile.getAbsolutePath())
+                );
             }
         }
         // 記事名検索でないときはこれを実施

@@ -27,7 +27,7 @@ import jp.toastkid.libs.utils.FileUtil;
  * <a href="http://stackoverflow.com/questions/29625170/display-popup-with-progressbar-in-javafx">
  * Display Popup with ProgressBar in JavaFX</a>
  */
-public final class ProgressDialog extends Application{
+public final class ProgressDialog extends Application implements AutoCloseable {
 
     /** FXML ファイルのパス. */
     private static final String DIALOG_FXML = "public/scenes/ProgressDialog.fxml";
@@ -237,5 +237,10 @@ public final class ProgressDialog extends Application{
 
     public static void main(final String... args) {
         Application.launch(ProgressDialog.class);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.stop();
     }
 }
