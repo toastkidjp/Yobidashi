@@ -32,6 +32,10 @@ public class PostProcessor {
     private static final Pattern HEADING_PATTERN
         = Pattern.compile("<h(\\d)>(.+?)</h\\d>", Pattern.DOTALL);
 
+    /** hyper link pattern. */
+    private static final Pattern HYPER_LINK_PATTERN
+        = Pattern.compile("<a .*>(.+?)</a>", Pattern.DOTALL);
+
     /** headings. */
     private MutableList<Subheading> subheadings;
 
@@ -81,14 +85,31 @@ public class PostProcessor {
             matcher = HEADING_PATTERN.matcher(str);
             if (matcher.find()) {
                 final int depth = Integer.parseInt(matcher.group(1));
-                final String subheading = matcher.group(2).trim();
+                final String subheading   = matcher.group(2).trim();
+                final String subheadingId = extractSubHeading(subheading);
                 final String subheadTag
-                    = String.format("<a id=\"%s\" href=\"#%s\">■</a>", subheading, subheading);
+                    = String.format("<a id=\"%s\" href=\"#%s\">■</a>",subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
-                subheadings.add(new Subheading(subheading, subheading, depth));
+                subheadings.add(new Subheading(subheading, subheadingId, depth));
             }
         }
         return str;
+    }
+
+    /**
+     * extract sub heading.
+     * @param text
+     * @return sub heading text
+     */
+    private String extractSubHeading(final String text) {
+        if (!text.contains("<a")) {
+            return text;
+        }
+        final Matcher matcher = HYPER_LINK_PATTERN.matcher(text);
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+        return text;
     }
 
     /**
@@ -145,7 +166,7 @@ public class PostProcessor {
      * generate subheading html from subheadings.
      * @return subheading html.
      */
-    public String generateSubheading(final ViewTemplate template) {
+    public String generateSubheadings(final ViewTemplate template) {
 
         if (subheadings == null) {
             throw new IllegalStateException("Please could you call this method after processed.");

@@ -125,8 +125,9 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      */
     private Optional<String> findStyle() {
         final String style = "-fx-background-image: url('" + chooser.choose() + "'); "
-                +"-fx-background-position: center center; "
-                +"-fx-background-repeat: stretch;";
+                + "-fx-background-position: center center; "
+                + "-fx-background-size: stretch stretch;"
+                + "-fx-background-repeat: stretch;";
         return Optional.of(style);
     }
 

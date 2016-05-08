@@ -34,10 +34,7 @@ public class PostProcessorTest {
     @Test
     public void testProcess() {
         assertEquals(
-                "<h2><a id=\"<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
-                + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a>\""
-                + " href=\"#<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
-                + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a>\">■</a>"
+                "<h2><a id=\"tomato\" href=\"#tomato\">■</a>"
                 + "<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
                 + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></h2>",
                 processor.process("<h2>[[tomato]] [[md:tomato]]</h2>")
@@ -46,20 +43,19 @@ public class PostProcessorTest {
 
     /**
      * test method for
-     * {@link jp.toastkid.libs.wiki.PostProcessor#generateSubheading
+     * {@link jp.toastkid.libs.wiki.PostProcessor#generateSubheadings
      * (jp.toastkid.gui.jfx.wiki.models.ViewTemplate)} .
      */
     @Test
     public void testGenerateSubheading() {
         processor.process("<h2>[[tomato]] [[md:tomato]]</h2>");
-        final String extected = "<ul class=\"nav\"><li><a href=\"#<a class=\"redLink\""
-                + " href=\"/txt/746F6D61746F.txt\">tomato</a> <a class=\"redLink\""
-                + " href=\"/md/746F6D61746F.md\">tomato</a>\"><a class=\"redLink\""
-                + " href=\"/txt/746F6D61746F.txt\">tomato</a> <a class=\"redLink\""
-                        + " href=\"/md/746F6D61746F.md\">tomato</a></a><br/>"
-            + System.lineSeparator() + "</ul>";
 
-        assertEquals(extected, processor.generateSubheading(ViewTemplate.MATERIAL));
+        final String extected = "<ul class=\"nav\"><li><a href=\"#tomato\">"
+                + "<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
+                + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></a><br/>"
+                + System.lineSeparator() + "</ul>";
+
+        assertEquals(extected, processor.generateSubheadings(ViewTemplate.MATERIAL));
     }
 
 }

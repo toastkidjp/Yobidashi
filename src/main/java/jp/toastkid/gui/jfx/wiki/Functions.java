@@ -159,7 +159,7 @@ public final class Functions {
         final ViewTemplate template = ViewTemplate.parse(Config.get("viewTemplate"));
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
         final String processed = post.process(content);
-        final String subheading = post.generateSubheading(template);
+        final String subheading = post.generateSubheadings(template);
         FileUtil.outPutStr(
             Functions.bindArgs(
                 template.getPath(),
