@@ -23,7 +23,9 @@
 #jump2head a{
 	color: #fff;
 }
-
+a:link.redLink	{
+	color:#ba0000;
+}
 /**
  * @see <a href="http://codepen.io/jcalifa/full/QwepvY">This page does not use JS.</a>
  */

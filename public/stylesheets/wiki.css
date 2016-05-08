@@ -1,8 +1,5 @@
-a:link	{
+﻿a:link	{
 	color:blue;
-}
-a:link.redLink	{
-	color:#ba0000;
 }
 /* 130113 追加 */
 a:visited.redLink	{

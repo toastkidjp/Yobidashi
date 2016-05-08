@@ -4,27 +4,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import jp.toastkid.gui.jfx.wiki.Functions;
-import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.calendar.HtmlCalendar;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
-import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.Strings;
 
 /**
@@ -76,13 +71,6 @@ public final class WikiConverter {
     /** メニューバーのファイル名(定数) */
     private static final String MENUBAR_FILE_NAME
         = Functions.toBytedString_EUC_JP("MenuBar") + ".txt";
-
-    /**
-     * ひとりWiki の内部リンクを再現するための検出用正規表現.
-     * ひとりWiki プラグインとの互換性を持たせるためのもの
-     */
-    private static final Pattern INTERNAL_LINK_PAT
-        = Pattern.compile("\\[\\[(.+?)\\]\\]", Pattern.DOTALL);
 
     /**
      * {center}中央揃え{center}検出用正規表現.
@@ -173,6 +161,9 @@ public final class WikiConverter {
     private static final Pattern OVERFLOW_HIDDEN_PATTERN
         = Pattern.compile("\\{hide\\:(.+?)\\}", Pattern.DOTALL);
 
+    /** yukiwiki's header pattern. */
+    private static final Pattern HEADER_PATTERN = Pattern.compile(".\\**");
+
     /** Blockquote tag. */
     private static final String QUOTE_TAG = "{quote}";
 
@@ -208,8 +199,6 @@ public final class WikiConverter {
     public boolean openLinkBrank   = false;
     /** 前回の処理で回収した画像のパス一覧. DocToEpubで参照. */
     public Set<String> latestImagePaths;
-    /** headings. */
-    private List<Subheading> subheadings;
 
     /**
      * 指定されたパスで変換器を初期化する.
@@ -267,7 +256,6 @@ public final class WikiConverter {
      */
     public List<String> convertToLines(final String filePath, final String fileEncode) {
         this.latestImagePaths = Sets.mutable.empty();
-        this.subheadings = new ArrayList<>();
         List<String> strs = FileUtil.readLines(filePath, fileEncode);
 
         // ソースディレクトリパスの取り出し
@@ -289,47 +277,7 @@ public final class WikiConverter {
         strs = wikiConvert(strs, true);
         return strs;
     }
-    /**
-     * generate subheading html from subheadings.
-     * @return subheading html.
-     */
-    public String generateSubheading(final ViewTemplate template) {
-        final StringBuilder headingHtml = new StringBuilder();
-        final String tagName = getTag(template);
 
-        final boolean notEmpty = StringUtils.isNotEmpty(tagName);
-        if (notEmpty) {
-            headingHtml.append("<").append(tagName).append(">");
-        }
-
-        if (subheadings != null) {
-            subheadings.stream().forEach((subheading) -> {
-                headingHtml
-                    .append("<li>")
-                    .append("<a href=\"#").append(subheading.id).append("\">")
-                    .append(subheading.title).append("</a>").append("<br/>")
-                    .append(Strings.LINE_SEPARATOR);
-            });
-        }
-
-        if (notEmpty) {
-            headingHtml.append("</").append(tagName.substring(0, 2)).append(">");
-        }
-        return headingHtml.toString();
-    }
-    /**
-     * return list tag name.
-     * @param template
-     * @return
-     */
-    private String getTag(final ViewTemplate template) {
-        switch (template.toString()) {
-            case "MATERIAL":
-                return "ul class=\"nav\"";
-            default:
-                return "ol";
-        }
-    }
     /**
      * SECOND 用メニューバー文字列を構築する.
      * @param sourceDir "MenuBar.txt" のあるフォルダ
@@ -494,7 +442,7 @@ public final class WikiConverter {
                 str = str.replaceFirst(lineSep + " ", lineSep);
                 isInPre = true;
             }
-            // TODO (130713)
+            // (130713)
             //isInQuote
             if (str.startsWith(QUOTE_TAG) && !isInQuote) {
                 if (isInP) {
@@ -725,6 +673,7 @@ public final class WikiConverter {
                 str = "<div class=\"expander\" id=\"expander" + expanderCount  + "\"><p>";
                 isInP = true;
             }
+
             if (isInExpand && str.trim().startsWith("{expand}") ) {
                 str = "</div><Script>close(\"expander" + expanderCount + "\");</Script>";
                 isInExpand = false;
@@ -945,50 +894,24 @@ public final class WikiConverter {
      * @return Wiki 変換された行
      */
     private final String convertLine(String str) {
-        if (str.startsWith("*") ) {
-            final String[] split = str.split("\\*");
-            final int index = split.length - 1;
-            final String subheading = (0 < index) ? split[index].trim() : "";
-            // 「**」だけの場合にエラーとなったので
-            final String subheadingID = extractSubheadingId(subheading);
-            // 目次
-            if (str.startsWith("******")) {
-                str = "<h6><a id=\"" + subheadingID + "\">" + subheading + "</a></h6>";
-                subheadings.add(new Subheading(subheading, subheadingID, 6));
-            }
-            if (str.startsWith("*****")) {
-                str = "<h5><a id=\"" + subheadingID + "\">" + subheading + "</a></h5>";
-                subheadings.add(new Subheading(subheading, subheadingID, 5));
-            }
-            if (str.startsWith("****")) {
-                str = "<h4><a id=\"" + subheadingID + "\">" + subheading + "</a></h4>";
-                subheadings.add(new Subheading(subheading, subheadingID, 4));
-            }
-            if (str.startsWith("***")) {
-                str = "<h3><a id=\"" + subheadingID + "\">" + subheading + "</a></h3>";
-                subheadings.add(new Subheading(subheading, subheadingID, 3));
-            }
-            if (str.startsWith("**")) {
-                str = "<h2><a id=\"" + subheadingID + "\">" + subheading + "</a></h2>";
-                subheadings.add(new Subheading(subheading, subheadingID, 2));
-            }
-            if (str.startsWith("*")) {
-                str = "<h1><a id=\"" + subheadingID + "\">" + subheading + "</a></h1>";
-                subheadings.add(new Subheading(subheading, subheadingID, 1));
+
+        if (str.startsWith("*")) {
+            final Matcher matcher = HEADER_PATTERN.matcher(str);
+            if (matcher.find()) {
+                str = HtmlUtil.makeHead(matcher.group(0).length(), matcher.replaceFirst(""));
             }
         }
-        // Confluence 風 Heading.
+
         if (str.startsWith("h") ) {
             final char c = str.charAt(1);
             if (Character.isDigit(c)) {
                 final String[] split = str.split("h\\d\\.");
                 final int index = split.length - 1;
                 final String subheading = (0 < index) ? split[index].trim() : "";
-                final String subheadingID = extractSubheadingId(subheading);
-                str = String.format("<h%s><a id=\"%s\">%s</a></h%s>", c, subheadingID, subheading, c);
-                subheadings.add(new Subheading(subheading, subheadingID, Character.getNumericValue(c)));
+                str = HtmlUtil.makeHead(Character.getNumericValue(c), subheading);
             }
         }
+
         if (str.indexOf("---") != -1) {
             str = str.replaceFirst("---*-", "<hr/>");
         }
@@ -1127,15 +1050,7 @@ public final class WikiConverter {
             }
         }
 
-        if (str.indexOf("[[") != -1) {
-            matcher = INTERNAL_LINK_PAT.matcher(str);
-            while (matcher.find()) {
-                final String found = matcher.group(1);
-                str = str.replaceFirst(INTERNAL_LINK_PAT.pattern(), makeInternalLink(found));
-            }
-        }
-
-        if (str.indexOf("[") != -1) {
+        if (str.indexOf("[") != -1 && str.indexOf("|") != -1) {
             matcher = HYPER_LINK_PATTERN.matcher(str);
             while (matcher.find()) {
                 final String alt  = matcher.group(1);
@@ -1231,47 +1146,12 @@ public final class WikiConverter {
             }
         }
 
-        // {latest:10}
-        if (str.startsWith("{latest")) {
-            //final long start = System.currentTimeMillis();
-            final int parsed
-                = MathUtil.parseOrZero(Strings.extractMatches(str, "\\{latest\\:(.+?)\\}"));
-            final Optional<String> map = Optional.ofNullable(Config.get(Config.Key.ARTICLE_DIR))
-                    .map(path -> {return new File(path);})
-                    .filter(path -> {return path.isDirectory();})
-                    .map(path -> {return path.listFiles();})
-                    .map(list -> {
-                        final MutableList<File> select = ArrayAdapter.adapt(list)
-                                .reject(file -> {return file.isDirectory();})
-                                .select(file -> {return FileUtil.isLastModifiedNdays(file, 3L);});
-                        final int limit = 0 < parsed
-                                ? Math.min(parsed, select.size()) : select.size();
-                        return select
-                            .sortThis((f1, f2) -> {
-                                return -1 * Long.compare(f1.lastModified(), f2.lastModified());})
-                            .subList(0, limit)
-                            .collect(file -> {
-                                return new StringBuilder()
-                                        .append("<tr><td>")
-                                        .append(makeInternalLink(Article.convertTitle(file.getName())))
-                                        .append("</td><td>")
-                                        .append(Strings.toUniTypeDate(file.lastModified()))
-                                        .append("</td></tr>")
-                                        .toString();})
-                            .makeString(System.lineSeparator());
-                    });
-            if (map.isPresent()) {
-                str = "<table><tr><th>Article Name</th><th>Last Modified</th></tr>" + map.get() + "</table>";
-            }
-            //System.out.println(System.currentTimeMillis() - start + "[ms]");
-        }
-
-        // 内部リンク.
-        if (str.indexOf("\\[\\[") != -1
+        // TODO 内部リンク.
+        /*if (str.indexOf("\\[\\[") != -1
                 && str.indexOf("\\]\\]") != -1) {
             str = str.replaceAll("\\[\\[", "<a href=\"");
             str = str.replaceAll("\\]\\]", "</a>");
-        }
+        }*/
 
         /**
          * <a href="http://d.hatena.ne.jp/srkzhr/20090529/1243614146">
@@ -1283,72 +1163,6 @@ public final class WikiConverter {
         return str;
     }
 
-    /**
-     * 記事名から内部リンクを生成する.
-     * @param articleName
-     * @return
-     */
-    private String makeInternalLink(String articleName) {
-        // (140112) 内部リンクの追加
-        String innerLink = null;
-        final int lastIndexOf = articleName.lastIndexOf("#");
-        if (lastIndexOf != -1) {
-            innerLink = HtmlUtil.tagEscape(articleName.substring(lastIndexOf));
-            articleName = articleName.substring(0, lastIndexOf);
-        }
-        final String bytedStr = Functions.toBytedString_EUC_JP(articleName);
-        final boolean isExist = new File(sourceDir + bytedStr.concat(".txt")).exists();
-        final StringBuilder generatedLink = new StringBuilder(180);
-        // (121010) ソースフォルダをリンクパスに追加
-        generatedLink.append("<a ");
-        if (!isExist) {
-            generatedLink.append("class=\"redLink\" ");
-        }
-        generatedLink.append("href=\"/txt/");
-        generatedLink.append(bytedStr);
-        generatedLink.append(".txt");
-        if (StringUtils.isNotEmpty(innerLink)) {
-            generatedLink.append(innerLink);
-        }
-        generatedLink.append("\">");
-        generatedLink.append(articleName);
-        generatedLink.append("</a>");
-        return generatedLink.toString();
-    }
-
-    /**
-     * extract subheading's ID.
-     * @param subheading
-     * @return subheading's ID.
-     */
-    private String extractSubheadingId(final String subheading) {
-        final String subheadingID = subheading.replace("[[", "").replace("]]", "");
-        // 各ハイパーリンクプラグインの回避処理.
-        // (130805) [|]
-        if (subheading.indexOf("[") != -1 ) {
-            final Matcher matcher = HYPER_LINK_PATTERN.matcher(subheadingID);
-            if (matcher.find()) {
-                return matcher.group(1).split("|")[0];
-            }
-        }
-
-        // {wikipedia:}
-        if (subheading.indexOf("ikipedia") != -1 ) {
-            final Matcher matcher = WIKIPEDIA_PATTERN.matcher(subheadingID);
-            if (matcher.find()) {
-                return matcher.group(1);
-            }
-        }
-
-        // {twitter:}
-        if (subheading.indexOf("witter") != -1 ) {
-            final Matcher matcher = TWITTER_PATTERN.matcher(subheadingID);
-            if (matcher.find()) {
-                return matcher.group(1);
-            }
-        }
-        return subheadingID;
-    }
     /**
      * タイトルを返す.
      * @return title タイトル

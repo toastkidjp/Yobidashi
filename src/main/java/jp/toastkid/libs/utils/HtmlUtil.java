@@ -327,5 +327,14 @@ public final class HtmlUtil {
     public static String underLine(final String text) {
         return new StringBuilder().append("<u>").append(text).append("</u>").toString();
     }
+    /**
+     * make hx tag.
+     * @param x x
+     * @param subheading
+     * @return hx tagged string.
+     */
+    public static String makeHead(final int x, final String subheading) {
+        return String.format("<h%d>%s</h%d>", x, subheading, x);
+    }
 
 }

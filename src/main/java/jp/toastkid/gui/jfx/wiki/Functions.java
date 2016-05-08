@@ -47,6 +47,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.gui.jfx.wiki.models.Config.Key;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.gui.jfx.wiki.models.Resources;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
@@ -61,6 +62,7 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.libs.wiki.PostProcessor;
 import jp.toastkid.libs.wiki.WikiConverter;
 
 /**
@@ -155,6 +157,9 @@ public final class Functions {
             final boolean isTool
             ) {
         final ViewTemplate template = ViewTemplate.parse(Config.get("viewTemplate"));
+        final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
+        final String processed = post.process(content);
+        final String subheading = post.generateSubheading(template);
         FileUtil.outPutStr(
             Functions.bindArgs(
                 template.getPath(),
@@ -166,14 +171,14 @@ public final class Functions {
                     put("title",       title);
                     put("wikiIcon",    Config.get("wikiIcon"));
                     put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
-                    put("subheadings", converter.generateSubheading(template));
-                    put("menu",        makeMenu(template));
+                    put("subheadings", subheading);
+                    put("menu",        post.process(makeMenu(template)));
                     put("content",
                         new StringBuilder().append("<div class=\"body\">")
                             .append(LINE_SEPARATOR)
                             .append("<div class=\"content_area\">")
                             .append(LINE_SEPARATOR)
-                            .append(content)
+                            .append(processed)
                             .append("</div>")
                             .toString()
                             );
@@ -787,8 +792,7 @@ public final class Functions {
             return md2Html(Config.article.file.getAbsolutePath());
         }
         if (Article.Extension.WIKI.text().equals(ext)) {
-            return wiki2Html(Config.article.file.getAbsolutePath())
-                    .replaceAll("class=\"redLink\"", "");
+            return wiki2Html(Config.article.file.getAbsolutePath());
         }
         if (Article.Extension.SLIDE.text().equals(ext)) {
             final String content
