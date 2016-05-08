@@ -1531,6 +1531,10 @@ public final class Controller implements Initializable {
                 callEditor();
             }
 
+            // TODO check
+            if (func == null) {
+                return;
+            }
             // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
             func.generateArticleFile();
             urlText.setText(Config.article.toInternalUrl());
