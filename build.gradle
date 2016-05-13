@@ -46,7 +46,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
     // Dependencies for use Script Engine.
-    compile 'org.codehaus.groovy:groovy-all:1.8.6'
+    compile 'org.codehaus.groovy:groovy-all:2.4.5'
     compile 'org.clojure:clojure:1.8.0'
 
     // Markdown parser.

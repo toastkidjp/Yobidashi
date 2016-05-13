@@ -34,6 +34,15 @@ public final class CashFlowExtractor implements ChartDataExtractor {
 
     private final List<KeyValue> values;
 
+    /** use for make title. */
+    private String prefix;
+
+    /** use for make title. */
+    private int overall;
+
+    /**
+     * init with empty list.
+     */
     public CashFlowExtractor() {
         values = Lists.mutable.empty();
     }
@@ -49,6 +58,8 @@ public final class CashFlowExtractor implements ChartDataExtractor {
      */
     @Override
     public Map<String, Number> extract(final String pathToDir, final String pPrefix) {
+
+        this.prefix = pPrefix;
 
         if (StringUtils.isEmpty(pathToDir)) {
             return Collections.emptyMap();
@@ -106,6 +117,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
                 e.printStackTrace();
             }
         });
+        this.overall = gross.get();
         return daily;
     }
 
@@ -116,5 +128,13 @@ public final class CashFlowExtractor implements ChartDataExtractor {
     @Override
     public List<KeyValue> getTableValues() {
         return values;
+    }
+
+    @Override
+    public String getTitle() {
+        if (prefix == null) {
+            throw new IllegalStateException("'prefix' is null.");
+        }
+        return String.format("%s: %s %d円", ChartPane.DIARY, prefix.substring(2), this.overall);
     }
 }

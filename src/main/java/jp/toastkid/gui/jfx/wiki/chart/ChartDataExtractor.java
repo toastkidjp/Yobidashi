@@ -27,4 +27,12 @@ public interface ChartDataExtractor {
     public default List<KeyValue> getTableValues() {
         return Collections.emptyList();
     }
+
+    /**
+     * return this chart's title.
+     * If insufficient parameter, you should throw {@link IllegalStateException}.
+     * @return title
+     * @throws IllegalStateException you should throw {@link IllegalStateException}.
+     */
+    public String getTitle();
 }

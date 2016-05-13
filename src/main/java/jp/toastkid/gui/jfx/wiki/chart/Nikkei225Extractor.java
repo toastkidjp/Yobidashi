@@ -25,6 +25,8 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
     /** file list. */
     private static String[] list;
 
+    private String prefix;
+
     /**
      *
      * @param pathToDir source file directory
@@ -33,10 +35,14 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
      */
     @Override
     public Map<String, Number> extract(final String pathToDir, final String pPrefix) {
+
+        this.prefix = pPrefix;
+
         final Map<String, Number> resultMap = new TreeMap<String, Number>();
         if(list == null){
             list = new File(pathToDir).list(new ArticleFileFilter(false));
         }
+
         final int length = list.length;
         for (int i = 0; i < length; i++) {
             final String name
@@ -72,5 +78,13 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
             }
         }
         return resultMap;
+    }
+
+    @Override
+    public String getTitle() {
+        if (prefix == null) {
+            throw new IllegalStateException("'prefix' is null.");
+        }
+        return ChartPane.DIARY + ": " + prefix.substring(2) + " ";
     }
 }

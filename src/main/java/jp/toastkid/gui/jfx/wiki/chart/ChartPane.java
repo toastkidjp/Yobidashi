@@ -73,7 +73,7 @@ public class ChartPane extends VBox {
         final ChartDataExtractor extractor = findExtractor(category);
         final Map<String, Number> dataMap
             = extractor.extract(Config.get(Key.ARTICLE_DIR), prefix);
-        final String title = category + ": " + prefix.substring(2);
+        final String title = extractor.getTitle();
 
         final LineChart<String,Number> chart = makeChart(title, dataMap, findThreshold(category));
         final Label dataLabel = new Label();

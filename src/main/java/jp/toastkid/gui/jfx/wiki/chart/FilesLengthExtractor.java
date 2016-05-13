@@ -25,6 +25,10 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
 
     private static String[] list;
 
+    private String prefix;
+
+    private int overall;
+
     /**
      *
      * @param pathToDir ソースファイルフォルダ
@@ -33,6 +37,7 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
      */
     @Override
     public Map<String, Number> extract(final String pathToDir, final String pPrefix) {
+        this.prefix = pPrefix;
         final Map<String, Number> resultMap = new TreeMap<String, Number>();
         if (list == null) {
             list = new File(pathToDir).list(new ArticleFileFilter(false));
@@ -55,7 +60,16 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
                 overall = overall + fileCharacterValue;
             }
         }
+        this.overall = overall;
         resultMap.put(TOTAL_KEY, overall);
         return resultMap;
+    }
+
+    @Override
+    public String getTitle() {
+        if (prefix == null) {
+            throw new IllegalStateException("'prefix' is null.");
+        }
+        return String.format("%s: %s %d字", ChartPane.DIARY, prefix.substring(2), this.overall);
     }
 }
