@@ -116,11 +116,11 @@ public final class Controller implements Initializable {
 
     /** WebView's highliting. */
     private static final String WINDOW_FIND_DOWN
-    = "window.find(\"{0}\", false, false, true, false, true, false)";
+        = "window.find(\"{0}\", false, false, true, false, true, false)";
 
     /** WebView's highliting. */
     private static final String WINDOW_FIND_UP
-    = "window.find(\"{0}\", false, true, true, false, true, false)";
+        = "window.find(\"{0}\", false, true, true, false, true, false)";
 
     /** 左のリストで中心をいくつずらすか. */
     private static final int FOCUS_MARGIN = 10;
@@ -133,31 +133,31 @@ public final class Controller implements Initializable {
 
     /** searcher appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SEARCHER
-    = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
 
     /** scripter appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SCRIPTER
-    = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
 
     /** run script keyboard shortcut. */
     private static final KeyCodeCombination RUN_SCRIPT
-    = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
-    = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
 
     /** Zoom decrement keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_DECREMENT
-    = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
 
     /** Show left pane. */
     private static final KeyCodeCombination SHOW_LEFT_PANE
-    = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
 
     /** Hide left pane. */
     private static final KeyCodeCombination HIDE_LEFT_PANE
-    = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+        = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
 
     /** header. */
     @FXML
@@ -635,10 +635,8 @@ public final class Controller implements Initializable {
     public final void callConvertAobun() {
         final String absolutePath = Config.article.file.getAbsolutePath();
         AobunUtils.docToTxt(absolutePath);
-        new AlertDialog.Builder().setParent(getParent())
-        .setTitle("変換完了")
-        .setMessage(Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath))
-        .build().show();
+        AlertDialog.showMessage(getParent(), "変換完了",
+                Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath));
     }
 
     /**
@@ -684,17 +682,17 @@ public final class Controller implements Initializable {
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
         new AlertDialog.Builder().setParent(getParent()).addControl(datePicker)
-        .setTitle("日付選択")
-        .setMessage("バックアップする最初の日を選択してください。")
-        .setOnPositive("Backup", () -> {
-            final LocalDate value = datePicker.getValue();
-            if (value == null) {
-                return;
-            }
-            final long epochDay = CalendarUtil.zoneDateTime2long(
-                    value.atStartOfDay().atZone(ZoneId.systemDefault()));
-            func.simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
-        }).build().show();
+            .setTitle("日付選択")
+            .setMessage("バックアップする最初の日を選択してください。")
+            .setOnPositive("Backup", () -> {
+                final LocalDate value = datePicker.getValue();
+                if (value == null) {
+                    return;
+                }
+                final long epochDay = CalendarUtil.zoneDateTime2long(
+                        value.atStartOfDay().atZone(ZoneId.systemDefault()));
+                func.simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+            }).build().show();
     }
 
     /**
@@ -738,28 +736,28 @@ public final class Controller implements Initializable {
     private final void callBackUp(final ActionEvent event) {
         final Window parent = getParent();
         new AlertDialog.Builder().setParent(parent)
-        .setTitle("バックアップ")
-        .setMessage("この処理には時間がかかります。")
-        .setOnPositive("OK", () -> {
-            final ProgressDialog pd = new ProgressDialog.Builder()
-                    .setScene(this.getParent().getScene())
-                    .setText("バックアップ中……").build();
-            final long start = System.currentTimeMillis();
-            String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
-            try {
-                new ZipArchiver().doDirectory(sArchivePath);
-                //new ZipArchiver().doDirectory(iArchivePath);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-            final long end = System.currentTimeMillis() - start;
-            pd.stop();
-            sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                    .concat(ZipArchiver.EXTENSION_ZIP);
-            final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
-                    sArchivePath, System.lineSeparator(), end);
-            AlertDialog.showMessage(parent, "バックアップ完了", message);
-        }).build().show();
+            .setTitle("バックアップ")
+            .setMessage("この処理には時間がかかります。")
+            .setOnPositive("OK", () -> {
+                final ProgressDialog pd = new ProgressDialog.Builder()
+                        .setScene(this.getParent().getScene())
+                        .setText("バックアップ中……").build();
+                final long start = System.currentTimeMillis();
+                String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
+                try {
+                    new ZipArchiver().doDirectory(sArchivePath);
+                    //new ZipArchiver().doDirectory(iArchivePath);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+                final long end = System.currentTimeMillis() - start;
+                pd.stop();
+                sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
+                        .concat(ZipArchiver.EXTENSION_ZIP);
+                final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
+                        sArchivePath, System.lineSeparator(), end);
+                AlertDialog.showMessage(parent, "バックアップ完了", message);
+            }).build().show();
     }
 
     /**
@@ -783,18 +781,17 @@ public final class Controller implements Initializable {
                 ){
             final String homeTitle = tabPane.getSelectionModel().getSelectedItem().getText();
             new AlertDialog.Builder().setParent(parent).setTitle("ホーム設定")
-            .setMessage(homeTitle + "をホームに設定しますか？")
-            .setOnPositive("YES", () -> {
-                Config.store(Config.Key.HOME, currentURL);
-                Config.reload();
-            }).build().show();;
-        } else {
-            AlertDialog.showMessage(parent, "設定不可", "現在のページはホームに設定できません。");
+                .setMessage(homeTitle + "をホームに設定しますか？")
+                .setOnPositive("YES", () -> {
+                    Config.store(Config.Key.HOME, currentURL);
+                    Config.reload();
+                }).build().show();
+            return ;
         }
+        AlertDialog.showMessage(parent, "設定不可", "現在のページはホームに設定できません。");
     }
 
     /**
-     * TODO modifying when chart reload.
      * 現在のタブをリロードする.
      * Wiki 記事の場合は再読み込み(というより一時HTMLの再生成)を実施する.
      */
@@ -1182,64 +1179,64 @@ public final class Controller implements Initializable {
     private void searchArticle(final String q, final String f) {
         final CheckBox  isTitleOnly = new JFXCheckBox("記事名で検索");
         new AlertDialog.Builder().setParent(getParent())
-        .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
-        //"記事名のみを対象に検索"
-        .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly)
-        .setOnPositive("OK", () -> {
-            final String query = queryInput.getText().trim();
-            if (StringUtils.isEmpty(query)) {
-                return;
-            }
-            ((AutoCompleteTextField) queryInput).getEntries().add(query);
+            .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
+            //"記事名のみを対象に検索"
+            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly)
+            .setOnPositive("OK", () -> {
+                final String query = queryInput.getText().trim();
+                if (StringUtils.isEmpty(query)) {
+                    return;
+                }
+                ((AutoCompleteTextField) queryInput).getEntries().add(query);
 
-            // 入っていない時もあるので.
-            final String filter = filterInput.getText();
-            if (StringUtils.isNotBlank(filter)) {
-                ((AutoCompleteTextField) filterInput).getEntries().add(filter);
-            }
+                // 入っていない時もあるので.
+                final String filter = filterInput.getText();
+                if (StringUtils.isNotBlank(filter)) {
+                    ((AutoCompleteTextField) filterInput).getEntries().add(filter);
+                }
 
-            final long start = System.currentTimeMillis();
+                final long start = System.currentTimeMillis();
 
-            final FileSearcher fileSearcher = new FileSearcher.Builder()
-                    .setHomeDirPath(Config.get("articleDir"))
-                    .setAnd(query.contains(" "))
-                    .setTitleOnly(isTitleOnly.isSelected())
-                    .setSelectName(filter)
-                    .build();
+                final FileSearcher fileSearcher = new FileSearcher.Builder()
+                        .setHomeDirPath(Config.get("articleDir"))
+                        .setAnd(query.contains(" "))
+                        .setTitleOnly(isTitleOnly.isSelected())
+                        .setSelectName(filter)
+                        .build();
 
-            final Map<String, SearchResult> map = fileSearcher.search(query);
-            if (map.isEmpty()){
-                AlertDialog.showMessage(
-                        getParent(), "見つかりませんでした。", "見つかりませんでした。");
-                searchArticle(queryInput.getText(), filterInput.getText());
-                return;
-            }
+                final Map<String, SearchResult> map = fileSearcher.search(query);
+                if (map.isEmpty()){
+                    AlertDialog.showMessage(
+                            getParent(), "見つかりませんでした。", "見つかりませんでした。");
+                    searchArticle(queryInput.getText(), filterInput.getText());
+                    return;
+                }
 
-            final Tab tab = Functions.makeClosableTab(query + "の検索結果", leftTabs);
-            // prepare tab's content.
-            final VBox box = new VBox();
-            leftTabs.getTabs().add(tab);
-            leftTabs.getSelectionModel().select(tab);
-            final ObservableList<Node> children = box.getChildren();
-            children.add(new Label(
-                    String.format("実行時間: %d[ms]", fileSearcher.getLastSearchTime())));
-            children.add(new Label(String.format("%dファイル / %dファイル中",
-                    map.size(), fileSearcher.getLastFilenum())));
-            // set up ListView.
-            final ListView<Article> listView = new ListView<Article>();
-            initArticleList(listView);
-            listView.getItems().addAll(
-                    map.entrySet().stream()
-                    .map(entry -> {return new Article(new File(entry.getValue().filePath));})
-                    .sorted()
-                    .collect(Collectors.toList())
-                    );
-            listView.setMinHeight(articleList.getHeight());
+                final Tab tab = Functions.makeClosableTab(query + "の検索結果", leftTabs);
+                // prepare tab's content.
+                final VBox box = new VBox();
+                leftTabs.getTabs().add(tab);
+                leftTabs.getSelectionModel().select(tab);
+                final ObservableList<Node> children = box.getChildren();
+                children.add(new Label(
+                        String.format("実行時間: %d[ms]", fileSearcher.getLastSearchTime())));
+                children.add(new Label(String.format("%dファイル / %dファイル中",
+                        map.size(), fileSearcher.getLastFilenum())));
+                // set up ListView.
+                final ListView<Article> listView = new ListView<Article>();
+                initArticleList(listView);
+                listView.getItems().addAll(
+                        map.entrySet().stream()
+                            .map(entry -> {return new Article(new File(entry.getValue().filePath));})
+                            .sorted()
+                            .collect(Collectors.toList())
+                        );
+                listView.setMinHeight(articleList.getHeight());
 
-            children.add(listView);
-            tab.setContent(box);
-            setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
-        }).build().show();
+                children.add(listView);
+                tab.setContent(box);
+                setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
+            }).build().show();
     }
 
     /**
@@ -1430,8 +1427,7 @@ public final class Controller implements Initializable {
      */
     private void initArticleList(final ListView<Article> listView) {
         listView.setCellFactory((lv) -> {return new ArticleListCell();});
-        final MultipleSelectionModel<Article> selectionModel
-        = listView.getSelectionModel();
+        final MultipleSelectionModel<Article> selectionModel = listView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         selectionModel.selectedItemProperty().addListener((property, oldVal, newVal) -> {
             if (property.getValue() == null) {
@@ -1572,23 +1568,23 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearBackup() {
         new AlertDialog.Builder().setParent(stage)
-        .setTitle("Clear History").setMessage("バックアップを削除します。")
-        .setOnPositive("OK", () -> {
-            try {
-                Files.list(Paths.get("backup/")).parallel()
-                .forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-            FILE_WATCHER_JOB.clear();
-        })
-        .build().show();
+            .setTitle("Clear History").setMessage("バックアップを削除します。")
+            .setOnPositive("OK", () -> {
+                try {
+                    Files.list(Paths.get("backup/")).parallel()
+                    .forEach(p -> {
+                        try {
+                            Files.deleteIfExists(p);
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                }
+                FILE_WATCHER_JOB.clear();
+            })
+            .build().show();
     }
 
     /**
@@ -1686,55 +1682,55 @@ public final class Controller implements Initializable {
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
         new AlertDialog.Builder().setParent(parent)
-        .setTitle("記事名変更").setMessage(renameMessage)
-        .addControl(input)
-        .setOnPositive("OK", () ->{
-            final String newTitle = input.getText();
-            if (StringUtils.isBlank(newTitle)) {
-                return;
-            }
-            final File dest = new File(
-                    Config.get(Config.Key.ARTICLE_DIR),
-                    Functions.toBytedString_EUC_JP(newTitle) + Config.article.extention()
-                    );
-            if (dest.exists()){
-                AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
-            }
-            final File file = Config.article.file;
-            boolean success = false;
-            try {
-                success = isCopy
-                        ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
-                                : file.renameTo(dest);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-            final String title;
-            final String message;
-            if (success){
+            .setTitle("記事名変更").setMessage(renameMessage)
+            .addControl(input)
+            .setOnPositive("OK", () ->{
+                final String newTitle = input.getText();
+                if (StringUtils.isBlank(newTitle)) {
+                    return;
+                }
+                final File dest = new File(
+                        Config.get(Config.Key.ARTICLE_DIR),
+                        Functions.toBytedString_EUC_JP(newTitle) + Config.article.extention()
+                        );
+                if (dest.exists()){
+                    AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
+                }
+                final File file = Config.article.file;
+                boolean success = false;
+                try {
+                    success = isCopy
+                            ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
+                                    : file.renameTo(dest);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+                final String title;
+                final String message;
+                if (success){
+                    if (isCopy) {
+                        title   = "コピー";
+                        message = "新規ファイル「" + newTitle  + "」を作成しました。";
+                    } else {
+                        title   = "変更";
+                        message = "ファイル名を「" + newTitle  + "」に変更しました。";
+                    }
+                    AlertDialog.showMessage(parent, title, message);
+                    Config.article.replace(dest);
+                    loadUrl(Config.article.toInternalUrl());
+                    removeHistory(new Article(file));
+                    loadArticleList();
+                    return;
+                }
                 if (isCopy) {
-                    title   = "コピー";
-                    message = "新規ファイル「" + newTitle  + "」を作成しました。";
+                    title   = "コピー失敗";
+                    message = "ファイルのコピーに失敗しました。";
                 } else {
-                    title   = "変更";
-                    message = "ファイル名を「" + newTitle  + "」に変更しました。";
+                    title   = "変更失敗";
+                    message = "ファイル名の変更に失敗しました。";
                 }
                 AlertDialog.showMessage(parent, title, message);
-                Config.article.replace(dest);
-                loadUrl(Config.article.toInternalUrl());
-                removeHistory(new Article(file));
-                loadArticleList();
-                return;
-            }
-            if (isCopy) {
-                title   = "コピー失敗";
-                message = "ファイルのコピーに失敗しました。";
-            } else {
-                title   = "変更失敗";
-                message = "ファイル名の変更に失敗しました。";
-            }
-            AlertDialog.showMessage(parent, title, message);
-        }).build().show();;
+            }).build().show();;
     }
 
     /**
@@ -1758,18 +1754,18 @@ public final class Controller implements Initializable {
             return;
         }
         new AlertDialog.Builder().setParent(parent).setTitle("ファイルの削除")
-        .setMessage(deleteTarget + " を削除しますか？")
-        .setOnPositive("OK", () -> {
-            article.file.delete();
-            AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-            // (130317)
-            final String homePath = Config.get(Config.Key.HOME);
-            // 削除後はホーム画面に戻す
-            loadUrl(homePath);
-            // (130309) そしてファイル一覧から削除
-            articleList.getItems().remove(deleteTarget);
-            removeHistory(article);
-        }).build().show();
+            .setMessage(deleteTarget + " を削除しますか？")
+            .setOnPositive("OK", () -> {
+                article.file.delete();
+                AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
+                // (130317)
+                final String homePath = Config.get(Config.Key.HOME);
+                // 削除後はホーム画面に戻す
+                loadUrl(homePath);
+                // (130309) そしてファイル一覧から削除
+                articleList.getItems().remove(deleteTarget);
+                removeHistory(article);
+            }).build().show();
     }
 
     /**
@@ -1839,7 +1835,7 @@ public final class Controller implements Initializable {
                 .getSelectedIndex()).getContent();
         return content instanceof WebView
                 ? Optional.of((WebView) content)
-                        : Optional.empty();
+                : Optional.empty();
     }
 
     /**
@@ -1857,24 +1853,24 @@ public final class Controller implements Initializable {
     public final void callPrinterJob() {
         final PrinterJob job = PrinterJob.createPrinterJob();
         new AlertDialog.Builder().setParent(getParent())
-        .setTitle("印刷").setMessage("印刷を実行しますか？")
-        .setOnPositive("OK", () -> {
-            if (job == null) {
-                return;
-            }
-            //PrinterAttributes attr = new PrinterAttributes(job);
-            func.generateHtmlForPrint(this.tabPane.getSelectionModel().getSelectedItem().getText());
-            final Optional<WebView> wv = getCurrentWebView();
-            if (!wv.isPresent()) {
-                return;
-            }
-            loadUrl(Defines.TEMP_FILE_NAME);
-            //getCurrentWebView().getEngine().print(job);
-            if (job.showPrintDialog(null)) {
-                job.printPage(wv.get());
-                job.endJob();
-            }
-        });
+            .setTitle("印刷").setMessage("印刷を実行しますか？")
+            .setOnPositive("OK", () -> {
+                if (job == null) {
+                    return;
+                }
+                //PrinterAttributes attr = new PrinterAttributes(job);
+                func.generateHtmlForPrint(this.tabPane.getSelectionModel().getSelectedItem().getText());
+                final Optional<WebView> wv = getCurrentWebView();
+                if (!wv.isPresent()) {
+                    return;
+                }
+                loadUrl(Defines.TEMP_FILE_NAME);
+                //getCurrentWebView().getEngine().print(job);
+                if (job.showPrintDialog(null)) {
+                    job.printPage(wv.get());
+                    job.endJob();
+                }
+            });
     }
 
     /**
