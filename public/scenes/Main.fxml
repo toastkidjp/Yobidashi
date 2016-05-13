@@ -68,7 +68,7 @@
             </Menu>
             <Menu text="Tool">
               <items>
-                <MenuItem accelerator="Ctrl+1" mnemonicParsing="true" onAction="#callCalc" text="電卓" />
+                <MenuItem accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="電卓" />
                 <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="文字数カウンタ" />
                 <MenuItem onAction="#callMorphAnalyzer" text="形態素解析" />
                 <MenuItem onAction="#callCmd" text="コマンドプロンプト" />
