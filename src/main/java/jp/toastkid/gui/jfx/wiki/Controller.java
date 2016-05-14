@@ -159,6 +159,42 @@ public final class Controller implements Initializable {
     private static final KeyCodeCombination HIDE_LEFT_PANE
         = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
 
+    /** select tab. */
+    private static final KeyCodeCombination FIRST_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination SECOND_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination THIRD_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination FOURTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination FIFTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination SIXTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination SEVENTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination EIGHTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.CONTROL_DOWN);
+
+    /** select tab. */
+    private static final KeyCodeCombination NINTH_TAB
+        = new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN);
+
     /** header. */
     @FXML
     public HBox header;
@@ -422,7 +458,28 @@ public final class Controller implements Initializable {
     protected void setupExpandables() {
         hideSearcher();
         scriptController.hideScripter();
-        stage.getScene().setOnKeyPressed((e) -> {
+        stage.getScene().setOnKeyPressed(e -> {
+            // select tab.
+            if (FIRST_TAB.match(e)) {
+                selectTab(0);
+            } else if (SECOND_TAB.match(e)) {
+                selectTab(1);
+            } else if (THIRD_TAB.match(e)) {
+                selectTab(2);
+            } else if (FOURTH_TAB.match(e)) {
+                selectTab(3);
+            } else if (FIFTH_TAB.match(e)) {
+                selectTab(4);
+            } else if (SIXTH_TAB.match(e)) {
+                selectTab(5);
+            } else if (SEVENTH_TAB.match(e)) {
+                selectTab(6);
+            } else if (EIGHTH_TAB.match(e)) {
+                selectTab(7);
+            } else if (NINTH_TAB.match(e)) {
+                selectTab(8);
+            }
+
             if (APPEAR_SEARCHER.match(e)) {
                 if (searcherArea.visibleProperty().getValue()) {
                     hideSearcher();
@@ -445,6 +502,7 @@ public final class Controller implements Initializable {
                 hideLeftPane();
             }
         });
+
         scriptController.scripterInput.setOnKeyPressed((e) -> {
             if (RUN_SCRIPT.match(e)) {
                 scriptController.runScript();
@@ -453,6 +511,19 @@ public final class Controller implements Initializable {
 
         // 特殊な使い方をしているので、ここでこのメソッドを呼んでタブ内のサイズ調整をする.
         tabPane.setPrefHeight(height);
+    }
+
+    /**
+     * select specified index tab.
+     * @param index
+     */
+    private void selectTab(final int index) {
+
+        if (index < 0 || tabPane.getTabs().size() < index ) {
+            System.out.println(index + " " + tabPane.getTabs().size());
+            return;
+        }
+        tabPane.getSelectionModel().select(index);
     }
 
     /**
@@ -1593,12 +1664,12 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearHistory() {
         new AlertDialog.Builder().setParent(stage)
-        .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
-        .setOnPositive("OK", () -> {
-            historyList.getItems().clear();
-            FILE_WATCHER_JOB.clear();
-        })
-        .build().show();
+            .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
+            .setOnPositive("OK", () -> {
+                historyList.getItems().clear();
+                FILE_WATCHER_JOB.clear();
+            })
+            .build().show();
     }
 
     /**
