@@ -1617,7 +1617,7 @@ public final class Controller implements Initializable {
             });
             // deep copy を渡す.
             addHistory(Config.article.clone());
-            //focusOn();
+            focusOn();
         }
     }
 
