@@ -80,6 +80,8 @@
                 <MenuItem onAction="#callRssFeeder" text="RSS Feeder" />
                 <MenuItem onAction="#openScripter" text="Script Runner" />
                 <SeparatorMenuItem />
+                <MenuItem onAction="#openCssGenerator" text="CSS Generator" />
+                <SeparatorMenuItem />
                 <MenuItem onAction="#callConvertMd" text="Markdown に変換" />
                 <MenuItem onAction="#callConvertAobun" text="青空文庫形式で出力" />
                 <MenuItem onAction="#callConvertEpub" text="ePub で出力" />

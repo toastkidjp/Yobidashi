@@ -78,6 +78,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.gui.jfx.common.Style;
 import jp.toastkid.gui.jfx.common.control.AutoCompleteTextField;
+import jp.toastkid.gui.jfx.cssgen.Main;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.dialog.ProgressDialog;
 import jp.toastkid.gui.jfx.wiki.chart.ChartPane;
@@ -925,6 +926,18 @@ public final class Controller implements Initializable {
         musicController.reload();
         if (!current.equals(Config.get(Config.Key.VIEW_TEMPLATE))) {
             reload();
+        }
+    }
+
+    /**
+     * open CSS Generator.
+     */
+    @FXML
+    private final void openCssGenerator() {
+        try {
+            new Main().start(this.stage);
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
     }
 
