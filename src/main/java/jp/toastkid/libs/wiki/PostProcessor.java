@@ -21,9 +21,6 @@ import jp.toastkid.libs.utils.Strings;
  */
 public class PostProcessor {
 
-    /** line separator. */
-    private static final String LINE_SEPARATOR = System.lineSeparator();
-
     /** internal link pattern. */
     private static final Pattern INTERNAL_LINK_PATTERN
         = Pattern.compile("\\[\\[(.+?)\\]\\]", Pattern.DOTALL);
@@ -61,7 +58,7 @@ public class PostProcessor {
 
         return ArrayAdapter.adapt(content.split("\n"))
                 .collect(str -> {return convertLine(str);})
-                .makeString(LINE_SEPARATOR);
+                .makeString("");
     }
 
     /**
