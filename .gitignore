@@ -18,6 +18,7 @@ gradlew*
 .class
 .externalToolBuilders/
 *.db
+*.epub
 *.bin
 script.py
 public/resources/NameMaker/*xml

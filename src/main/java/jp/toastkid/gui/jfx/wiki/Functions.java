@@ -55,6 +55,8 @@ import jp.toastkid.libs.Zip;
 import jp.toastkid.libs.comparator.NumberMapComparator;
 import jp.toastkid.libs.epub.DocToEpub;
 import jp.toastkid.libs.epub.EpubMetaData;
+import jp.toastkid.libs.epub.PageLayout;
+import jp.toastkid.libs.epub.PageProgressDirection;
 import jp.toastkid.libs.fileFilter.ImageFileFilter;
 import jp.toastkid.libs.markdown.MarkdownConverter;
 import jp.toastkid.libs.tinysegmenter.TinySegmenter;
@@ -449,21 +451,24 @@ public final class Functions {
 
     /**
      * 現在開いている記事をePubに変換する.
+     * @param isVertival
      * @param fileName
      */
-    public final void toEpub() {
+    public final void toEpub(final boolean isVertival) {
         final EpubMetaData meta = new EpubMetaData();
         meta.recursive = true;
         final String convertTitle = Config.article.title;
-        meta.title = convertTitle;
-        meta.subtitle = convertTitle;
-        meta.author = Defines.AUTHOR;
-        meta.editor = Defines.AUTHOR;
-        meta.publisher = Defines.AUTHOR;
-        meta.version = "0.0.1";
-        meta.zipFilePath = convertTitle + ".epub";
+        meta.title        = convertTitle;
+        meta.subtitle     = convertTitle;
+        meta.author       = Defines.AUTHOR;
+        meta.editor       = Defines.AUTHOR;
+        meta.publisher    = Defines.AUTHOR;
+        meta.version      = "0.0.1";
+        meta.zipFilePath  = convertTitle + ".epub";
         meta.targetPrefix = convertTitle;
         meta.containInnerLinks = false;
+        meta.layout       = isVertival ? PageLayout.VERTICAL : PageLayout.HORIZONTAL;
+        meta.direction    = isVertival ? PageProgressDirection.RTL : PageProgressDirection.LTR;
         DocToEpub.run(meta.toString());
     }
 

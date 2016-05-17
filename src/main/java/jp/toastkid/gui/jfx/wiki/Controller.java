@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +52,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
@@ -61,6 +61,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -124,12 +125,6 @@ public final class Controller implements Initializable {
 
     /** 左のリストで中心をいくつずらすか. */
     private static final int FOCUS_MARGIN = 10;
-
-    /** パラメータの置換に使用. */
-    private static final Pattern paramPat = Pattern.compile(
-            "map\\.get\\(\"(.+?)\"\\)",
-            Pattern.DOTALL
-            );
 
     /** searcher appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SEARCHER
@@ -301,15 +296,12 @@ public final class Controller implements Initializable {
     private jp.toastkid.gui.jfx.wiki.bmi.Controller bmiController;
 
     /** search history. */
-    private final TextField queryInput  = new AutoCompleteTextField(){{
-        setPromptText("検索キーワードを入力");
-    }};
+    private final TextField queryInput
+        = new AutoCompleteTextField(){{setPromptText("検索キーワードを入力");}};
 
     /** filter input. */
-    private final TextField filterInput = new AutoCompleteTextField(){{
-        setPromptText("記事名の一部を入力");
-    }};
-
+    private final TextField filterInput
+        = new AutoCompleteTextField(){{setPromptText("記事名の一部を入力");}};
 
     /** for auto backup. */
     private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
@@ -715,16 +707,25 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callConvertEpub() {
+        final RadioButton vertically   = new RadioButton("vertically");
+        final RadioButton horizontally = new RadioButton("horizontally");
+
+        final ToggleGroup radios = new ToggleGroup() {{
+            getToggles().addAll(vertically, horizontally);
+            vertically.setSelected(true);
+        }};
+
         new AlertDialog.Builder().setParent(getParent())
-        .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
-        .setOnPositive("OK", () -> {
-            final ProgressDialog pd = new ProgressDialog.Builder()
-                    .setScene(this.getParent().getScene())
-                    .setText("ePub 生成中……").build();
-            pd.start(stage);
-            func.toEpub();
-            pd.stop();
-        }).build().show();
+            .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
+            .addControl(vertically, horizontally)
+            .setOnPositive("OK", () -> {
+                final ProgressDialog pd = new ProgressDialog.Builder()
+                        .setScene(this.getParent().getScene())
+                        .setText("ePub 生成中……").build();
+                pd.start(stage);
+                func.toEpub(vertically.isSelected());
+                pd.stop();
+            }).build().show();
     }
 
     /**

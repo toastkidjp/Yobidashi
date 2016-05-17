@@ -16,6 +16,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
+
 import jp.toastkid.gui.jfx.wiki.Functions;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.Pair;
@@ -23,30 +28,33 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
-
 /**
  * epub を生成する.
  * @author Toast kid
  *
  */
 public final class EpubMaker {
+
+    /** 改行記号. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
+
     /** コンテンツの格納エントリ. */
     private static final String CONTENT_DIR = "OEBPS/";
+
     /** メタデータの格納エントリ. */
     private static final String META_DIR    = "META-INF/";
+
     /** epub に同梱するコンテンツ(HTML or XHTML). */
     private List<ContentMetaData> contentPaths;
+
     /** メタデータ. */
     private final EpubMetaData meta;
+
     /** 必ず削除対象とするファイル. */
     private static final List<String> DEFAULT_REMOVE_TARGETS = Collections.unmodifiableList(
         Arrays.asList(new String[]{"content.opf", "navdoc.html", "title_page.xhtml", "toc.ncx"})
     );
+
     /** epub に必ず含めるメタファイル名とその参照元の組一覧. */
     private static final ImmutableList<Pair<String, String>> REQUIRED_METAFILE_PAIRS
         = Lists.immutable.with(
@@ -59,6 +67,7 @@ public final class EpubMaker {
                 new Pair<>("content.opf", CONTENT_DIR),
                 new Pair<>("title_page.xhtml", CONTENT_DIR)
             );
+
     /**
      * 与えられたメタデータで初期化する.
      * @param meta
@@ -66,6 +75,7 @@ public final class EpubMaker {
     public EpubMaker(final EpubMetaData meta) {
         this.meta = meta;
     }
+
     /**
      * ePubを生成する.
      */
@@ -94,6 +104,7 @@ public final class EpubMaker {
         archive(pairs);
         clean(cleanTargets);
     }
+
     /**
      * コンテンツの用意.
      * @return コンテンツ関連のファイルパスのペア
@@ -118,6 +129,7 @@ public final class EpubMaker {
         generateContentOpf(contentPaths);
         return pairs;
     }
+
     /**
      * navdoc.html(3.0用) を生成する.
      * @param fileNames
@@ -142,6 +154,7 @@ public final class EpubMaker {
             Defines.ARTICLE_ENCODE
         );
     }
+
     /**
      * toc.ncx(2.0用) を生成する.
      * @param fileNames
@@ -178,6 +191,7 @@ public final class EpubMaker {
             Defines.ARTICLE_ENCODE
         );
     }
+
     /**
      * ファイルとタイトルの組から content.opf を生成する.
      * @param filePairs ファイルとタイトルの組
@@ -227,13 +241,14 @@ public final class EpubMaker {
                         put("publisher", meta.publisher);
                         put("content",   content.toString());
                         put("idref",     idref.toString());
-                        put("ppd",       meta.ppd.toString().toLowerCase());
+                        put("ppd",       meta.direction.toString().toLowerCase());
                     }}
             ),
             "content.opf",
             Defines.ARTICLE_ENCODE
         );
     }
+
     /**
      * 渡されたファイルリストの順に圧縮する.
      * @param files
@@ -260,6 +275,7 @@ public final class EpubMaker {
         }
         //System.out.println("圧縮終了");
     }
+
     /**
      * ZipOutputStreamに対してファイルを登録する.
      * @param out ZipOutputStream
@@ -273,9 +289,7 @@ public final class EpubMaker {
             final String path
             ) throws FileNotFoundException, IOException {
         final byte[] buf = new byte[128];
-        try {
-            // 圧縮元ファイルへのストリームを開く
-            final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+        try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));) {
             // エントリを作成する
             final String entryPath = path + file.getName();
             System.out.println(entryPath + " | " + file.getAbsolutePath());
@@ -293,32 +307,31 @@ public final class EpubMaker {
             e.printStackTrace();
         }
     }
+
     /**
      * ZipOutputStream に対しディレクトリを登録する.
      * @param out
      * @param file
      * @throws IOException
      */
-    private static void putEntryDirectory(
-            final ZipOutputStream out,
-            final File file
-            ) throws IOException {
+    private static void putEntryDirectory(final ZipOutputStream out, final File file)
+            throws IOException {
         final ZipEntry entry = new ZipEntry(file.getPath() + "/");
         entry.setSize(0);
         out.putNextEntry(entry);
     }
+
     /**
      * 不要となった生成ファイルを削除する.
      * @param pathList ファイルパスの一覧
      */
     private static final void clean(final List<String> pathList) {
-        for (final String path : pathList) {
-            final File file = new File(path);
-            if (file.exists()) {
-                file.delete();
-            }
-        }
+        pathList.parallelStream()
+            .map(pathStr -> {return new File(pathStr);})
+            .filter(file -> {return file.exists();})
+            .forEach(file -> {file.delete();});
     }
+
     /**
      * contentPaths をセットする.
      * @param contentPaths
