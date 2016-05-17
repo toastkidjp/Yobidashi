@@ -59,7 +59,7 @@ public class PostProcessor {
 
         this.subheadings = Lists.mutable.empty();
 
-        return ArrayAdapter.adapt(content.split(LINE_SEPARATOR))
+        return ArrayAdapter.adapt(content.split("\n"))
                 .collect(str -> {return convertLine(str);})
                 .makeString(LINE_SEPARATOR);
     }
@@ -82,13 +82,17 @@ public class PostProcessor {
 
         // Confluence 風 Heading.
         if (str.startsWith("<h") ) {
+            // for markdown.
+            if (str.contains(" id=")) {
+                str = str.replaceFirst(" id=\".+?\"", "");
+            }
             matcher = HEADING_PATTERN.matcher(str);
             if (matcher.find()) {
                 final int depth = Integer.parseInt(matcher.group(1));
                 final String subheading   = matcher.group(2).trim();
                 final String subheadingId = extractSubHeading(subheading);
                 final String subheadTag
-                    = String.format("<a id=\"%s\" href=\"#%s\">■</a>",subheadingId, subheadingId);
+                    = String.format("<a id=\"%s\" href=\"#%s\">■</a>", subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
                 subheadings.add(new Subheading(subheading, subheadingId, depth));
             }
