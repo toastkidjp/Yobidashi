@@ -78,7 +78,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.gui.jfx.common.Style;
 import jp.toastkid.gui.jfx.common.control.AutoCompleteTextField;
-import jp.toastkid.gui.jfx.cssgen.Main;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.dialog.ProgressDialog;
 import jp.toastkid.gui.jfx.wiki.chart.ChartPane;
@@ -935,7 +934,19 @@ public final class Controller implements Initializable {
     @FXML
     private final void openCssGenerator() {
         try {
-            new Main().start(this.stage);
+            new jp.toastkid.gui.jfx.cssgen.Main().start(this.stage);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * open Noodle Timer.
+     */
+    @FXML
+    private final void openNoodleTimer() {
+        try {
+            new jp.toastkid.gui.jfx.noodle_timer.Main().start(this.stage);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -1127,6 +1138,9 @@ public final class Controller implements Initializable {
             final MenuItem hideLeft = new MenuItem("記事一覧を閉じる"){{
                 setOnAction(event -> {hideLeftPane();});
             }};
+            final MenuItem wordCloud = new MenuItem("Word cloud"){{
+                setOnAction(event -> {callWordCloud();});
+            }};
 
             // add new item:
             cmc.getItemsContainer().getChildren().addAll(
@@ -1139,7 +1153,8 @@ public final class Controller implements Initializable {
                     cmc.new MenuItemContainer(moveToTop),
                     cmc.new MenuItemContainer(moveToBottom),
                     cmc.new MenuItemContainer(searchAll),
-                    cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft)
+                    cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft),
+                    cmc.new MenuItemContainer(wordCloud)
                     );
 
             return (PopupWindow)window;

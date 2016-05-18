@@ -22,16 +22,16 @@
               <items>
                 <MenuItem onAction="#setHome" text="ホームに設定する" />
                 <MenuItem accelerator="Ctrl+H" mnemonicParsing="true" onAction="#callHome" text="ホームに戻る" />
-                <MenuItem accelerator="Ctrl+T" mnemonicParsing="true" onAction="#openWebTab" text="タブを開く" />
-                <MenuItem accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="タブを閉じる" />
-                <MenuItem accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="スライドショー"/>
-                <MenuItem accelerator="Alt+F" mnemonicParsing="true" onAction="#callTabFullScreen" text="タブを全画面表示" />
+                <MenuItem accelerator="Ctrl+T" mnemonicParsing="true" onAction="#openWebTab" text="Open new tab" />
+                <MenuItem accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="Close tab" />
+                <MenuItem accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="Slide show"/>
+                <MenuItem accelerator="Alt+F" mnemonicParsing="true" onAction="#callTabFullScreen" text="Full screen this tab" />
                 <SeparatorMenuItem />
                 <MenuItem accelerator="Ctrl+R" mnemonicParsing="true" onAction="#loadArticleList" text="記事一覧の更新" />
-                <MenuItem onAction="#clearBackup" text="バックアップの削除" />
-                <MenuItem onAction="#clearHistory" text="閲覧履歴の削除" />
+                <MenuItem onAction="#clearBackup" text="Delete backup" />
+                <MenuItem onAction="#clearHistory" text="Delete history" />
                 <SeparatorMenuItem />
-                <Menu text="フォルダを開く">
+                <Menu text="Open folder">
                     <items>
                         <MenuItem onAction="#openFolder" text="現在のフォルダ" />
                         <MenuItem onAction="#openFolder" text="記事" />
@@ -40,51 +40,52 @@
                     </items>
                 </Menu>
                 <SeparatorMenuItem />
-                <MenuItem accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="記事のバックアップ" />
+                <MenuItem accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="Backup article" />
                 <SeparatorMenuItem />
-                <MenuItem accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="印刷" />
+                <MenuItem accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" />
                 <SeparatorMenuItem />
-                <MenuItem onAction="#closeApplication" text="終了" />
+                <MenuItem onAction="#closeApplication" text="Exit" />
               </items>
             </Menu>
             <Menu text="Edit">
               <items>
-                <Menu text="新規作成" accelerator="Ctrl+N">
+                <Menu text="New article" accelerator="Ctrl+N">
                   <items>
-                    <MenuItem onAction="#makeArticle" text="記事" />
+                    <MenuItem onAction="#makeArticle" text="Wiki Article" />
                     <MenuItem onAction="#makeMarkdown" text="Markdown" />
                   </items>
                 </Menu>
-                <MenuItem accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="コピー" />
-                <MenuItem onAction="#callRename" text="記事名変更" />
-                <MenuItem accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="エディタで開く" />
+                <MenuItem accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="Copy article" />
+                <MenuItem onAction="#callRename" text="Rename article" />
+                <MenuItem accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
                 <SeparatorMenuItem />
-                <MenuItem accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTMLソース" />
+                <MenuItem accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" />
                 <SeparatorMenuItem />
                 <MenuItem accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="全記事から検索" />
                 <SeparatorMenuItem />
-                <MenuItem onAction="#callDelete" text="削除" />
+                <MenuItem onAction="#callDelete" text="Delete article" />
               </items>
             </Menu>
             <Menu text="Tool">
               <items>
-                <MenuItem accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="電卓" />
+                <MenuItem accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="Calculator" />
                 <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="文字数カウンタ" />
                 <MenuItem onAction="#callMorphAnalyzer" text="形態素解析" />
-                <MenuItem onAction="#callCmd" text="コマンドプロンプト" />
+                <MenuItem onAction="#callCmd" text="Command Prompt" />
                 <SeparatorMenuItem />
-                <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="グラフ描画" />
+                <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="Draw chart" />
                 <MenuItem onAction="#callGallery" text="Gallery" />
                 <MenuItem accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" />
                 <MenuItem accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
                 <MenuItem onAction="#callRssFeeder" text="RSS Feeder" />
                 <MenuItem onAction="#openScripter" text="Script Runner" />
                 <SeparatorMenuItem />
+                <MenuItem onAction="#openNoodleTimer" text="Noodle Timer" />
                 <MenuItem onAction="#openCssGenerator" text="CSS Generator" />
                 <SeparatorMenuItem />
-                <MenuItem onAction="#callConvertMd" text="Markdown に変換" />
-                <MenuItem onAction="#callConvertAobun" text="青空文庫形式で出力" />
-                <MenuItem onAction="#callConvertEpub" text="ePub で出力" />
+                <MenuItem onAction="#callConvertMd" text="Convert to Markdown" />
+                <MenuItem onAction="#callConvertAobun" text="Generate AozoraBunko" />
+                <MenuItem onAction="#callConvertEpub" text="Generate ePub" />
                 <MenuItem onAction="#callSimpleBachup" text="Simple article backup" />
                 <SeparatorMenuItem />
                 <MenuItem onAction="#callGenerateEpubs" text="まとめてePub生成" />
