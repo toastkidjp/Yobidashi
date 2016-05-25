@@ -1573,7 +1573,6 @@ public final class Controller implements Initializable {
     /**
      * ページをロードする.
      * @param url ロードする URL
-     * @return yOffset.
      */
     private void loadUrl(final String url) {
         loadUrl(url, false);
@@ -1583,7 +1582,6 @@ public final class Controller implements Initializable {
      * ページをロードする.
      * @param url ロードする URL
      * @param isReload リロードの場合、yOffsetを保持.
-     * @return yOffset.
      */
     private void loadUrl(final String url, final boolean isReload) {
         final Optional<WebView> currentWebView = getCurrentWebView();
@@ -1612,10 +1610,7 @@ public final class Controller implements Initializable {
             fileName  = fileName.substring(0, lastIndexOf);
         }
         final File file = new File(Config.get(Config.Key.ARTICLE_DIR), fileName);
-        if (!fileName.endsWith(".html")
-                && !FileUtil.isImageFile(fileName)
-                //&& (url.startsWith("file://") || url.startsWith(Defines.ARTICLE_URL_PREFIX) )
-                ){
+        if (!fileName.endsWith(".html") && !FileUtil.isImageFile(fileName)){
             if (Config.article == null) {
                 Config.article = new Article(file);
             } else {
@@ -1627,7 +1622,6 @@ public final class Controller implements Initializable {
                 callEditor();
             }
 
-            // TODO check
             if (func == null) {
                 return;
             }
