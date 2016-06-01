@@ -37,6 +37,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import am.ik.marked4j.Marked;
 import am.ik.marked4j.MarkedBuilder;
@@ -809,26 +810,56 @@ public final class Functions {
         return "";
     }
 
+    private static final Pattern BG_PATTERN = Pattern.compile("\\{background:(.+?)\\}", Pattern.DOTALL);
+
+    private static final String BG_STATEMENT_DELIMITER = "\\|";
+    private static final String BG_ELEMPAIR_DELIMITER = "=";
+
     /**
      * Wiki 記事をスライドに変換する.
      * @return
      */
     public String convertArticle2Slide() {
         final MutableList<String> converted = Lists.mutable.empty();
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder content = new StringBuilder();
+        final StringBuilder sectitonOption = new StringBuilder();
         converter.convertToLines(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE)
             .forEach(str -> {
-                if ((str.contains("<hr/>") || str.matches("^<h[1-6r]>.*")) && sb.length() != 0) {
-                    converted.add(String.format("<section>%s</section>", sb.toString()));
-                    sb.setLength(0);
+                if (str.startsWith("{background")) {
+                    final Matcher matcher = BG_PATTERN.matcher(str);
+                    if (matcher.find()) {
+                        ArrayIterate.forEach(
+                                matcher.group(1).split(BG_STATEMENT_DELIMITER),
+                                elemPair -> {
+                                    final String[] splited = elemPair.split(BG_ELEMPAIR_DELIMITER);
+                                    switch (splited[0]) {
+                                        case "src":
+                                            sectitonOption.append("data-background-image=")
+                                                .append(splited[1]);
+                                            break;
+                                        case "repeat":
+                                            sectitonOption.append("data-background-repeat=")
+                                                .append(splited[1]);
+                                            break;
+                                    }
+                                }
+                            );
+                    }
+                    return;
+                }
+                if ((str.contains("<hr/>") || str.matches("^<h[1-6r]>.*")) && content.length() != 0) {
+                    converted.add(String.format("<section %s>%s</section>",
+                            sectitonOption.toString(), content.toString()));
+                    content.setLength(0);
+                    sectitonOption.setLength(0);
                 }
                 final String trimmed = str.startsWith("<") ? str.replace("<hr/>", "") : str;
                 if (trimmed.length() != 0) {
-                    sb.append(trimmed).append(LINE_SEPARATOR);
+                    content.append(trimmed).append(LINE_SEPARATOR);
                 }
             });
-        if (sb.length() != 0) {
-            converted.add(String.format("<section>%s</section>", sb.toString()));
+        if (content.length() != 0) {
+            converted.add(String.format("<section>%s</section>", content.toString()));
         }
         return converted.makeString(LINE_SEPARATOR);
     }
