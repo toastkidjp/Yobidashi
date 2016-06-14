@@ -622,8 +622,19 @@ public final class Controller implements Initializable {
      */
     private final void moveToTop() {
         getCurrentWebView().ifPresent(wv -> {
-            wv.getEngine().executeScript("window.scrollTo(0, 0);");
+            wv.getEngine().executeScript(findScrollTop(wv.getEngine().getLocation()));
         });
+    }
+
+    /**
+     * find scroll script.
+     * @param url
+     * @return
+     */
+    private String findScrollTop(final String url) {
+        return url.endsWith(Defines.TEMP_FILE_NAME)
+                ? "$('html,body').animate({ scrollTop: 0 }, 'fast');"
+                : "window.scrollTo(0, 0);";
     }
 
     /**
@@ -633,8 +644,19 @@ public final class Controller implements Initializable {
      */
     private final void moveToBottom() {
         getCurrentWebView().ifPresent(wv -> {
-            wv.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
+            wv.getEngine().executeScript(findScrollBottom(wv.getEngine().getLocation()));
         });
+    }
+
+    /**
+     * find scroll script.
+     * @param url
+     * @return
+     */
+    private String findScrollBottom(final String url) {
+        return url.endsWith(Defines.TEMP_FILE_NAME)
+                ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
+                : "window.scrollTo(0, document.body.scrollHeight);";
     }
 
     /**
