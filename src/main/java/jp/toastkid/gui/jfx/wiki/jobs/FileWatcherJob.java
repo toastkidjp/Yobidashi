@@ -3,6 +3,7 @@ package jp.toastkid.gui.jfx.wiki.jobs;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.collections.api.map.MutableMap;
@@ -33,11 +34,14 @@ public class FileWatcherJob implements Runnable {
                 backup.mkdir();
             }
             targets
-                .select((file, ms) -> {return ms < file.lastModified();})
+                .select((file, ms) -> ms < file.lastModified())
                 .forEachKeyValue(Procedures2.throwing((file, ms) -> {
-                    final Path copy
-                        = Files.copy(file.toPath(), new File(backup, file.getName()).toPath());
-                    System.out.println(copy);
+                    final Path copy = Files.copy(
+                            file.toPath(), new File(backup, file.getName()).toPath(),
+                            StandardCopyOption.REPLACE_EXISTING
+                            );
+                    System.out.println("Backup to " + copy);
+                    targets.put(file, file.lastModified());
                     }));
             try {
                 TimeUtil.sleep(BACKUP_INTERVAL);
@@ -47,14 +51,25 @@ public class FileWatcherJob implements Runnable {
         }
     }
 
+    /**
+     * add file to watch list.
+     * @param file article file.
+     */
     public void add(final File file) {
-        targets.put(file, -1L);
+        targets.put(file, file.lastModified());
     }
 
+    /**
+     * remove file to list.
+     * @param file
+     */
     public void remove(final File file) {
         targets.remove(file);
     }
 
+    /**
+     * clear watch list.
+     */
     public void clear() {
         targets.clear();
 
