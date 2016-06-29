@@ -3,8 +3,7 @@
  */
 package jp.toastkid.gui.jfx.wiki.models;
 
-import static org.junit.Assert.*;
-import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -16,19 +15,17 @@ import org.junit.Test;
 public class ViewTemplateTest {
 
     /**
-     * {@link jp.toastkid.gui.jfx.wiki.models.ViewTemplate#parse(java.lang.String)} のためのテスト・メソッド.
+     * {@link jp.toastkid.gui.jfx.wiki.models.ViewTemplate#parse(java.lang.String)}
+     * のためのテスト・メソッド.
      */
     @Test
     public final void testParse() {
         assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse("materialize"));
         assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse("MATERIALIZE"));
-        assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse("Materialize"));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse("classic"));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse("CLASSIC"));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse("Classic"));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse("tekito"));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse(" "));
-        assertEquals(ViewTemplate.CLASSIC, ViewTemplate.parse(null));
+        assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse("Materialize"));;
+        assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse("tekito"));
+        assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse(" "));
+        assertEquals(ViewTemplate.MATERIAL, ViewTemplate.parse(null));
     }
 
 }

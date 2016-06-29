@@ -8,7 +8,6 @@ import java.io.Serializable;
  *
  */
 public enum ViewTemplate implements Serializable {
-    CLASSIC("src/main/views/main_classic.html"),
     SECOND("src/main/views/main_2nd.html"),
     MATERIAL("src/main/views/main_material.html");
 
@@ -25,19 +24,16 @@ public enum ViewTemplate implements Serializable {
      */
     public static ViewTemplate parse(final String str) {
         if (str == null) {
-            return CLASSIC;
+            return MATERIAL;
         }
         switch (str.toLowerCase()) {
-            case "material":
-            case "materialize":
-                return MATERIAL;
-            case "classic":
-                return CLASSIC;
             case "second":
             case "2nd":
                 return SECOND;
+            case "material":
+            case "materialize":
             default:
-                return CLASSIC;
+                return MATERIAL;
         }
     }
     /**

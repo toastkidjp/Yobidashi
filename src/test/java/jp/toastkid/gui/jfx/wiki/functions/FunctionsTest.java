@@ -2,11 +2,11 @@ package jp.toastkid.gui.jfx.wiki.functions;
 
 import static org.junit.Assert.assertTrue;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
-import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
-
 import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
+
+import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 
 /**
  * {@link Functions} のテストケース.
@@ -20,7 +20,7 @@ public final class FunctionsTest {
     @Test
     public final void testGetHTMLContent() {
         final String htmlContent = Functions.bindArgs(
-            ViewTemplate.CLASSIC.getPath(),
+            ViewTemplate.MATERIAL.getPath(),
             Maps.mutable.with("title", "タイトルでござい", "content", "こんてんと")
         );
         assertTrue(

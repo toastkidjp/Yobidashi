@@ -29,9 +29,8 @@
 			</tooltip>
 			<items>
 				<FXCollections fx:factory="observableArrayList">
-		              <String fx:value="SECOND" />
-		              <String fx:value="CLASSIC" />
 		              <String fx:value="MATERIAL" />
+                      <String fx:value="SECOND" />
 				</FXCollections>
 			</items>
 		</ComboBox>

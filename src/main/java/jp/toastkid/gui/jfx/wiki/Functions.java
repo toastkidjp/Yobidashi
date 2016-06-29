@@ -215,11 +215,8 @@ public final class Functions {
     private final String makeMenu(final ViewTemplate tmpl) {
         switch (tmpl) {
             case MATERIAL:
-                return converter.makeMaterialMenubar(Config.get("articleDir"));
-            case CLASSIC:
-                return converter.makeSecondMenubar(Config.get("articleDir"));
             case SECOND:
-                return converter.makeSecondMenubar(Config.get("articleDir"));
+                return converter.makeMenubar(Config.get("articleDir"));
             default:
                 return "";
         }
@@ -434,20 +431,6 @@ public final class Functions {
      */
     public static final ObservableList<?> getUniqueItemList(final ObservableList<?> list){
         return FXCollections.observableArrayList(Sets.mutable.ofAll(list));
-    }
-
-    /**
-     * Wiki の HTML テンプレートヘッダを返す.
-     * <HR>
-     * (130302) 作成<BR>
-     * @param installDir アプリケーションのインストールフォルダ
-     * @return Wiki コンテンツの文字列表現
-     */
-    public static final String loadHtmlContent(final String installDir) {
-        return Functions.bindArgs(
-            ViewTemplate.CLASSIC.getPath(),
-            Maps.fixedSize.of("installDir", installDir)
-        );
     }
 
     /**

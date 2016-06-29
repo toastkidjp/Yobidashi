@@ -1,5 +1,9 @@
-/** Kay's edit **/
-/** (130511) 追加 */
+.page-blue .header {
+    background-color: #111693; !important
+}
+a {
+    color: #111693;
+}
 .lineGraphScrollBox {
 	overflow: scroll;
 	width: 100%;
@@ -21,22 +25,6 @@ input.titleArea{
 	font-weight: bold;
 	width: 90%;
 }
-header {
-	top: 0;
-	z-index: 1000;
-	position: fixed;
-	width: 100%;
-	height: 32px;
-	line-height: 32px;
-	padding: 20px 0;
-	background: navy;
-	/* Firefox用
-	background: -moz-linear-gradient(top, #004da0, #FFF);
-	/* Safari,Google Chrome用
-	background: -webkit-gradient(linear, left top, left bottom, from(#004da0), to(#FFF)); */
-	border-bottom: 1px solid #ccc;
-	box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-}
 /** (130323) グラフのパラメータ設定エリア */
 div.params {
 	position: fixed;
@@ -46,9 +34,12 @@ div.params {
 header nav a:hover{
 	font-size: 20pt;
 }
+.header-logo {
+    font-size: 30px;
+    padding: 20px;
+}
 .nav{
-	padding: 2px;
-	background: #253142;
+	padding: 15px;
 }
 
 /** (121020) ナビゲーションバー拡張 */
@@ -72,9 +63,6 @@ a:hover{
 	background:rgba(255,255,255,0.8);
 	border:1px solid #ccc;
 	padding:7px 10px;
-	-webkit-border-radius:5px;
-	-moz-border-radius:5px;
-	border-radius:5px;
 	-webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
 	-moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
 	box-shadow:1px 1px 3px rgba(150,150,150,0.5)
@@ -83,13 +71,7 @@ a:hover{
 	position:fixed;
 	right:150px;
 	bottom:15px;
-	/* Firefox逕ｨ */
-	background: -moz-linear-gradient(top, #006da0, #FFF);
-	/* Safari,Google Chrome逕ｨ */
-	background: -webkit-gradient(linear, left top, left bottom, from(#006da0), to(#FFF));
-	border-radius: 10px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
+	background: #111693;
 	font-weight: bold;
 	text-shadow: 1.5px 2.5px 2.5px #004daf;
 	transition:all 2.0s ease-in-out
@@ -103,18 +85,13 @@ a:hover{
 
 /** Main layout **/
 html, body {
-	/*background: #364B66 !important;*/
 	font-family: Helvetica, Arial, Sans !important;
 }
 body {
-	/* width: 900px; */
-	/* (130203) */
-	width: 98%;
 	margin: auto;
 	background-position: 50% 50%;
 }
 body, x:-moz-any-link  {
-	/* (130204) */
 	width: 80%;
 }
 
@@ -128,7 +105,6 @@ body, x:-moz-any-link  {
 #logo {
 	position: absolute;
 	height: 45px;
-	/* (121028) edit */
 	margin-left: 90px;
 	color: #fff;
 	font-size: 48px;
@@ -157,64 +133,6 @@ body, x:-moz-any-link  {
 #logo a:hover{
 	padding:2px 0px;
 }
-#tools {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	position: absolute;
-	right: 0;
-	top: 30px;
-	right: 20px;
-}
-
-#tools a {
-	color: #fff;
-	text-decoration: none;
-}
-
-#title {
-	background: #B8C569;
-	padding: 20px 30px 30px 20px;
-	margin: 20px 0;
-	color: #3C4313;
-	position: relative;
-	-webkit-border-radius: 16px;
-	-webkit-box-shadow: 0 2px 0 #93A045;
-	-moz-border-radius: 16px;
-}
-
-/** A little hacky to create arrows without images **/
-.about {
-	text-indent: -999em;
-	display: block;
-	width: 0; 
-	height: 0; 
-	border-left: 10px solid transparent; 
-	border-right: 10px solid transparent;
-	border-bottom: 10px solid #BAC36E;
-	border-top: 0;
-	position: absolute;
-	top: -10px;
-	left: 60px;
-}
-
-#title h1 {
-	font-size: 64px;
-	margin: 0;
-}
-
-#title h1 a {
-	text-decoration: none;
-	color: inherit;
-}
-
-#title h2 {
-	font-size: 26px;
-	margin: 0;
-	font-weight: normal;
-}
-
-/** Main content **/
 
 #main {
 	-webkit-border-radius: 16px;
@@ -233,137 +151,6 @@ h3 span {
 	font-weight: normal;
 }
 
-.comment {
-	width: 70%;
-	clear: both;
-}
-
-.comment .comment-metadata {
-	color: #869AB1;
-	display: block;
-	font-size: 50%;
-	display: block;
-	float: left;
-	width: 80px;
-	text-align: right;
-}
-
-.comment .comment-author {
-	font-size: 150%;
-	font-weight: bold;
-	display: block;
-}
-
-.comment .comment-content {
-	position: relative;
-	background: #E4EAFF;
-	color: #242C58;
-	font-size: 80%;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	margin-left: 100px;
-	padding: 10px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-}
-
-.comment .about {
-	text-indent: -999em;
-	display: block;
-	width: 0; 
-	height: 0; 
-	border-top: 10px solid transparent; 
-	border-bottom: 10px solid transparent;
-	border-right: 10px solid #E4EAFF;
-	border-left: 0;
-	position: absolute;
-	top: 4px;
-	left: -4px;
-}
-
-/** Form **/
-
-
-form .error {
-	background: #c00;
-	color: #fff;
-	font-size: 90%;
-	padding: 3px 5px;
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-box-shadow: 0 2px 0 #800;
-}
-
-form .error:empty {
-	 display: none;	
-}
-
-form p {
-	margin: 5px 0 0 0;
-}
-
-form input, form textarea {
-	font-size: 14px;
-}
-
-form label {
-	display: block;
-	font-weight: bold;
-	font-size: 90%;
-	color: #aaa;
-	margin-bottom: 3px;
-}
-
-#captcha{
-	display: block;
-	height: 50px;	
-}
-
-.success {
-	background: #67AD10;
-	color: #fff;
-	padding: 10px;
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-box-shadow: 0 2px 0 #4E840B; 
-}
-
-/** Pagination **/
-
-#pagination {
-	list-style: none;
-	padding: 0;
-	position: relative;
-	color: #869AB1;
-	font-size: 90%;
-	top: -20px;
-	margin-bottom: 30px;
-}
-
-#pagination a {
-	color: #869AB1;
-	font-size: 90%;
-}
-
-#pagination #previous {
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-
-#pagination #previous:before {
-	content: '<< ';
-}
-
-#pagination #next {
-	position: absolute;
-	top: 0;
-	right: 0;
-}
-
-#pagination #next:after {
-	content: ' >>';
-}
 
 /** Footer **/
 
@@ -390,61 +177,6 @@ div.content_area {
 	/*margin-left: 16%;*/
 	padding: 0px 0px 5px 5px;
 }
-div.menubar {
-	top: 15%;
-	width: 15%;
-	border-style: solid;
-	border-width: 0.5px;
-	display: block;
-	list-style-type: none;
-}
-div.menubar li {
-	margin: 0px;
-	width: 100px;
-	padding: 8px;
-	display: block;
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	/*background-color: #CFD;*/
-	color: #FFFFFF;
-	text-decoration: bold;
-	white-space: nowrap;
-	overflow: hidden;
- 	text-overflow: ellipsis;
- 	-o-text-overflow: ellipsis;
-}
-div.menubar li:hover{
-	-webkit-border-radius: 8px;
-	-moz-border-radius: 8px;
-	background-color: #FFF;
-	color: #000000;
-}
-div.menubar ul {
-	margin-top: 0px;
-	margin-bottom: 4px;
-	padding: 0px 0px 0px 0px !important;
-}
-
-div.menubar li ul {
-	position: absolute;
-	left: -999em;
-	width: 300px !important;
-	background: transparent;
-	white-space: nowrap;
-}
-div.menubar :hover ul,
-div.menubar li:hover ul {
-	left: 3em;
-	white-space: nowrap;
-	background: #FFFFFF;
-	width: 300px !important;
-}
-div.menubar ul:hover ul,
-div.menubar .hover li {
-	visibility: visible;
-	margin-left: 20px;
-	text-decoration: none;
-}
 
 /*
 tooltip HTML sample
@@ -463,9 +195,6 @@ tooltip HTML sample
 }
 .tooltip .tooltipBody {
     border: solid 2px #f98325;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     position: absolute;
     left: 1em;
     top: -2.7em;
@@ -523,15 +252,3 @@ table {
 	/* Safari,Google Chrome */
 	-webkit-box-shadow: 1px 1px 3px #000;
 }
-
-/* pushy overwrite */
-.pushy-active .site-overlay {
-    background-color: rgba(0,0,0,0)  !important;
-}
-.pushy {
-    background: navy !important;
-}
-.menu-btn {
-    color: white !important ;
-}
-

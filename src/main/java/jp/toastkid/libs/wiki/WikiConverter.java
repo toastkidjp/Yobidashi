@@ -279,51 +279,6 @@ public final class WikiConverter {
     }
 
     /**
-     * SECOND 用メニューバー文字列を構築する.
-     * @param sourceDir "MenuBar.txt" のあるフォルダ
-     */
-    public String makeSecondMenubar(final String sourceDir) {
-        final String menubarFilePath = sourceDir + MENUBAR_FILE_NAME;
-
-        if (!new File(menubarFilePath).exists()) {
-            return "";
-        }
-
-        final StringBuilder menuBuf = new StringBuilder(2000);
-        menuBuf.append("<div class=\"menubar\">");
-        // メニューバーソース読み込み
-        final List<String> menuBarStrList =
-                FileUtil.readLines(menubarFilePath, Defines.ARTICLE_ENCODE);
-        // 自力でパース
-        boolean inUl = false;
-        for (final String str : menuBarStrList) {
-            if ("".equals(str) && inUl) {
-                inUl = false;
-                menuBuf.append("</ul></li>");
-                continue;
-            }
-            if (str.startsWith("--")) {
-                menuBuf.append("<li>").append(convertLine(str.replaceFirst("\\-\\-", ""))).append("</li>");
-                continue;
-            }
-            if (str.startsWith("-")) {
-                if (!inUl) {
-                    inUl = true;
-                }
-                menuBuf.append("<li>").append(convertLine(str.replaceFirst("\\-", ""))).append("<ul>");
-                continue;
-            }
-        }
-        if (inUl) {
-            menuBuf.append("</ul></li>");
-        }
-        menuBuf.append("</div>");
-        menuBuf.append(Strings.LINE_SEPARATOR);
-        menuBuf.append(Strings.LINE_SEPARATOR);
-        return menuBuf.toString();
-    }
-
-    /**
      * return toggle html.
      * @param id toggle id.
      * @return toggle html.
@@ -337,16 +292,15 @@ public final class WikiConverter {
     }
 
     /**
-     * now in implementing.
+     * Make menu bar html.
      * @param articleDirPath
-     * @return
+     * @return menu bar html string
      */
-    public String makeMaterialMenubar(final String articleDirPath) {
+    public String makeMenubar(final String articleDirPath) {
         final String menubarFilePath = sourceDir + MENUBAR_FILE_NAME;
         if (!new File(menubarFilePath).exists()) {
             return "";
         }
-
         final StringBuilder menuBuf = new StringBuilder(2000);
         menuBuf.append("<ul class=\"nav\">");
         // メニューバーソース読み込み

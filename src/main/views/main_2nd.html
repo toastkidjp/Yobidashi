@@ -6,45 +6,63 @@
         <!--Import jQuery before materialize.js-->
         <script src="public/javascripts/jquery-2.1.1.min.js" charset="utf-8"></script>
         <script src="public/javascripts/GitHub-jQuery-Repo-Widget/jquery.githubRepoWidget.min.js" charset="utf-8"></script>
-        <script src="public/javascripts/pushy/js/pushy.min.js" charset="utf-8"></script>
         <script src="public/javascripts/highlightjs/highlight.pack.js"></script>
 
         <link rel="stylesheet" type="text/css" href="public/javascripts/highlightjs/styles/github.css">
         <link rel="stylesheet" type="text/css" href="public/stylesheets/football.css" />
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/material/css/base.css">
         <link rel="stylesheet" type="text/css" href="public/stylesheets/main_2nd.css" />
-        <link rel="stylesheet" type="text/css" href="public/stylesheets/wiki.css" id="current_style"/>
         <link rel="stylesheet" type="text/css" href="public/stylesheets/ascii_art.css" />
         <link rel="stylesheet" type="text/css" href="public/stylesheets/additional.css" />
         <link rel="stylesheet" type="text/css" href="user/css/html/user.css" />
     </head>
-    <body>
-        <header>
-          <img id="wikiIcon" src="${wikiIcon}">
-            <div id="logo">
-                ${wikiTitle}
-            </div>
-            <span class="nav" id="pageTitle">
-                <marquee scrollamount="3">${title}</marquee>
-            </span>
-            <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>
-				<!-- Menu Button -->
-				<span id="container" class="menu-btn">&#9776; Menu</span>
-            </span>
-            <!-- Site Overlay -->
-			<div class="site-overlay"></div>
-			<nav>
-		        ${menu}
-			</nav>
+    <body class="page-blue">
+        <header class="header">
+          <ul class="nav nav-list pull-left">
+            <li>
+				<a class="menu-toggle" href="#menu">
+					<span class="access-hide">Menu</span>
+					<span class="icon icon-menu"></span>
+					<span class="header-close icon icon-close"></span>
+				</a>
+			</li>
+		</ul>
+		<a class="header-logo">${title} - ${wikiTitle}</a>
+			<ul class="nav nav-list pull-right">
+				<li>
+					<a class="menu-toggle" href="#profile">
+						<span class="access-hide">Right Side Menu</span>
+						<span class="avatar avatar-sm"><img alt="alt text for your avatar" src="${wikiIcon}"></span>
+						<span class="header-close icon icon-close"></span>
+					</a>
+				</li>
+			</ul>
         </header>
+        <br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <nav class="menu" id="menu">
+			<div class="menu-scroll">
+				<div class="menu-wrap">
+					<div class="menu-content">
+						${menu}
+					</div>
+				</div>
+			</div>
+		</nav>
+		<nav class="menu menu-right" id="profile">
+			<div class="menu-scroll">
+				<div class="menu-wrap">
+					<div class="menu-content">
+							${subheadings}
+					</div>
+				</div>
+			</div>
+	    </nav>
         <a id="head"></a>
-        <div id="main">
-            <h2><a href="JavaScript:open('subheadings')">Subheadings</a></h2>
-			<div class="expander" id="subheadings">
-				${subheadings}
-			</div><script>close("subheadings");</script>
-            ${content}
+        <div id="content">
+			<div class="container">
+            	${content}
+        	</div>
         </div>
         <p id="footer">This application is generate Wiki like document. This is built by Toast kid.</p>
         <span id="jump2head"><a href="#head">Jump to head</a></span>
@@ -53,4 +71,5 @@
         // for highlighting
         hljs.initHighlightingOnLoad();
     </script>
+    <script src="public/stylesheets/material/js/base.js" type="text/javascript"></script>
 </html>
