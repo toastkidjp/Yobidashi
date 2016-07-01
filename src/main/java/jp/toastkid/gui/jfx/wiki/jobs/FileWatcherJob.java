@@ -1,16 +1,17 @@
 package jp.toastkid.gui.jfx.wiki.jobs;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.impl.block.factory.Procedures2;
 import org.eclipse.collections.impl.factory.Maps;
 
 import jp.toastkid.libs.utils.TimeUtil;
+import reactor.core.publisher.Flux;
 
 /**
  * watch file for auto backup.
@@ -27,28 +28,36 @@ public class FileWatcherJob implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            final File backup = new File("backup");
-            if (!backup.exists() || !backup.isDirectory()) {
-                System.out.println("make backup dir.");
-                backup.mkdir();
-            }
-            targets
-                .select((file, ms) -> ms < file.lastModified())
-                .forEachKeyValue(Procedures2.throwing((file, ms) -> {
-                    final Path copy = Files.copy(
-                            file.toPath(), new File(backup, file.getName()).toPath(),
-                            StandardCopyOption.REPLACE_EXISTING
-                            );
-                    System.out.println("Backup to " + copy);
-                    targets.put(file, file.lastModified());
-                    }));
-            try {
-                TimeUtil.sleep(BACKUP_INTERVAL);
-            } catch (final InterruptedException e) {
-                //e.printStackTrace();
-            }
+        final File backup = new File("backup");
+        if (!backup.exists() || !backup.isDirectory()) {
+            System.out.println("make backup dir.");
+            backup.mkdir();
         }
+        Flux.<File>create(emitter -> {
+            while (true) {
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> emitter.complete()));
+                targets
+                    .select((file, ms) -> ms < file.lastModified())
+                    .forEachKeyValue((file, ms) -> emitter.next(file));
+                try {
+                    TimeUtil.sleep(BACKUP_INTERVAL);
+                } catch (final InterruptedException e) {
+                    emitter.fail(e);
+                }
+            }
+        })
+        .subscribe(file -> {
+            try {
+                final Path copy = Files.copy(
+                        file.toPath(), new File(backup, file.getName()).toPath(),
+                        StandardCopyOption.REPLACE_EXISTING
+                        );
+                System.out.println("Backup to " + copy);
+                targets.put(file, file.lastModified());
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

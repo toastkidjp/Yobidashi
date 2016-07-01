@@ -307,7 +307,7 @@ public final class Controller implements Initializable {
     private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
 
     /** file watcher. */
-    private static final FileWatcherJob FILE_WATCHER_JOB = new FileWatcherJob();
+    private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -439,7 +439,7 @@ public final class Controller implements Initializable {
         webSearch.setGraphic(new ImageView(FileUtil.getUrl(Resources.PATH_IMG_SEARCH).toString()));
         //initReloadButton();
 
-        BACKUP.submit(FILE_WATCHER_JOB);
+        BACKUP.submit(FILE_WATCHER);
         pd.addProgress(11);
         pd.stop();
     }
@@ -1680,7 +1680,7 @@ public final class Controller implements Initializable {
         if (!items.contains(article)) {
             items.add(0, article);
         }
-        FILE_WATCHER_JOB.add(article.file);
+        FILE_WATCHER.add(article.file);
         historyList.requestLayout();
     }
 
@@ -1704,7 +1704,6 @@ public final class Controller implements Initializable {
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
-                FILE_WATCHER_JOB.clear();
             })
             .build().show();
     }
@@ -1718,7 +1717,7 @@ public final class Controller implements Initializable {
             .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
             .setOnPositive("OK", () -> {
                 historyList.getItems().clear();
-                FILE_WATCHER_JOB.clear();
+                FILE_WATCHER.clear();
             })
             .build().show();
     }
