@@ -12,6 +12,7 @@ import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,6 +21,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -43,6 +46,12 @@ import jp.toastkid.libs.utils.MathUtil;
  */
 public class FullScreen {
 
+    private static final KeyCodeCombination FULL_SCREEN_KEY = new KeyCodeCombination(KeyCode.F11);
+
+    private static final KeyCodeCombination RELOAD_KEY = new KeyCodeCombination(KeyCode.F5);
+
+    private static final KeyCodeCombination JUMP_KEY = new KeyCodeCombination(KeyCode.J, KeyCombination.CONTROL_DOWN);
+
     /** path to theme's css dir. */
     private static final String THEME_DIR = "public/javascripts/reveal/css/theme/";
 
@@ -50,17 +59,15 @@ public class FullScreen {
     private static final FilenameFilter CSS_FILTER = (dir, name) -> {return name.endsWith(".css");};
 
     /** stage. */
-    private final Stage stage
-        = new Stage();
+    private final Stage stage = new Stage();
 
     /** WebView. */
     private final WebView webView;
+
+    /** Style sheets. */
     private final ComboBox<String> styles;
 
-    /** Width. */
-    private final double width;
-    /** Height. */
-    private final double height;
+    private String title;
 
     /**
      * width & height.
@@ -68,29 +75,20 @@ public class FullScreen {
      * @param height
      */
     public FullScreen(final double width, final double height) {
-        this.width = width;
-        this.height = height;
         webView = new WebView();
-        styles = new ComboBox<>();
-    }
-
-    /**
-     * show full screen.
-     */
-    public void show(final String url) {
-
+        styles  = new ComboBox<>();
         initWebView();
-
-        webView.getEngine().load(url);
         final AnchorPane ap = new AnchorPane();
         ap.getChildren().add(webView);
         AnchorPane.setTopAnchor(ap, 0.0);
         AnchorPane.setBottomAnchor(ap, 0.0);
         AnchorPane.setRightAnchor(ap, 0.0);
         AnchorPane.setLeftAnchor(ap, 0.0);
+        webView.setPrefWidth(width);
+        webView.setPrefHeight(height);
 
         final NumberTextField page = new NumberTextField();
-        page.setOnAction(e -> {jump(page.getText());});
+        page.setOnAction(e -> jump(page.getText()));
 
         // 初期値セット
         final String theme = Config.get(Config.Key.SLIDE_THEME);
@@ -102,8 +100,27 @@ public class FullScreen {
                 callJump();
             }
         });
-        stage.setFullScreen(true);
+        final ObservableMap<KeyCombination, Runnable> accelerators = scene.getAccelerators();
+        accelerators.put(JUMP_KEY,        () -> callJump());
+        accelerators.put(RELOAD_KEY,      () -> webView.getEngine().reload());
+        accelerators.put(FULL_SCREEN_KEY, () -> stage.setFullScreen(true));
         stage.setScene(scene);
+    }
+
+    /**
+     * show full screen with url.
+     * @param url
+     */
+    public void show(final String url) {
+        webView.getEngine().load(url);
+        show();
+    }
+
+    /**
+     * show full screen.
+     */
+    public void show() {
+        stage.setFullScreen(true);
         stage.show();
     }
 
@@ -123,7 +140,7 @@ public class FullScreen {
         });
 
         final Button reset = new JFXButton("Reset");
-        reset.setOnAction(eve -> {stopwatch.reset();});
+        reset.setOnAction(eve -> stopwatch.reset());
 
         return new HBox(stopwatch, start, reset, makeThemeChooser());
     }
@@ -134,9 +151,11 @@ public class FullScreen {
      */
     private ComboBox<String> makeThemeChooser() {
         final ObservableList<String> items = styles.getItems();
-        items.addAll(ArrayAdapter.adapt(new File(THEME_DIR).list(CSS_FILTER))
-                .collect(name -> {return FileUtil.removeExtension(name);}));
-        styles.setOnAction(event -> {setTheme(styles.getSelectionModel().getSelectedItem());});
+        items.addAll(
+                ArrayAdapter.adapt(new File(THEME_DIR).list(CSS_FILTER))
+                    .collect(name -> FileUtil.removeExtension(name))
+                    );
+        styles.setOnAction(event -> setTheme(styles.getSelectionModel().getSelectedItem()));
         return styles;
     }
 
@@ -156,14 +175,7 @@ public class FullScreen {
      * @return WebView オブジェクト
      */
     private void initWebView() {
-        webView.setPrefHeight(height);
-        webView.setPrefWidth(width);
-        webView.setOnContextMenuRequested(event -> {showContextMenu();});
-        webView.setOnKeyTyped(value -> {
-            if (value.getCode().equals(KeyCode.UNDEFINED)) {
-                close();
-            }
-        });
+        webView.setOnContextMenuRequested(event -> showContextMenu());
     }
 
     /**
@@ -176,7 +188,7 @@ public class FullScreen {
             .setTitle("ジャンプ")
             .setMessage("何ページ目に移動しますか？")
             .addControl(num)
-            .setOnPositive("Jump", () -> { jump(num.getText());})
+            .setOnPositive("Jump", () -> jump(num.getText()))
             .build().show();
     }
 
@@ -229,7 +241,7 @@ public class FullScreen {
             }
             final Node bridge = popup.lookup(".context-menu");
             final ContextMenuContent cmc
-            = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
+                = (ContextMenuContent)((Parent)bridge).getChildrenUnmodifiable().get(0);
 
             final VBox itemsContainer = cmc.getItemsContainer();
             for (final Node n: itemsContainer.getChildren()) {
@@ -238,20 +250,35 @@ public class FullScreen {
             }
 
             // adding new item:
-            final MenuItem jump = new MenuItem("ジャンプ"){{
-                setOnAction(event -> {callJump();});
+            final MenuItem jump = new MenuItem("Jump"){{
+                setOnAction(event -> callJump());
             }};
 
-            final MenuItem length = new MenuItem("終了"){{
-                setOnAction(event -> {close();});
-            }};
-
-            // add new item:
-            cmc.getItemsContainer().getChildren().addAll(
-                    cmc.new MenuItemContainer(jump),
-                    cmc.new MenuItemContainer(length)
+            // jump
+            cmc.getItemsContainer().getChildren().add(
+                    cmc.new MenuItemContainer(jump)
                     );
 
+            // quit full screen.
+            if (!stage.isFullScreen()) {
+                final MenuItem fs = new MenuItem("Full Screen"){{
+                    setOnAction(event -> stage.setFullScreen(true));
+                }};
+                cmc.getItemsContainer().getChildren().add(cmc.new MenuItemContainer(fs));
+            } else {
+                final MenuItem fs = new MenuItem("Quit Full Screen"){{
+                    setOnAction(event -> stage.setFullScreen(false));
+                }};
+                cmc.getItemsContainer().getChildren().add(cmc.new MenuItemContainer(fs));
+            }
+
+            // Close window.
+            final MenuItem length = new MenuItem("Close"){{
+                setOnAction(event -> close());
+            }};
+            cmc.getItemsContainer().getChildren().add(
+                    cmc.new MenuItemContainer(length)
+                    );
             return (PopupWindow)window;
         }
         return null;
@@ -263,5 +290,21 @@ public class FullScreen {
     private void close() {
         this.stage.setFullScreen(false);
         this.stage.close();
+    }
+
+    /**
+     * set to this title.
+     * @param title
+     */
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    /**
+     * get this title.
+     * @return title
+     */
+    public CharSequence getTitle() {
+        return this.title;
     }
 }

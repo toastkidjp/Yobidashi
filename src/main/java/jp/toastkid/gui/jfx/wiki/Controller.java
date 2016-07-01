@@ -309,6 +309,8 @@ public final class Controller implements Initializable {
     /** file watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
+    private FullScreen fs;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -1466,7 +1468,16 @@ public final class Controller implements Initializable {
      */
     @FXML
     private void callTabFullScreen() {
-        new FullScreen(width, height).show(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+        if (fs == null) {
+            fs = new FullScreen(this.width, this.height);
+        }
+
+        if (!StringUtils.equals(fs.getTitle(), Config.article.title)) {
+            fs.setTitle(Config.article.title);
+            fs.show(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+            return;
+        }
+        fs.show();
     }
 
     /**
