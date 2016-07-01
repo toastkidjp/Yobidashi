@@ -40,16 +40,19 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 
 /**
- * タブの全画面表示用.
+ * For appear article full screen.
  * @author Toast kid
  *
  */
 public class FullScreen {
 
+    /** Full screen key. */
     private static final KeyCodeCombination FULL_SCREEN_KEY = new KeyCodeCombination(KeyCode.F11);
 
+    /** Reload key. */
     private static final KeyCodeCombination RELOAD_KEY = new KeyCodeCombination(KeyCode.F5);
 
+    /** Jump key. */
     private static final KeyCodeCombination JUMP_KEY = new KeyCodeCombination(KeyCode.J, KeyCombination.CONTROL_DOWN);
 
     /** path to theme's css dir. */
@@ -67,6 +70,7 @@ public class FullScreen {
     /** Style sheets. */
     private final ComboBox<String> styles;
 
+    /** use for reloading. */
     private String title;
 
     /**
@@ -78,6 +82,7 @@ public class FullScreen {
         webView = new WebView();
         styles  = new ComboBox<>();
         initWebView();
+
         final AnchorPane ap = new AnchorPane();
         ap.getChildren().add(webView);
         AnchorPane.setTopAnchor(ap, 0.0);
@@ -170,22 +175,22 @@ public class FullScreen {
     }
 
     /**
-     * WebView を初期化.
+     * Init WebView.
      * @param url URL
-     * @return WebView オブジェクト
+     * @return WebView Obbject
      */
     private void initWebView() {
         webView.setOnContextMenuRequested(event -> showContextMenu());
     }
 
     /**
-     * ジャンプするページ数を入力させる.
+     * Specify target page.
      * @param webView
      */
     private void callJump() {
         final NumberTextField num = new NumberTextField();
         new AlertDialog.Builder().setParent(stage.getScene().getWindow())
-            .setTitle("ジャンプ")
+            .setTitle("Jump to")
             .setMessage("何ページ目に移動しますか？")
             .addControl(num)
             .setOnPositive("Jump", () -> jump(num.getText()))
@@ -193,7 +198,7 @@ public class FullScreen {
     }
 
     /**
-     * 指定したページにジャンプする.
+     * Jump to specified page.
      * @param webView WebView
      * @param num ページ番号(必ず数字になっているはず)
      */
@@ -203,7 +208,7 @@ public class FullScreen {
     }
 
     /**
-     * # 以下を消す.
+     * Remove under #.
      * @param url URL
      * @return # 以下を消したURL
      */

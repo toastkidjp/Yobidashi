@@ -107,6 +107,7 @@ import jp.toastkid.libs.wiki.Wiki2Markdown;
 
 /**
  * JavaFX WikiClient's Controller.
+ *
  * @author Toast kid
  *
  */
@@ -1417,7 +1418,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * RSS Feederを呼び出す．
+     * call RSS Feeder．
      */
     @FXML
     private final void callRssFeeder() {
@@ -1433,14 +1434,14 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 生成した一時 HTML を読み込む.
+     * Load temporary HTML.
      */
     private void loadDefaultFile() {
         loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
-     * 電卓を呼び出す.
+     * Call system calculator.
      */
     @FXML
     private final void callCalc() {
@@ -1448,7 +1449,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * コマンドプロンプトを呼び出す.
+     * Call command prompt.
      */
     @FXML
     private final void callCmd() {
@@ -1456,7 +1457,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Full screen モードの切り替えをする.
+     * switch Full screen mode.
      */
     @FXML
     private final void fullScreen() {
@@ -1464,7 +1465,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 1タブを全画面表示する.
+     * Show current tab to full screen.
      */
     @FXML
     private void callTabFullScreen() {
