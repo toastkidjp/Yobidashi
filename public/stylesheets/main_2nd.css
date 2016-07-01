@@ -1,3 +1,6 @@
+.menu-content .nav {
+    margin-top: 25px;
+}
 .page-blue .header {
     background-color: #111693; !important
 }
@@ -96,6 +99,11 @@ body, x:-moz-any-link  {
 }
 
 /** Blog header **/
+
+.header-logo {
+	width: 80%;
+    text-overflow: ellipsis;
+}
 
 #header {
 	padding: 8px 0;
