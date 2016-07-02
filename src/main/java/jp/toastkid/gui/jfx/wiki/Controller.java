@@ -1310,11 +1310,12 @@ public final class Controller implements Initializable {
      * @param f 記事名フィルタ文字列
      */
     private void searchArticle(final String q, final String f) {
-        final CheckBox  isTitleOnly = new JFXCheckBox("記事名で検索");
+        final CheckBox isTitleOnly = new JFXCheckBox("記事名で検索");
+        final CheckBox isAnd       = new JFXCheckBox("AND 検索"){{setSelected(true);}};
         new AlertDialog.Builder().setParent(getParent())
             .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
             //"記事名のみを対象に検索"
-            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly)
+            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly, isAnd)
             .setOnPositive("OK", () -> {
                 final String query = queryInput.getText().trim();
                 if (StringUtils.isEmpty(query)) {
@@ -1332,7 +1333,7 @@ public final class Controller implements Initializable {
 
                 final FileSearcher fileSearcher = new FileSearcher.Builder()
                         .setHomeDirPath(Config.get("articleDir"))
-                        .setAnd(query.contains(" "))
+                        .setAnd(isAnd.isSelected())
                         .setTitleOnly(isTitleOnly.isSelected())
                         .setSelectName(filter)
                         .build();
@@ -1345,7 +1346,10 @@ public final class Controller implements Initializable {
                     return;
                 }
 
-                final Tab tab = Functions.makeClosableTab(query + "の検索結果", leftTabs);
+                final Tab tab = Functions.makeClosableTab(
+                        String.format("「%s」の%s検索結果", query, isAnd.isSelected() ? "AND" : "OR"),
+                        leftTabs
+                        );
                 // prepare tab's content.
                 final VBox box = new VBox();
                 leftTabs.getTabs().add(tab);

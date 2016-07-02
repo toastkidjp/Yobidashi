@@ -12,10 +12,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import javafx.stage.Stage;
 import jp.toastkid.gui.jfx.dialog.ProgressDialog;
@@ -104,9 +104,7 @@ public final class FileSearcher {
         this.isAnd       = b.isAnd;
         this.isTitleOnly = b.isTitleOnly;
         this.selectName  = b.selectName;
-        pd = new ProgressDialog.Builder()
-                //.setText("検索中……")
-                .build();
+        pd = new ProgressDialog.Builder().build();
     }
 
     /**
@@ -123,7 +121,7 @@ public final class FileSearcher {
             dirSearch(homeDirPath, pQuery);
             // 検索にかかった時間
             lastSearchTime   = System.currentTimeMillis() - start;
-            //pd.addText("検索完了: " + lastSearchTime + "[ms]");
+            pd.addText("検索完了: " + lastSearchTime + "[ms]");
         } finally {
             pd.stop();
         }
@@ -139,20 +137,19 @@ public final class FileSearcher {
      */
     private void dirSearch(final String dirPath, final String pQuery) {
         final ExecutorService exs = Executors.newFixedThreadPool(getParallel());
-        final Set<Pattern> patSet = getPattermList(pQuery);
+        final Set<Pattern> patterns = getPattermList(pQuery);
         final File[] files = new File(dirPath).listFiles();
         // 検索の Runnable
-        final MutableList<FileSearchableImpl> runnableList = Lists.mutable.empty();
-        for (int i = 0; i < files.length; i++) {
-            if (StringUtils.isNotEmpty(this.selectName)
-                    && !Article.convertTitle(files[i].getName()).contains(this.selectName)) {
-                continue;
-            }
-            runnableList.add(new FileSearchableImpl(files[i].getAbsolutePath(), patSet, isAnd));
-        }
+        final MutableList<FileSearchableImpl> runnables
+            = ArrayIterate
+                .reject(files, file ->
+                    StringUtils.isNotEmpty(this.selectName)
+                    && !Article.convertTitle(file.getName()).contains(this.selectName)
+                )
+                .collect(file -> new FileSearchableImpl(file.getAbsolutePath(), patterns));
         final List<Future<?>> fList = new ArrayList<Future<?>>();
         // 検索の Runnable を初期化する
-        for (int i = 0; i < runnableList.size(); i++) {
+        for (int i = 0; i < runnables.size(); i++) {
             final File readingFile = files[i];
             if (readingFile.isDirectory()) {
                 dirSearch(readingFile.getAbsolutePath(), pQuery);
@@ -160,7 +157,7 @@ public final class FileSearcher {
             }
             lastFilenum++;
             if (!isTitleOnly) {
-                fList.add(exs.submit(runnableList.get(i)));
+                fList.add(exs.submit(runnables.get(i)));
                 continue;
             }
             // 記事名検索の場合、ここで結果を入れる.
@@ -172,9 +169,9 @@ public final class FileSearcher {
             }
         }
         // 記事名検索でないときはこれを実施
-        if (fList.isEmpty()) {
+        /*if (fList.isEmpty()) {
             return;
-        }
+        }*/
         boolean isEnded = false;
         while (!isEnded) {
             for (final Future<?> f : fList) {
@@ -184,9 +181,10 @@ public final class FileSearcher {
                 }
             }
         }
-        runnableList
-            .reject((elem) -> {return elem.getResult().df.isEmpty();})
-            .each((elem)   -> {searchResultMap.put(elem.getFilePath(), elem.getResult());});
+        runnables
+            .reject(elem -> elem.getResult().df.isEmpty())
+            .reject(elem -> isAnd && elem.getResult().df.size() < patterns.size())
+            .each(  elem -> searchResultMap.put(elem.getFilePath(), elem.getResult()));
     }
 
     /**
@@ -235,8 +233,8 @@ public final class FileSearcher {
             return Sets.fixedSize.of(Pattern.compile(patternEscape(query), Pattern.DOTALL));
         }
         return ArrayAdapter.adapt(query.split(QUERY_DELIMITER))
-                .reject((str) -> { return StringUtils.isEmpty(str);})
-                .collect((str) -> {return Pattern.compile(str, Pattern.DOTALL);})
+                .reject(StringUtils::isEmpty)
+                .collect(str -> Pattern.compile(str, Pattern.DOTALL))
                 .toSet();
     }
 
