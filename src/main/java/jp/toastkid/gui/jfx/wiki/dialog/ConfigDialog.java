@@ -33,11 +33,11 @@ public final class ConfigDialog  extends Application {
     public ConfigDialog(final Window window) {
         loadDialog(window);
         controller.loadConfig();
-        // StyleSheet をコピーする.
+        // copy StyleSheet.
         this.scene.getStylesheets().addAll(window.getScene().getStylesheets());
     }
     /**
-     * FXML からロードする.
+     * Load scene from FXML.
      * @return Parent オブジェクト
      */
     private final void loadDialog(final Window window) {
@@ -60,6 +60,7 @@ public final class ConfigDialog  extends Application {
     }
     /**
      * 入力を受け付けるダイアログを表示する.
+     * This method is stopping main thread until when the dialog close.
      * @param title  ダイアログのタイトル
      * @param msg    ダイアログのメッセージ
      * @param defaultInput デフォルト入力、null を指定した場合はテキストフィールドを表示しない
@@ -67,7 +68,6 @@ public final class ConfigDialog  extends Application {
      * @return input 入力文字列
      */
     public final void showConfigDialog() {
-        // ダイアログが閉じるまでブロックされる
         dialog.showAndWait();
     }
     @Override

@@ -59,7 +59,7 @@ public class FullScreen {
     private static final String THEME_DIR = "public/javascripts/reveal/css/theme/";
 
     /** css file name filter. */
-    private static final FilenameFilter CSS_FILTER = (dir, name) -> {return name.endsWith(".css");};
+    private static final FilenameFilter CSS_FILTER = (dir, name) -> name.endsWith(".css");
 
     /** stage. */
     private final Stage stage = new Stage();

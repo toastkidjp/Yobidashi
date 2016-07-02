@@ -435,8 +435,8 @@ public final class Controller implements Initializable {
         searchKind.getSelectionModel().select(0);
 
         // move to top.
-        header.setOnMousePressed((event) -> {moveToTop();});
-        footer.setOnMousePressed((event) -> {moveToBottom();});
+        header.setOnMousePressed((event) -> moveToTop());
+        footer.setOnMousePressed((event) -> moveToBottom());
         pd.addProgress(11);
 
         reload.setGraphic(   new ImageView(FileUtil.getUrl(Resources.PATH_IMG_RELOAD).toString()));
@@ -546,11 +546,10 @@ public final class Controller implements Initializable {
      */
     private final void highlight(
             final Optional<String> word, final String script) {
-        word.ifPresent(keyword -> {
-            getCurrentWebView().ifPresent(wv -> {
-                wv.getEngine().executeScript(MessageFormat.format(script, keyword));
-            });
-        });
+        word.ifPresent(keyword ->
+            getCurrentWebView()
+                .ifPresent(wv -> wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
+        );
     }
 
     /**
@@ -625,9 +624,9 @@ public final class Controller implements Initializable {
      * How to auto-scroll to the end in WebView?</a>
      */
     private final void moveToTop() {
-        getCurrentWebView().ifPresent(wv -> {
-            wv.getEngine().executeScript(findScrollTop(wv.getEngine().getLocation()));
-        });
+        getCurrentWebView().ifPresent(wv ->
+            wv.getEngine().executeScript(findScrollTop(wv.getEngine().getLocation()))
+        );
     }
 
     /**
@@ -647,9 +646,9 @@ public final class Controller implements Initializable {
      * How to auto-scroll to the end in WebView?</a>
      */
     private final void moveToBottom() {
-        getCurrentWebView().ifPresent(wv -> {
-            wv.getEngine().executeScript(findScrollBottom(wv.getEngine().getLocation()));
-        });
+        getCurrentWebView().ifPresent(wv ->
+            wv.getEngine().executeScript(findScrollBottom(wv.getEngine().getLocation()))
+        );
     }
 
     /**
@@ -699,7 +698,7 @@ public final class Controller implements Initializable {
                 new JFXSnackbar(mainArea).show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
-            opt.ifPresent(article -> {loadUrl(article.toInternalUrl());});
+            opt.ifPresent(article -> loadUrl(article.toInternalUrl()));
         } catch (final Exception e) {
             System.err.println("no such element" + e.getMessage());
         }
@@ -830,9 +829,9 @@ public final class Controller implements Initializable {
         final Map<String, String> map = ApplicationState.getConfigMap();
         final StringBuilder bld = new StringBuilder();
         final String lineSeparator = System.lineSeparator();
-        map.forEach((key, value) -> {
-            bld.append(key).append("\t").append(value).append(lineSeparator);
-        });
+        map.forEach((key, value) ->
+            bld.append(key).append("\t").append(value).append(lineSeparator)
+        );
         AlertDialog.showMessage(getParent(), "状態", bld.toString());
     }
 
@@ -1045,7 +1044,7 @@ public final class Controller implements Initializable {
 
         final Tab tab = makeClosableTab("new tab");
         final WebView wv = new WebView();
-        wv.setOnContextMenuRequested(event -> {showContextMenu();});
+        wv.setOnContextMenuRequested(event -> showContextMenu());
         tab.setContent(wv);
         final WebEngine engine = wv.getEngine();
         // 新規タブで開く場合
@@ -1096,7 +1095,7 @@ public final class Controller implements Initializable {
     private Tab makeClosableTab(final String title) {
         final Tab tab = new Tab(title);
         final Button closeButton = new JFXButton("x");
-        closeButton.setOnAction(e -> {closeTab(tab);});
+        closeButton.setOnAction(e -> closeTab(tab));
         tab.setGraphic(closeButton);
         return tab;
     }
@@ -1141,40 +1140,40 @@ public final class Controller implements Initializable {
 
             // adding new item:
             final MenuItem length = new MenuItem("文字数計測"){{
-                setOnAction(event -> {callFileLength();});
+                setOnAction(event -> callFileLength());
             }};
             final MenuItem fullScreen = new MenuItem("Full Screen"){{
-                setOnAction(event -> {callTabFullScreen();});
+                setOnAction(event -> callTabFullScreen());
             }};
             final MenuItem slideShow = new MenuItem("スライドショー"){{
-                setOnAction(event -> {slideShow();});
+                setOnAction(event -> slideShow());
             }};
             final MenuItem openTab = new MenuItem("新しいタブを開く"){{
-                setOnAction(event -> {openWebTab();});
+                setOnAction(event -> openWebTab());
             }};
             final MenuItem source = new MenuItem("ソースを表示"){{
-                setOnAction(event -> {callHtmlSource();});
+                setOnAction(event -> callHtmlSource());
             }};
             final MenuItem search = new MenuItem("ページ内検索"){{
-                setOnAction(event -> {openSearcher();});
+                setOnAction(event -> openSearcher());
             }};
             final MenuItem moveToTop = new MenuItem("ページの先頭に移動"){{
-                setOnAction(event -> {moveToTop();});
+                setOnAction(event -> moveToTop());
             }};
             final MenuItem moveToBottom = new MenuItem("ページの最後に移動"){{
-                setOnAction(event -> {moveToBottom();});
+                setOnAction(event -> moveToBottom());
             }};
             final MenuItem searchAll = new MenuItem("全記事検索"){{
-                setOnAction(event -> {callSearch();});
+                setOnAction(event -> callSearch());
             }};
             final MenuItem showLeft = new MenuItem("記事一覧を開く"){{
-                setOnAction(event -> {showLeftPane();});
+                setOnAction(event -> showLeftPane());
             }};
             final MenuItem hideLeft = new MenuItem("記事一覧を閉じる"){{
-                setOnAction(event -> {hideLeftPane();});
+                setOnAction(event -> hideLeftPane());
             }};
             final MenuItem wordCloud = new MenuItem("Word cloud"){{
-                setOnAction(event -> {callWordCloud();});
+                setOnAction(event -> callWordCloud());
             }};
 
             // add new item:
@@ -1276,9 +1275,8 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void stop() {
-        Platform.runLater( () -> getCurrentWebView().ifPresent(wv -> {
-            wv.getEngine().getLoadWorker().cancel();
-        }));
+        Platform.runLater( () ->
+            getCurrentWebView().ifPresent(wv -> wv.getEngine().getLoadWorker().cancel()));
     }
 
     /**
@@ -1362,7 +1360,7 @@ public final class Controller implements Initializable {
                 initArticleList(listView);
                 listView.getItems().addAll(
                         map.entrySet().stream()
-                            .map(entry -> {return new Article(new File(entry.getValue().filePath));})
+                            .map(entry -> new Article(new File(entry.getValue().filePath)))
                             .sorted()
                             .collect(Collectors.toList())
                         );
@@ -1570,7 +1568,7 @@ public final class Controller implements Initializable {
      * @param listView ListView
      */
     private void initArticleList(final ListView<Article> listView) {
-        listView.setCellFactory((lv) -> {return new ArticleListCell();});
+        listView.setCellFactory((lv) -> new ArticleListCell());
         final MultipleSelectionModel<Article> selectionModel = listView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         selectionModel.selectedItemProperty().addListener((property, oldVal, newVal) -> {

@@ -1,8 +1,9 @@
 package jp.toastkid.gui.jfx.wiki;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * 現在稼働中のアプリケーションの情報を表示する画面
@@ -15,8 +16,8 @@ import java.util.Map;
  */
 public final class ApplicationState {
 
-    /** 1MBに等しい数値を返す.すなわち 1024  の 2 乗 */
-    private static final long MEGA_BYTE = Math.round(Math.pow(1024,2));
+    /** 1MB に等しい数値を返す.すなわち 1024  の 2 乗 */
+    private static final long MEGA_BYTE = Math.round(Math.pow(1024, 2));
 
     /**
      * アプリケーションの情報を取得する。
@@ -24,7 +25,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     public static final Map<String, String> getConfigMap() {
-        final Map<String, String> configMap = new HashMap<String, String>(30);
+        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(6);
         configMap.putAll(getJavaConfigMap());
         configMap.putAll(getRuntimeConfigMap());
         return configMap;
@@ -36,7 +37,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     private static final Map<String, String> getJavaConfigMap() {
-        final Map<String, String> configMap = new HashMap<String, String>(3);
+        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(2);
         configMap.put("Java Version", System.getProperty("java.version"));
         configMap.put("Java Home",    System.getProperty("java.home"));
         return configMap;
@@ -49,7 +50,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     private static final Map<String, String> getRuntimeConfigMap() {
-        final Map<String, String> configMap = new HashMap<String, String>(5);
+        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(4);
         final Runtime runtime = Runtime.getRuntime();
         configMap.put("Max Memory",          getFormatNum(runtime.maxMemory() ));
         configMap.put("Free Memory",         getFormatNum(runtime.freeMemory() ));

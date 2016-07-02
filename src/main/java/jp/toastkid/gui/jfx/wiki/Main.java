@@ -69,7 +69,7 @@ public final class Main extends Application {
         if (LOCK_FILE.exists()) {
             new AlertDialog.Builder().setTitle("二重起動防止")
                 .setMessage(MESSAGE_ALERT_PROCESS_DUPLICATE)
-                .setOnPositive("OK",     () -> {System.exit(-1);})
+                .setOnPositive("OK",     () -> System.exit(-1))
                 .setOnNegative("Delete", () -> {})
                 .build().show();
         }

@@ -232,10 +232,10 @@ public final class Functions {
             return Collections.emptyList();
         }
         return ArrayAdapter
-                .newArrayWith(dir.listFiles((f) -> {return Article.isValidContentFile(f);}))
+                .newArrayWith(dir.listFiles((f) -> Article.isValidContentFile(f)))
                 .asParallel(Executors.newFixedThreadPool(24), 24)
-                .collect(f -> {return new Article(f);})
-                .select( a -> {return a.isValid();})
+                .collect(f -> new Article(f))
+                .select( a -> a.isValid())
                 .toList();
     }
 
@@ -297,12 +297,12 @@ public final class Functions {
         final Map<String,Integer> map = new HashMap<String,Integer>(100);
         FileUtil.readLines(Config.article.file, Defines.ARTICLE_ENCODE)
             .stream()
-            .filter(str  -> {return StringUtils.isNotEmpty(str);})
+            .filter(str  -> StringUtils.isNotEmpty(str))
             .forEach(str -> {
                 ts.segment(str).stream()
-                    .map(seg     -> {return seg.replace("\"", "");})
-                    .filter(seg  -> {return StringUtils.isNotEmpty(seg);})
-                    .forEach(seg -> {map.put(seg, map.getOrDefault(seg, 0) + 1);});
+                    .map(seg     -> seg.replace("\"", ""))
+                    .filter(seg  -> StringUtils.isNotEmpty(seg))
+                    .forEach(seg -> map.put(seg, map.getOrDefault(seg, 0) + 1));
             });
         final Map<String, Integer> resMap = new TreeMap<>(new NumberMapComparator(map));
         resMap.putAll(map);
@@ -462,8 +462,8 @@ public final class Functions {
     public final void runEpubGenerator() {
         final List<String> absPathes
             = Stream.of(new File(Defines.EPUB_RECIPE_DIR).listFiles())
-                .map((file) -> {return file.getAbsolutePath();})
-                .filter((fileName) -> {return fileName.toLowerCase().endsWith(".json");})
+                .map((file) -> file.getAbsolutePath())
+                .filter((fileName) -> fileName.toLowerCase().endsWith(".json"))
                 .collect(Collectors.toList());
         DocToEpub.run(absPathes.toArray(new String[]{}));
     }
@@ -478,8 +478,8 @@ public final class Functions {
             final Zip backup
                 = new Zip("backup" + ZonedDateTime.now().toInstant().getEpochSecond() + ".zip");
             ArrayAdapter.adapt(new File(articleDir).listFiles())
-                .select(file -> {return offsetMs < file.lastModified();})
-                .each(Procedures.throwing((file) -> {backup.entry(file);}));
+                .select(file -> offsetMs < file.lastModified())
+                .each(Procedures.throwing((file) -> backup.entry(file)));
             backup.doZip();
         } catch (final IOException e) {
             e.printStackTrace();
@@ -503,9 +503,7 @@ public final class Functions {
      * @return 妥当な音楽ファイルの拡張子なら true
      */
     public static final boolean isValidMusicFile(final String pName) {
-        return Defines.MUSIC_FILES.anySatisfy(suffix -> {
-            return pName.toLowerCase().endsWith(suffix);
-        });
+        return Defines.MUSIC_FILES.anySatisfy(suffix -> pName.toLowerCase().endsWith(suffix));
     }
 
     /**
@@ -745,7 +743,7 @@ public final class Functions {
         tab.setClosable(true);
 
         final Button closeButton = new Button("x");
-        closeButton.setOnAction(e -> { parent.getTabs().remove(tab);});
+        closeButton.setOnAction(e -> parent.getTabs().remove(tab));
         tab.setGraphic(closeButton);
         return tab;
     }
@@ -787,7 +785,7 @@ public final class Functions {
             final String content
                 = converter.convert(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE);
             return ArrayAdapter.adapt(content.split("<hr/>"))
-                .collect(str -> {return String.format("<section>%s</section>", str);})
+                .collect(str -> String.format("<section>%s</section>", str))
                 .makeString(LINE_SEPARATOR);
         }
         return "";
