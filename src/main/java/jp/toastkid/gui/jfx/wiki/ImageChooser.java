@@ -13,14 +13,14 @@ import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * Image file url random chooser.
- * TODO write test.
+ *
  * @author Toast kid
  *
  */
 public class ImageChooser {
 
     /** image file filter. */
-    private static final FileFilter IMAGE_FILTER = f -> {return FileUtil.isImageFile(f.getName());};
+    private static final FileFilter IMAGE_FILTER = f -> FileUtil.isImageFile(f.getName());
 
     /** images. */
     private final List<File> images;
@@ -32,11 +32,11 @@ public class ImageChooser {
     public ImageChooser(final String... dirs) {
         images = Lists.mutable.empty();
         ArrayAdapter.adapt(dirs)
-            .select(dir -> {return StringUtils.isNotBlank(dir);})
-            .collect(dir -> {return new File(dir);})
-            .select(f -> {return f.exists() && f.isDirectory();})
-            .collect(f -> {return f.listFiles(IMAGE_FILTER);})
-            .each(files -> {images.addAll(Arrays.asList(files));});
+            .select(StringUtils::isNotBlank)
+            .collect(dir -> new File(dir))
+            .select(f -> f.exists() && f.isDirectory())
+            .collect(f -> f.listFiles(IMAGE_FILTER))
+            .each(files -> images.addAll(Arrays.asList(files)));
     }
 
     /**

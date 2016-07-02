@@ -1309,7 +1309,6 @@ public final class FileUtil {
     }
     /**
      * 指定したファイルの文字数を計測して返す.
-     * TODO write test.
      * @param pFileName
      * @param pEncode
      */
@@ -1707,7 +1706,7 @@ public final class FileUtil {
      * @param fileName
      * @return Optional string. It contains ".txt".
      */
-    public static Optional<String> findExtension(File file) {
+    public static Optional<String> findExtension(final File file) {
         if (file == null) {
             return Optional.empty();
         }
@@ -1778,7 +1777,7 @@ public final class FileUtil {
      * @param filePath
      * @return
      */
-    public static String removeExtension(String filePath) {
+    public static String removeExtension(final String filePath) {
         return filePath.substring(0, filePath.lastIndexOf("."));
     }
 

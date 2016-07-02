@@ -4,12 +4,10 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.Map;
 
 import org.eclipse.collections.impl.factory.Maps;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -176,15 +174,6 @@ public final class HtmlUtilTest {
     @Test
     public final void testTabRemove() {
         assertEquals("ab", HtmlUtil.tabRemove("a\tb"));
-    }
-
-
-    /**
-     * {@link jp.toastkid.libs.utils.HtmlUtil#getRssUrls(java.lang.String)} のためのテスト.・メソッド.
-     */
-    @Ignore
-    public final void testGetRSSURLs() {
-        fail("まだ実装されていません"); // TODO
     }
 
     /**

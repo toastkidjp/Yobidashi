@@ -205,7 +205,6 @@ public final class TinySegmenter {
     /**
      * @param args
     public static void main(String[] args) {
-        // TODO 自動生成されたメソッド・スタブ
         final long start = System.currentTimeMillis();
         final TinySegmenter ts = new TinySegmenter();
         for (int i = 0; i < 100; i++) {

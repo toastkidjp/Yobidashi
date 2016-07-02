@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jp.toastkid.libs.utils.CollectionUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
 
+import jp.toastkid.libs.utils.CollectionUtil;
+
 /**
  * Markdown converter.
- * TODO implementing.
  * <ol>
  * <li>Table
  * <li>Plugins(Ruby, tooltip, and so on...)

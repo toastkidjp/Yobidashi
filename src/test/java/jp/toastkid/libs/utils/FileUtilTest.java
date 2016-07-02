@@ -73,4 +73,20 @@ public class FileUtilTest {
             .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(73L));
         assertFalse(FileUtil.isLastModifiedNdays(mock, 3));
     }
+
+    /**
+     * {@link FileUtil#countCharacters(String, String)}.
+     */
+    @Test
+    public void testCountCharacters() {
+        assertEquals(6, FileUtil.countCharacters("src/test/resources/utils/file/a.txt", "UTF-8"));
+    }
+
+    /**
+     * {@link FileUtil#removeExtension(String)}.
+     */
+    @Test
+    public void testRemoveExtension() {
+        assertEquals("a", FileUtil.removeExtension("a.txt"));
+    }
 }

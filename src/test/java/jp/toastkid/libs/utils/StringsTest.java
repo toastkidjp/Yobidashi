@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import jp.toastkid.libs.utils.CollectionUtil;
-import jp.toastkid.libs.utils.Strings;
-
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.junit.Ignore;
@@ -137,17 +134,17 @@ public final class StringsTest {
     /**
      * {@link jp.toastkid.libs.utils.Strings#katahiraNonDist(java.lang.String)} のためのテスト.・メソッド.
      */
-    @Ignore
+    @Test
     public final void testKatahiraNonDist() {
-        fail("まだ実装されていません"); // TODO
+        assertEquals("あｶさ他", Strings.katahiraNonDist("アｶさ他"));
     }
 
     /**
      * {@link jp.toastkid.libs.utils.Strings#kigouNonDist(java.lang.String)} のためのテスト.・メソッド.
      */
-    @Ignore
+    @Test
     public final void testKigouNonDist() {
-        fail("まだ実装されていません"); // TODO
+        assertEquals("$$&&", Strings.kigouNonDist("$＄＆&"));
     }
 
     /**

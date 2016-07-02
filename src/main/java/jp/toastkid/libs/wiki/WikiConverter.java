@@ -1091,7 +1091,7 @@ public final class WikiConverter {
             }
         }
 
-        // TODO under line.
+        // under line.
         if (str.contains("+")) {
             matcher = UNDERLINE_PATTERN.matcher(str);
             while (matcher.find()) {
@@ -1099,13 +1099,6 @@ public final class WikiConverter {
                 str = str.replaceFirst(UNDERLINE_PATTERN.pattern(), HtmlUtil.underLine(found));
             }
         }
-
-        // TODO 内部リンク.
-        /*if (str.indexOf("\\[\\[") != -1
-                && str.indexOf("\\]\\]") != -1) {
-            str = str.replaceAll("\\[\\[", "<a href=\"");
-            str = str.replaceAll("\\]\\]", "</a>");
-        }*/
 
         /**
          * <a href="http://d.hatena.ne.jp/srkzhr/20090529/1243614146">

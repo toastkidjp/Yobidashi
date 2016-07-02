@@ -2,13 +2,11 @@ package jp.toastkid.libs.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Sets;
 
 
 /**
@@ -277,33 +275,6 @@ public final class HtmlUtil {
         } else {
             return str;
         }
-    }
-    /**
-     * 文字列中から RSS の URL だけを抜き出して Set で返す.
-     * <HR>
-     * <PRE>
-     * String str = WebDocumentUtil.getWebDocs(
-     * "http://www.itmedia.co.jp/info/rss/kw.html", "UTF-8").toString();
-     * HashSet<String> resSet = StringUtil.getRSSURLs( str );
-     * System.out.println( ColleUtil.getStringFromSet(resSet, StringUtil.lineSeparator));
-     * </PRE>
-     * <HR>
-     * (120903) 作成<BR>
-     * @param str
-     */
-    public static Set<String> getRssUrls( final String str ) {
-        final Set<String> resSet = Sets.mutable.empty();
-        final Matcher matcher = RDF_PATTERN.matcher(str);
-        while (matcher.find()) {
-            final String matched = matcher.group(0).toLowerCase();
-            if(matched.length() < 100
-                    && (!matched.endsWith("xml") || matched.indexOf("rss") != -1)
-                    ){
-                //System.out.println("match : " +  matched);
-                resSet.add(matched);
-            }
-        }
-        return resSet;
     }
 
     /**

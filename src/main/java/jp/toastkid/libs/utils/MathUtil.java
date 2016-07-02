@@ -105,7 +105,6 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
     }
     /**
      * pNumberを最大の数とする,pSize個のユニークな要素を持つint型配列を生成し返す.
-     * TODO テスト追加
      * @param pNumber : 集合に含まれる最大の数
      * @param pSize : 集合の要素数
      * @return intSet pNumberを最大の数とする,pSize個のユニークな要素を持つint型配列
@@ -116,16 +115,6 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
             ){
         final MutableIntSet randamNumberSet = createRandamNumberSet(pNumber, pSize);
         return randamNumberSet.toArray();
-        /*
-        final MutableIntIterator iterator = createRandamNumberSet(pNumber,pSize).intIterator();
-        final int[] intSet = new int[iterator.size()];
-        int i = 0;
-        while(iterator.hasNext()){
-            intSet[i] = iterator.next();
-            i++;
-        }
-        return intSet;
-        */
     }
     /**
      * 引数として渡された２数の最大公約数をユークリッドの互除法で求める
