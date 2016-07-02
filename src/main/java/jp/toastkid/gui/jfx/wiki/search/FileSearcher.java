@@ -168,10 +168,11 @@ public final class FileSearcher {
                 );
             }
         }
-        // 記事名検索でないときはこれを実施
-        /*if (fList.isEmpty()) {
+        // 記事名検索の時はこれを実施
+        if (fList.isEmpty()) {
             return;
-        }*/
+        }
+        // 内容検索の時は Future を確認
         boolean isEnded = false;
         while (!isEnded) {
             for (final Future<?> f : fList) {
