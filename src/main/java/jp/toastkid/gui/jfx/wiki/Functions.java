@@ -179,7 +179,7 @@ public final class Functions {
                     put("content",
                         new StringBuilder().append("<div class=\"body\">")
                             .append(LINE_SEPARATOR)
-                            .append("<div class=\"content_area\">")
+                            .append("<div class=\"content-area\">")
                             .append(LINE_SEPARATOR)
                             .append(processed)
                             .append("</div>")

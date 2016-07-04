@@ -89,7 +89,7 @@ public class PostProcessor {
                 final String subheading   = matcher.group(2).trim();
                 final String subheadingId = extractSubHeading(subheading);
                 final String subheadTag
-                    = String.format("<a id=\"%s\" href=\"#%s\">■</a>", subheadingId, subheadingId);
+                    = String.format("<a class='waves-attach waves-effect' id=\"%s\" href=\"#%s\">■</a>", subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
                 subheadings.add(new Subheading(subheading, subheadingId, depth));
             }
@@ -138,7 +138,7 @@ public class PostProcessor {
             = new File(articleDir, bytedStr.concat(".").concat(findExtension(isMd))).exists();
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
-        generatedLink.append("<a ");
+        generatedLink.append("<a class='waves-attach waves-effect' ");
         if (!isExist) {
             generatedLink.append("class=\"redLink\" ");
         }
@@ -185,7 +185,7 @@ public class PostProcessor {
             subheadings.each((subheading) -> {
                 headingHtml
                     .append("<li>")
-                    .append("<a href=\"#").append(subheading.id).append("\">")
+                    .append("<a class='waves-attach waves-effect' href=\"#").append(subheading.id).append("\">")
                     .append(subheading.title).append("</a>").append("<br/>")
                     .append(Strings.LINE_SEPARATOR);
             });

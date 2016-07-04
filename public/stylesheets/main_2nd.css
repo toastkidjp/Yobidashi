@@ -1,8 +1,15 @@
-.menu-content .nav {
-    margin-top: 25px;
+.side-menu-title {
+    margin-left: 10px;
+}
+.content-area {
+    background-color: #EEEEEE;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 .page-blue .header {
     background-color: #111693; !important
+}
+.menu-content .nav {
+    margin-top: 25px;
 }
 a {
     color: #111693;
@@ -62,7 +69,7 @@ header nav a:hover{
 	right: 200px;
 }
 /** (121015) http://css-happylife.com/ 参考 */
-a:hover{
+a:hover, span:hover {
 	background:rgba(255,255,255,0.8);
 	border:1px solid #ccc;
 	padding:7px 10px;
