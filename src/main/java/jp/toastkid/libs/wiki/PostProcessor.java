@@ -138,10 +138,11 @@ public class PostProcessor {
             = new File(articleDir, bytedStr.concat(".").concat(findExtension(isMd))).exists();
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
-        generatedLink.append("<a class='waves-attach waves-effect' ");
+        generatedLink.append("<a class='waves-attach waves-effect ");
         if (!isExist) {
-            generatedLink.append("class=\"redLink\" ");
+            generatedLink.append("redLink");
         }
+        generatedLink.append("' ");
         generatedLink.append("href=\"/").append(findExtension(isMd)).append("/");
         generatedLink.append(bytedStr);
         generatedLink.append(".").append(findExtension(isMd));
