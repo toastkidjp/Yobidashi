@@ -40,7 +40,7 @@ public class Controller implements Initializable {
             nationalities.getItems().addAll(nameGenerator.getNationalities());
             nationalities.getSelectionModel().select(0);
 
-            nameGenerator.checkXml();
+            //nameGenerator.checkXml();
 
             System.out.println(Thread.currentThread().getName() + " Ended initialize NameMaker."
                     + (System.currentTimeMillis() - start) + "ms");

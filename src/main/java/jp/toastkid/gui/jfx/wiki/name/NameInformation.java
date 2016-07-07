@@ -9,17 +9,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public final class NameInformation implements Comparable<NameInformation> {
 
+    private static final NameInformation PRESENT = new NameInformation.Builder().build();
+
     /** name. */
-    private final String name;
+    private String name;
 
     /** name's spelling. */
-    private final String spelling;
+    private String spelling;
 
     /** name's gender. */
-    private final String seibetsu;
+    private String seibetsu;
 
     /** name's nationality. */
-    private final String nationality;
+    private String nationality;
 
     /**
      * Builder.
@@ -71,6 +73,13 @@ public final class NameInformation implements Comparable<NameInformation> {
         public NameInformation build() {
             return new NameInformation(this);
         }
+    }
+
+    /**
+     * for use Jackson.
+     */
+    public NameInformation() {
+        // NOP.
     }
 
     /**
@@ -140,5 +149,9 @@ public final class NameInformation implements Comparable<NameInformation> {
      */
     public String getNationality(){
          return this.nationality;
+    }
+
+    public static NameInformation empty() {
+        return PRESENT;
     }
 }

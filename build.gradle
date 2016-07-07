@@ -27,9 +27,6 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    //dependencies {
-    //    classpath 'com.github.rholder:gradle-one-jar:1.0.4'
-    //}
 }
 
 //this one works with file dependencies. If you prefer
@@ -56,6 +53,8 @@ dependencies {
     compile "io.projectreactor:reactor-core:2.5.0.M4"
     compile 'net.arnx:jsonic:1.3.10'
     compile 'org.apache.commons:commons-lang3:3.4'
+    
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.0'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'
