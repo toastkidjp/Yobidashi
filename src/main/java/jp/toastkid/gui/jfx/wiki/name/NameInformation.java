@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public final class NameInformation implements Comparable<NameInformation> {
 
+    /** empty object. */
     private static final NameInformation PRESENT = new NameInformation.Builder().build();
 
     /** name. */

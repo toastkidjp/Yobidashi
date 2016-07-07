@@ -18,19 +18,23 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Read nameInformation from passed XML.
- * @author Toast kid
+ * Read nameInformation from passed JSON.
  *
+ * @author Toast kid
  */
 public class NameLoader implements Callable<Collection<NameInformation>>{
 
+    /** ObjectReader's holder. */
     private static final ThreadLocal<ObjectReader> READER
         = ThreadLocal.withInitial(() -> new ObjectMapper().readerFor(NameInformation.class));
 
+    /** Name list. */
     private final Collection<NameInformation> names;
 
+    /** Name nationalities. */
     private final Collection<String> nationalities;
 
+    /** target JSON file. */
     private final File targetFile;
 
     /**
@@ -39,8 +43,8 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
      */
     public NameLoader(final File file) {
         this.targetFile = file;
-        nationalities = Sets.mutable.empty();
-        names         = Lists.mutable.empty();
+        nationalities   = Sets.mutable.empty();
+        names           = Lists.mutable.empty();
     }
 
     @Override
@@ -49,7 +53,7 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
             final Flux<NameInformation> cache
                 = Flux.<NameInformation>create(emitter -> fileReader.lines().forEach(str -> {
                     try {
-                        emitter.next(READER.get().readValue(str));
+                        emitter.next(READER.get().readValue(str.getBytes()));
                     } catch (final Exception e) {
                         emitter.fail(e);
                     }

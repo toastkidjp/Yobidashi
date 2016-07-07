@@ -1,5 +1,7 @@
 package jp.toastkid.gui.jfx.wiki.name;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -9,6 +11,11 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
 
+/**
+ * {@link NameLoader}'s test.
+ * @author Toast kid
+ *
+ */
 public class NameLoaderTest {
 
     /** path/to/firstname/file. */
@@ -59,4 +66,11 @@ public class NameLoaderTest {
         System.out.println(System.currentTimeMillis() - start + "[ms]");
     }
 
+    /**
+     * check {@link NameLoader#getNationalities()}.
+     */
+    @Test
+    public void testGetNationalities() {
+        assertTrue(new NameLoader(new File("")).getNationalities().isEmpty());
+    }
 }
