@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -53,14 +54,14 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
             final Flux<NameInformation> cache
                 = Flux.<NameInformation>create(emitter -> fileReader.lines().forEach(str -> {
                     try {
-                        emitter.next(READER.get().readValue(str.getBytes()));
+                        emitter.next(READER.get().readValue(str.getBytes("UTF-8")));
                     } catch (final Exception e) {
                         emitter.fail(e);
                     }
                 })).cache();
-            cache.subscribeOn(Schedulers.elastic())
+            cache.subscribeOn(Schedulers.fromExecutor(Executors.newFixedThreadPool(8)))
                 .subscribe(names::add);
-            cache.subscribeOn(Schedulers.elastic())
+            cache
                 .subscribe(info -> nationalities.add(info.getNationality()));
         } catch (final IOException e) {
             e.printStackTrace();

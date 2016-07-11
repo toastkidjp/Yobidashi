@@ -104,9 +104,6 @@ body {
 	background-position: 50% 50%;
 	background-color: #EEEECC;
 }
-body, x:-moz-any-link  {
-	width: 80%;
-}
 
 /** Blog header **/
 
@@ -257,6 +254,10 @@ tooltip HTML sample
 }
 .highlight {
   background-color: yellow;
+}
+
+.table {
+	width: 98%;
 }
 
 table {
