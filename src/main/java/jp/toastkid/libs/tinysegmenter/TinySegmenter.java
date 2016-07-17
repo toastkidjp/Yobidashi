@@ -193,7 +193,7 @@ public final class TinySegmenter {
             firstChar = word.substring(0,1);
         }
         if (!this.isAllowChar
-                && ( this.stopChars.matcher(firstChar).matches()) ){
+                && ( this.stopChars.matcher(firstChar).matches()) || word.length() == 1 ){
             return false;
         }
         if (!this.isAllowNum

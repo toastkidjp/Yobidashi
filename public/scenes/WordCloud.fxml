@@ -3,10 +3,13 @@
 <?import javafx.scene.chart.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-
+<?import javafx.scene.control.ScrollPane?>
+<?import jp.toastkid.gui.jfx.wordcloud.JFXMasonryPane2 ?>
 
 <VBox 
-	fx:controller="jp.toastkid.gui.jfx.wordcloud.Controller"
-	maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-	<FlowPane fx:id="canvas" maxWidth="800" maxHeight="600" />
+    fx:controller="jp.toastkid.gui.jfx.wordcloud.Controller"
+    maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <ScrollPane fitToHeight="true" fitToWidth="true" fx:id="parent">
+        <JFXMasonryPane2 prefHeight="400.0" prefWidth="600.0" fx:id="canvas" />
+    </ScrollPane>
 </VBox>

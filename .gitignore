@@ -22,3 +22,4 @@ gradlew*
 *.bin
 script.py
 public/resources/NameMaker/*xml
+sample

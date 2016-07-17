@@ -5,16 +5,21 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.ScrollPane;
 
 /**
  * コントローラ.
  * @author Toast kid
  */
 public final class Controller implements Initializable {
+
+    /** parent view for use JFXMasonryPane2. */
+    @FXML
+    public ScrollPane parent;
+
     /** 表示領域. */
     @FXML
-    public FlowPane canvas;
+    public JFXMasonryPane2 canvas;
 
     /**
      * close this dialog.

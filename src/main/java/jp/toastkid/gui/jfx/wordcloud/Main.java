@@ -3,6 +3,7 @@ package jp.toastkid.gui.jfx.wordcloud;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -49,14 +50,16 @@ public final class Main extends Application {
             e.printStackTrace();
         }
         controller = loader.getController();
-        stage = new Stage(StageStyle.UTILITY);
+        stage = new Stage(StageStyle.DECORATED);
         stage.setScene(scene);
+        stage.setResizable(true);
         if (window != null) {
             stage.initOwner(window);
         }
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setResizable(false);
-        FxWordCloud.draw(controller.canvas, "sample");
+        new FxWordCloud.Builder().build().draw(controller.canvas, "sample");
+        Platform.runLater(()-> controller.parent.requestLayout());
     }
 
     public void show() {

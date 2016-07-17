@@ -66,7 +66,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -93,6 +92,7 @@ import jp.toastkid.gui.jfx.wiki.rss.RssFeeder;
 import jp.toastkid.gui.jfx.wiki.search.FileSearcher;
 import jp.toastkid.gui.jfx.wiki.search.SearchResult;
 import jp.toastkid.gui.jfx.wordcloud.FxWordCloud;
+import jp.toastkid.gui.jfx.wordcloud.JFXMasonryPane2;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.utils.AobunUtils;
@@ -313,6 +313,8 @@ public final class Controller implements Initializable {
 
     private FullScreen fs;
 
+    private FxWordCloud wordCloud;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -405,6 +407,8 @@ public final class Controller implements Initializable {
                         }
                     }
                     );
+            wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
+                            .setMinFontSize(8.0).build();
             Platform.runLater( () -> {
                 openWebTab();
                 callHome();
@@ -1360,7 +1364,7 @@ public final class Controller implements Initializable {
                 children.add(new Label(String.format("%dファイル / %dファイル中",
                         map.size(), fileSearcher.getLastFilenum())));
                 // set up ListView.
-                final ListView<Article> listView = new ListView<Article>();
+                final ListView<Article> listView = new ListView<>();
                 initArticleList(listView);
                 listView.getItems().addAll(
                         map.entrySet().stream()
@@ -1382,9 +1386,13 @@ public final class Controller implements Initializable {
     @FXML
     private final void callWordCloud() {
         final Tab tab = makeClosableTab(Config.article.title + "のワードクラウド");
-        final FlowPane pane = new FlowPane();
-        tab.setContent(new ScrollPane(pane));
-        FxWordCloud.draw(pane, Config.article.file);
+        final JFXMasonryPane2 pane = new JFXMasonryPane2();
+        final ScrollPane value = new ScrollPane(pane);
+        value.setFitToHeight(true);
+        value.setFitToWidth(true);
+        tab.setContent(value);
+        wordCloud.draw(pane, Config.article.file);
+        Platform.runLater(()-> value.requestLayout());
         openTab(tab);
     }
 
