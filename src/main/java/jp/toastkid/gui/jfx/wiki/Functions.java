@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
+import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.block.factory.Procedures;
 import org.eclipse.collections.impl.factory.Lists;
@@ -41,6 +41,8 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import am.ik.marked4j.Marked;
 import am.ik.marked4j.MarkedBuilder;
+import groovy.text.SimpleTemplateEngine;
+import groovy.text.TemplateEngine;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -532,34 +534,15 @@ public final class Functions {
             final String pathToTemplate,
             final Map<String, String> params
             ) {
-        final String lineSeparator = System.lineSeparator();
-        final ImmutableList<String> templates = Lists.immutable.ofAll(
-                FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
-            );
-        final StringBuilder convertedText = new StringBuilder();
-        templates.each(template -> {
-            if (template.contains("${")) {
-                Matcher matcher = Functions.PARAM_TEMPLATE_PATTERN.matcher(template);
-                while (matcher.find()) {
-                    final String key = matcher.group(1);
-                    if (!params.containsKey(key)) {
-                        continue;
-                    }
-                    String value = params.get(key);
-                    if (value == null) {
-                        continue;
-                    }
-                    if (value.contains("$") && !value.contains("\\$")) {
-                        value = value.replace("$", "\\$");
-                    }
-                    //System.out.println("value = " + value);
-                    template = matcher.replaceFirst(value);
-                    matcher = Functions.PARAM_TEMPLATE_PATTERN.matcher(template);
-                }
-            }
-            convertedText.append(template).append(lineSeparator);
-        });
-        return convertedText.toString();
+        final TemplateEngine engine = new SimpleTemplateEngine();
+        try {
+            return engine.createTemplate(Lists.immutable.ofAll(
+                    FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
+                    ).makeString(LINE_SEPARATOR)).make(params).toString();
+        } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**

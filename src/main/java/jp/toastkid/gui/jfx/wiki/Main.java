@@ -36,7 +36,7 @@ public final class Main extends Application {
     private static final String FXML_PATH = "public/scenes/Main.fxml";
 
     /** process lock file. */
-    private static final File LOCK_FILE = new File(Defines.TEMP_FILE_NAME);
+    private static final File   LOCK_FILE = new File(Defines.TEMP_FILE_NAME);
 
     /** コントローラ. */
     private Controller controller;
