@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.JSONException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Gzip converting utility.
@@ -24,6 +23,8 @@ import net.arnx.jsonic.JSONException;
  */
 public class GzipUtils {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * passed object convert to gziped byte array.
      * @param o
@@ -31,14 +32,14 @@ public class GzipUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static final <T> byte[] gzip(final T o) throws JSONException, IOException {
+    public static final <T> byte[] gzip(final T o) throws IOException {
         if (o == null) {
             return null;
         }
         try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
              final GZIPOutputStream      gzip = new GZIPOutputStream(baos);
                 ) {
-            JSON.encode(o, gzip);
+            gzip.write(MAPPER.writeValueAsBytes(o));;
             gzip.close();
             return baos.toByteArray();
         }
@@ -51,12 +52,12 @@ public class GzipUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static final String gunzip(final byte[] b) throws JSONException, IOException {
+    public static final <T> T gunzip(final byte[] b, final Class<T> c) throws IOException {
         if (b == null) {
             return null;
         }
         try (final GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(b))) {
-            return JSON.decode(in).toString();
+            return MAPPER.readValue(in, c);
         }
     }
 
@@ -85,7 +86,7 @@ public class GzipUtils {
      */
     public static void write(final Object o, final String filename) throws IOException {
         try (final BufferedWriter bw = setUpWriter(filename)) {
-            bw.write(JSON.encode(o).toString());
+            bw.write(MAPPER.writeValueAsString(o));
             bw.close();
         }
     }

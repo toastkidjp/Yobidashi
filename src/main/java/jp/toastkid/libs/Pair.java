@@ -3,10 +3,11 @@ package jp.toastkid.libs;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.arnx.jsonic.JSON;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -18,10 +19,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @param <T2>
  */
 public final class Pair<T1, T2> {
+
+    /** for use toString(). */
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /** left value. */
     public final T1 left;
     /** right value. */
     public final T2 right;
+
+    private Pair() {
+        left  = null;
+        right = null;
+    }
 
     /**
      * public constructor.
@@ -72,7 +82,12 @@ public final class Pair<T1, T2> {
 
     @Override
     public String toString() {
-        return JSON.encode(this);
+        try {
+            return MAPPER.writeValueAsString(this);
+        } catch (final JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return super.toString();
     }
 
     /**

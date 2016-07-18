@@ -182,7 +182,7 @@ public final class EpubMaker {
         FileUtil.outPutStr(
             Functions.bindArgs(
                 Resource.TOC_NCX,
-                Maps.fixedSize.of(
+                Maps.mutable.of(
                         "title",   meta.title,
                         "content", sb.toString()
                         )

@@ -1,6 +1,7 @@
 package jp.toastkid.libs.epub;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,13 +12,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Maps;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jp.toastkid.gui.jfx.wiki.Functions;
 import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.wiki.WikiConverter;
-import net.arnx.jsonic.JSON;
 
 /**
  * 記事を epub に変換して出力する.
@@ -53,7 +55,7 @@ public final class DocToEpub {
      */
     public static void run(final String[] args) {
         Arrays.asList(args).parallelStream()
-            .forEach((json) -> {generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE));});
+            .forEach(json -> generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE)));
         clean();
     }
 
@@ -71,30 +73,34 @@ public final class DocToEpub {
      * @param json 設定ファイル
      */
     private static void generate(final String json) {
-        final EpubMetaData meta = JSON.decode(
-                json,
-                EpubMetaData.class
-                );
-        /**
-         * 処理の流れ
-         * プレフィックス回収
-         * 指定回収
-         * 指定静的コンテンツ回収
-         */
-        final EpubMaker eMaker = new EpubMaker(meta);
-        final List<ContentMetaData> targetContents = new ArrayList<ContentMetaData>();
-        if (StringUtils.isNotEmpty(meta.targetPrefix)) {
-            targetContents.addAll(
-                    getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
-                );
+        try {
+            final EpubMetaData meta = new ObjectMapper().readValue(
+                    json,
+                    EpubMetaData.class
+                    );
+            /*
+             * 処理の流れ
+             * プレフィックス回収
+             * 指定回収
+             * 指定静的コンテンツ回収
+             */
+            final EpubMaker eMaker = new EpubMaker(meta);
+            final List<ContentMetaData> targetContents = new ArrayList<ContentMetaData>();
+            if (StringUtils.isNotEmpty(meta.targetPrefix)) {
+                targetContents.addAll(
+                        getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
+                    );
+            }
+            if (meta.targets != null && meta.targets.size() != 0) {
+                targetContents.addAll(
+                        getTargetContents(getTargets(meta.targets), meta.layout)
+                    );
+            }
+            eMaker.setContentPairs(targetContents);
+            eMaker.generateEpub();
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
-        if (meta.targets != null && meta.targets.size() != 0) {
-            targetContents.addAll(
-                    getTargetContents(getTargets(meta.targets), meta.layout)
-                );
-        }
-        eMaker.setContentPairs(targetContents);
-        eMaker.generateEpub();
     }
 
     /**
@@ -184,7 +190,7 @@ public final class DocToEpub {
                     : EpubDefine.STYLESHEET_HORIZONTAL;
             final String convertedSource = Functions.bindArgs(
                     "public/resources/epub/OEBPS/template.xhtml",
-                    Maps.fixedSize.of(
+                    Maps.mutable.of(
                             "title", title,
                             "content", content.toString(),
                             "stylesheet", style

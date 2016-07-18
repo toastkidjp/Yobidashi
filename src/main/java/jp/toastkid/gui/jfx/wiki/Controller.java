@@ -1509,7 +1509,7 @@ public final class Controller implements Initializable {
         FileUtil.outPutStr(
                 Functions.bindArgs(
                         Resources.PATH_SLIDE,
-                        Maps.fixedSize.of(
+                        Maps.mutable.of(
                                 "title",   Config.article.title,
                                 "content", func.convertArticle2Slide(),
                                 "theme",   Config.get(Config.Key.SLIDE_THEME, "white")

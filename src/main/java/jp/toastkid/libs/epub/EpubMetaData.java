@@ -2,16 +2,21 @@ package jp.toastkid.libs.epub;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
-import net.arnx.jsonic.JSON;
 
 /**
- * Epub のメタデータ.
+ * Epub's meta data.
  * @author Toast kid
  *
  */
 public final class EpubMetaData {
+
+    /** for use toString(). */
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /** epubファイルの拡張子. */
     public static final String EPUB_SUFFIX = ".epub";
@@ -57,7 +62,12 @@ public final class EpubMetaData {
 
     @Override
     public final String toString() {
-        return JSON.encode(this);
+        try {
+            return MAPPER.writeValueAsString(this);
+        } catch (final JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return super.toString();
     }
     /**
      * ルールセットをファイルに出力する.

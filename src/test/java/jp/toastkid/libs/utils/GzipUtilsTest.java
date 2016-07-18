@@ -6,11 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import jp.toastkid.libs.Pair;
-import jp.toastkid.libs.utils.GzipUtils;
-import net.arnx.jsonic.JSONException;
-
 import org.junit.Test;
+
+import jp.toastkid.libs.Pair;
 
 /**
  * check {@link GzipUtils} behavior.
@@ -33,7 +31,7 @@ public class GzipUtilsTest {
      * @throws IOException
      */
     @Test
-    public final void testGzip() throws JSONException, IOException {
+    public final void testGzip() throws IOException {
         assertEquals(
                 "[31, -117, 8, 0, 0, 0, 0, 0, 0, 0, -85, 86, -54, 73, 77, 43, 81, -78, 82, 42, -55,"
                 + " -49, 77, 44, -55, 87, -46, 81, 42, -54, 76, -49, 0, 10, 24, 25, 24, -44, 2,"
@@ -47,8 +45,10 @@ public class GzipUtilsTest {
      * @throws IOException
      */
     @Test
-    public final void testGunzip() throws JSONException, IOException {
-        assertEquals("{left=tomato, right=200}", GzipUtils.gunzip(GzipUtils.gzip(PAIR)));
+    public final void testGunzip() throws IOException {
+        final String gunzip = GzipUtils.gunzip(GzipUtils.gzip(PAIR), Pair.class).toString();
+        System.out.println(gunzip);
+        assertEquals("{\"left\":\"tomato\",\"right\":200}", gunzip);
     }
 
     /**

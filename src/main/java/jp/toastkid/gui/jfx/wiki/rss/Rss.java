@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jp.toastkid.libs.http.Http;
-import jp.toastkid.libs.utils.HtmlUtil;
-import net.arnx.jsonic.JSON;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jp.toastkid.libs.http.Http;
+import jp.toastkid.libs.utils.HtmlUtil;
 
 /**
  * TODO write test.
@@ -305,10 +307,11 @@ public class Rss {
     /**
      * main method.
      * @param args
+     * @throws JsonProcessingException
      */
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws JsonProcessingException {
         final Rss rss = new Rss("http://rss.rssad.jp/rss/codezine/new/20/index.xml");
         rss.parse();
-        System.out.println(JSON.encode(rss));
+        System.out.println(new ObjectMapper().writeValueAsString(rss));
     }
 }

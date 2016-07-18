@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -38,7 +39,7 @@ public class Controller implements Initializable {
             final long start = System.currentTimeMillis();
             nameGenerator = new NameGenerator();
             nationalities.getItems().addAll(nameGenerator.getNationalities());
-            nationalities.getSelectionModel().select(0);
+            Platform.runLater(() -> nationalities.getSelectionModel().select(0));
 
             //nameGenerator.checkXml();
 

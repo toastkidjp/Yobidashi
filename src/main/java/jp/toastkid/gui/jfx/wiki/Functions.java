@@ -117,7 +117,7 @@ public final class Functions {
             = converter.convert(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE);
         final String content = bindArgs(
                 "src/main/views/print.html",
-                Maps.fixedSize.of(
+                Maps.mutable.of(
                         "title",      title,
                         "installDir", findInstallDir(),
                         "body",       converted
@@ -202,7 +202,7 @@ public final class Functions {
         FileUtil.outPutStr(
                 Functions.bindArgs(
                     Resources.PATH_SLIDE,
-                    Maps.fixedSize.of("title", title, "content", content)
+                    Maps.mutable.of("title", title, "content", content)
                 ),
                 Defines.TEMP_FILE_NAME,
                 Defines.ARTICLE_ENCODE
@@ -701,7 +701,7 @@ public final class Functions {
 
             contents.append(bindArgs(
                     Resources.PATH_GALLERY_ITEM,
-                    Maps.fixedSize.of(
+                    Maps.mutable.of(
                             "subtitle",   pics[0].getParent().replace("\\", "/"),
                             "expanderId", expanderId,
                             "table",      table.toString()
