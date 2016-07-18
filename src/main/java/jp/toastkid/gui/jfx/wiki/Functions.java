@@ -76,9 +76,6 @@ import jp.toastkid.libs.wiki.WikiConverter;
  *
  */
 public final class Functions {
-    /** テンプレート内パラメータの検出用パターン. */
-    private static final Pattern PARAM_TEMPLATE_PATTERN
-        = Pattern.compile("\\$\\{(.+?)\\}", Pattern.DOTALL);
 
     /** Markdown Converter. */
     private static final Marked MARKED = new MarkedBuilder().gfm(true).build();
@@ -94,6 +91,9 @@ public final class Functions {
 
     /** リンクのプレフィクス. */
     public String prefix;
+
+    /** Groovy template engine. */
+    private static final TemplateEngine TEMPLATE_ENGINE = new SimpleTemplateEngine();
 
     /**
      * init functions.
@@ -534,9 +534,8 @@ public final class Functions {
             final String pathToTemplate,
             final Map<String, String> params
             ) {
-        final TemplateEngine engine = new SimpleTemplateEngine();
         try {
-            return engine.createTemplate(Lists.immutable.ofAll(
+            return TEMPLATE_ENGINE.createTemplate(Lists.immutable.ofAll(
                     FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
                     ).makeString(LINE_SEPARATOR)).make(params).toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
