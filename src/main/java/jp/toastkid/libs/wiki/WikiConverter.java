@@ -468,7 +468,7 @@ public final class WikiConverter {
                 str = buf.toString();
             }
             // 箇条書きリスト
-            if (str.startsWith("-") ) {
+            if (!isInCodeBlock && str.startsWith("-") ) {
                 if (source.startsWith("--") && uLTagDepth < 2) {
                     if (isInP) {
                         contents.add("</p>");
@@ -495,7 +495,7 @@ public final class WikiConverter {
                 }
             }
             // (121019) 数字付きリスト
-            if (str.startsWith("#") ) {
+            if (!isInCodeBlock && str.startsWith("#") ) {
                 if (source.startsWith("##") && oLTagDepth < 2) {
                     if (isInP) {
                         contents.add("</p>");
