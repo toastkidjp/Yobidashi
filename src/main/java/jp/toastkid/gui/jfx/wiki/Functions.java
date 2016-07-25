@@ -187,6 +187,8 @@ public final class Functions {
                             .append("</div>")
                             .toString()
                             );
+                    final File bgFile = new File("user/res/images/background.png");
+                    put("bodyAdditional", bgFile.exists() ? "bg bg-1" : "");
                 }}),
             Defines.TEMP_FILE_NAME,
             Defines.ARTICLE_ENCODE

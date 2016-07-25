@@ -28,6 +28,7 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextArea;
+import com.sun.istack.internal.logging.Logger;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
@@ -113,6 +114,9 @@ import reactor.core.publisher.Mono;
  *
  */
 public final class Controller implements Initializable {
+
+    /** Logger. */
+    private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -520,7 +524,7 @@ public final class Controller implements Initializable {
     private void selectTab(final int index) {
 
         if (index < 0 || tabPane.getTabs().size() < index ) {
-            System.out.println(index + " " + tabPane.getTabs().size());
+            LOGGER.info(index + " " + tabPane.getTabs().size());
             return;
         }
         tabPane.getSelectionModel().select(index);
@@ -924,7 +928,7 @@ public final class Controller implements Initializable {
             return;
         }
         // webView でなければそれぞれ reload.
-        System.out.println(node.getClass().equals(ChartPane.class) + " " + node.getClass().getName() + " " + ToStringBuilder.reflectionToString(node));
+        LOGGER.info(node.getClass().equals(ChartPane.class) + " " + node.getClass().getName() + " " + ToStringBuilder.reflectionToString(node));
         if (node instanceof ChartPane) {
             drawChart(false);
         }
@@ -1060,7 +1064,7 @@ public final class Controller implements Initializable {
                 }
                 );
         //engine.setJavaScriptEnabled(true);
-        engine.setOnAlert(e -> System.out.println(e.getData()));
+        engine.setOnAlert(e -> LOGGER.info(e.getData()));
         final Worker<Void> loadWorker = engine.getLoadWorker();
         loadWorker.stateProperty().addListener(
                 (arg0, prev, next) -> {
