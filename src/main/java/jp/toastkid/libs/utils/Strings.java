@@ -23,201 +23,55 @@ import org.apache.commons.lang3.StringUtils;
  * 文字列について様々な処理を行うユーティリティ・クラス<BR>
  * 計算式はカーネル法のものを用いている.<BR>
  *
- * <HR>
- *
- * 以下資料
- * <pre>
- * 10/1(水)分
-
-    * 文字列カーネル
-    * 今後
-
-文字列カーネル
-
-ある対象文字列に対して候補文字列を部分マッチングするだけでは、
-その候補文字列が対象文字列に含まれているか含まれていないかを数え上げる判断だけである.
-StringKernelは、ある文字間の距離を測り、図った値から重み付き一致度を　λ^距離　より求める.
-
-基本の式：類似度(x,y)=k(x,y)/√(k(x,x)･k(y,y))
-
-まず、対象文字列の２つを、助詞で分ける.(違う例もあり).
-
-例えば、
-
-x	昨日、/北朝鮮で/事件が/あった.
-y	昨日、/朝鮮民主主義人民共和国で/事件が/あった.
-
-すべての区切りの組み合わせをチェックしていく.
-
-この場合、組み合わせに使われる区切りは、
-
-昨日、/北朝鮮で/事件が/あった./朝鮮民主主義人民共和国で
-
-の５つ.
-
-
-まず、k(x,y)を求める.
-
-両方に含まれる区切りの組み合わせは、
-
-１：昨日、/事件が
-２：昨日、/あった.
-３：事件が/あった.
-
-１の組み合わせは、xでは距離が３離れている.yでは距離が３離れている.
-よって、λ^3･λ^3＝λ^6
-
-２の組み合わせは、xでは距離が４離れている.yでは距離が４離れている.
-よって、λ^4･λ^4＝λ^8
-
-３の組み合わせは、xでは距離が２離れている.yでは距離が２離れている.
-よって、λ^2･λ^2＝λ^4
-
-よって、k(x,y)＝λ^4･λ^6･λ^8
-
-(単なる2乗？)
-
-
-つぎに、k(x,x)を求める.
-
-x	昨日、/北朝鮮で/事件が/あった.
-y	昨日、/朝鮮民主主義人民共和国で/事件が/あった.
-
-１：昨日、/北朝鮮で
-２：昨日、/事件が
-３：昨日、/あった.
-４：北朝鮮で/事件が
-５：北朝鮮で/あった.
-６：事件が/あった.
-
-１の組み合わせは、xでは距離が２離れている.
-よって、λ^2
-
-２の組み合わせは、xでは距離が３離れている.
-よって、λ^3
-
-３の組み合わせは、xでは距離が４離れている.
-よって、λ^4
-
-４の組み合わせは、xでは距離が２離れている.
-よって、λ^2
-
-５の組み合わせは、xでは距離が３離れている.
-よって、λ^3
-
-６の組み合わせは、xでは距離が２離れている.
-よって、λ^2
-
-よって、
-k(x,x)＝(λ^2)^2 + (λ^3)^2 + (λ^4)^2 + (λ^2)^2 + (λ^3)^2 + (λ^2)^2
-      ＝３λ^4＋２λ^6＋λ^8
-
-k(y,y)も同様に、
-
-k(y,y)＝３λ^4＋２λ^6＋λ^8
-
-<HR>
-
-10/15(水)分
-
-    * 文字列カーネル
-    * 今後
-
-文字列カーネル
-
-簡単な説明
-
-ある対象文字列に対して、候補文字列の類似度を計算する方法.
-カーネル法という、数学で言うベクトルの内積のような計算の文字列に対する応用である.
-
-ある対象文字列に対して候補文字列を部分マッチングするだけでは、
-その候補文字列が対象文字列に含まれているか含まれていないかを数え上げる判断だけである.
-StringKernelは、ある文字間の距離を測り、図った値から重み付き一致度を　λ^距離　より求める.
-
-基本の式：類似度(x,y)=k(x,y)/√(k(x,x)･k(y,y))
-
-もう少し詳しく、はこちら
-
-サンプルソース(形態素で名詞、動詞だけ取り出して計算するバージョン)
-ソース
-
-計算方法について
-
-英語の文献を読んだが、英語がわからなかったので、インターネットで探したら、以下の資料が出た.
-
-
-たとえば、"baa"という対象文字列に対して、"ba"のλ距離を測る場合は、
-bから、"baa"の2文字目aにつくまでの距離λ^2と、同じくbから、
-"baa"の3文字目のaにつくまでの距離λ^3を足し合わせたものが答えとなる.
-
-また、例では2文字で距離を求めているが、場合によっては3文字以上で行ってもよい、とある.
-ただ、条件がきつくなるので、個人的には2文字でよいのでは、と思っている.
-</pre>
- *
  * @author Toast kid
- *
- * @see <a href=
- * "http://www.ism.ac.jp/~fukumizu/ISM_lecture_2006/Lecture2006_application.pdf">参考PDF</a>
  */
 public final class Strings {
     /**
      * 年/月/日/時/分/秒/曜日.
      */
     private static final ThreadLocal<DateFormat> YMDHMSSE_HOLDER
-        = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy年M月dd日(E)HH時mm分ss秒");
-        };
-    };
+        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy年M月dd日(E)HH時mm分ss秒"));
 
     /**
      * 書式 = yyyy/M/dd(E) HH:mm:ss..
      */
     private static final ThreadLocal<DateFormat> UNI_DF_HOLDER
-        = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy/M/dd(E) HH:mm:ss");
-        };
-    };
+        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy/M/dd(E) HH:mm:ss"));
+
     /**
      * 書式 = yyyy年 M月 dd日(E).
      */
     private static final ThreadLocal<DateFormat> JP_SIMPLE_DATE_FORMAT_HOLDER
-        = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy年 M月 d日 (E)");
-        };
-    };
+        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy年 M月 d日 (E)"));
+
     /**
      * 書式 = yyyy-MM-dd(E).
      */
     private static final ThreadLocal<DateFormat> HIFUN_COMBINED_HOLDER
-        = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd(E)");
-        };
-    };
+        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd(E)"));
 
     /** 半角カタカナの集合 */
     private static final String HALFSIZE_KATAKANA
         = "ｱｲｳｴｵｧｨｩｪｫｶｷｸｹｺｻｼｽｾｿﾀﾁﾂｯﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖｬｭｮﾗﾘﾙﾚﾛﾜｦﾝｰﾞﾟ､｡";
+
     /** 全角カタカナの集合 */
     private static final String FULLSIZE_KATAKANA
         = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノ"
                 + "ハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー゛゜、.";
+
     /** 半角記号の集合 */
     private static final String HALFSIZE_SYMBOL = "+-*/=|!?\"#@$%&'`()[],,.;:_<>^";
+
     /** 全角記号の集合 */
     private static final String FULLSIZE_SYMBOL
         = "＋－＊／＝｜！？”＃＠＄％＆’｀（）［］，、．；：＿＜＞＾";
+
     /** lamdaの設定がわからない時はこの値を使うといい(定数、0.9). */
     public static final double SAMPLE_LAMDA = 0.9;
+
     /** 改行記号. */
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     /**
      * htmlStringConvert()メソッドで使用.
      */
@@ -229,6 +83,7 @@ public final class Strings {
                 ">",
                 "     "
              };
+
     /**
      * htmlStringConvert()メソッドで使用.
      */
@@ -240,6 +95,7 @@ public final class Strings {
                 "&#62;",
                 "&nbsp;&nbsp;&nbsp;&nbsp; "
              };
+
     /**
      * ファイルパスのフォルダ区切り記号を取得し返す
      */
@@ -250,6 +106,7 @@ public final class Strings {
             return System.getProperty("file.separator");
         }
     }
+
     /**
      * 現在使用しているOSの文字列表現を返す.
      * (120119) 作成
@@ -258,10 +115,12 @@ public final class Strings {
     public static String getOSName() {
         return System.getProperty("os.name");
     }
+
     /**
-     * StringUtilクラス、現在はコンストラクタを使用しない
+     * deny make instance.
      */
     private Strings(){}
+
     /**
      * 四捨五入した類似度を返す
      * @param x : 比較する文字列

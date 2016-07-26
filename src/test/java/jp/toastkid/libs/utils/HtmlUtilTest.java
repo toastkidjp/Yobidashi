@@ -200,4 +200,12 @@ public final class HtmlUtilTest {
         assertEquals("<u>text</u>", HtmlUtil.underLine("text"));
     }
 
+    /**
+     * check {@link HtmlUtil#inLineCode(String)}.
+     */
+    @Test
+    public final void testInLineCode() {
+        assertEquals("<code>text</code>", HtmlUtil.inLineCode("text"));
+    }
+
 }

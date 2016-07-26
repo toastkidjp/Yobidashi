@@ -298,6 +298,17 @@ public final class HtmlUtil {
     public static String underLine(final String text) {
         return new StringBuilder().append("<u>").append(text).append("</u>").toString();
     }
+
+    /**
+     * convert to HTML in-line code block.
+     * @param text string
+     * @return HTML under line
+     */
+    public static String inLineCode(final String text) {
+        return new StringBuilder(text.length() + 14)
+                .append("<code>").append(text).append("</code>").toString();
+    }
+
     /**
      * make hx tag.
      * @param x x

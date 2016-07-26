@@ -23,7 +23,7 @@ import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
 
 /**
- * テキストファイルの中身を YukiWiki 風のルールで HTML に変換する.
+ * This class convert text file to HTML with Wiki mark-up.
  * <HR>
  * <PRE>
  * generateConvertedHTML(
@@ -32,24 +32,7 @@ import jp.toastkid.libs.utils.Strings;
  * "D:/Study/CitationsTest"
  * );
  * </PRE>
- * <HR>
- * (130831) インスタンスを生成して使う形式に変更<BR>
- * (130804) 別名リンク 機能追加<BR>
- * (130803) expand 機能追加<BR>
- * (130727) プラグインが先頭に来ている時に段落タグで囲っていなかったのを修正<BR>
- * (130615) 変数名指定誤りのバグを修正<BR>
- * (130319) "|" での表変換に対応<BR>
- * (121118) ptag<BR>
- * (121020) link の条件分岐を追加<BR>
- * (121019) 数字リスト変換、h1タグ対応<BR>
- * (121014) レンダリング時に、半角%が含まれていると
- * レンダリングに失敗するPlay!のバグを回避する修正を実施<BR>
- * (121014) 設定したソースフォルダからファイルを読み込むよう修正<BR>
- * (121012) テーブルの閉じ忘れを修正<BR>
- * (121010) Android 版をコピペして作成開始<BR>
- * @author 10fmi13
- * @see <a href="http://itref.fc2web.com/java/lang.html">lang</a>
- * @see <a href="http://mimizun.com/log/2ch/tech/1089530578/">【初心者歓迎】iアプリ相談室</a>
+ * @author Toast kid
  */
 public final class WikiConverter {
 
@@ -160,6 +143,10 @@ public final class WikiConverter {
     /** Overflow hidden の正規表現. */
     private static final Pattern OVERFLOW_HIDDEN_PATTERN
         = Pattern.compile("\\{hide\\:(.+?)\\}", Pattern.DOTALL);
+
+    /** inline code の正規表現. */
+    private static final Pattern INLINE_CODE_PATTERN
+        = Pattern.compile("```(.+?)```", Pattern.DOTALL);
 
     /** yukiwiki's header pattern. */
     private static final Pattern HEADER_PATTERN = Pattern.compile(".\\**");
@@ -657,7 +644,7 @@ public final class WikiConverter {
                                 case "title":
                                     title = "<span class=\"code-title\">"
                                             + prop[1].substring(0, prop[1].length() - 1)
-                                            + "</span>";
+                                            + "</span><br/>";
                                     break;
                             }
                         }
@@ -1097,6 +1084,15 @@ public final class WikiConverter {
             while (matcher.find()) {
                 final String found = matcher.group(1);
                 str = str.replaceFirst(UNDERLINE_PATTERN.pattern(), HtmlUtil.underLine(found));
+            }
+        }
+
+        // in-line code.
+        if (str.contains("```")) {
+            matcher = INLINE_CODE_PATTERN.matcher(str);
+            while (matcher.find()) {
+                final String found = matcher.group(1);
+                str = str.replaceFirst(INLINE_CODE_PATTERN.pattern(), HtmlUtil.inLineCode(found));
             }
         }
 
