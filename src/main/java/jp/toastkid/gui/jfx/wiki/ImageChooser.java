@@ -44,6 +44,9 @@ public class ImageChooser {
      * @return file url string.
      */
     public String choose() {
+        if (images.size() == 0) {
+            return "";
+        }
         return images.get((int) Math.round((images.size() - 1) * Math.random())).toURI().toString();
     }
 }

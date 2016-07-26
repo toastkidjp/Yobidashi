@@ -77,6 +77,8 @@ import jp.toastkid.libs.wiki.WikiConverter;
  */
 public final class Functions {
 
+    private static final String USER_BACKGROUND = "user/res/images/background/";
+
     /** Markdown Converter. */
     private static final Marked MARKED = new MarkedBuilder().gfm(true).build();
 
@@ -92,6 +94,9 @@ public final class Functions {
     /** リンクのプレフィクス. */
     public String prefix;
 
+    /** Image file chooser. */
+    private final ImageChooser chooser;
+
     /** Groovy template engine. */
     private static final TemplateEngine TEMPLATE_ENGINE = new SimpleTemplateEngine();
 
@@ -106,6 +111,7 @@ public final class Functions {
         ts.isAllowChar     = false;
         ts.isAllowHiragana = false;
         ts.isAllowNum      = false;
+        chooser = new ImageChooser(USER_BACKGROUND);
     }
 
     /**
@@ -187,9 +193,15 @@ public final class Functions {
                             .append("</div>")
                             .toString()
                             );
-                    final File bgFile = new File("user/res/images/background.png");
-                    put("bodyAdditional", bgFile.exists() ? "bg bg-1" : "");
-                }}),
+                    if (new File(USER_BACKGROUND).exists()) {
+                        final String choose = chooser.choose();
+                        put("bodyAdditional",
+                                choose.isEmpty() ? "" : String.format("style=\"background-image: url('%s');\" ", choose));
+                    } else {
+                        put("bodyAdditional", "");
+                    }
+                }
+            }),
             Defines.TEMP_FILE_NAME,
             Defines.ARTICLE_ENCODE
         );

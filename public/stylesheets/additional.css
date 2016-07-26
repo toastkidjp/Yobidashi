@@ -49,7 +49,3 @@ style.onPage {
     background-repeat: no-repeat;
     background-position: center center;
 }
- 
-.bg-1 {
-    background-image: url("../../user/res/images/background.png");
-}
