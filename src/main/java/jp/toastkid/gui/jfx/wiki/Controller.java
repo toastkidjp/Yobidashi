@@ -22,13 +22,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.impl.factory.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextArea;
-import com.sun.istack.internal.logging.Logger;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
@@ -116,7 +117,7 @@ import reactor.core.publisher.Mono;
 public final class Controller implements Initializable {
 
     /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -614,7 +615,7 @@ public final class Controller implements Initializable {
             final double ratio = Double.parseDouble(zoomInput.getText());
             zoom.setValue(ratio);
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);
         }
     }
 
@@ -862,7 +863,7 @@ public final class Controller implements Initializable {
                     new ZipArchiver().doDirectory(sArchivePath);
                     //new ZipArchiver().doDirectory(iArchivePath);
                 } catch (final IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error", e);;
                 }
                 final long end = System.currentTimeMillis() - start;
                 pd.stop();
@@ -978,7 +979,7 @@ public final class Controller implements Initializable {
         try {
             new jp.toastkid.gui.jfx.cssgen.Main().start(this.stage);
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
     }
 
@@ -990,7 +991,7 @@ public final class Controller implements Initializable {
         try {
             new jp.toastkid.gui.jfx.noodle_timer.Main().start(this.stage);
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
     }
 
@@ -1415,7 +1416,7 @@ public final class Controller implements Initializable {
                     Wiki2Markdown.convert(Files.readAllLines(Config.article.file.toPath()))
                     ));
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
             AlertDialog.showMessage(getParent(), "IOException", e.getMessage());
             return;
         }
@@ -1734,11 +1735,11 @@ public final class Controller implements Initializable {
                         try {
                             Files.deleteIfExists(p);
                         } catch (final Exception e) {
-                            e.printStackTrace();
+                            LOGGER.error("Error", e);;
                         }
                     });
                 } catch (final Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error", e);;
                 }
             })
             .build().show();
@@ -1860,7 +1861,7 @@ public final class Controller implements Initializable {
                             ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
                                     : file.renameTo(dest);
                 } catch (final IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error", e);;
                 }
                 final String title;
                 final String message;
@@ -1952,7 +1953,7 @@ public final class Controller implements Initializable {
             openTarget.createNewFile();
             Files.write(openTarget.toPath(), Functions.makeNewContent());
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
         loadArticleList();
         openFileByEditor(openTarget);
@@ -1970,7 +1971,7 @@ public final class Controller implements Initializable {
         try {
             desktop.open(openTarget);
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
     }
 

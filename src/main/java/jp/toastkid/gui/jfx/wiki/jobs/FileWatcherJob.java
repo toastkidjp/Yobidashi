@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.utils.TimeUtil;
 import reactor.core.publisher.Flux;
@@ -20,6 +22,9 @@ import reactor.core.publisher.Flux;
  */
 public class FileWatcherJob implements Runnable {
 
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileWatcherJob.class);
+
     /** backup interval. */
     private static final long BACKUP_INTERVAL = TimeUnit.SECONDS.toMillis(30L);
 
@@ -30,7 +35,7 @@ public class FileWatcherJob implements Runnable {
     public void run() {
         final File backup = new File("backup");
         if (!backup.exists() || !backup.isDirectory()) {
-            System.out.println("make backup dir.");
+            LOGGER.info("make backup dir.");
             backup.mkdir();
         }
         Flux.<File>create(emitter -> {
@@ -52,10 +57,10 @@ public class FileWatcherJob implements Runnable {
                         file.toPath(), new File(backup, file.getName()).toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                         );
-                System.out.println("Backup to " + copy);
+                LOGGER.info("Backup to " + copy);
                 targets.put(file, file.lastModified());
             } catch (final IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Error", e);;
             }
         });
     }

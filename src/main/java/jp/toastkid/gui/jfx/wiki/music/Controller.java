@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -31,12 +33,17 @@ import jp.toastkid.gui.jfx.wiki.models.Config;
  */
 public class Controller implements Initializable {
 
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
     /** (Mp3) タブ. */
     @FXML
     public TabPane musicTabPane;
+
     /** (Mp3) 現在選択中のファイル名を表示する. */
     @FXML
     public TextField currentMusicFileName;
+
     /** (Mp3) ファイル再生インスタンス. */
     private MediaPlayer mediaPlayer;
 
@@ -63,7 +70,7 @@ public class Controller implements Initializable {
                 openMp3Tab(dir);
             }
 
-            System.out.println(Thread.currentThread().getName() + " Ended initialize MP3 Player."
+            LOGGER.info(Thread.currentThread().getName() + " Ended initialize MP3 Player."
                     + (System.currentTimeMillis() - start ) + "ms");
         });
         executor.shutdown();

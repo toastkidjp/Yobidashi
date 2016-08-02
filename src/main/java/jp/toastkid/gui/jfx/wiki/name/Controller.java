@@ -5,6 +5,9 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,6 +20,9 @@ import javafx.scene.control.TextArea;
  *
  */
 public class Controller implements Initializable {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     /** name nationalities. */
     @FXML
@@ -43,7 +49,7 @@ public class Controller implements Initializable {
 
             //nameGenerator.checkXml();
 
-            System.out.println(Thread.currentThread().getName() + " Ended initialize NameMaker."
+            LOGGER.info(Thread.currentThread().getName() + " Ended initialize NameMaker."
                     + (System.currentTimeMillis() - start) + "ms");
         });
         executor.shutdown();

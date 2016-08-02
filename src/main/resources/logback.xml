@@ -1,67 +1,21 @@
-<configuration scan="true" scanPeriod="30 seconds">
-    <jmxConfigurator />
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
+		<encoder>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>logs/app.log</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
+		</encoder>
+	</appender>
 
-    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/${logfile.name}_ERROR</file>
-
-        <!-- ERRORレベル以上のログのみを出力するためのフィルタ -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
-        </filter>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/${logfile.name}_ERROR.%d{yyyy-MM-dd}
-            </fileNamePattern>
-            <maxHistory>14</maxHistory>
-        </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%t] [%logger{35}:%line]%msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/${logfile.name}_WARN</file>
-
-        <!-- WARNレベル以上のログのみを出力するためのフィルタ -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
-        </filter>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/${logfile.name}_WARN.%d{yyyy-MM-dd}
-            </fileNamePattern>
-            <maxHistory>14</maxHistory>
-        </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%t] [%logger{35}:%line]%msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/${logfile.name}_INFO</file>
-
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/${logfile.name}_INFO.%d{yyyy-MM-dd}
-            </fileNamePattern>
-            <maxHistory>14</maxHistory>
-        </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%t] [%logger{35}:%line]%msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <root level="INFO">
-        <appender-ref ref="ERROR_FILE" />
-        <appender-ref ref="WARN_FILE" />
-        <appender-ref ref="INFO_FILE" />
-    </root>
+	<root>
+		<level value="INFO" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
 </configuration>

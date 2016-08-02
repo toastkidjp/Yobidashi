@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
 import javafx.concurrent.Service;
@@ -28,6 +30,9 @@ import jp.toastkid.libs.utils.FileUtil;
  * Display Popup with ProgressBar in JavaFX</a>
  */
 public final class ProgressDialog extends Application implements AutoCloseable {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
     /** FXML ファイルのパス. */
     private static final String DIALOG_FXML = "public/scenes/ProgressDialog.fxml";
@@ -94,7 +99,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
                 scene = new Scene(loader.load());
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
         controller = loader.getController();
         dialogStage = new Stage(StageStyle.DECORATED);
@@ -203,7 +208,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      * @param text
      */
     public void addText(final String text) {
-        System.out.println(getProg() + " " + text);
+        LOGGER.info(getProg() + " " + text);
         this.text.append(System.lineSeparator()).append(text);
     }
 
@@ -230,7 +235,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         try {
             super.stop();
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         } finally {
             active = false;
         }

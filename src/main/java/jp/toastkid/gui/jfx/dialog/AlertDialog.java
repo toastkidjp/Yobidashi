@@ -2,6 +2,13 @@ package jp.toastkid.gui.jfx.dialog;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,11 +20,6 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import jp.toastkid.libs.utils.FileUtil;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
-
 /**
  * 簡単な確認ダイアログ.
  * JavaFX 8u40以前でも使用可能.
@@ -27,12 +29,19 @@ import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
  * JavaFX2.2でダイアログを作る方法</a>
  */
 public final class AlertDialog extends Application {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlertDialog.class);
+
     /** FXML ファイルのパス. */
     private static final String DIALOG_FXML = "public/scenes/AlertDialog.fxml";
+
     /** コントローラオブジェクト. */
     private AlertDialogController controller;
+
     /** Stage. */
     private Stage stage;
+
     /** Scene. */
     private Scene scene = null;
 
@@ -145,7 +154,7 @@ public final class AlertDialog extends Application {
                 scene = new Scene(loader.load());
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error", e);;
         }
         controller = loader.getController();
         stage = new Stage(StageStyle.UTILITY);
