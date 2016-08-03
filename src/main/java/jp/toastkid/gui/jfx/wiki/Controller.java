@@ -106,7 +106,7 @@ import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.libs.wiki.Wiki2Markdown;
-import reactor.core.publisher.Mono;
+import rx.Single;
 
 /**
  * JavaFX WikiClient's Controller.
@@ -806,28 +806,27 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callHtmlSource() {
-        final Mono<String> source = Mono.<String>create(emitter -> {
-            getCurrentWebView().ifPresent(wv -> {
-                emitter.complete(wv.getEngine()
+        final Single<String> source = Single.<String>create(emitter ->
+            getCurrentWebView().ifPresent(wv ->
+                emitter.onSuccess(wv.getEngine()
                         .executeScript(
                                 "document.getElementsByTagName('html')[0].innerHTML;"
                                 )
                         .toString()
                         .replace("<", "&lt;")
                         .replace(">", "&gt;")
-                        );
-            });
-        });
+                        .replace("\n", "<br/>")
+                        )
+            )
+        );
 
-        final Mono<WebView> browser = Mono.<WebView>create(emitter -> {
+        final Single<WebView> browser = Single.<WebView>create(emitter -> {
             final String title = tabPane.getSelectionModel().getSelectedItem().getText();
             openWebTab(title.concat("'s HTML Source"));
-            getCurrentWebView().ifPresent(wv -> emitter.complete(wv));
+            getCurrentWebView().ifPresent(wv -> emitter.onSuccess(wv));
         });
 
-        source.and(browser).subscribe(tuple ->
-            tuple.t2.getEngine().loadContent(tuple.t1.replace("\n", "<br/>"))
-        );
+        source.subscribe(html -> browser.subscribe(wv -> wv.getEngine().loadContent(html)));
     }
 
     /**

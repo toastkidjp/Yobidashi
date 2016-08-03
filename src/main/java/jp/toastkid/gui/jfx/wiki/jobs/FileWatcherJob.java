@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.utils.TimeUtil;
-import reactor.core.publisher.Flux;
+import rx.Observable;
 
 /**
  * watch file for auto backup.
@@ -38,16 +38,16 @@ public class FileWatcherJob implements Runnable {
             LOGGER.info("make backup dir.");
             backup.mkdir();
         }
-        Flux.<File>create(emitter -> {
+        Observable.<File>create(emitter -> {
             while (true) {
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> emitter.complete()));
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> emitter.onCompleted()));
                 targets
                     .select((file, ms) -> ms < file.lastModified())
-                    .forEachKeyValue((file, ms) -> emitter.next(file));
+                    .forEachKeyValue((file, ms) -> emitter.onNext(file));
                 try {
                     TimeUtil.sleep(BACKUP_INTERVAL);
                 } catch (final InterruptedException e) {
-                    emitter.fail(e);
+                    emitter.onError(e);
                 }
             }
         })

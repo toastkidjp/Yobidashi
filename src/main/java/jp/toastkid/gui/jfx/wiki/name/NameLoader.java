@@ -15,8 +15,8 @@ import org.eclipse.collections.impl.factory.Sets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 /**
  * Read nameInformation from passed JSON.
@@ -51,15 +51,15 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
     @Override
     public Collection<NameInformation> call() {
         try (final BufferedReader fileReader = Files.newBufferedReader(Paths.get(targetFile.toURI()))) {
-            final Flux<NameInformation> cache
-                = Flux.<NameInformation>create(emitter -> fileReader.lines().forEach(str -> {
+            final Observable<NameInformation> cache
+                = Observable.<NameInformation>create(emitter -> fileReader.lines().forEach(str -> {
                     try {
-                        emitter.next(READER.get().readValue(str.getBytes("UTF-8")));
+                        emitter.onNext(READER.get().readValue(str.getBytes("UTF-8")));
                     } catch (final Exception e) {
-                        emitter.fail(e);
+                        emitter.onError(e);
                     }
                 })).cache();
-            cache.subscribeOn(Schedulers.fromExecutor(Executors.newFixedThreadPool(8)))
+            cache.subscribeOn(Schedulers.from(Executors.newFixedThreadPool(8)))
                 .subscribe(names::add);
             cache
                 .subscribe(info -> nationalities.add(info.getNationality()));
