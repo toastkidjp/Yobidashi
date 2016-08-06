@@ -1090,7 +1090,6 @@ public final class WikiConverter {
         // in-line code.
         if (str.contains("```")) {
             matcher = INLINE_CODE_PATTERN.matcher(str);
-            System.out.println(str);
             while (matcher.find()) {
                 final String found = matcher.group(1);
                 str = str.replaceFirst(INLINE_CODE_PATTERN.pattern(), HtmlUtil.inLineCode(found));
