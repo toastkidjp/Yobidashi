@@ -11,10 +11,13 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
+import jp.toastkid.gui.jfx.wiki.Main;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -24,6 +27,9 @@ import reactor.core.scheduler.Schedulers;
  * @author Toast kid
  */
 public class NameLoader implements Callable<Collection<NameInformation>>{
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** ObjectReader's holder. */
     private static final ThreadLocal<ObjectReader> READER
@@ -64,7 +70,7 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
             cache
                 .subscribe(info -> nationalities.add(info.getNationality()));
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         return names;
     }

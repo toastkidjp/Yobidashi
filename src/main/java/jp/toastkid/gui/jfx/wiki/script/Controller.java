@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
@@ -13,10 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.Main;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Script area's controller.
@@ -24,6 +27,9 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public class Controller {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** Script file name. */
     @FXML
@@ -107,7 +113,7 @@ public class Controller {
                     StandardOpenOption.WRITE
                     );
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
     }
 
@@ -133,7 +139,7 @@ public class Controller {
                     CollectionUtil.implode(Files.readAllLines(file.toPath()),System.lineSeparator())
                     );
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
     }
 

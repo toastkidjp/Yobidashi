@@ -10,7 +10,10 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import jp.toastkid.gui.jfx.wiki.Main;
 import jp.toastkid.libs.Props;
 import jp.toastkid.libs.utils.FileUtil;
 
@@ -27,6 +30,9 @@ import jp.toastkid.libs.utils.FileUtil;
  * @version 0.0.1
  */
 public final class Config {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
      * keys of Config.
@@ -172,7 +178,7 @@ public final class Config {
                 = Files.newBufferedWriter(new File(Defines.CONF_DIR, Defines.CONF_NAME).toPath())) {
             CONFIG.store(writer, MESSAGE);
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
     }
 

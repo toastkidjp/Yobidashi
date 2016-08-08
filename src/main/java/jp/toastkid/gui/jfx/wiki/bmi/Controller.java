@@ -3,10 +3,14 @@ package jp.toastkid.gui.jfx.wiki.bmi;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import jp.toastkid.gui.jfx.wiki.Main;
 
 /**
  * Controller.
@@ -14,6 +18,9 @@ import javafx.scene.control.TextField;
  *
  */
 public class Controller implements Initializable {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** 改行記号. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
@@ -48,7 +55,7 @@ public class Controller implements Initializable {
             final double weight = Double.parseDouble(this.weight.getText());
             result.setText(makeBmiResult(bmi(height, weight), standardWeight(height)));
         } catch (final RuntimeException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
     }
 

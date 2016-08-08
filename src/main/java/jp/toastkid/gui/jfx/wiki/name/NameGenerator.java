@@ -8,6 +8,10 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jp.toastkid.gui.jfx.wiki.Main;
 
 /**
  * Name generator.
@@ -15,6 +19,9 @@ import org.eclipse.collections.impl.factory.Lists;
  *
  */
 public class NameGenerator {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** path/to/firstname/file. */
     private static final String FIRST_NAME_FILE  = "public/resources/NameMaker/first.txt";
@@ -59,7 +66,7 @@ public class NameGenerator {
         try {
             latch.await();
         } catch (final InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         es.shutdown();
     }

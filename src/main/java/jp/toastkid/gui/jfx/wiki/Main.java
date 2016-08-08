@@ -3,6 +3,9 @@ package jp.toastkid.gui.jfx.wiki;
 import java.io.File;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -27,6 +30,9 @@ import jp.toastkid.libs.utils.FileUtil;
  */
 public final class Main extends Application {
 
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     /** 二重起動している際のメッセージ. */
     private static final String MESSAGE_ALERT_PROCESS_DUPLICATE
         = "すでに別プロセスで起動しています。"
@@ -49,13 +55,13 @@ public final class Main extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (LOCK_FILE.exists()) {
                 LOCK_FILE.delete();
-                System.out.println("Lock file was deleted.");
+                LOGGER.info("Lock file was deleted.");
             }
         }));
         try {
             initialize(stage);
         } catch (final Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
     }
@@ -78,7 +84,7 @@ public final class Main extends Application {
         try {
             LOCK_FILE.createNewFile();
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
 
         stage.getIcons().add(new Image(FileUtil.getUrl(Resources.PATH_IMG_ICON).toString()));
@@ -117,7 +123,7 @@ public final class Main extends Application {
             controller.setStage(stage);
             return new Scene(loaded);
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         return null;
     }

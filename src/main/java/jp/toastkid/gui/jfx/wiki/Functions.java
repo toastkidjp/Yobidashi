@@ -38,6 +38,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import am.ik.marked4j.Marked;
 import am.ik.marked4j.MarkedBuilder;
@@ -77,6 +79,10 @@ import jp.toastkid.libs.wiki.WikiConverter;
  */
 public final class Functions {
 
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+    /** background directory. */
     private static final String USER_BACKGROUND = "user/res/images/background/";
 
     /** Markdown Converter. */
@@ -281,7 +287,7 @@ public final class Functions {
             source.add("最終更新： " + Strings.toYmdhmsse(Files.getLastModifiedTime(path).toMillis()));
             return MARKED.marked(CollectionUtil.implode(source));
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         return "";
     }
@@ -339,14 +345,14 @@ public final class Functions {
             try {
                 return newArticle(Config.article.title).getBytes(Defines.ARTICLE_ENCODE);
             } catch (final UnsupportedEncodingException e) {
-                e.printStackTrace();
+                LOGGER.error("Caught error.", e);
             }
         }
         if (Article.Extension.MD.text().equals(ext.get())) {
             try {
                 return newMarkdown(Config.article.title).getBytes(Defines.ARTICLE_ENCODE);
             } catch (final UnsupportedEncodingException e) {
-                e.printStackTrace();
+                LOGGER.error("Caught error.", e);
             }
         }
         return new byte[0];
@@ -498,7 +504,7 @@ public final class Functions {
                 .each(Procedures.throwing((file) -> backup.entry(file)));
             backup.doZip();
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
     }
 
@@ -534,7 +540,7 @@ public final class Functions {
             final BufferedImage img = new Robot().createScreenCapture(rect);
             ImageIO.write(img, "png", new File(name));
         } catch (final IOException | AWTException e) {
-            e.printStackTrace();;
+            LOGGER.error("Caught error.", e);;
         }
     }
 
@@ -553,7 +559,7 @@ public final class Functions {
                     FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
                     ).makeString(LINE_SEPARATOR)).make(params).toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         return "";
     }
@@ -609,7 +615,7 @@ public final class Functions {
         try {
             by = str.getBytes("EUC-JP");
         } catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
 
         final StringBuilder buf = new StringBuilder(by.length * 3);

@@ -17,13 +17,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.application.Application;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javafx.application.Application;
+import jp.toastkid.gui.jfx.wiki.Main;
 
 /**
  * JavaFX stylesheet definition.
@@ -31,12 +34,18 @@ import org.eclipse.collections.impl.factory.Sets;
  * @see Application
  */
 public class Style {
-    /** default style. */
-    public static final String DEFAULT = "MODENA";
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     /** extension of stylesheet. */
     private static final String CSS = ".css";
+
     /** path to user defined stylesheets. */
     private static final String USER_DEFINED_PATH = "user/css/gui";
+
+    /** default style. */
+    public static final String DEFAULT = "MODENA";
 
     /**
      * get path to css.
@@ -56,7 +65,7 @@ public class Style {
             try {
                 return userDefined.toURI().toURL().toString();
             } catch (final MalformedURLException e) {
-                e.printStackTrace();
+                LOGGER.error("Caught error.", e);
             }
         }
         return (resource != null) ? resource.toString() : s.toString();
@@ -74,7 +83,7 @@ public class Style {
         try {
             styles.addAll(findJarResourceDir());
         } catch (final RuntimeException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
 
         // read from user css dir.
@@ -112,7 +121,7 @@ public class Style {
             // Jar でないならパスから読み込み
              return Arrays.asList(new File(resource).list());
         } catch (final URISyntaxException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught error.", e);
         }
         return Lists.fixedSize.empty();
     }

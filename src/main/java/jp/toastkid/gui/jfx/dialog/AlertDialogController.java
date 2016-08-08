@@ -3,13 +3,9 @@ package jp.toastkid.gui.jfx.dialog;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-
-
-
 import org.apache.commons.lang3.StringUtils;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import jp.toastkid.gui.jfx.wiki.Main;
 
 /**
  * 簡単な確認ダイアログのコントローラ.
@@ -26,9 +23,14 @@ import javafx.scene.layout.VBox;
  * JavaFX2.2でダイアログを作る方法</a>
  */
 public final class AlertDialogController implements Initializable {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     /** メッセージラベル. */
     @FXML
     public Label message;
+
     /** Control を入れる VBox. */
     @FXML
     public VBox inputBox;
@@ -95,7 +97,7 @@ public final class AlertDialogController implements Initializable {
                     this.close();
                 } catch (final RuntimeException e) {
                     AlertDialog.showMessage(message.getScene().getWindow(), "Error!!!", e.getMessage());
-                    e.printStackTrace();
+                    LOGGER.error("Caught error.", e);
                 }
             };
         } else {
