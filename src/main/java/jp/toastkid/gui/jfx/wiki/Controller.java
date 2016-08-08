@@ -2010,6 +2010,9 @@ public final class Controller implements Initializable {
 
     /**
      * PrinterJob を呼ぶ.
+     *
+     * @see <a href="http://d.hatena.ne.jp/tatsu-no-toshigo/20141208/1417957734">
+     * 続・JavaFX8の印刷機能によるHTMLのPDF変換</a>
      */
     @FXML
     public final void callPrinterJob() {
@@ -2028,12 +2031,9 @@ public final class Controller implements Initializable {
                     LOGGER.info("print name:" + printer.getName());
                 }
 
-                // レイアウトの設定
                 final PageLayout pageLayout = printer.createPageLayout(
                         Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
 
-                // Printerジョブの取得。
-                // ジョブ名が出力するファイル名となるため変更する。
                 final PrinterJob job = PrinterJob.createPrinterJob(printer);
                 if (job == null) {
                     return;
