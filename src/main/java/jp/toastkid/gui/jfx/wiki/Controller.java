@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -122,6 +123,9 @@ public final class Controller implements Initializable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
+    /** log file. */
+    private static final String PATH_APP_LOG = "logs/app.log";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -846,6 +850,23 @@ public final class Controller implements Initializable {
             bld.append(key).append("\t").append(value).append(lineSeparator)
         );
         AlertDialog.showMessage(getParent(), "状態", bld.toString());
+    }
+
+    /**
+     * call LogViewer.
+     */
+    @FXML
+    private final void callLogViewer() {
+        if (!new File(PATH_APP_LOG).exists()) {
+            return;
+        }
+        final String log = String.format(
+                "<pre>%s</pre>",
+                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
+                );
+        func.generateHtml(log, "LogViewer");
+        openWebTab();
+        loadDefaultFile();
     }
 
     /**
@@ -1660,6 +1681,13 @@ public final class Controller implements Initializable {
 
         // Web ページならそのまま表示.
         if (!StringUtils.isEmpty(url) && url.startsWith("http")) {
+            urlText.setText(url);
+            currentWebView.ifPresent(wv -> wv.getEngine().load(url));
+            return;
+        }
+
+        // HTMLならそのまま表示.
+        if (!StringUtils.isEmpty(url) && url.endsWith(".html")) {
             urlText.setText(url);
             currentWebView.ifPresent(wv -> wv.getEngine().load(url));
             return;
