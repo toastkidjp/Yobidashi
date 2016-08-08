@@ -42,6 +42,10 @@ import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -2009,26 +2013,37 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callPrinterJob() {
-        final PrinterJob job = PrinterJob.createPrinterJob();
         new AlertDialog.Builder().setParent(getParent())
-            .setTitle("印刷").setMessage("印刷を実行しますか？")
+            .setTitle("PDF印刷").setMessage("PDFへの印刷を実行しますか？")
             .setOnPositive("OK", () -> {
-                if (job == null) {
-                    return;
-                }
-                //PrinterAttributes attr = new PrinterAttributes(job);
-                func.generateHtmlForPrint(this.tabPane.getSelectionModel().getSelectedItem().getText());
                 final Optional<WebView> wv = getCurrentWebView();
                 if (!wv.isPresent()) {
                     return;
                 }
-                loadUrl(Defines.TEMP_FILE_NAME);
-                //getCurrentWebView().getEngine().print(job);
-                if (job.showPrintDialog(null)) {
-                    job.printPage(wv.get());
-                    job.endJob();
+                final Printer printer = Printer.getDefaultPrinter();
+                if(printer == null) {
+                    LOGGER.warn("printe is null");
+                    return;
+                } else {
+                    LOGGER.info("print name:" + printer.getName());
                 }
-            });
+
+                // レイアウトの設定
+                final PageLayout pageLayout = printer.createPageLayout(
+                        Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+
+                // Printerジョブの取得。
+                // ジョブ名が出力するファイル名となるため変更する。
+                final PrinterJob job = PrinterJob.createPrinterJob(printer);
+                if (job == null) {
+                    return;
+                }
+                job.getJobSettings().setJobName(Config.get(Config.Key.WIKI_TITLE));
+                LOGGER.info("jobName [{}]\n", job.getJobSettings().getJobName());
+                wv.get().getEngine().print(job);
+                job.endJob();
+                AlertDialog.showMessage(getParent(), "PDF印刷完了", "PDF印刷が正常に完了しました。");
+            }).build().show();
     }
 
     /**
