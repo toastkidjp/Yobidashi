@@ -12,7 +12,7 @@
 <?import com.jfoenix.controls.*?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
-    fx:controller="jp.toastkid.gui.jfx.wiki.Controller">
+    fx:controller="jp.toastkid.yobidashi.Controller">
   <children>
     <HBox prefHeight="25.0" prefWidth="900.0" fx:id="header">
       <children>

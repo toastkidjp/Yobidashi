@@ -10,7 +10,7 @@
 <?import com.jfoenix.controls.*?>
 
 <GridPane
-	fx:controller="jp.toastkid.gui.jfx.dialog.AlertDialogController"
+	fx:controller="jp.toastkid.dialog.AlertDialogController"
 	hgap="14.0" maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" 
     vgap="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>

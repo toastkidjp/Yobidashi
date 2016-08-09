@@ -5,11 +5,11 @@
 <?import javafx.scene.layout.*?>
 
 <?import com.jfoenix.controls.*?>
-<?import jp.toastkid.gui.jfx.common.control.NumberTextField?>
+<?import jp.toastkid.jfx.common.control.NumberTextField?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
    prefHeight="250.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-   fx:controller="jp.toastkid.gui.jfx.bmi.Controller"
+   fx:controller="jp.toastkid.bmi.Controller"
     >
     <children>
       <Label text="  BMIを計算するツールです" />

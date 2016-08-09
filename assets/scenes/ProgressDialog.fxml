@@ -8,7 +8,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
   prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="jp.toastkid.gui.jfx.dialog.ProgressDialogController" fx:id="background"
+  fx:controller="jp.toastkid.dialog.ProgressDialogController" fx:id="background"
   >
 	<children>
       <ProgressIndicator fx:id="pin" progress="0.0" VBox.vgrow="ALWAYS" />

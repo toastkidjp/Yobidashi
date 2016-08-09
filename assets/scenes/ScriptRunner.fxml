@@ -9,7 +9,7 @@
 <?import com.jfoenix.controls.*?>
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-  fx:id="scripterArea" fx:controller="jp.toastkid.gui.jfx.script.Controller">
+  fx:id="scripterArea" fx:controller="jp.toastkid.script.Controller">
   <children>
     <HBox alignment="CENTER" minHeight="300.0" spacing="5.0">
       <children>
