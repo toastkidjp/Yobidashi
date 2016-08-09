@@ -10,6 +10,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -19,7 +20,7 @@ import jp.toastkid.libs.utils.FileUtil;
  */
 public final class Main extends Application {
     /** FXML ファイルのパス. */
-    private static final String FXML = "public/scenes/WordCloud.fxml";
+    private static final String FXML = Defines.SCENE_DIR + "/WordCloud.fxml";
     /** コントローラオブジェクト. */
     private Controller controller;
     /** Stage. */

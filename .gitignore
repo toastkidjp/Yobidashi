@@ -21,6 +21,5 @@ gradlew*
 *.epub
 *.bin
 script.py
-public/resources/NameMaker/*xml
 sample
 *.log

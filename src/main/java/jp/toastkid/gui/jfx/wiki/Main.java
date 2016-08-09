@@ -41,7 +41,7 @@ public final class Main extends Application {
                 + "\n心当たりのない場合は「temp.html」というファイルを削除してください。";
 
     /** fxml ファイル. */
-    private static final String FXML_PATH = "public/scenes/Main.fxml";
+    private static final String FXML_PATH = Defines.SCENE_DIR + "/Main.fxml";
 
     /** process lock file. */
     private static final File   LOCK_FILE = new File(Defines.TEMP_FILE_NAME);

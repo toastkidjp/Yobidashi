@@ -18,6 +18,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -34,7 +35,7 @@ public final class AlertDialog extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertDialog.class);
 
     /** FXML ファイルのパス. */
-    private static final String DIALOG_FXML = "public/scenes/AlertDialog.fxml";
+    private static final String DIALOG_FXML = Defines.SCENE_DIR + "/AlertDialog.fxml";
 
     /** コントローラオブジェクト. */
     private AlertDialogController controller;

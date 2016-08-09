@@ -36,6 +36,7 @@ import jp.toastkid.gui.jfx.common.control.NumberTextField;
 import jp.toastkid.gui.jfx.common.control.Stopwatch;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 
@@ -56,7 +57,7 @@ public class FullScreen {
     private static final KeyCodeCombination JUMP_KEY = new KeyCodeCombination(KeyCode.J, KeyCombination.CONTROL_DOWN);
 
     /** path to theme's css dir. */
-    private static final String THEME_DIR = "public/javascripts/reveal/css/theme/";
+    private static final String THEME_DIR = Defines.ASSETS_DIR + "/javascripts/reveal/css/theme/";
 
     /** css file name filter. */
     private static final FilenameFilter CSS_FILTER = (dir, name) -> name.endsWith(".css");

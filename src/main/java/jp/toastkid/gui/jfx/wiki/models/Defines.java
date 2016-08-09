@@ -29,7 +29,10 @@ public final class Defines {
     public static final String TEMPLATE_DIR       = "templates";
 
     /** dir of assets. */
-    public static final String ASSETS_DIR         = "public";
+    public static final String ASSETS_DIR         = "assets";
+
+    /** dir of scene files. */
+    public static final String SCENE_DIR          = ASSETS_DIR + "/scenes";
 
     /** dir of user files. */
     public static final String USER_DIR           = "user";

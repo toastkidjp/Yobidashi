@@ -11,6 +11,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.wiki.models.Defines;
+
 /**
  * {@link NameLoader}'s test.
  * @author Toast kid
@@ -19,10 +21,12 @@ import org.junit.Test;
 public class NameLoaderTest {
 
     /** path/to/firstname/file. */
-    private static final String FIRST_NAME_FILE  = "public/resources/NameMaker/first.txt";
+    private static final String FIRST_NAME_FILE
+        = Defines.ASSETS_DIR + "/resources/NameMaker/first.txt";
 
     /** path/to/familyname/file. */
-    private static final String FAMILY_NAME_FILE = "public/resources/NameMaker/family.txt";
+    private static final String FAMILY_NAME_FILE
+        = Defines.ASSETS_DIR + "/resources/NameMaker/family.txt";
 
     /** file から読み込んだ国籍を格納する. */
     private volatile MutableList<String> nationalities;

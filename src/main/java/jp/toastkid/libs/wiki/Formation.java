@@ -3,6 +3,7 @@ package jp.toastkid.libs.wiki;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -13,7 +14,7 @@ import jp.toastkid.libs.utils.FileUtil;
  */
 public final class Formation {
     /** リソースフォルダ */
-    private static final String RESOURCES_DIR = "public/resources/football/";
+    private static final String RESOURCES_DIR = Defines.ASSETS_DIR + "/resources/football/";
     /** サッカーのプレイ人数 */
     private static final int ELEVEN   = 11;
     /** 4-4-2 の 守備的 MF 2人 */
@@ -38,7 +39,7 @@ public final class Formation {
         output.append("<table><tr></tr><tr><td>");
         // ピッチ
         output.append("<div class=\"pitch\" style=\"position:relative;\">");
-        output.append("<p><img src=\"public/images/pitch.png\" height=\"350\" width=\"280\"></a></p>");
+        output.append("<p><img src=\"assets/images/pitch.png\" height=\"350\" width=\"280\"></a></p>");
         final List<String> positionList = getPositionList(formation);
         for (int i = 0; i < ELEVEN; i++) {
             final Footballer fb = team.get(i);

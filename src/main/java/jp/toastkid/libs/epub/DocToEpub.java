@@ -189,7 +189,7 @@ public final class DocToEpub {
                     ? EpubDefine.STYLESHEET_VERTICAL
                     : EpubDefine.STYLESHEET_HORIZONTAL;
             final String convertedSource = Functions.bindArgs(
-                    "public/resources/epub/OEBPS/template.xhtml",
+                    Defines.ASSETS_DIR + "/resources/epub/OEBPS/template.xhtml",
                     Maps.mutable.of(
                             "title", title,
                             "content", content.toString(),

@@ -3,10 +3,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <title>${title}</title>
         
-        <script src="public/javascripts/highlightjs/highlight.pack.js"></script>
-        <link rel="stylesheet" href="public/javascripts/reveal/css/reveal.css"/>
-        <link rel="stylesheet" href="public/javascripts/reveal/css/theme/${theme}.css" id="theme" />
-        <link rel="stylesheet" type="text/css" href="public/javascripts/highlightjs/styles/github.css">
+        <script src="assets/javascripts/highlightjs/highlight.pack.js"></script>
+        <link rel="stylesheet" href="assets/javascripts/reveal/css/reveal.css"/>
+        <link rel="stylesheet" href="assets/javascripts/reveal/css/theme/${theme}.css" id="theme" />
+        <link rel="stylesheet" type="text/css" href="assets/javascripts/highlightjs/styles/github.css">
     </head>
     <body>
         <div class="reveal">
@@ -14,7 +14,7 @@
                 ${content}
             </div>
         </div>
-        <script src="public/javascripts/reveal/js/reveal.js"></script>
+        <script src="assets/javascripts/reveal/js/reveal.js"></script>
         <script>
             Reveal.initialize({
                 // Display controls in the bottom right corner
@@ -112,7 +112,7 @@
                 var link = document.createElement( 'link' );
                 link.rel = 'stylesheet';
                 link.type = 'text/css';
-                link.href = 'public/javascripts/reveal/css/print/pdf.css';
+                link.href = 'assets/javascripts/reveal/css/print/pdf.css';
                 document.getElementsByTagName( 'head' )[0].appendChild( link );
             }
 

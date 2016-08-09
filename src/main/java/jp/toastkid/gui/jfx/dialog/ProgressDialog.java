@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jp.toastkid.gui.jfx.wiki.ImageChooser;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -34,8 +35,14 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
+    /** path to default image directory. */
+    private static final String DEFAULT_IMAGE_DIR = Defines.ASSETS_DIR + "/images/splash/";
+
+    /** path to user image directory. */
+    private static final String USER_IMAGE_DIR    = Defines.USER_DIR + "/res/images/splash/";
+
     /** FXML ファイルのパス. */
-    private static final String DIALOG_FXML = "public/scenes/ProgressDialog.fxml";
+    private static final String DIALOG_FXML       = Defines.SCENE_DIR + "/ProgressDialog.fxml";
 
     /** Scene. */
     private Scene scene = null;
@@ -108,7 +115,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
 
-        this.chooser = new ImageChooser("public/images/splash/", "user/res/images/splash/");
+        this.chooser = new ImageChooser(DEFAULT_IMAGE_DIR, USER_IMAGE_DIR);
         // 画像をランダムで選択して設定.
         findStyle().ifPresent(style -> { controller.background.setStyle(style); });
 

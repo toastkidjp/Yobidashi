@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.gui.jfx.wiki.Main;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 
 /**
  * Name generator.
@@ -24,10 +25,12 @@ public class NameGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** path/to/firstname/file. */
-    private static final String FIRST_NAME_FILE  = "public/resources/NameMaker/first.txt";
+    private static final String FIRST_NAME_FILE
+        = Defines.ASSETS_DIR + "/resources/NameMaker/first.txt";
 
     /** path/to/familyname/file. */
-    private static final String FAMILY_NAME_FILE = "public/resources/NameMaker/family.txt";
+    private static final String FAMILY_NAME_FILE
+        = Defines.ASSETS_DIR + "/resources/NameMaker/family.txt";
 
     /** file から読み込んだ国籍を格納する. */
     private volatile MutableList<String> nationalities;

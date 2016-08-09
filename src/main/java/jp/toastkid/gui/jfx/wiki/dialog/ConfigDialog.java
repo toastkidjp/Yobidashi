@@ -9,6 +9,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -19,14 +20,19 @@ import jp.toastkid.libs.utils.FileUtil;
  *
  */
 public final class ConfigDialog  extends Application {
+
     /** FXML ファイルのパス. */
-    private static final String DIALOG_FXML = "public/scenes/ConfigDialog.fxml";
+    private static final String DIALOG_FXML = Defines.SCENE_DIR + "/ConfigDialog.fxml";
+
     /** コントローラオブジェクト. */
     private ConfigDialogController controller;
+
     /** Stage. */
     private Stage dialog;
+
     /** Scene. */
     private Scene scene = null;
+
     /**
      * シーンファイルをロードしておく.
      */
@@ -36,6 +42,7 @@ public final class ConfigDialog  extends Application {
         // copy StyleSheet.
         this.scene.getStylesheets().addAll(window.getScene().getStylesheets());
     }
+
     /**
      * Load scene from FXML.
      * @return Parent オブジェクト
@@ -58,6 +65,7 @@ public final class ConfigDialog  extends Application {
         dialog.setResizable(false);
         dialog.setTitle("Config");
     }
+
     /**
      * 入力を受け付けるダイアログを表示する.
      * This method is stopping main thread until when the dialog close.
@@ -70,10 +78,12 @@ public final class ConfigDialog  extends Application {
     public final void showConfigDialog() {
         dialog.showAndWait();
     }
+
     @Override
     public void start(final Stage arg0) throws Exception {
         showConfigDialog();
     }
+
     /**
      *
      * @param args
