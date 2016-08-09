@@ -1,13 +1,17 @@
 package jp.toastkid.gui.jfx.wiki.models;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.libs.utils.FileUtil;
@@ -55,7 +59,7 @@ public class Article implements Comparable<Article> {
 
     /** usable extensions. */
     private static final FixedSizeSet<String> EXTENSIONS
-    = Sets.fixedSize.of(Extension.WIKI.text, Extension.MD.text);
+        = Sets.fixedSize.of(Extension.WIKI.text, Extension.MD.text);
 
     /**
      * initialize Article model.
@@ -161,6 +165,45 @@ public class Article implements Comparable<Article> {
     }
 
     /**
+     * 記事名一覧を返す.
+     * @param articleDir dir of articles
+     * @return 記事名一覧の Set (ソート済み)
+     */
+    public static final List<Article> readArticleNames(final String articleDir) {
+        final File dir = new File(articleDir);
+        if (dir == null || !dir.canRead()){
+            return Collections.emptyList();
+        }
+        return ArrayAdapter
+                .newArrayWith(dir.listFiles((f) -> isValidContentFile(f)))
+                .asParallel(Executors.newFixedThreadPool(24), 24)
+                .collect(f -> new Article(f))
+                .select( a -> a.isValid())
+                .toList();
+    }
+
+    /**
+     * URL から記事ファイル名を取り出す.
+     * <HR>
+     * (130707) 作成<BR>
+     * @param url URL
+     * @return 記事ファイル名
+     */
+    public static final String findFileNameFromUrl(final String url) {
+        final String[] split = url.split("/");
+        return split[split.length - 1];
+    }
+
+    /**
+     * URL が Wiki 記事であるかを判定する.
+     * @param url URL
+     * @return Wiki 記事なら true
+     */
+    public static final boolean isWikiArticleUrl(final String url) {
+        return (url.contains("/txt/") || url.contains("/md/"));
+    }
+
+    /**
      * ファイル名(<b>path は不可</b>)を人間の読める形式にして返す.
      * 「.txt」 が入っていても可
      * <HR>
@@ -196,5 +239,16 @@ public class Article implements Comparable<Article> {
         return EXTENSIONS.contains(ext.get());
     }
 
+    /**
+     * ファイルの字数計測結果を文字列にまとめて返す.
+     * @return ファイルの字数計測結果(文字列)
+     */
+    public final String makeCharCountResult() {
+        return new StringBuilder()
+            .append(title).append(" は ")
+            .append(FileUtil.countCharacters(file.getAbsolutePath(), Defines.ARTICLE_ENCODE))
+            .append(" 字です。").append(Defines.LINE_SEPARATOR)
+            .append(file.length() / 1024L).append("[KB]").toString();
+    }
 
 }

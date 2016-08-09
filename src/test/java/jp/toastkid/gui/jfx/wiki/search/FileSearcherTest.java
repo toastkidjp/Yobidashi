@@ -1,4 +1,4 @@
-package jp.toastkid.gui.jfx.wiki.functions.search;
+package jp.toastkid.gui.jfx.wiki.search;
 
 import static org.junit.Assert.assertEquals;
 

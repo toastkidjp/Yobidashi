@@ -23,8 +23,9 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
+import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * Music Player's controller
@@ -70,8 +71,11 @@ public class Controller implements Initializable {
                 openMp3Tab(dir);
             }
 
-            LOGGER.info(Thread.currentThread().getName() + " Ended initialize MP3 Player."
-                    + (System.currentTimeMillis() - start ) + "ms");
+            LOGGER.info(
+                    "{} Ended initialize MP3 Player. {}ms",
+                    Thread.currentThread().getName(),
+                    System.currentTimeMillis() - start
+                    );
         });
         executor.shutdown();
     }
@@ -91,11 +95,10 @@ public class Controller implements Initializable {
                 || !StringUtils.isNotBlank(fileName)) {
             return;
         }
-        final Media media = new Media(
-                ArticleGenerator.format4Mp3Player(
-                        new File(
-                                currentMusicDir.replaceAll("　", "%E3%80%80"),
-                                fileName.replaceAll("　", "%E3%80%80")
+        final Media media = new Media(formatPath(
+                new File(
+                        currentMusicDir.replaceAll("　", "%E3%80%80"),
+                        fileName.replaceAll("　", "%E3%80%80")
                         ).getAbsolutePath()
                     )
                 );
@@ -160,12 +163,30 @@ public class Controller implements Initializable {
     private void loadMp3List(final ListView<String> lv, final File dir) {
         final ObservableList<String> items = lv.getItems();
         items.removeAll();
-        Lists.immutable.with(dir.listFiles()).each(f ->{
-            if (ArticleGenerator.isValidMusicFile(f.getName())) {
-                items.add(f.getName());
-            }
-        });
+        Lists.immutable.with(dir.listFiles())
+            .select(f -> isValidFile(f.getName()))
+            .each(  f -> items.add(f.getName()));
         lv.requestLayout();
+    }
+
+    /**
+     * 正規化されたファイルパスを返す.
+     * @param path ファイルのパス
+     * @return 正規化されたファイルパス
+     */
+    public static final String formatPath(final String path) {
+        return FileUtil.FILE_PROTOCOL + path.replace("\\", "/").replace(" ", "%20");
+    }
+
+    /**
+     * 妥当なファイルか否かを拡張子で判定する.
+     * <HR>
+     * (130622) 作成<BR>
+     * @param pName
+     * @return 妥当な音楽ファイルの拡張子なら true
+     */
+    public static final boolean isValidFile(final String pName) {
+        return Defines.MUSIC_FILES.anySatisfy(suffix -> pName.toLowerCase().endsWith(suffix));
     }
 
     /**

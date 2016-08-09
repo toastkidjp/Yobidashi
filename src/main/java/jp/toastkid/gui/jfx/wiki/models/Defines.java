@@ -1,7 +1,11 @@
 package jp.toastkid.gui.jfx.wiki.models;
 
+import java.io.File;
+
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
+
+import jp.toastkid.libs.utils.FileUtil;
 
 
 /**
@@ -77,10 +81,24 @@ public final class Defines {
     /** Groovy Script Dialog title. */
     public static final String SCRIPT_RUNNER      = "Script Runner";
 
+    /** line separator. */
+    public static final String LINE_SEPARATOR = System.lineSeparator();
+
     /**
      * インスタンス生成を禁止する.
      */
     private Defines() {
         //do nothing.
+    }
+
+    /**
+     * インストールフォルダを取得して返す.
+     * <HR>
+     * (130803) 作成<BR>
+     * @return インストールフォルダのパス
+     */
+    public static String findInstallDir() {
+        return FileUtil.FILE_PROTOCOL
+                + new File(".").getAbsoluteFile().getParent().replace("\\", "/") + "/";
     }
 }

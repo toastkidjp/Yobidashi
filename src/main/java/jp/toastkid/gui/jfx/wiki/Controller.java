@@ -128,12 +128,6 @@ public final class Controller implements Initializable {
     /** 「リロード」ボタンの画像ファイルへのパス */
     private static final String PATH_IMG_RELOAD  = Defines.ASSETS_DIR + "/images/reload.png";
 
-    /** 「進む」ボタンの画像ファイルへのパス */
-    private static final String PATH_IMG_FORWARD = Defines.ASSETS_DIR + "/images/forward.png";
-
-    /** 「戻る」ボタンの画像ファイルへのパス */
-    private static final String PATH_IMG_BACK    = Defines.ASSETS_DIR + "/images/back.png";
-
     /** 「検索」画像ファイルへのパス. */
     private static final String PATH_IMG_SEARCH  = Defines.ASSETS_DIR + "/images/search.png";
 
@@ -334,8 +328,10 @@ public final class Controller implements Initializable {
     /** file watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
+    /** use for full screen. */
     private FullScreen fs;
 
+    /** use for draw word-cloud. */
     private FxWordCloud wordCloud;
 
     @Override
@@ -695,7 +691,7 @@ public final class Controller implements Initializable {
     @FXML
     public final void callGallery() {
         func.generateGallery();
-        loadUrl(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
+        loadUrl(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -775,7 +771,7 @@ public final class Controller implements Initializable {
                         .setScene(this.getParent().getScene())
                         .setText("ePub 生成中……").build();
                 pd.start(stage);
-                func.toEpub(vertically.isSelected());
+                new EpubGenerator().toEpub(vertically.isSelected());
                 pd.stop();
             }).build().show();
     }
@@ -792,7 +788,7 @@ public final class Controller implements Initializable {
                     .setScene(this.getParent().getScene())
                     .setText("ePub 生成中……").build();
             pd.start(stage);
-            func.runEpubGenerator();
+            new EpubGenerator().runEpubGenerator();
             pd.stop();
         }).build().show();
     }
@@ -815,7 +811,7 @@ public final class Controller implements Initializable {
                 }
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                func.simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+                new Archiver().simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
             }).build().show();
     }
 
@@ -1110,7 +1106,7 @@ public final class Controller implements Initializable {
                         tab.setText("loading...");
                     }
 
-                    if (ArticleGenerator.isWikiArticleUrl(url)) {
+                    if (Article.isWikiArticleUrl(url)) {
                         if (State.SCHEDULED.equals(arg0.getValue())) {
                             loadWorker.cancel();
                             Platform.runLater(() -> loadUrl(url));
@@ -1332,11 +1328,7 @@ public final class Controller implements Initializable {
         AlertDialog.showMessage(
                 getParent(),
                 "文字数計測",
-                func.makeCharCountResult(
-                        tabPane.getSelectionModel().getSelectedItem().getText(),
-                        Config.article.file,
-                        Defines.ARTICLE_ENCODE
-                        )
+                Config.article.makeCharCountResult()
                 );
     }
 
@@ -1390,7 +1382,7 @@ public final class Controller implements Initializable {
                     return;
                 }
 
-                final Tab tab = ArticleGenerator.makeClosableTab(
+                final Tab tab = makeClosableTab(
                         String.format("「%s」の%s検索結果", query, isAnd.isSelected() ? "AND" : "OR"),
                         leftTabs
                         );
@@ -1418,6 +1410,22 @@ public final class Controller implements Initializable {
                 tab.setContent(box);
                 setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
             }).build().show();
+    }
+
+    /**
+     * make empty closable tab.
+     * @param title Tab's title
+     * @param parent Parent TabPane
+     * @return 空の Tab
+     */
+    public static Tab makeClosableTab(final String title, final TabPane parent) {
+        final Tab tab = new Tab(title);
+        tab.setClosable(true);
+
+        final Button closeButton = new Button("x");
+        closeButton.setOnAction(e -> parent.getTabs().remove(tab));
+        tab.setGraphic(closeButton);
+        return tab;
     }
 
     /**
@@ -1460,24 +1468,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 形態素解析機能を呼び出す。
-     * 解析には辞書不要のライブラリ TinySegmenter の Java 移植版を利用している。
-     * <HR>
-     * (130414) 結果の出力形式を HTML に変更<BR>
-     * (130406) TinySegmenter を JavaScript から Java版に切り替え<BR>
-     * (130401) 作成開始<BR>
-     */
-    @FXML
-    private final void callMorphAnalyzer() {
-        final long start = System.currentTimeMillis();
-        final Map<String, Integer> resMap = func.makeTermFrequencyMap();
-        openWebTab("形態素解析の結果");
-        func.generateHtml(HtmlUtil.getTableHtml(resMap), "形態素解析の結果");
-        loadDefaultFile();
-        setStatus("解析完了：" + (System.currentTimeMillis() - start) + "[ms]");
-    }
-
-    /**
      * call RSS Feeder．
      */
     @FXML
@@ -1497,7 +1487,7 @@ public final class Controller implements Initializable {
      * Load temporary HTML.
      */
     private void loadDefaultFile() {
-        loadUrl(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
+        loadUrl(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1535,7 +1525,7 @@ public final class Controller implements Initializable {
 
         if (!StringUtils.equals(fs.getTitle(), Config.article.title)) {
             fs.setTitle(Config.article.title);
-            fs.show(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
+            fs.show(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
             return;
         }
         fs.show();
@@ -1565,7 +1555,7 @@ public final class Controller implements Initializable {
         String[] dirs;
         switch (text) {
             case "現在のフォルダ":
-                dirs = new String[]{ ArticleGenerator.findInstallDir() };
+                dirs = new String[]{ Defines.findInstallDir() };
                 break;
             case "記事":
                 dirs = new String[]{ Config.get(Config.Key.ARTICLE_DIR) };
@@ -1577,7 +1567,7 @@ public final class Controller implements Initializable {
                 dirs = Config.get(Config.Key.MUSIC_DIR).split(",");
                 break;
             default:
-                dirs = new String[]{ ArticleGenerator.findInstallDir() };
+                dirs = new String[]{ Defines.findInstallDir() };
                 break;
         }
         for (final String dir : dirs) {
@@ -1631,7 +1621,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        final List<Article> readArticleNames = ArticleGenerator.readArticleNames();
+        final List<Article> readArticleNames = Article.readArticleNames(Config.get("articleDir"));
         items.addAll(readArticleNames);
         articleList.requestLayout();
         focusOn();
@@ -1697,7 +1687,7 @@ public final class Controller implements Initializable {
         }
 
         // (121229) ファイルパスを取得するための処理
-        String fileName  = ArticleGenerator.findFileNameFromUrl(url);
+        String fileName  = Article.findFileNameFromUrl(url);
         final int lastIndexOf = fileName.lastIndexOf("#");
         final String innerLink = lastIndexOf != -1
                 ? HtmlUtil.tagEscape(fileName.substring(lastIndexOf)) : "";
@@ -1721,7 +1711,6 @@ public final class Controller implements Initializable {
                 callEditor();
             }
 
-            // TODO check
             if (func == null) {
                 return;
             }
@@ -1734,7 +1723,7 @@ public final class Controller implements Initializable {
                 final Object script = engine.executeScript("window.pageYOffset;");
                 final int yOffset
                     = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
-                engine.load(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+                engine.load(Defines.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
                 Config.article.yOffset = isReload ? yOffset : 0;
             });
             // deep copy を渡す.
@@ -2083,7 +2072,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     public void callCapture() {
-        func.capture(Long.toString(System.nanoTime()), getCurrentRectangle());
+        FileUtil.capture(Long.toString(System.nanoTime()), getCurrentRectangle());
     }
 
     /**

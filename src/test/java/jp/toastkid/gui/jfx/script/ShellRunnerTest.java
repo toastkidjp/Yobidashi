@@ -1,4 +1,4 @@
-package jp.toastkid.gui.jfx.wiki.script;
+package jp.toastkid.gui.jfx.script;
 
 import static org.junit.Assert.assertEquals;
 

@@ -70,7 +70,6 @@
               <items>
                 <MenuItem accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="Calculator" />
                 <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="文字数カウンタ" />
-                <MenuItem onAction="#callMorphAnalyzer" text="形態素解析" />
                 <MenuItem onAction="#callCmd" text="Command Prompt" />
                 <SeparatorMenuItem />
                 <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="Draw chart" />

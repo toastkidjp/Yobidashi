@@ -1,11 +1,10 @@
-package jp.toastkid.gui.jfx.wiki.functions;
+package jp.toastkid.gui.jfx.wiki;
 
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 
 /**
@@ -13,7 +12,8 @@ import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
  * @author Toast kid
  *
  */
-public final class FunctionsTest {
+public final class ArticleGeneratorTest {
+
     /**
      * テンプレートのパラメータ置換が正しくできることを確認する.
      */
@@ -27,14 +27,6 @@ public final class FunctionsTest {
             htmlContent.contains("<title>タイトルでござい</title>")
             && htmlContent.contains("こんてんと")
         );
-    }
-
-    /**
-     * check {@link ArticleGenerator#isValidMusicFile(String)}'s behavior.
-     */
-    @Test
-    public final void testIsValidMusicFile() {
-        assertTrue(ArticleGenerator.isValidMusicFile("echo.mp3"));
     }
 
 }

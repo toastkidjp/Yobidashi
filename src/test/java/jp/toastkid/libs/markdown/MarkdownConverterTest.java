@@ -9,6 +9,7 @@ import java.util.List;
 
 import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Config;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.utils.Strings;
 
@@ -42,7 +43,7 @@ public class MarkdownConverterTest {
                 /** default uid. */
                 private static final long serialVersionUID = 1L;
             {
-                put("installDir", ArticleGenerator.findInstallDir());
+                put("installDir", Defines.findInstallDir());
                 put("title",      "test");
                 put("wikiIcon",   Config.get("wikiIcon"));
                 put("wikiTitle",  Config.get("wikiTitle", "Wiklone"));

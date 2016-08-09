@@ -1,4 +1,4 @@
-package jp.toastkid.gui.jfx.wiki;
+package jp.toastkid.gui.jfx.common;
 
 import static org.junit.Assert.*;
 import jp.toastkid.gui.jfx.common.Style;

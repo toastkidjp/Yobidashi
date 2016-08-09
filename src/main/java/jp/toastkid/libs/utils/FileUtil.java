@@ -1,6 +1,10 @@
 
 package jp.toastkid.libs.utils;
 
+import java.awt.AWTException;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -38,6 +42,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
@@ -1785,6 +1791,22 @@ public final class FileUtil {
      */
     public static String removeExtension(final String filePath) {
         return filePath.substring(0, filePath.lastIndexOf("."));
+    }
+
+    /**
+     * capture current window.
+     * @param fileName output file name.
+     * @param rect rectangle size.
+     */
+    public static void capture(final String fileName, final Rectangle rect) {
+        final String name
+            = fileName.toLowerCase().endsWith(".png") ? fileName : fileName.concat(".png");
+        try {
+            final BufferedImage img = new Robot().createScreenCapture(rect);
+            ImageIO.write(img, "png", new File(name));
+        } catch (final IOException | AWTException e) {
+            e.printStackTrace();
+        }
     }
 
 }

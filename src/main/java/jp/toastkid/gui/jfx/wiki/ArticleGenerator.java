@@ -1,9 +1,5 @@
 package jp.toastkid.gui.jfx.wiki;
 
-import java.awt.AWTException;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,30 +9,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.block.factory.Procedures;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,22 +29,11 @@ import am.ik.marked4j.Marked;
 import am.ik.marked4j.MarkedBuilder;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Config.Key;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
-import jp.toastkid.libs.Zip;
-import jp.toastkid.libs.comparator.NumberMapComparator;
-import jp.toastkid.libs.epub.DocToEpub;
-import jp.toastkid.libs.epub.EpubMetaData;
-import jp.toastkid.libs.epub.PageLayout;
-import jp.toastkid.libs.epub.PageProgressDirection;
 import jp.toastkid.libs.fileFilter.ImageFileFilter;
 import jp.toastkid.libs.markdown.MarkdownConverter;
 import jp.toastkid.libs.tinysegmenter.TinySegmenter;
@@ -73,13 +46,14 @@ import jp.toastkid.libs.wiki.WikiConverter;
 
 /**
  * WikiClient で共通して使えるメソッドを収録.
+ *
  * @author Toast kid
  *
  */
 public final class ArticleGenerator {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArticleGenerator.class);
 
     /** Gallery 全体のView. */
     private static final String PATH_GALLERY      = Defines.TEMPLATE_DIR + "/gallery.html";
@@ -186,7 +160,7 @@ public final class ArticleGenerator {
                     /** default uid. */
                     private static final long serialVersionUID = 1L;
                 {
-                    put("installDir",  findInstallDir());
+                    put("installDir",  Defines.findInstallDir());
                     put("title",       title);
                     put("wikiIcon",    Config.get("wikiIcon"));
                     put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
@@ -251,23 +225,6 @@ public final class ArticleGenerator {
     }
 
     /**
-     * 記事名一覧を返す.
-     * @return 記事名一覧の Set (ソート済み)
-     */
-    public static final List<Article> readArticleNames() {
-        final File dir = new File(Config.get("articleDir"));
-        if (dir == null || !dir.canRead()){
-            return Collections.emptyList();
-        }
-        return ArrayAdapter
-                .newArrayWith(dir.listFiles((f) -> Article.isValidContentFile(f)))
-                .asParallel(Executors.newFixedThreadPool(24), 24)
-                .collect(f -> new Article(f))
-                .select( a -> a.isValid())
-                .toList();
-    }
-
-    /**
      * {@link WikiConverter} で変換した結果を返す.
      * @param absolutePath 記事ファイルのパス
      * @return 変換後の HTML 文字列
@@ -296,45 +253,6 @@ public final class ArticleGenerator {
             LOGGER.error("Caught error.", e);
         }
         return "";
-    }
-
-    /**
-     * ファイルの字数計測結果を文字列にまとめて返す.
-     * @param titile ファイルのタイトル
-     * @param file   ファイルオブジェクト
-     * @param encode ファイルの文字コード
-     * @return ファイルの字数計測結果(文字列)
-     */
-    public final String makeCharCountResult(
-            final String title,
-            final File file,
-            final String encode
-        ) {
-        return new StringBuilder()
-            .append(title).append(" は ")
-            .append(FileUtil.countCharacters(file.getAbsolutePath(), encode))
-            .append(" 字です。").append(LINE_SEPARATOR)
-            .append(file.length() / 1024L).append("[KB]").toString();
-    }
-
-    /**
-     * 単語頻度マップを作成して返す.
-     * @return 単語頻度マップ
-     */
-    public final Map<String, Integer> makeTermFrequencyMap() {
-        final Map<String,Integer> map = new HashMap<String,Integer>(100);
-        FileUtil.readLines(Config.article.file, Defines.ARTICLE_ENCODE)
-            .stream()
-            .filter(str  -> StringUtils.isNotEmpty(str))
-            .forEach(str -> {
-                ts.segment(str).stream()
-                    .map(seg     -> seg.replace("\"", ""))
-                    .filter(seg  -> StringUtils.isNotEmpty(seg))
-                    .forEach(seg -> map.put(seg, map.getOrDefault(seg, 0) + 1));
-            });
-        final Map<String, Integer> resMap = new TreeMap<>(new NumberMapComparator(map));
-        resMap.putAll(map);
-        return resMap;
     }
 
     /**
@@ -453,104 +371,6 @@ public final class ArticleGenerator {
     }
 
     /**
-     * ObservableList の要素をユニークにして返す.
-     * @param list ObservableList
-     * @return ユニークにした List
-     */
-    public static final ObservableList<?> getUniqueItemList(final ObservableList<?> list){
-        return FXCollections.observableArrayList(Sets.mutable.ofAll(list));
-    }
-
-    /**
-     * 現在開いている記事をePubに変換する.
-     * @param isVertival
-     * @param fileName
-     */
-    public final void toEpub(final boolean isVertival) {
-        final EpubMetaData meta = new EpubMetaData();
-        meta.recursive = true;
-        final String convertTitle = Config.article.title;
-        meta.title        = convertTitle;
-        meta.subtitle     = convertTitle;
-        meta.author       = Defines.AUTHOR;
-        meta.editor       = Defines.AUTHOR;
-        meta.publisher    = Defines.AUTHOR;
-        meta.version      = "0.0.1";
-        meta.zipFilePath  = convertTitle + ".epub";
-        meta.targetPrefix = convertTitle;
-        meta.containInnerLinks = false;
-        meta.layout       = isVertival ? PageLayout.VERTICAL : PageLayout.HORIZONTAL;
-        meta.direction    = isVertival ? PageProgressDirection.RTL : PageProgressDirection.LTR;
-        DocToEpub.run(meta.toString());
-    }
-
-    /**
-     * DocToEpub を動かし、EPUB_RECIPE_DIR のレシピ json から複数のePubを生成する.
-     */
-    public final void runEpubGenerator() {
-        final List<String> absPathes
-            = Stream.of(new File(Defines.EPUB_RECIPE_DIR).listFiles())
-                .map((file) -> file.getAbsolutePath())
-                .filter((fileName) -> fileName.toLowerCase().endsWith(".json"))
-                .collect(Collectors.toList());
-        DocToEpub.run(absPathes.toArray(new String[]{}));
-    }
-
-    /**
-     * do simpleBackup.
-     * @param articleDir
-     * @param offsetMs
-     */
-    public void simpleBackup(final String articleDir, final long offsetMs) {
-        try {
-            final Zip backup
-                = new Zip("backup" + ZonedDateTime.now().toInstant().getEpochSecond() + ".zip");
-            ArrayAdapter.adapt(new File(articleDir).listFiles())
-                .select(file -> offsetMs < file.lastModified())
-                .each(Procedures.throwing((file) -> backup.entry(file)));
-            backup.doZip();
-        } catch (final IOException e) {
-            LOGGER.error("Caught error.", e);
-        }
-    }
-
-    /**
-     * 正規化されたファイルパスを返す.
-     * @param path ファイルのパス
-     * @return 正規化されたファイルパス
-     */
-    public static final String format4Mp3Player(final String path) {
-        return FileUtil.FILE_PROTOCOL + path.replace("\\", "/").replace(" ", "%20");
-    }
-
-    /**
-     * 妥当なファイルか否かを拡張子で判定する.
-     * <HR>
-     * (130622) 作成<BR>
-     * @param pName
-     * @return 妥当な音楽ファイルの拡張子なら true
-     */
-    public static final boolean isValidMusicFile(final String pName) {
-        return Defines.MUSIC_FILES.anySatisfy(suffix -> pName.toLowerCase().endsWith(suffix));
-    }
-
-    /**
-     * capture current window.
-     * @param fileName output file name.
-     * @param rect rectangle size.
-     */
-    public void capture(final String fileName, final Rectangle rect) {
-        final String name
-            = fileName.toLowerCase().endsWith(".png") ? fileName : fileName.concat(".png");
-        try {
-            final BufferedImage img = new Robot().createScreenCapture(rect);
-            ImageIO.write(img, "png", new File(name));
-        } catch (final IOException | AWTException e) {
-            LOGGER.error("Caught error.", e);;
-        }
-    }
-
-    /**
      * テンプレートにパラメータをセットして返す.
      * @param pathToTemplate テンプレートファイルのパス
      * @param params パラメータ
@@ -569,38 +389,6 @@ public final class ArticleGenerator {
             LOGGER.error("Caught error.", e);
         }
         return "";
-    }
-
-    /**
-     * インストールフォルダを取得して返す.
-     * <HR>
-     * (130803) 作成<BR>
-     * @return インストールフォルダのパス
-     */
-    public static String findInstallDir() {
-        return FileUtil.FILE_PROTOCOL
-                + new File(".").getAbsoluteFile().getParent().replace("\\", "/") + "/";
-    }
-
-    /**
-     * URL から記事ファイル名を取り出す.
-     * <HR>
-     * (130707) 作成<BR>
-     * @param url URL
-     * @return 記事ファイル名
-     */
-    public static final String findFileNameFromUrl(final String url) {
-        final String[] split = url.split("/");
-        return split[split.length - 1];
-    }
-
-    /**
-     * URL が Wiki 記事であるかを判定する.
-     * @param url URL
-     * @return Wiki 記事なら true
-     */
-    public static final boolean isWikiArticleUrl(final String url) {
-        return (url.contains("/txt/") || url.contains("/md/"));
     }
 
     /**
@@ -739,29 +527,6 @@ public final class ArticleGenerator {
                 bindArgs(PATH_GALLERY, Maps.fixedSize.of("content", contents.toString())),
                 title
                 );
-    }
-
-    /**
-     * make empty closable tab.
-     * @param title Tab's title
-     * @param parent Parent TabPane
-     * @return 空の Tab
-     */
-    public static Tab makeClosableTab(final String title, final TabPane parent) {
-        final Tab tab = new Tab(title);
-        tab.setClosable(true);
-
-        final Button closeButton = new Button("x");
-        closeButton.setOnAction(e -> parent.getTabs().remove(tab));
-        tab.setGraphic(closeButton);
-        return tab;
-    }
-
-    /**
-     * ツールを閉じる.
-     */
-    public void close() {
-        // Do nothing.
     }
 
     /**

@@ -16,8 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.Main;
+import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 
@@ -89,7 +89,7 @@ public class Controller {
     @FXML
     public void openScript() {
         final FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(FileUtil.uriToPath(ArticleGenerator.findInstallDir())));
+        fc.setInitialDirectory(new File(FileUtil.uriToPath(Defines.findInstallDir())));
         final File result = fc.showOpenDialog(stage.getScene().getWindow());
         loadScript(result);
     }

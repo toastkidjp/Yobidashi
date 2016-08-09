@@ -1,4 +1,4 @@
-package jp.toastkid.gui.jfx.wiki.name;
+package jp.toastkid.gui.jfx.name;
 
 import static org.junit.Assert.assertTrue;
 
