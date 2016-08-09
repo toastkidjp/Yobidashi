@@ -4,6 +4,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.script.ClojureRunner;
+import jp.toastkid.gui.jfx.script.GroovyRunner;
+import jp.toastkid.gui.jfx.script.JavaScriptRunner;
+import jp.toastkid.gui.jfx.script.Language;
+import jp.toastkid.gui.jfx.script.ScriptRunner;
+import jp.toastkid.gui.jfx.script.ShellRunner;
+
 /**
  * {@link ScriptRunner}'s test.
  * @author Toast kid

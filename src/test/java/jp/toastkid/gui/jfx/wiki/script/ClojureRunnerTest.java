@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.script.ClojureRunner;
+
 /**
  * {@link ClojureRunner}'s test,
  *

@@ -9,7 +9,7 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -133,7 +133,7 @@ public class PostProcessor {
             input = input.substring("md:".length());
         }
 
-        final String bytedStr = Functions.toBytedString_EUC_JP(input);
+        final String bytedStr = ArticleGenerator.toBytedString_EUC_JP(input);
         final boolean isExist
             = new File(articleDir, bytedStr.concat(".").concat(findExtension(isMd))).exists();
         final StringBuilder generatedLink = new StringBuilder(180);

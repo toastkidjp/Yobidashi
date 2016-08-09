@@ -1,9 +1,10 @@
 package jp.toastkid.gui.jfx.wiki.script;
 
 import static org.junit.Assert.*;
-import jp.toastkid.gui.jfx.wiki.script.Language;
 
 import org.junit.Test;
+
+import jp.toastkid.gui.jfx.script.Language;
 
 /**
  * Language's test.

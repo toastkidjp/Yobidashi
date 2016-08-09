@@ -14,7 +14,7 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
@@ -113,7 +113,7 @@ public final class DocToEpub {
             final boolean recursive
         ) {
         final List<File> targets = ARTICLES.parallelStream().filter((file) -> {
-            return file.getName().startsWith(Functions.toBytedString_EUC_JP(prefix));
+            return file.getName().startsWith(ArticleGenerator.toBytedString_EUC_JP(prefix));
         }).collect(Collectors.toList());
         if (recursive) {
             final List<File> recursiveFiles = new ArrayList<File>();
@@ -130,7 +130,7 @@ public final class DocToEpub {
                         while (matcher.find()) {
                             final File f = new File(
                                     ARTICLE_PATH,
-                                    Functions.toBytedString_EUC_JP(matcher.group(1)).concat(".txt")
+                                    ArticleGenerator.toBytedString_EUC_JP(matcher.group(1)).concat(".txt")
                                 );
                             if (f.exists() && !recursiveFiles.contains(f)) {
                                 recursiveFiles.add(f);
@@ -152,7 +152,7 @@ public final class DocToEpub {
         final List<File> files = new ArrayList<File>(targets.size());
         targets.parallelStream()
             .map(prefix -> {return new File(ARTICLE_PATH,
-                    Functions.toBytedString_EUC_JP(prefix).concat(".txt"));})
+                    ArticleGenerator.toBytedString_EUC_JP(prefix).concat(".txt"));})
             .filter(f -> {return ARTICLES.contains(f);})
             .forEach(f -> {files.add(f);});
         return files;
@@ -188,7 +188,7 @@ public final class DocToEpub {
             final String style = layout.equals(PageLayout.VERTICAL)
                     ? EpubDefine.STYLESHEET_VERTICAL
                     : EpubDefine.STYLESHEET_HORIZONTAL;
-            final String convertedSource = Functions.bindArgs(
+            final String convertedSource = ArticleGenerator.bindArgs(
                     Defines.ASSETS_DIR + "/resources/epub/OEBPS/template.xhtml",
                     Maps.mutable.of(
                             "title", title,

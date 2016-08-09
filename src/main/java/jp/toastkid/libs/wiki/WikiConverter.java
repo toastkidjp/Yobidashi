@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.calendar.HtmlCalendar;
@@ -53,7 +53,7 @@ public final class WikiConverter {
 
     /** メニューバーのファイル名(定数) */
     private static final String MENUBAR_FILE_NAME
-        = Functions.toBytedString_EUC_JP("MenuBar") + ".txt";
+        = ArticleGenerator.toBytedString_EUC_JP("MenuBar") + ".txt";
 
     /**
      * {center}中央揃え{center}検出用正規表現.
@@ -260,7 +260,7 @@ public final class WikiConverter {
         }
         setFile(filePath);
         final String bytestr = FileUtil.removeExtension(file.getName());
-        setTitle(Functions.decodeBytedStr(bytestr, Defines.TITLE_ENCODE));
+        setTitle(ArticleGenerator.decodeBytedStr(bytestr, Defines.TITLE_ENCODE));
         strs = wikiConvert(strs, true);
         return strs;
     }

@@ -9,7 +9,7 @@
 <?import com.jfoenix.controls.*?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0"
-  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.toastkid.gui.jfx.wiki.music.Controller">
+  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.toastkid.gui.jfx.music.Controller">
     <children>
      <JFXTextField fx:id="currentMusicFileName" editable="false" prefHeight="31.0" prefWidth="300.0" />
      <JFXTabPane fx:id="musicTabPane" layoutX="34.0" layoutY="51.0" prefHeight="250.0" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE"/>

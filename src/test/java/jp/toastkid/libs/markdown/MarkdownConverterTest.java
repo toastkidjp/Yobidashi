@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.utils.Strings;
@@ -36,13 +36,13 @@ public class MarkdownConverterTest {
 
         final String content = new MarkdownConverter().convert(source);
 
-        final String html = Functions.bindArgs(
+        final String html = ArticleGenerator.bindArgs(
             ViewTemplate.MATERIAL.getPath(),
             new HashMap<String, String>(){
                 /** default uid. */
                 private static final long serialVersionUID = 1L;
             {
-                put("installDir", Functions.findInstallDir());
+                put("installDir", ArticleGenerator.findInstallDir());
                 put("title",      "test");
                 put("wikiIcon",   Config.get("wikiIcon"));
                 put("wikiTitle",  Config.get("wikiTitle", "Wiklone"));

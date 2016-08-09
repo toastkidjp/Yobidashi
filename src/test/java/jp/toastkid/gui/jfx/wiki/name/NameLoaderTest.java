@@ -11,6 +11,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.name.NameInformation;
+import jp.toastkid.gui.jfx.name.NameLoader;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 
 /**

@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
 
@@ -90,7 +90,7 @@ public class Article implements Comparable<Article> {
      */
     public String toInternalUrl() {
         return String.format("/%s/%s%s", this.extention().substring(1),
-                Functions.toBytedString_EUC_JP(this.title), this.extention());
+                ArticleGenerator.toBytedString_EUC_JP(this.title), this.extention());
     }
 
     /**
@@ -170,7 +170,7 @@ public class Article implements Comparable<Article> {
      */
     public static final String convertTitle(final String filePath) {
         return (StringUtils.isNotEmpty(filePath))
-                                        ? Functions.decodeBytedStr(FileUtil.removeExtension(filePath), "EUC-JP" )
+                                        ? ArticleGenerator.decodeBytedStr(FileUtil.removeExtension(filePath), "EUC-JP" )
                                                                         : null;
     }
 

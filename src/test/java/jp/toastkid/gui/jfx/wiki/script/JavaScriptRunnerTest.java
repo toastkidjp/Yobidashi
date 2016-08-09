@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.script.JavaScriptRunner;
+
 /**
  * {@link JavaScriptRunner}'s test.
  * @author Toast kid

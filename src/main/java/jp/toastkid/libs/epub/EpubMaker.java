@@ -21,7 +21,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
@@ -85,7 +85,7 @@ public final class EpubMaker {
         pairs.addAll(prepareContents());
         // titlePage
         FileUtil.outPutStr(
-                Functions.bindArgs(
+                ArticleGenerator.bindArgs(
                         Resource.TITLE_PAGE,
                         new HashMap<String, String>(){
                             /** default. */
@@ -146,7 +146,7 @@ public final class EpubMaker {
             }
         }
         FileUtil.outPutStr(
-            Functions.bindArgs(
+            ArticleGenerator.bindArgs(
                 Resource.NAVDOC,
                 Maps.mutable.with("title", meta.title, "content", sb.toString())
             ),
@@ -180,7 +180,7 @@ public final class EpubMaker {
             }
         }
         FileUtil.outPutStr(
-            Functions.bindArgs(
+            ArticleGenerator.bindArgs(
                 Resource.TOC_NCX,
                 Maps.mutable.of(
                         "title",   meta.title,
@@ -228,7 +228,7 @@ public final class EpubMaker {
             }
         }
         FileUtil.outPutStr(
-            Functions.bindArgs(
+            ArticleGenerator.bindArgs(
                     Resource.CONTENT_OPF,
                     new HashMap<String, String>(){
                         /** default. */

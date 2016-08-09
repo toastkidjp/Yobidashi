@@ -5,6 +5,8 @@ import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 
+import jp.toastkid.gui.jfx.name.NameInformation;
+
 /**
  * {@link NameInformation}'s test case.
  * @author Toast kid

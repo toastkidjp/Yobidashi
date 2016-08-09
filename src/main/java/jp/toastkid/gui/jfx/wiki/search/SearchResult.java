@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import jp.toastkid.gui.jfx.wiki.Functions;
+import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -57,7 +57,7 @@ public final class SearchResult {
      */
     public final String getLink() {
         final String fileName = new File(this.filePath).getName();
-        final String title = Functions.decodeBytedStr(
+        final String title = ArticleGenerator.decodeBytedStr(
                 fileName.replace(".txt", ""),
                 Defines.TITLE_ENCODE
         );

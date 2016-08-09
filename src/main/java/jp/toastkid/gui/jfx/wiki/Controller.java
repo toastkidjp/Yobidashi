@@ -81,11 +81,12 @@ import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import jp.toastkid.gui.jfx.chart.ChartPane;
 import jp.toastkid.gui.jfx.common.Style;
 import jp.toastkid.gui.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.dialog.ProgressDialog;
-import jp.toastkid.gui.jfx.wiki.chart.ChartPane;
+import jp.toastkid.gui.jfx.rss.RssFeeder;
 import jp.toastkid.gui.jfx.wiki.control.ArticleListCell;
 import jp.toastkid.gui.jfx.wiki.dialog.ConfigDialog;
 import jp.toastkid.gui.jfx.wiki.jobs.FileWatcherJob;
@@ -93,7 +94,6 @@ import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Article.Extension;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.rss.RssFeeder;
 import jp.toastkid.gui.jfx.wiki.search.FileSearcher;
 import jp.toastkid.gui.jfx.wiki.search.SearchResult;
 import jp.toastkid.gui.jfx.wordcloud.FxWordCloud;
@@ -294,7 +294,7 @@ public final class Controller implements Initializable {
     /** for desktop control. */
     private static Desktop desktop;
     /** functions class. */
-    private Functions func;
+    private ArticleGenerator func;
 
     /** Stage. */
     private Stage stage;
@@ -306,19 +306,19 @@ public final class Controller implements Initializable {
 
     /** Music Player's controller. */
     @FXML
-    private jp.toastkid.gui.jfx.wiki.music.Controller  musicController;
+    private jp.toastkid.gui.jfx.music.Controller  musicController;
 
     /** NameMaker's controller. */
     @FXML
-    private jp.toastkid.gui.jfx.wiki.name.Controller   nameController;
+    private jp.toastkid.gui.jfx.name.Controller   nameController;
 
     /** Script area's controller. */
     @FXML
-    private jp.toastkid.gui.jfx.wiki.script.Controller scriptController;
+    private jp.toastkid.gui.jfx.script.Controller scriptController;
 
     /** BMI area's controller. */
     @FXML
-    private jp.toastkid.gui.jfx.wiki.bmi.Controller bmiController;
+    private jp.toastkid.gui.jfx.bmi.Controller bmiController;
 
     /** search history. */
     private final TextField queryInput
@@ -367,7 +367,7 @@ public final class Controller implements Initializable {
 
         es.execute(() -> {
             final long start = System.currentTimeMillis();
-            func = new Functions();
+            func = new ArticleGenerator();
             pd.addProgress(11);
             pd.addText(Thread.currentThread().getName() + " Ended initialize Functions class. "
                     + (System.currentTimeMillis() - start) + "ms");
@@ -421,7 +421,7 @@ public final class Controller implements Initializable {
                         // (130317) 「現在選択中のファイル名」にセット
                         final File selected = new File(
                                 Config.get(Config.Key.ARTICLE_DIR),
-                                Functions.toBytedString_EUC_JP(nextTab.getText()) + Article.Extension.WIKI.text()
+                                ArticleGenerator.toBytedString_EUC_JP(nextTab.getText()) + Article.Extension.WIKI.text()
                                 );
                         if (selected.exists()){
                             Config.article = new Article(selected);
@@ -695,7 +695,7 @@ public final class Controller implements Initializable {
     @FXML
     public final void callGallery() {
         func.generateGallery();
-        loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+        loadUrl(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1110,7 +1110,7 @@ public final class Controller implements Initializable {
                         tab.setText("loading...");
                     }
 
-                    if (Functions.isWikiArticleUrl(url)) {
+                    if (ArticleGenerator.isWikiArticleUrl(url)) {
                         if (State.SCHEDULED.equals(arg0.getValue())) {
                             loadWorker.cancel();
                             Platform.runLater(() -> loadUrl(url));
@@ -1390,7 +1390,7 @@ public final class Controller implements Initializable {
                     return;
                 }
 
-                final Tab tab = Functions.makeClosableTab(
+                final Tab tab = ArticleGenerator.makeClosableTab(
                         String.format("「%s」の%s検索結果", query, isAnd.isSelected() ? "AND" : "OR"),
                         leftTabs
                         );
@@ -1497,7 +1497,7 @@ public final class Controller implements Initializable {
      * Load temporary HTML.
      */
     private void loadDefaultFile() {
-        loadUrl(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+        loadUrl(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1535,7 +1535,7 @@ public final class Controller implements Initializable {
 
         if (!StringUtils.equals(fs.getTitle(), Config.article.title)) {
             fs.setTitle(Config.article.title);
-            fs.show(Functions.findInstallDir() + Defines.TEMP_FILE_NAME);
+            fs.show(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME);
             return;
         }
         fs.show();
@@ -1565,7 +1565,7 @@ public final class Controller implements Initializable {
         String[] dirs;
         switch (text) {
             case "現在のフォルダ":
-                dirs = new String[]{ Functions.findInstallDir() };
+                dirs = new String[]{ ArticleGenerator.findInstallDir() };
                 break;
             case "記事":
                 dirs = new String[]{ Config.get(Config.Key.ARTICLE_DIR) };
@@ -1577,7 +1577,7 @@ public final class Controller implements Initializable {
                 dirs = Config.get(Config.Key.MUSIC_DIR).split(",");
                 break;
             default:
-                dirs = new String[]{ Functions.findInstallDir() };
+                dirs = new String[]{ ArticleGenerator.findInstallDir() };
                 break;
         }
         for (final String dir : dirs) {
@@ -1631,7 +1631,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        final List<Article> readArticleNames = Functions.readArticleNames();
+        final List<Article> readArticleNames = ArticleGenerator.readArticleNames();
         items.addAll(readArticleNames);
         articleList.requestLayout();
         focusOn();
@@ -1697,7 +1697,7 @@ public final class Controller implements Initializable {
         }
 
         // (121229) ファイルパスを取得するための処理
-        String fileName  = Functions.findFileNameFromUrl(url);
+        String fileName  = ArticleGenerator.findFileNameFromUrl(url);
         final int lastIndexOf = fileName.lastIndexOf("#");
         final String innerLink = lastIndexOf != -1
                 ? HtmlUtil.tagEscape(fileName.substring(lastIndexOf)) : "";
@@ -1734,7 +1734,7 @@ public final class Controller implements Initializable {
                 final Object script = engine.executeScript("window.pageYOffset;");
                 final int yOffset
                     = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
-                engine.load(Functions.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+                engine.load(ArticleGenerator.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
                 Config.article.yOffset = isReload ? yOffset : 0;
             });
             // deep copy を渡す.
@@ -1828,7 +1828,7 @@ public final class Controller implements Initializable {
                 .build().show();
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
-            Config.article = Article.find(Functions.toBytedString_EUC_JP(newFileName) + ext.text());
+            Config.article = Article.find(ArticleGenerator.toBytedString_EUC_JP(newFileName) + ext.text());
             callEditor();
         }
     }
@@ -1884,7 +1884,7 @@ public final class Controller implements Initializable {
                 }
                 final File dest = new File(
                         Config.get(Config.Key.ARTICLE_DIR),
-                        Functions.toBytedString_EUC_JP(newTitle) + Config.article.extention()
+                        ArticleGenerator.toBytedString_EUC_JP(newTitle) + Config.article.extention()
                         );
                 if (dest.exists()){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
@@ -1986,7 +1986,7 @@ public final class Controller implements Initializable {
         // (130302) ファイルが存在しない場合は、ひな形を元に新規作成する。
         try {
             openTarget.createNewFile();
-            Files.write(openTarget.toPath(), Functions.makeNewContent());
+            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent());
         } catch (final IOException e) {
             LOGGER.error("Error", e);;
         }

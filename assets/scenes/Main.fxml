@@ -192,7 +192,7 @@
         <VBox fx:id="mainArea">
           <children>
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
-            <AnchorPane><children><fx:include fx:id="script" source="Script.fxml"/></children></AnchorPane>
+            <AnchorPane><children><fx:include fx:id="script" source="ScriptRunner.fxml"/></children></AnchorPane>
           </children>
         </VBox>
       </items>
