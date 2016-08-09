@@ -32,8 +32,8 @@ This software contains following open source softwares. Thanks a lot. :bow:
 |:---|:---|:---|
 | Eclipse Collections | Eclipse Public License ver 1.0 | Fantastic Java Collection library.
 | Clojure | Eclipse Public License ver 1.0 | Use at ScriptRunner.
-| org.codehaus.groovy:groovy-all:1.8.6 | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.
-| org.apache.commons:commons-lang3:3.4 | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+| org.codehaus.groovy:groovy-all | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.
+| org.apache.commons:commons-lang3 | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 | [JFoenix](http://jfoenix.com/) | [Apache License Version 2.0](https://github.com/jfoenixadmin/JFoenix/blob/master/LICENSE) | Provide Material design components.
 | JQuery | MIT License
 | [GitHub jQuery Repo Widget](https://github.com/JoelSutherland/GitHub-jQuery-Repo-Widget) | MIT License | jQuery Plugin using preview GitHub Repository.
@@ -45,7 +45,7 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | [Marked4J](https://github.com/making/marked4j) |  [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Markdown parser for Java |
 | Mockito | MIT | Mock lib for testing.
 | Reactor-core | Apache License Version 2.0 | Implementation of Reactive Extensions.
-| [org.slf4j:slf4j-api:1.7.21|http://www.slf4j.org/] | [MIT license|http://www.slf4j.org/license.html] | Logging
-| ch.qos.logback:logback-classic:1.1.3 | EPL/LGPL | Logger implementation.
-| com.fasterxml.jackson.core:jackson-databind:2.8.0 | Apache License Version 2.0 | convert string to POJO.
+| [slf4j-api|http://www.slf4j.org/] | [MIT license|http://www.slf4j.org/license.html] | Logging
+| slf4j-log4j12 | [MIT license|http://www.slf4j.org/license.html] | Logging
+| com.fasterxml.jackson.core:jackson-databind | Apache License Version 2.0 | convert string to POJO.
 
