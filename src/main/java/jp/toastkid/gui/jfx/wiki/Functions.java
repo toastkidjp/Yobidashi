@@ -54,7 +54,6 @@ import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Config.Key;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.models.Resources;
 import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.Zip;
 import jp.toastkid.libs.comparator.NumberMapComparator;
@@ -82,8 +81,26 @@ public final class Functions {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
+    /** Gallery 全体のView. */
+    private static final String PATH_GALLERY      = Defines.TEMPLATE_DIR + "/gallery.html";
+
+    /** Gallery 1section分のTemplate. */
+    private static final String PATH_GALLERY_ITEM = Defines.TEMPLATE_DIR + "/gallery_item.html";
+
+    /** Slide template. */
+    private static final String PATH_SLIDE        = Defines.TEMPLATE_DIR + "/slide.html";
+
     /** background directory. */
-    private static final String USER_BACKGROUND = "user/res/images/background/";
+    private static final String USER_BACKGROUND   = Defines.USER_DIR + "/res/images/background/";
+
+    /** for use background graphic in slide. */
+    private static final String BG_STATEMENT_DELIMITER = "\\|";
+
+    /** for use background graphic in slide. */
+    private static final String BG_ELEMPAIR_DELIMITER = "=";
+
+    /** for use background graphic in slide. */
+    private static final Pattern BG_PATTERN = Pattern.compile("\\{background:(.+?)\\}", Pattern.DOTALL);
 
     /** Markdown Converter. */
     private static final Marked MARKED = new MarkedBuilder().gfm(true).build();
@@ -215,14 +232,16 @@ public final class Functions {
 
     /**
      * generate html slide powered by reveal.js.
-     * @param content HTML content.
-     * @param title title.
+
+     * @param title title of slide
+     * @param content HTML content
+     * @param theme theme of slide
      */
-    private void generateSlide(final String content, final String title) {
+    public void generateSlide(final String title, final String content, final String theme) {
         FileUtil.outPutStr(
                 Functions.bindArgs(
-                    Resources.PATH_SLIDE,
-                    Maps.mutable.of("title", title, "content", content)
+                    PATH_SLIDE,
+                    Maps.mutable.of("title", title, "content", content, "theme", theme)
                 ),
                 Defines.TEMP_FILE_NAME,
                 Defines.ARTICLE_ENCODE
@@ -555,7 +574,8 @@ public final class Functions {
             final Map<String, String> params
             ) {
         try {
-            return TEMPLATE_ENGINE.createTemplate(Lists.immutable.ofAll(
+            return TEMPLATE_ENGINE.createTemplate(
+                    Lists.immutable.ofAll(
                     FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
                     ).makeString(LINE_SEPARATOR)).make(params).toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
@@ -720,7 +740,7 @@ public final class Functions {
             table.append("</tr></table>");
 
             contents.append(bindArgs(
-                    Resources.PATH_GALLERY_ITEM,
+                    PATH_GALLERY_ITEM,
                     Maps.mutable.of(
                             "subtitle",   pics[0].getParent().replace("\\", "/"),
                             "expanderId", expanderId,
@@ -729,7 +749,7 @@ public final class Functions {
                 ));
         }
         generateHtml(
-                bindArgs(Resources.PATH_GALLERY, Maps.fixedSize.of("content", contents.toString())),
+                bindArgs(PATH_GALLERY, Maps.fixedSize.of("content", contents.toString())),
                 title
                 );
     }
@@ -761,14 +781,7 @@ public final class Functions {
      * generate article file.
      */
     public void generateArticleFile() {
-
-        final String extension = Config.article.extention();
-        if (Article.Extension.SLIDE.text().equals(extension)) {
-            final String convertArticle = convertArticle(extension);
-            generateSlide(convertArticle, Config.article.title);
-            return;
-        }
-        generateHtml(convertArticle(extension), Config.article.title);
+        generateHtml(convertArticle(Config.article.extention()), Config.article.title);
     }
 
     /**
@@ -783,20 +796,8 @@ public final class Functions {
         if (Article.Extension.WIKI.text().equals(ext)) {
             return wiki2Html(Config.article.file.getAbsolutePath());
         }
-        if (Article.Extension.SLIDE.text().equals(ext)) {
-            final String content
-                = converter.convert(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE);
-            return ArrayAdapter.adapt(content.split("<hr/>"))
-                .collect(str -> String.format("<section>%s</section>", str))
-                .makeString(LINE_SEPARATOR);
-        }
         return "";
     }
-
-    private static final Pattern BG_PATTERN = Pattern.compile("\\{background:(.+?)\\}", Pattern.DOTALL);
-
-    private static final String BG_STATEMENT_DELIMITER = "\\|";
-    private static final String BG_ELEMPAIR_DELIMITER = "=";
 
     /**
      * Wiki 記事をスライドに変換する.

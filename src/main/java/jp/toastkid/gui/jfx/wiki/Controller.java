@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +93,6 @@ import jp.toastkid.gui.jfx.wiki.models.Article;
 import jp.toastkid.gui.jfx.wiki.models.Article.Extension;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.models.Resources;
 import jp.toastkid.gui.jfx.wiki.rss.RssFeeder;
 import jp.toastkid.gui.jfx.wiki.search.FileSearcher;
 import jp.toastkid.gui.jfx.wiki.search.SearchResult;
@@ -125,7 +123,19 @@ public final class Controller implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     /** log file. */
-    private static final String PATH_APP_LOG = "logs/app.log";
+    private static final String PATH_APP_LOG     = Defines.LOG_DIR + "/app.log";
+
+    /** 「リロード」ボタンの画像ファイルへのパス */
+    private static final String PATH_IMG_RELOAD  = Defines.ASSETS_DIR + "/images/reload.png";
+
+    /** 「進む」ボタンの画像ファイルへのパス */
+    private static final String PATH_IMG_FORWARD = Defines.ASSETS_DIR + "/images/forward.png";
+
+    /** 「戻る」ボタンの画像ファイルへのパス */
+    private static final String PATH_IMG_BACK    = Defines.ASSETS_DIR + "/images/back.png";
+
+    /** 「検索」画像ファイルへのパス. */
+    private static final String PATH_IMG_SEARCH  = Defines.ASSETS_DIR + "/images/search.png";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -456,8 +466,8 @@ public final class Controller implements Initializable {
         footer.setOnMousePressed((event) -> moveToBottom());
         pd.addProgress(11);
 
-        reload.setGraphic(   new ImageView(FileUtil.getUrl(Resources.PATH_IMG_RELOAD).toString()));
-        webSearch.setGraphic(new ImageView(FileUtil.getUrl(Resources.PATH_IMG_SEARCH).toString()));
+        reload.setGraphic(   new ImageView(FileUtil.getUrl(PATH_IMG_RELOAD).toString()));
+        webSearch.setGraphic(new ImageView(FileUtil.getUrl(PATH_IMG_SEARCH).toString()));
         //initReloadButton();
 
         BACKUP.submit(FILE_WATCHER);
@@ -1536,17 +1546,10 @@ public final class Controller implements Initializable {
      */
     @FXML
     private void slideShow() {
-        FileUtil.outPutStr(
-                Functions.bindArgs(
-                        Resources.PATH_SLIDE,
-                        Maps.mutable.of(
-                                "title",   Config.article.title,
-                                "content", func.convertArticle2Slide(),
-                                "theme",   Config.get(Config.Key.SLIDE_THEME, "white")
-                                )
-                        ),
-                Defines.TEMP_FILE_NAME,
-                Defines.ARTICLE_ENCODE
+        func.generateSlide(
+                Config.article.title,
+                func.convertArticle2Slide(),
+                Config.get(Config.Key.SLIDE_THEME, "white")
                 );
         callTabFullScreen();
     }

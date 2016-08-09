@@ -18,35 +18,61 @@ import org.eclipse.collections.impl.factory.Sets;
  *
  */
 public final class Defines {
-    /** 作者名. */
+
+    /** name of author. */
     public static final String AUTHOR             = "Toast kid";
+
+    /** path/to/log. */
+    public static final String LOG_DIR            = "log";
+
+    /** path/to/dir/view/template. */
+    public static final String TEMPLATE_DIR       = "templates";
+
+    /** dir of assets. */
+    public static final String ASSETS_DIR         = "public";
+
+    /** dir of user files. */
+    public static final String USER_DIR           = "user";
+
     /** 設定ファイルフォルダのパス. */
-    public static final String CONF_DIR           = "user/conf/";
+    public static final String CONF_DIR           = USER_DIR + "/conf/";
+
     /** 設定ファイル名. */
     public static final String CONF_NAME          = "config.properties";
+
     /** WikiClient の設定ファイルのパス. */
     public static final String CONF_ENCODE        = "UTF-8";
+
     /** タイトルの文字コード. */
     public static final String TITLE_ENCODE       = "EUC-JP";
+
     /** 記事ファイルの文字コード. */
     public static final String ARTICLE_ENCODE     = "UTF-8";
-    /** Terapad のオプション. */
-    public static final String TERAPAD_OPTIONS    = " /cu8n";
+
     /** 一時ファイルの名前. */
     public static final String TEMP_FILE_NAME     = "temp.html";
+
     /** Windows デフォルトのエディタ. */
     public static final String NOTEPAD_EXE        = "notepad.exe";
+
+    /** Terapad のオプション. */
+    public static final String TERAPAD_OPTIONS    = " /cu8n";
+
     /** デフォルトの URL. */
     public static final String DEFAULT_HOME       = "http://www.yahoo.co.jp";
+
     /** 個人的な使用か否か. */
     public static final boolean isMyUse           = true;
+
     /** ePub生成レシピの置き場所. */
-    public static final String EPUB_RECIPE_DIR    = "user/res/epub/";
+    public static final String EPUB_RECIPE_DIR    = USER_DIR + "/res/epub/";
+
     /** このプログラムで扱う音楽ファイルの拡張子. */
     public static final ImmutableSet<String> MUSIC_FILES
         = Sets.immutable.of(".mid", ".mp3", ".wav");
+
     /** Groovy Script Dialog title. */
-    public static final String SCRIPT_RUNNER = "Script Runner";
+    public static final String SCRIPT_RUNNER      = "Script Runner";
 
     /**
      * インスタンス生成を禁止する.

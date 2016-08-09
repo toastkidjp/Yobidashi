@@ -3,10 +3,10 @@ package jp.toastkid.gui.jfx.wiki.rss;
 import java.io.File;
 import java.util.List;
 
-import jp.toastkid.gui.jfx.wiki.models.Resources;
-import jp.toastkid.libs.utils.FileUtil;
-
 import org.apache.commons.lang3.StringUtils;
+
+import jp.toastkid.gui.jfx.wiki.models.Defines;
+import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * RSS リーダ.
@@ -16,19 +16,22 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class RssFeeder {
 
+    /** RSS取得対象のURLリスト. */
+    private static final String PATH_RSS_TARGETS = Defines.USER_DIR + "/res/rss";
+
     /** line separator. */
-	private static final String LINE_SEPARATOR = System.lineSeparator();
+	private static final String LINE_SEPARATOR   = System.lineSeparator();
 
     /**
 	 * RSS を取得し、その結果をHTMLで返す．
 	 * @return RSS取得結果.
 	 */
 	public static String run() {
-		if (!new File(Resources.PATH_RSS_TARGETS).exists()) {
+		if (!new File(PATH_RSS_TARGETS).exists()) {
 			return null;
 		}
 		final StringBuilder content = new StringBuilder();
-		final List<String> urls = FileUtil.readDirLines(Resources.PATH_RSS_TARGETS);
+		final List<String> urls = FileUtil.readDirLines(PATH_RSS_TARGETS);
 		urls.parallelStream()
 			.filter((url) ->  {return StringUtils.isNotBlank(url) && url.startsWith("http");})
 			.forEach((url) -> {content.append(getFeed(url)).append(LINE_SEPARATOR);}

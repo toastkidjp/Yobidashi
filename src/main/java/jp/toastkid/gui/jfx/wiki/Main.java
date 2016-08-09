@@ -20,7 +20,6 @@ import javafx.stage.WindowEvent;
 import jp.toastkid.gui.jfx.dialog.AlertDialog;
 import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.models.Resources;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -32,6 +31,9 @@ public final class Main extends Application {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+    /** アイコン画像ファイルへのパス */
+    private static final String PATH_IMG_ICON = Defines.ASSETS_DIR + "/images/Icon.png";
 
     /** 二重起動している際のメッセージ. */
     private static final String MESSAGE_ALERT_PROCESS_DUPLICATE
@@ -87,7 +89,7 @@ public final class Main extends Application {
             LOGGER.error("Caught error.", e);
         }
 
-        stage.getIcons().add(new Image(FileUtil.getUrl(Resources.PATH_IMG_ICON).toString()));
+        stage.getIcons().add(new Image(FileUtil.getUrl(PATH_IMG_ICON).toString()));
         final Scene scene = readScene(stage);
         stage.setScene(scene);
         final Rectangle2D d = Screen.getPrimary().getVisualBounds();

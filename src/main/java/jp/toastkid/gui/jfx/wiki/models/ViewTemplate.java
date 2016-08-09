@@ -8,11 +8,15 @@ import java.io.Serializable;
  *
  */
 public enum ViewTemplate implements Serializable {
-    SECOND("src/main/views/main_2nd.html"),
-    MATERIAL("src/main/views/main_material.html");
+    SECOND(  Defines.TEMPLATE_DIR + "/main_2nd.html"),
+    MATERIAL(Defines.TEMPLATE_DIR + "/main_material.html");
 
     private String path;
 
+    /**
+     * call from only this class.
+     * @param path
+     */
     private ViewTemplate(final String path) {
         this.path = path;
     }

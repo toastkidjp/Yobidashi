@@ -41,7 +41,7 @@ public class Article implements Comparable<Article> {
      *
      */
     public static enum Extension {
-        MD(".md"), WIKI(".txt"), SLIDE(".slide");
+        MD(".md"), WIKI(".txt");
 
         private String text;
         private Extension(final String n) {
@@ -55,7 +55,7 @@ public class Article implements Comparable<Article> {
 
     /** usable extensions. */
     private static final FixedSizeSet<String> EXTENSIONS
-    = Sets.fixedSize.of(Extension.SLIDE.text, Extension.WIKI.text, Extension.MD.text);
+    = Sets.fixedSize.of(Extension.WIKI.text, Extension.MD.text);
 
     /**
      * initialize Article model.

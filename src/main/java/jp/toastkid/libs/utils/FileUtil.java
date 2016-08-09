@@ -129,7 +129,7 @@ public final class FileUtil {
             final String pEncode
             ) {
         try {
-            return getFileReader(new FileInputStream(pTargetFileName), pEncode);
+            return makeInputStreamReader(new FileInputStream(pTargetFileName), pEncode);
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -146,7 +146,7 @@ public final class FileUtil {
             final String pEncode
             ) {
         try {
-            return getFileReader(new FileInputStream(pFile), pEncode);
+            return makeInputStreamReader(new FileInputStream(pFile), pEncode);
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -161,7 +161,7 @@ public final class FileUtil {
      * @return BufferedReader
      * @throws UnsupportedEncodingException
      */
-    private static BufferedReader getFileReader(
+    private static BufferedReader makeInputStreamReader(
             final InputStream pStream,
             final String pEncode
             ) {
@@ -245,28 +245,34 @@ public final class FileUtil {
             final String filePath,
             final String pEncode
             ) {
-        final List<String> resSet = new ArrayList<String>(100);
-        final BufferedReader fileReader;
-        final InputStream in = FileUtil.getStream(filePath);
-        if (in != null) {
-            fileReader = FileUtil.getFileReader(in, pEncode);
-        } else {
-            fileReader = FileUtil.makeFileReader(filePath, pEncode);
-        }
-        if (fileReader == null) {
-            return null;
-        }
-        try {
+        final List<String> lines = new ArrayList<String>(5000);
+        try (final BufferedReader fileReader = makeReader(filePath, pEncode)) {
+
+            if (fileReader == null) {
+                return lines;
+            }
+
             String str = fileReader.readLine();
             while(str != null) {
-                resSet.add(str);
+                lines.add(str);
                 str = fileReader.readLine();
             }
             fileReader.close();
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        return resSet;
+        return lines;
+    }
+
+    private static BufferedReader makeReader(final String filePath, final String pEncode) {
+        final BufferedReader fileReader;
+        final InputStream in = FileUtil.getStream(filePath);
+        if (in != null) {
+            fileReader = FileUtil.makeInputStreamReader(in, pEncode);
+        } else {
+            fileReader = FileUtil.makeFileReader(filePath, pEncode);
+        }
+        return fileReader;
     }
     /**
      * 引数として渡したファイル(String，String)に記述されているデータをMap<String，String>に格納して返す<BR>
@@ -1371,7 +1377,7 @@ public final class FileUtil {
      */
     public static final String getStrFromStream(final InputStream pStream, final String pEncode) {
         final StringBuilder buf = new StringBuilder(10000);
-        try (final BufferedReader read = getFileReader(pStream, pEncode);) {
+        try (final BufferedReader read = makeInputStreamReader(pStream, pEncode);) {
             final String line = System.lineSeparator();
             String str = read.readLine();
             while (str != null) {
