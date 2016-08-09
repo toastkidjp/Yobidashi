@@ -10,10 +10,10 @@ import java.io.File;
 
 import org.junit.Test;
 
-import jp.toastkid.gui.jfx.wiki.models.Config;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wiki.models.Config;
 
 /**
  * Wiki 変換のテスト.

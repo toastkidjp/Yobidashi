@@ -204,7 +204,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.gui.jfx.wiki.ArticleGenerator#toBytedString_EUC_JP(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.wiki.ArticleGenerator#toBytedString_EUC_JP(java.lang.String)} のためのテスト.・メソッド.
      */
     @Ignore
     public final void testToBytedString_EUC_JP() {
@@ -212,7 +212,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.gui.jfx.wiki.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.wiki.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
      */
     @Ignore
     public final void testDecodeBytedStr() {

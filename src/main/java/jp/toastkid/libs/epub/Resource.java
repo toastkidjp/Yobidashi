@@ -1,6 +1,6 @@
 package jp.toastkid.libs.epub;
 
-import jp.toastkid.gui.jfx.wiki.models.Defines;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * リソースへのパスを格納.

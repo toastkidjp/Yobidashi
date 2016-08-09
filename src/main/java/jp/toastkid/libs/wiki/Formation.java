@@ -3,8 +3,8 @@ package jp.toastkid.libs.wiki;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * サッカーのフォーメーションの定義

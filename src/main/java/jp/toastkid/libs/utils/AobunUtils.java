@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.gui.jfx.wiki.models.Article;
-import jp.toastkid.gui.jfx.wiki.models.Defines;
+import jp.toastkid.wiki.models.Article;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * 青空文庫に関する便利クラス

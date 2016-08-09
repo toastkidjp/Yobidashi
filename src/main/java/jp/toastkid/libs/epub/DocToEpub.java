@@ -14,12 +14,12 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
-import jp.toastkid.gui.jfx.wiki.models.Article;
-import jp.toastkid.gui.jfx.wiki.models.Config;
-import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.wiki.WikiConverter;
+import jp.toastkid.wiki.ArticleGenerator;
+import jp.toastkid.wiki.models.Article;
+import jp.toastkid.wiki.models.Config;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * 記事を epub に変換して出力する.

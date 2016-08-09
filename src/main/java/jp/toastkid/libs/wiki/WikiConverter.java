@@ -12,15 +12,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
-import jp.toastkid.gui.jfx.wiki.models.Config;
-import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.calendar.HtmlCalendar;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wiki.ArticleGenerator;
+import jp.toastkid.wiki.models.Config;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * This class convert text file to HTML with Wiki mark-up.

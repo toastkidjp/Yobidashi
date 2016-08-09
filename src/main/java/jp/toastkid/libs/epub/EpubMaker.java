@@ -21,12 +21,12 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
-import jp.toastkid.gui.jfx.wiki.models.Defines;
 import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wiki.ArticleGenerator;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * epub を生成する.

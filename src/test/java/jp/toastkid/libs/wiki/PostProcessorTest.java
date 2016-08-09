@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
+import jp.toastkid.wiki.models.ViewTemplate;
 
 /**
  * {@link PostProcessor}'s test cases.
@@ -44,7 +44,7 @@ public class PostProcessorTest {
     /**
      * test method for
      * {@link jp.toastkid.libs.wiki.PostProcessor#generateSubheadings
-     * (jp.toastkid.gui.jfx.wiki.models.ViewTemplate)} .
+     * (jp.toastkid.wiki.models.ViewTemplate)} .
      */
     @Test
     public void testGenerateSubheading() {

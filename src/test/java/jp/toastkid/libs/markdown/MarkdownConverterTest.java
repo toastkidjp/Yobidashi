@@ -7,11 +7,11 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
-import jp.toastkid.gui.jfx.wiki.ArticleGenerator;
-import jp.toastkid.gui.jfx.wiki.models.Config;
-import jp.toastkid.gui.jfx.wiki.models.Defines;
-import jp.toastkid.gui.jfx.wiki.models.ViewTemplate;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wiki.ArticleGenerator;
+import jp.toastkid.wiki.models.Config;
+import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.wiki.models.ViewTemplate;
 
 import org.junit.Test;
 
