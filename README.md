@@ -46,6 +46,6 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | Mockito | MIT | Mock lib for testing.
 | Reactor-core | Apache License Version 2.0 | Implementation of Reactive Extensions.
 | [slf4j-api](http://www.slf4j.org/) | [MIT license](http://www.slf4j.org/license.html) | Logging
-| slf4j-log4j12 | [MIT license|http://www.slf4j.org/license.html] | Logging
+| slf4j-log4j12 | [MIT license](http://www.slf4j.org/license.html) | Logging
 | com.fasterxml.jackson.core:jackson-databind | Apache License Version 2.0 | convert string to POJO.
 
