@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-import jp.toastkid.yobidashi.Main;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -29,7 +28,7 @@ import reactor.core.scheduler.Schedulers;
 public class NameLoader implements Callable<Collection<NameInformation>>{
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NameLoader.class);
 
     /** ObjectReader's holder. */
     private static final ThreadLocal<ObjectReader> READER

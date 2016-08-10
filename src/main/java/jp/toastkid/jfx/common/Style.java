@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
-import jp.toastkid.yobidashi.Main;
+import jp.toastkid.wiki.models.Defines;
 
 /**
  * JavaFX stylesheet definition.
@@ -36,13 +36,13 @@ import jp.toastkid.yobidashi.Main;
 public class Style {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Style.class);
 
     /** extension of stylesheet. */
     private static final String CSS = ".css";
 
     /** path to user defined stylesheets. */
-    private static final String USER_DEFINED_PATH = "user/css/gui";
+    private static final String USER_DEFINED_PATH = Defines.USER_DIR + "/css/gui";
 
     /** default style. */
     public static final String DEFAULT = "MODENA";
@@ -106,15 +106,16 @@ public class Style {
         try {
             final URI resource = Style.class.getResource("/css/").toURI();
             if ("jar".equals(resource.getScheme())) {
-                final JarURLConnection jarConn = (JarURLConnection) resource.toURL().openConnection() ;
+                final JarURLConnection jarConn
+                    = (JarURLConnection) resource.toURL().openConnection();
                 final URL fileURL = jarConn.getJarFileURL();
                 final FileSystem fs = FileSystems.newFileSystem(
                         Paths.get(fileURL.toURI()),
                         Style.class.getClassLoader()
                         );
                 try (Stream<Path> s = Files.walk(fs.getPath("/css/"), 1)) {
-                    return s.filter((p) -> {return p.getFileName().toString().endsWith(CSS);})
-                            .map(p -> {return p.getFileName().toString();})
+                    return s.filter(p -> p.getFileName().toString().endsWith(CSS))
+                            .map(   p -> p.getFileName().toString())
                             .collect(Collectors.toList());
                 }
             }

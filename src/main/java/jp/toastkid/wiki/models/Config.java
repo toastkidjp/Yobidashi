@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.Props;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Main;
 
 /**
  * config of Wiki client.
@@ -32,7 +31,7 @@ import jp.toastkid.yobidashi.Main;
 public final class Config {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     /**
      * keys of Config.

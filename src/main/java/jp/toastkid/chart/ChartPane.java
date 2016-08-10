@@ -43,6 +43,7 @@ import jp.toastkid.wiki.models.Config.Key;
  */
 public class ChartPane extends VBox {
 
+    /** default width. */
     private static final double DEFAULT_WIDTH = 1200.0;
 
     /** 「日記の文字数」.  (130406)*/

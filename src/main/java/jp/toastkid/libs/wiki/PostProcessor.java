@@ -21,6 +21,10 @@ import jp.toastkid.wiki.models.ViewTemplate;
  */
 public class PostProcessor {
 
+    /** subhead format. */
+    private static final String SUBHEAD_FORMAT
+        = "<a class='waves-attach waves-effect' id=\"%s\" href=\"#%s\">■</a>";
+
     /** internal link pattern. */
     private static final Pattern INTERNAL_LINK_PATTERN
         = Pattern.compile("\\[\\[(.+?)\\]\\]", Pattern.DOTALL);
@@ -57,7 +61,7 @@ public class PostProcessor {
         this.subheadings = Lists.mutable.empty();
 
         return ArrayAdapter.adapt(content.split("\n"))
-                .collect(str -> {return convertLine(str);})
+                .collect(this::convertLine)
                 .makeString("");
     }
 
@@ -88,8 +92,7 @@ public class PostProcessor {
                 final int depth = Integer.parseInt(matcher.group(1));
                 final String subheading   = matcher.group(2).trim();
                 final String subheadingId = extractSubHeading(subheading);
-                final String subheadTag
-                    = String.format("<a class='waves-attach waves-effect' id=\"%s\" href=\"#%s\">■</a>", subheadingId, subheadingId);
+                final String subheadTag = String.format(SUBHEAD_FORMAT, subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
                 subheadings.add(new Subheading(subheading, subheadingId, depth));
             }
@@ -142,16 +145,14 @@ public class PostProcessor {
         if (!isExist) {
             generatedLink.append("redLink");
         }
-        generatedLink.append("' ");
-        generatedLink.append("href=\"/").append(findExtension(isMd)).append("/");
-        generatedLink.append(bytedStr);
-        generatedLink.append(".").append(findExtension(isMd));
+        generatedLink.append("' ")
+            .append("href=\"/").append(findExtension(isMd)).append("/")
+            .append(bytedStr)
+            .append(".").append(findExtension(isMd));
         if (StringUtils.isNotEmpty(innerLink)) {
             generatedLink.append(innerLink);
         }
-        generatedLink.append("\">");
-        generatedLink.append(input);
-        generatedLink.append("</a>");
+        generatedLink.append("\">").append(input).append("</a>");
         return generatedLink.toString();
     }
 
@@ -186,7 +187,8 @@ public class PostProcessor {
             subheadings.each((subheading) -> {
                 headingHtml
                     .append("<li>")
-                    .append("<a class='waves-attach waves-effect' href=\"#").append(subheading.id).append("\">")
+                    .append("<a class='waves-attach waves-effect' href=\"#")
+                    .append(subheading.id).append("\">")
                     .append(subheading.title).append("</a>").append("<br/>")
                     .append(Strings.LINE_SEPARATOR);
             });

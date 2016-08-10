@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.wiki.models.Defines;
-import jp.toastkid.yobidashi.Main;
 
 /**
  * Name generator.
@@ -22,7 +21,7 @@ import jp.toastkid.yobidashi.Main;
 public class NameGenerator {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NameGenerator.class);
 
     /** path/to/firstname/file. */
     private static final String FIRST_NAME_FILE

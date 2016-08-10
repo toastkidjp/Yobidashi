@@ -213,8 +213,8 @@ public class Article implements Comparable<Article> {
      */
     public static final String convertTitle(final String filePath) {
         return (StringUtils.isNotEmpty(filePath))
-                                        ? ArticleGenerator.decodeBytedStr(FileUtil.removeExtension(filePath), "EUC-JP" )
-                                                                        : null;
+                   ? ArticleGenerator.decodeBytedStr(FileUtil.removeExtension(filePath), "EUC-JP")
+                   : null;
     }
 
     /**

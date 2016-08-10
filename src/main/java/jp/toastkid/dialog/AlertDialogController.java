@@ -14,7 +14,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import jp.toastkid.yobidashi.Main;
 
 /**
  * 簡単な確認ダイアログのコントローラ.
@@ -25,7 +24,7 @@ import jp.toastkid.yobidashi.Main;
 public final class AlertDialogController implements Initializable {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlertDialogController.class);
 
     /** メッセージラベル. */
     @FXML

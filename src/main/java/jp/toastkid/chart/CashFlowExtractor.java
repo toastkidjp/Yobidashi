@@ -32,6 +32,7 @@ import jp.toastkid.wiki.models.Defines;
  */
 public final class CashFlowExtractor implements ChartDataExtractor {
 
+    /** key value pair's list. */
     private final List<KeyValue> values;
 
     /** use for make title. */
@@ -123,7 +124,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
 
     /**
      * return KeyValues.
-     * @return
+     * @return current KeyValues
      */
     @Override
     public List<KeyValue> getTableValues() {

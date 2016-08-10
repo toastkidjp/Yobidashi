@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import jp.toastkid.yobidashi.Main;
 
 /**
  * Controller.
@@ -20,7 +19,7 @@ import jp.toastkid.yobidashi.Main;
 public class Controller implements Initializable {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     /** 改行記号. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
