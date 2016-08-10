@@ -29,11 +29,12 @@ public class EpubGenerator {
         final EpubMetaData meta = new EpubMetaData();
         meta.recursive = true;
         final String convertTitle = Config.article.title;
+        final String author       = Config.get(Config.Key.AUTHOR);
         meta.title        = convertTitle;
         meta.subtitle     = convertTitle;
-        meta.author       = Defines.AUTHOR;
-        meta.editor       = Defines.AUTHOR;
-        meta.publisher    = Defines.AUTHOR;
+        meta.author       = author;
+        meta.editor       = author;
+        meta.publisher    = author;
         meta.version      = "0.0.1";
         meta.zipFilePath  = convertTitle + ".epub";
         meta.targetPrefix = convertTitle;

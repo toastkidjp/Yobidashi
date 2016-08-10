@@ -39,6 +39,7 @@ public final class Config {
      *
      */
     public enum Key {
+        AUTHOR("author"),
         WIKI_TITLE("wikiTitle"),
         EDITOR_PATH("editorPath"),
         ARTICLE_DIR("articleDir"),

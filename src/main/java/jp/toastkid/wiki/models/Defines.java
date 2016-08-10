@@ -23,9 +23,6 @@ import jp.toastkid.libs.utils.FileUtil;
  */
 public final class Defines {
 
-    /** name of author. */
-    public static final String AUTHOR             = "Toast kid";
-
     /** path/to/log. */
     public static final String LOG_DIR            = "log";
 

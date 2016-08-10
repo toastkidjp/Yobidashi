@@ -10,9 +10,11 @@
 <VBox prefHeight="411.0" prefWidth="591.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
 	fx:controller="jp.toastkid.wiki.dialog.ConfigDialogController">
 	<children>
-		<Label text="Wiki title" />
+		<Label text="Author" />
+		<JFXTextField fx:id="author" onAction="#storeConfig" />
+		<Label text="Tool title" />
 		<JFXTextField fx:id="wikiTitle" onAction="#storeConfig" />
-		<Label text="Wiki icon" />
+		<Label text="Tool icon" />
 		<JFXTextField fx:id="wikiIcon" onAction="#storeConfig" />
 		<Label text="Article folder" />
 		<JFXTextField fx:id="articleFolder" onAction="#storeConfig" />

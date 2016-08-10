@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import jp.toastkid.wiki.models.Article;
+import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
 
 /**
@@ -159,7 +160,7 @@ public final class AobunUtils {
             }
         }
         output.set(0, Strings.kigouFullSizeNonDist(bookTitle) + " " + output.get(0));
-        output.add(1, Defines.AUTHOR);
+        output.add(1, Config.get(Config.Key.AUTHOR));
         output.add(2, "");
         output.add(3, "---------------------------------------------------");
         output.add(4, "");

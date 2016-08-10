@@ -3,13 +3,13 @@ package jp.toastkid.wiki.dialog;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import jp.toastkid.wiki.models.Config;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * 設定ダイアログのコントローラ.
@@ -18,6 +18,10 @@ import org.apache.commons.lang3.StringUtils;
  * JavaFX2.2でダイアログを作る方法</a>
  */
 public final class ConfigDialogController {
+
+    /** author(tool user name). */
+    @FXML
+    public TextField author;
 
     /** tool's title. */
     @FXML
@@ -51,6 +55,7 @@ public final class ConfigDialogController {
      * ファイルから設定値を読み込んでセットしておく.
      */
     public final void loadConfig() {
+        author.setText(Config.get("author"));
         wikiTitle.setText(Config.get("wikiTitle"));
         wikiIcon.setText(Config.get("wikiIcon"));
         articleFolder.setText(Config.get( "articleDir"));
@@ -68,6 +73,9 @@ public final class ConfigDialogController {
     @FXML
     public final void storeConfig() {
         final Map<String,String> newValues = new HashMap<String,String>(10);
+        if (StringUtils.isNotEmpty(author.getText())) {
+            newValues.put("author", author.getText());
+        }
         if (StringUtils.isNotEmpty(wikiTitle.getText())) {
             newValues.put("wikiTitle", wikiTitle.getText());
         }
