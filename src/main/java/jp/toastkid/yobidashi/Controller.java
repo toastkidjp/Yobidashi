@@ -107,9 +107,9 @@ import jp.toastkid.wiki.control.ArticleListCell;
 import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.jobs.FileWatcherJob;
 import jp.toastkid.wiki.models.Article;
+import jp.toastkid.wiki.models.Article.Extension;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
-import jp.toastkid.wiki.models.Article.Extension;
 import jp.toastkid.wiki.search.FileSearcher;
 import jp.toastkid.wiki.search.SearchResult;
 import jp.toastkid.wordcloud.FxWordCloud;
@@ -575,8 +575,8 @@ public final class Controller implements Initializable {
     private final void highlight(
             final Optional<String> word, final String script) {
         word.ifPresent(keyword ->
-            getCurrentWebView()
-                .ifPresent(wv -> wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
+            getCurrentWebView().ifPresent(
+                    wv -> wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
         );
     }
 
@@ -728,7 +728,7 @@ public final class Controller implements Initializable {
             }
             opt.ifPresent(article -> loadUrl(article.toInternalUrl()));
         } catch (final Exception e) {
-            System.err.println("no such element" + e.getMessage());
+            LOGGER.error("no such element", e);
         }
     }
 
@@ -2144,10 +2144,11 @@ public final class Controller implements Initializable {
 
     /**
      * 引数で渡された文字列を画面下部のステータスラベルに表示する.
-     * @param str 文字列
+     * @param message 文字列
      */
-    public final void setStatus(final String str) {
-        status.setText(str);
+    protected final void setStatus(final String message) {
+        status.setText(message);
+        LOGGER.info(message);
     }
 
     /**

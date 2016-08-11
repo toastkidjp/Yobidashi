@@ -2,6 +2,9 @@ package jp.toastkid.wiki.dialog;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,6 +23,9 @@ import jp.toastkid.wiki.models.Defines;
  *
  */
 public final class ConfigDialog  extends Application {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigDialog.class);
 
     /** FXML ファイルのパス. */
     private static final String DIALOG_FXML = Defines.SCENE_DIR + "/ConfigDialog.fxml";
@@ -55,7 +61,7 @@ public final class ConfigDialog  extends Application {
                 scene = new Scene(loader.load());
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught Error.", e);
         }
         controller = loader.getController();
         dialog = new Stage(StageStyle.UTILITY);

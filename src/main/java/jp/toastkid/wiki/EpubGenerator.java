@@ -1,9 +1,8 @@
 package jp.toastkid.wiki;
 
 import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import jp.toastkid.libs.epub.DocToEpub;
 import jp.toastkid.libs.epub.EpubMetaData;
@@ -48,12 +47,11 @@ public class EpubGenerator {
      * DocToEpub を動かし、EPUB_RECIPE_DIR のレシピ json から複数のePubを生成する.
      */
     public final void runEpubGenerator() {
-        final List<String> absPathes
-            = Stream.of(new File(Defines.EPUB_RECIPE_DIR).listFiles())
-                .map((file) -> file.getAbsolutePath())
-                .filter((fileName) -> fileName.toLowerCase().endsWith(".json"))
-                .collect(Collectors.toList());
-        DocToEpub.run(absPathes.toArray(new String[]{}));
+        DocToEpub.run(
+                ArrayIterate.collect(
+                        new File(Defines.EPUB_RECIPE_DIR).listFiles(),
+                        file -> file.getAbsolutePath())
+                .select(fileName -> fileName.toLowerCase().endsWith(".json")));
     }
 
 }

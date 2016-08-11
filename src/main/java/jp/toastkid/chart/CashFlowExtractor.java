@@ -3,16 +3,15 @@ package jp.toastkid.chart;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.ArticleGenerator;
@@ -67,11 +66,8 @@ public final class CashFlowExtractor implements ChartDataExtractor {
         }
 
         final String prefix = ArticleGenerator.toBytedString_EUC_JP(pPrefix);
-        final List<String> articleTitles
-            = Arrays.asList(new File(pathToDir).list())
-                .stream()
-                .filter((item) -> item.startsWith(prefix))
-                .collect(Collectors.toList());
+        final List<String> articleTitles = ArrayIterate.select(
+                new File(pathToDir).list(), item -> item.startsWith(prefix)).asUnmodifiable();
 
         if (articleTitles.size() < 1) {
             return Collections.emptyMap();

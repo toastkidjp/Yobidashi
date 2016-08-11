@@ -2,6 +2,9 @@ package jp.toastkid.wordcloud;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -19,12 +22,19 @@ import jp.toastkid.wiki.models.Defines;
  * @author Toast kid
  */
 public final class Main extends Application {
-    /** FXML ファイルのパス. */
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+    /** path to scene file. */
     private static final String FXML = Defines.SCENE_DIR + "/WordCloud.fxml";
-    /** コントローラオブジェクト. */
+
+    /** Controller object. */
     private Controller controller;
+
     /** Stage. */
     private Stage stage;
+
     /** Scene. */
     private Scene scene = null;
 
@@ -41,14 +51,13 @@ public final class Main extends Application {
      * @return Parent オブジェクト
      */
     private final void loadDialog(final Window window) {
-        final FXMLLoader loader
-            = new FXMLLoader(FileUtil.getUrl(FXML));
+        final FXMLLoader loader = new FXMLLoader(FileUtil.getUrl(FXML));
         try {
             if (scene == null) {
                 scene = new Scene(loader.load());
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught Error.", e);
         }
         controller = loader.getController();
         stage = new Stage(StageStyle.DECORATED);

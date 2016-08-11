@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
@@ -34,6 +36,9 @@ import jp.toastkid.wiki.models.Defines;
  *
  */
 public final class EpubMaker {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpubMaker.class);
 
     /** 改行記号. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
@@ -271,9 +276,9 @@ public final class EpubMaker {
             out.flush();
             out.close();
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught Error.", e);
         }
-        //System.out.println("圧縮終了");
+        //LOGGER.info("圧縮終了");
     }
 
     /**
@@ -292,7 +297,7 @@ public final class EpubMaker {
         try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));) {
             // エントリを作成する
             final String entryPath = path + file.getName();
-            System.out.println(entryPath + " | " + file.getAbsolutePath());
+            LOGGER.info(entryPath + " | " + file.getAbsolutePath());
             final ZipEntry entry = new ZipEntry(entryPath);
             out.putNextEntry(entry);
             // データを圧縮して書き込む
@@ -302,9 +307,11 @@ public final class EpubMaker {
             }
             in.close();
         } catch (final FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught FileNotFoundException.", e);
         } catch (final ZipException e) {
-            e.printStackTrace();
+            LOGGER.error("Caught ZipException.", e);
+        } catch (final Exception e) {
+            LOGGER.error("Caught Error.", e);
         }
     }
 

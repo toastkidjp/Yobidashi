@@ -46,7 +46,7 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.5'
     compile 'org.clojure:clojure:1.8.0'
 
-    compile 'org.eclipse.collections:eclipse-collections:7.1.0'
+    compile 'org.eclipse.collections:eclipse-collections:8.0.0-M1'
     compile 'io.projectreactor:reactor-core:3.0.0.RC1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.0'
     compile 'org.apache.commons:commons-lang3:3.4'

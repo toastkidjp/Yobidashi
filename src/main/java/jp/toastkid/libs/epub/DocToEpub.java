@@ -3,13 +3,14 @@ package jp.toastkid.libs.epub;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +36,8 @@ public final class DocToEpub {
     public static final int FILE_NAME_LENGTH = 50;
 
     /** 記事名一覧. */
-    private static final List<File> ARTICLES = Arrays.asList(new File(ARTICLE_PATH).listFiles());
+    private static final ImmutableList<File> ARTICLES
+        = Lists.immutable.of(new File(ARTICLE_PATH).listFiles());
 
     /**
      * ひとりWiki のハイパーリンクを再現するための検出用正規表現.
@@ -50,12 +52,19 @@ public final class DocToEpub {
     private static List<String> cleanTargets = new ArrayList<String>();
 
     /**
-     * 生成メソッド.
-     * @param args jsonファイル名
+     * run generator.
+     * @param fileNames names of json file
      */
-    public static void run(final String[] args) {
-        Arrays.asList(args).parallelStream()
-            .forEach(json -> generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE)));
+    public static void run(final String[] fileNames) {
+        run(Lists.immutable.of(fileNames));
+    }
+
+    /**
+     * run generator.
+     * @param fileNames names of json file
+     */
+    public static void run(final Iterable<String> args) {
+        args.forEach(json -> generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE)));
         clean();
     }
 
@@ -112,20 +121,20 @@ public final class DocToEpub {
             final String  prefix,
             final boolean recursive
         ) {
-        final List<File> targets = ARTICLES.parallelStream().filter((file) -> {
-            return file.getName().startsWith(ArticleGenerator.toBytedString_EUC_JP(prefix));
-        }).collect(Collectors.toList());
+        final List<File> targets = ARTICLES.asParallel(Executors.newFixedThreadPool(20), 20)
+                .select(file -> file.getName().startsWith(ArticleGenerator.toBytedString_EUC_JP(prefix)))
+                .toList();
         if (recursive) {
             final List<File> recursiveFiles = new ArrayList<File>();
-            targets.forEach((file) ->{
+            targets.forEach(file ->{
                 recursiveFiles.add(file);
                 final List<String> contents = FileUtil.readLines(
                         file.getAbsolutePath(),
                         Defines.ARTICLE_ENCODE
                     );
                 contents.stream()
-                    .filter(content -> {return content.contains("[[") && content.contains("]]");})
-                    .map(content -> {return HYPERLINK_PAT.matcher(content);})
+                    .filter(content -> content.contains("[[") && content.contains("]]"))
+                    .map(   content -> HYPERLINK_PAT.matcher(content))
                     .forEach(matcher -> {
                         while (matcher.find()) {
                             final File f = new File(
@@ -151,10 +160,10 @@ public final class DocToEpub {
     private static final List<File> getTargets(final List<String> targets) {
         final List<File> files = new ArrayList<File>(targets.size());
         targets.parallelStream()
-            .map(prefix -> {return new File(ARTICLE_PATH,
-                    ArticleGenerator.toBytedString_EUC_JP(prefix).concat(".txt"));})
-            .filter(f -> {return ARTICLES.contains(f);})
-            .forEach(f -> {files.add(f);});
+            .map(prefix -> new File(ARTICLE_PATH,
+                    ArticleGenerator.toBytedString_EUC_JP(prefix).concat(".txt")))
+            .filter(ARTICLES::contains)
+            .forEach(f -> files.add(f));
         return files;
     }
 
@@ -236,12 +245,10 @@ public final class DocToEpub {
      * @param pathList ファイルパスの一覧
      */
     private static final void clean() {
-        cleanTargets.parallelStream().forEach((path) -> {
-            final File file = new File(path);
-            if (file.exists()) {
-                file.delete();
-            }
-        });
+        cleanTargets.parallelStream()
+            .map(    path -> new File(path))
+            .filter( file -> file.exists())
+            .forEach(file -> file.delete());
     }
 
     /**
