@@ -15,17 +15,16 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  */
 public final class TimeUtil {
+
     /** スレッド停止時間. */
     private static volatile Map<Thread, AtomicLong> threadSleepTimes;
+
     private static AtomicBoolean simulating = new AtomicBoolean(false);
+
     private static final Object sleepTimesLock = new Object();
+
     private static ThreadLocal<AtomicLong> simulatedCurrTimeMs
-        = new ThreadLocal<AtomicLong>() {
-        @Override
-        public AtomicLong initialValue() {
-            return new AtomicLong(0);
-        }
-    };
+        = ThreadLocal.withInitial(() -> new AtomicLong(0));
 
     public static void startSimulating() {
         synchronized(sleepTimesLock) {
