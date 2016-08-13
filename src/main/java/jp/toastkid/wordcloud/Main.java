@@ -62,7 +62,6 @@ public final class Main extends Application {
         controller = loader.getController();
         stage = new Stage(StageStyle.DECORATED);
         stage.setScene(scene);
-        stage.setResizable(true);
         if (window != null) {
             stage.initOwner(window);
         }

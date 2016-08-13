@@ -1,6 +1,7 @@
 package jp.toastkid.dialog;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,12 +12,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 /**
- * 簡単な確認ダイアログのコントローラ.
+ * AlertDialog's Controller.
  * @author Toast kid
  * @see <a href="http://d.hatena.ne.jp/aoe-tk/20130526/1369577773">
  * JavaFX2.2でダイアログを作る方法</a>
@@ -26,13 +28,17 @@ public final class AlertDialogController implements Initializable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertDialogController.class);
 
-    /** メッセージラベル. */
+    /** title label. */
     @FXML
-    public Label message;
+    private Label title;
 
-    /** Control を入れる VBox. */
+    /** message label. */
     @FXML
-    public VBox inputBox;
+    private Label message;
+
+    /** contains Control. */
+    @FXML
+    private VBox inputBox;
 
     /** OK button. */
     @FXML
@@ -51,7 +57,7 @@ public final class AlertDialogController implements Initializable {
      * @param text
      * @param action
      */
-    public void setOnPositive(final String text, final Action action) {
+    public void setOnPositive(final String text, final Runnable action) {
         setOnActionToButton(posi, text, action);
     }
 
@@ -60,7 +66,7 @@ public final class AlertDialogController implements Initializable {
      * @param text
      * @param action
      */
-    public void setOnNeutral(final String text, final Action action) {
+    public void setOnNeutral(final String text, final Runnable action) {
         if (StringUtils.isEmpty(text)) {
             return;
         }
@@ -73,17 +79,17 @@ public final class AlertDialogController implements Initializable {
      * @param text
      * @param action
      */
-    public void setOnNegative(final String text, final Action action) {
+    public void setOnNegative(final String text, final Runnable action) {
         setOnActionToButton(nega, text, action);
     }
 
     /**
-     * Button に Action を登録.
+     * Button に Runnable を登録.
      * @param b Button object
      * @param text text
      * @param action action
      */
-    private void setOnActionToButton(final Button b, final String text, final Action action) {
+    private void setOnActionToButton(final Button b, final String text, final Runnable action) {
         if (StringUtils.isNotBlank(text)) {
             b.setText(text);
         }
@@ -92,7 +98,7 @@ public final class AlertDialogController implements Initializable {
         if (action != null) {
             eventHandler = eve -> {
                 try {
-                    action.doAction();
+                    action.run();
                     this.close();
                 } catch (final RuntimeException e) {
                     AlertDialog.showMessage(message.getScene().getWindow(), "Error!!!", e.getMessage());
@@ -100,9 +106,41 @@ public final class AlertDialogController implements Initializable {
                 }
             };
         } else {
-            eventHandler = eve -> {this.close();};
+            eventHandler = eve -> this.close();
         }
         b.setOnAction(eventHandler);
+    }
+
+    /**
+     * set message text.
+     * @param msg
+     */
+    public void setMessage(final String msg) {
+        message.setText(msg);
+    }
+
+    /**
+     * add one child node.
+     * @param cntr
+     */
+    public void add(final Node cntr) {
+        inputBox.getChildren().add(cntr);
+    }
+
+    /**
+     * add multiple children nodes.
+     * @param cntr
+     */
+    public void addAll(final Collection<Node> cntrs) {
+        inputBox.getChildren().addAll(cntrs);
+    }
+
+    /**
+     * set title text.
+     * @param titleText
+     */
+    public void setTitle(final String titleText) {
+        title.setText(titleText);
     }
 
     /**
@@ -115,6 +153,6 @@ public final class AlertDialogController implements Initializable {
 
     @Override
     public void initialize(final URL arg0, final ResourceBundle arg1) {
-        neutral.setOnMouseClicked(eve -> {this.close();});
+        neutral.setOnMouseClicked(eve -> this.close());
     }
 }

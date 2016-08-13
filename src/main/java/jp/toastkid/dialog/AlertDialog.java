@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
@@ -57,15 +58,15 @@ public final class AlertDialog extends Application {
         private String message;
 
         private String negaText;
-        private Action negaAction;
+        private Runnable negaAction;
 
         private String posiText;
-        private Action posiAction;
+        private Runnable posiAction;
 
         private String neutralText;
-        private Action neutralAction;
+        private Runnable neutralAction;
 
-        private final MutableList<Control> cntrs;
+        private final MutableList<Node> cntrs;
 
         public Builder() {
             cntrs = Lists.mutable.empty();
@@ -86,19 +87,19 @@ public final class AlertDialog extends Application {
             return this;
         }
 
-        public Builder setOnPositive(final String title, final Action act) {
+        public Builder setOnPositive(final String title, final Runnable act) {
             this.posiText   = title;
             this.posiAction = act;
             return this;
         }
 
-        public Builder setOnNeutral(final String title, final Action act) {
+        public Builder setOnNeutral(final String title, final Runnable act) {
             this.neutralText   = title;
             this.neutralAction = act;
             return this;
         }
 
-        public Builder setOnNegative(final String title, final Action act) {
+        public Builder setOnNegative(final String title, final Runnable act) {
             this.negaText   = title;
             this.negaAction = act;
             return this;
@@ -127,14 +128,15 @@ public final class AlertDialog extends Application {
         controller.setOnNeutral(b.neutralText, b.neutralAction);
 
         if (StringUtils.isNotBlank(b.message)) {
-            controller.message.setText(b.message);
+            controller.setMessage(b.message);
         }
 
         if (b.cntrs != null && !b.cntrs.isEmpty()) {
-            controller.inputBox.getChildren().addAll(b.cntrs);
+            controller.addAll(b.cntrs);
         }
 
         stage.setTitle(b.title);
+        controller.setTitle(b.title);
 
         if (b.parent == null || b.parent.getScene().getStylesheets() == null) {
             return;
@@ -158,7 +160,7 @@ public final class AlertDialog extends Application {
             LOGGER.error("Error", e);;
         }
         controller = loader.getController();
-        stage = new Stage(StageStyle.UTILITY);
+        stage = new Stage(StageStyle.TRANSPARENT);
         stage.setScene(scene);
         if (window != null) {
             stage.initOwner(window);
@@ -188,13 +190,13 @@ public final class AlertDialog extends Application {
      * 渡されたコントロールをセットする。
      * @param control
      */
-    public AlertDialog setControl(final Control control) {
-        controller.inputBox.getChildren().add(control);
+    public AlertDialog setControl(final Node control) {
+        controller.add(control);
         return this;
     }
 
     /**
-     *
+     * main method.
      * @param args
      */
     public static void main(final String[] args) {
