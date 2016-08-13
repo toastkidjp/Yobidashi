@@ -82,6 +82,7 @@ jar {
         attributes 'Main-Class' : mainClassName
     }
     destinationDir = projectDir
+    // version = version + "_" + revHash()
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
@@ -96,4 +97,14 @@ startScripts {
 task del(type:Exec) {
     executable "rm"
     args "-r", "build/*"
+}
+
+task printRevHash() {
+  println revHash()
+}
+
+def String revHash() {
+  ext.revision = 'git rev-list --count HEAD'.execute().text.trim()
+  ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
+  return "r${revision}.${hash}"
 }
