@@ -128,7 +128,10 @@ public final class Controller implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     /** log file. */
-    private static final String PATH_APP_LOG     = Defines.LOG_DIR + "/app.log";
+    private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
+
+    /** about file. */
+    private static final String PATH_ABOUT_APP   = "README.md";
 
     /** 「リロード」ボタンの画像ファイルへのパス */
     private static final String PATH_IMG_RELOAD  = Defines.ASSETS_DIR + "/images/reload.png";
@@ -869,6 +872,7 @@ public final class Controller implements Initializable {
     @FXML
     private final void callLogViewer() {
         if (!new File(PATH_APP_LOG).exists()) {
+            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
             return;
         }
         final String log = String.format(

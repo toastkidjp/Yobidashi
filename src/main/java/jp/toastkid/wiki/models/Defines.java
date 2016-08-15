@@ -24,7 +24,7 @@ import jp.toastkid.libs.utils.FileUtil;
 public final class Defines {
 
     /** path/to/log. */
-    public static final String LOG_DIR            = "log";
+    public static final String LOG_DIR            = "logs";
 
     /** path/to/dir/view/template. */
     public static final String TEMPLATE_DIR       = "templates";
