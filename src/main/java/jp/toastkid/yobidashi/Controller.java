@@ -885,6 +885,24 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * call About.
+     */
+    @FXML
+    private final void callAbout() {
+        if (!new File(PATH_ABOUT_APP).exists()) {
+            LOGGER.warn(new File(PATH_ABOUT_APP).getAbsolutePath() + " is not exists.");
+            return;
+        }
+
+        func.generateHtml(
+                new ArticleGenerator().md2Html(PATH_ABOUT_APP),
+                "About"
+                );
+        openWebTab();
+        loadDefaultFile();
+    }
+
+    /**
      * バックアップ機能を呼び出す。
      */
     @FXML

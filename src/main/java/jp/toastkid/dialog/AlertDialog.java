@@ -13,7 +13,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -105,7 +104,7 @@ public final class AlertDialog extends Application {
             return this;
         }
 
-        public Builder addControl(final Control... cntrs) {
+        public Builder addControl(final Node... cntrs) {
             this.cntrs.withAll(ArrayAdapter.adapt(cntrs));
             return this;
         }

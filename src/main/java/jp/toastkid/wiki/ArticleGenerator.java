@@ -40,9 +40,9 @@ import jp.toastkid.libs.wiki.PostProcessor;
 import jp.toastkid.libs.wiki.WikiConverter;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
+import jp.toastkid.wiki.models.Config.Key;
 import jp.toastkid.wiki.models.Defines;
 import jp.toastkid.wiki.models.ViewTemplate;
-import jp.toastkid.wiki.models.Config.Key;
 
 /**
  * WikiClient で共通して使えるメソッドを収録.
@@ -243,6 +243,7 @@ public final class ArticleGenerator {
      */
     public String md2Html(final String absolutePath) {
         try {
+            LOGGER.info("PATH = " + absolutePath);
             final Path path = Paths.get(absolutePath);
             final List<String> source = Files.readAllLines(path, StandardCharsets.UTF_8);
             source.add("");

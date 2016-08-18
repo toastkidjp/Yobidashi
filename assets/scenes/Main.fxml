@@ -101,7 +101,7 @@
               <items>
                 <MenuItem onAction="#callApplicationState" text="Application state" />
                 <MenuItem onAction="#callLogViewer" text="LogViewer" />
-                <MenuItem text="About" />
+                <MenuItem onAction="#callAbout" text="About" />
               </items>
             </Menu>
           </menus>
