@@ -1,13 +1,16 @@
-apply plugin: 'application'
-apply plugin: 'eclipse'
-apply plugin: 'jacoco'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
 
-/**
- * @see
- * <a href="http://patrickmoule.net/2012/12/16/
- *building-and-packaging-of-javafx-applications-with-gradle/">
- * building-and-packaging-of-javafx-applications-with-gradle</a>
- */
+plugins {
+    id 'com.github.hierynomus.license' version '0.13.1'
+    id 'application'
+    id 'eclipse'
+    id 'jacoco'
+}
+
 sourceCompatibility = 1.8
 
 version = '0.0.1'
@@ -23,11 +26,6 @@ repositories {
     mavenCentral()
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
 
 //this one works with file dependencies. If you prefer
 
