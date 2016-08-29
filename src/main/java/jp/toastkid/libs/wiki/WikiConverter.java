@@ -2,7 +2,6 @@ package jp.toastkid.libs.wiki;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -10,9 +9,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import jp.toastkid.libs.calendar.HtmlCalendar;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -35,6 +34,9 @@ import jp.toastkid.wiki.models.Defines;
  * @author Toast kid
  */
 public final class WikiConverter {
+
+    /** logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(WikiConverter.class);
 
     /** value separator. */
     private static final String VALUE_SEPARATOR = "\\|";
@@ -143,6 +145,10 @@ public final class WikiConverter {
     /** Overflow hidden の正規表現. */
     private static final Pattern OVERFLOW_HIDDEN_PATTERN
         = Pattern.compile("\\{hide\\:(.+?)\\}", Pattern.DOTALL);
+
+    /** 数値付きリストを検出する正規表現. */
+    private static final Pattern ORDERED_LIST_PATTERN
+        = Pattern.compile("^[\\d+]\\. ", Pattern.DOTALL);
 
     /** inline code の正規表現. */
     private static final Pattern INLINE_CODE_PATTERN
@@ -261,7 +267,11 @@ public final class WikiConverter {
         setFile(filePath);
         final String bytestr = FileUtil.removeExtension(file.getName());
         setTitle(ArticleGenerator.decodeBytedStr(bytestr, Defines.TITLE_ENCODE));
-        strs = wikiConvert(strs, true);
+        try {
+            strs = wikiConvert(strs, true);
+        } catch (final Exception e) {
+            LOGGER.error("Caught error!", e);
+        }
         return strs;
     }
 
@@ -481,8 +491,8 @@ public final class WikiConverter {
                     uLTagDepth = 1;
                 }
             }
-            // (121019) 数字付きリスト
-            if (!isInCodeBlock && str.startsWith("#") ) {
+            // TODO 数字付きリスト
+            if (!isInCodeBlock && (str.startsWith("#") || ORDERED_LIST_PATTERN.matcher(str).find()) ) {
                 if (source.startsWith("##") && oLTagDepth < 2) {
                     if (isInP) {
                         contents.add("</p>");
@@ -493,7 +503,7 @@ public final class WikiConverter {
                         contents.add("<ol>");
                     }
                     oLTagDepth = 2;
-                } else if (source.startsWith("#") && !source.startsWith("##") ) {
+                } else {//if ((source.startsWith("#") || str.matches("\\d\\.")) && !source.startsWith("##") ) {
                     if (isInP) {
                         contents.add("</p>");
                         isInP = false;
@@ -583,10 +593,14 @@ public final class WikiConverter {
                 }
             }
             if (oLTagDepth != 0) {
-                if (source.startsWith("#") ) {
-                    str =  str.replaceFirst("#*#", "<li>") + "</li>";
+                final boolean find = ORDERED_LIST_PATTERN.matcher(source).find();
+                if (source.startsWith("#")) {
+                    str = str.replaceFirst("#*#", "<li>") + "</li>";
                 }
-                if (!source.startsWith("#") ) {
+                if (find) {
+                    str = str.replaceFirst(ORDERED_LIST_PATTERN.pattern(), "<li>") + "</li>";
+                }
+                if (!source.startsWith("#") && !find) {
                     final StringBuffer buf = new StringBuffer(oLTagDepth * 5);
                     for (int j = 0; j < oLTagDepth; j++) {
                         buf.append("</ol>");
@@ -1051,7 +1065,7 @@ public final class WikiConverter {
             }
         }
 
-        // {calendar}.
+        /* {calendar}.
         if (str.contains("alendar")) {
             matcher = CALENDAR_PATTERN.matcher(str);
             while (matcher.find()) {
@@ -1076,7 +1090,7 @@ public final class WikiConverter {
                 }
                 str = str.replaceFirst(CALENDAR_PATTERN.pattern(), HtmlCalendar.makeOneMonth(cal));
             }
-        }
+        }*/
 
         // under line.
         if (str.contains("+")) {
