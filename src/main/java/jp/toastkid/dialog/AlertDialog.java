@@ -52,7 +52,7 @@ public final class AlertDialog extends Application {
      *
      */
     public static class Builder {
-        private Window parent;
+        private final Window parent;
         private String title;
         private String message;
 
@@ -68,12 +68,12 @@ public final class AlertDialog extends Application {
         private final MutableList<Node> cntrs;
 
         public Builder() {
-            cntrs = Lists.mutable.empty();
+            this(null);
         }
 
-        public Builder setParent(final Window parent) {
+        public Builder(final Window parent) {
             this.parent = parent;
-            return this;
+            cntrs = Lists.mutable.empty();
         }
 
         public Builder setTitle(final String title) {
@@ -221,7 +221,7 @@ public final class AlertDialog extends Application {
      */
     public static void showMessage(
             final Window parent, final String title, final String message, final String detail) {
-        final Builder builder = new AlertDialog.Builder().setParent(parent)
+        final Builder builder = new AlertDialog.Builder(parent)
                 .setTitle(title)
                 .setMessage(message);
         if (StringUtils.isNotEmpty(detail)) {

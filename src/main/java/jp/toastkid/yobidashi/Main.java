@@ -75,7 +75,8 @@ public final class Main extends Application {
     private void initialize(final Stage stage) {
         // (130615) 二重起動防止機能
         if (LOCK_FILE.exists()) {
-            new AlertDialog.Builder().setTitle("二重起動防止")
+            new AlertDialog.Builder()
+                .setTitle("二重起動防止")
                 .setMessage(MESSAGE_ALERT_PROCESS_DUPLICATE)
                 .setOnPositive("OK",     () -> System.exit(-1))
                 .setOnNegative("Delete", () -> {})

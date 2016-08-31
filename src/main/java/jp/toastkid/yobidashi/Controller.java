@@ -771,7 +771,7 @@ public final class Controller implements Initializable {
             vertically.setSelected(true);
         }};
 
-        new AlertDialog.Builder().setParent(getParent())
+        new AlertDialog.Builder(getParent())
             .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
             .addControl(vertically, horizontally)
             .setOnPositive("OK", () -> {
@@ -789,7 +789,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callGenerateEpubs() {
-        new AlertDialog.Builder().setParent(getParent())
+        new AlertDialog.Builder(getParent())
         .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
         .setOnPositive("OK", () -> {
             final ProgressDialog pd = new ProgressDialog.Builder()
@@ -809,7 +809,7 @@ public final class Controller implements Initializable {
         final DatePicker datePicker = new JFXDatePicker();
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
-        new AlertDialog.Builder().setParent(getParent()).addControl(datePicker)
+        new AlertDialog.Builder(getParent()).addControl(datePicker)
             .setTitle("日付選択")
             .setMessage("バックアップする最初の日を選択してください。")
             .setOnPositive("Backup", () -> {
@@ -908,7 +908,7 @@ public final class Controller implements Initializable {
     @FXML
     private final void callBackUp(final ActionEvent event) {
         final Window parent = getParent();
-        new AlertDialog.Builder().setParent(parent)
+        new AlertDialog.Builder(parent)
             .setTitle("バックアップ")
             .setMessage("この処理には時間がかかります。")
             .setOnPositive("OK", () -> {
@@ -953,7 +953,7 @@ public final class Controller implements Initializable {
                 || currentURL.startsWith("https://")
                 ){
             final String homeTitle = tabPane.getSelectionModel().getSelectedItem().getText();
-            new AlertDialog.Builder().setParent(parent).setTitle("ホーム設定")
+            new AlertDialog.Builder(parent).setTitle("ホーム設定")
                 .setMessage(homeTitle + "をホームに設定しますか？")
                 .setOnPositive("YES", () -> {
                     Config.store(Config.Key.HOME, currentURL);
@@ -1375,7 +1375,7 @@ public final class Controller implements Initializable {
     private void searchArticle(final String q, final String f) {
         final CheckBox isTitleOnly = new JFXCheckBox("記事名で検索");
         final CheckBox isAnd       = new JFXCheckBox("AND 検索"){{setSelected(true);}};
-        new AlertDialog.Builder().setParent(getParent())
+        new AlertDialog.Builder(getParent())
             .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
             //"記事名のみを対象に検索"
             .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly, isAnd)
@@ -1777,7 +1777,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void clearBackup() {
-        new AlertDialog.Builder().setParent(stage)
+        new AlertDialog.Builder(stage)
             .setTitle("Clear History").setMessage("バックアップを削除します。")
             .setOnPositive("OK", () -> {
                 try {
@@ -1801,7 +1801,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void clearHistory() {
-        new AlertDialog.Builder().setParent(stage)
+        new AlertDialog.Builder(stage)
             .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
             .setOnPositive("OK", () -> {
                 historyList.getItems().clear();
@@ -1837,7 +1837,7 @@ public final class Controller implements Initializable {
         final TextField input = new TextField();
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
         input.setPromptText(newArticleMessage);
-        new AlertDialog.Builder().setParent(getParent())
+        new AlertDialog.Builder(getParent())
                 .setTitle("新記事作成")
                 .setMessage(newArticleMessage)
                 .addControl(input)
@@ -1890,7 +1890,7 @@ public final class Controller implements Initializable {
 
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
-        new AlertDialog.Builder().setParent(parent)
+        new AlertDialog.Builder(parent)
             .setTitle("記事名変更").setMessage(renameMessage)
             .addControl(input)
             .setOnPositive("OK", () ->{
@@ -1962,7 +1962,8 @@ public final class Controller implements Initializable {
                     "ファイルがありません", deleteTarget + " というファイルは存在しません。");
             return;
         }
-        new AlertDialog.Builder().setParent(parent).setTitle("ファイルの削除")
+        new AlertDialog.Builder(parent)
+            .setTitle("ファイルの削除")
             .setMessage(deleteTarget + " を削除しますか？")
             .setOnPositive("OK", () -> {
                 article.file.delete();
@@ -2063,7 +2064,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callPrinterJob() {
-        new AlertDialog.Builder().setParent(getParent())
+        new AlertDialog.Builder(getParent())
             .setTitle("PDF印刷").setMessage("PDFへの印刷を実行しますか？")
             .setOnPositive("OK", () -> {
                 final Optional<WebView> wv = getCurrentWebView();

@@ -190,7 +190,7 @@ public class FullScreen {
      */
     private void callJump() {
         final NumberTextField num = new NumberTextField();
-        new AlertDialog.Builder().setParent(stage.getScene().getWindow())
+        new AlertDialog.Builder(stage.getScene().getWindow())
             .setTitle("Jump to")
             .setMessage("何ページ目に移動しますか？")
             .addControl(num)
