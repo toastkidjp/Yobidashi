@@ -5,6 +5,8 @@ package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,18 +23,20 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * {@link jp.toastkid.libs.utils.Strings} のテスト.クラス.
+ * {@link jp.toastkid.libs.utils.Strings}'s test cases.
  * @author Toast kid
  *
  */
 public final class StringsTest {
+
     /** sample of CamelCase string. */
     private static final String CAMEL = "TomatoCurry";
+
     /** sample of snake_case string. */
     private static final String SNAKE = "tomato_curry";
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getDirSeparator()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getDirSeparator()} 's test method.
      */
     @Test
     public final void testGetDirSeparator() {
@@ -49,7 +53,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getOSName()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getOSName()} 's test method.
      */
     @Test
     public final void testGetOSName() {
@@ -60,7 +64,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double)} 's test method.
      */
     @Ignore
     public final void testCalcScaledSimilarityStringStringDouble() {
@@ -68,7 +72,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double, int)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double, int)} 's test method.
      */
     @Ignore
     public final void testCalcScaledSimilarityStringStringDoubleInt() {
@@ -76,7 +80,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testCalcSimilarityStringString() {
@@ -84,7 +88,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String, double)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String, double)} 's test method.
      */
     @Ignore
     public final void testCalcSimilarityStringStringDouble() {
@@ -92,7 +96,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testCalcSimilarityArrayListOfStringString() {
@@ -100,7 +104,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String, double)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String, double)} 's test method.
      */
     @Ignore
     public final void testCalcSimilarityArrayListOfStringStringDouble() {
@@ -108,7 +112,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getBiGrams(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getBiGrams(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testGetBiGrams() {
@@ -116,7 +120,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#alphaNonDist(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#alphaNonDist(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testAlphaNonDist() {
@@ -124,7 +128,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#numNonDist(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#numNonDist(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testNumNonDist() {
@@ -132,7 +136,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#katahiraNonDist(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#katahiraNonDist(java.lang.String)} 's test method.
      */
     @Test
     public final void testKatahiraNonDist() {
@@ -140,7 +144,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#kigouNonDist(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#kigouNonDist(java.lang.String)} 's test method.
      */
     @Test
     public final void testKigouNonDist() {
@@ -148,7 +152,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#kataZenHanNonDist(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#kataZenHanNonDist(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testKataZenHanNonDist() {
@@ -156,7 +160,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#encodeHTML(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#encodeHTML(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testEncodeHTML() {
@@ -164,7 +168,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#doubleQuote(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#doubleQuote(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testQuoteString() {
@@ -172,7 +176,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#removeQuote(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#removeQuote(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testRemoveQuote() {
@@ -180,7 +184,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#uniteTwoString(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#uniteTwoString(java.lang.String, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testUniteTwoString() {
@@ -188,7 +192,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#htmlStringConvert(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#htmlStringConvert(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testHtmlStringConvert() {
@@ -196,7 +200,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#parseDoubleDivide(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#parseDoubleDivide(java.lang.String, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testParseDoubleDivide() {
@@ -204,7 +208,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.wiki.ArticleGenerator#toBytedString_EUC_JP(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.wiki.ArticleGenerator#toBytedString_EUC_JP(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testToBytedString_EUC_JP() {
@@ -212,7 +216,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.wiki.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.wiki.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testDecodeBytedStr() {
@@ -220,7 +224,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#printDebugString(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#printDebugString(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testPrintDebugString() {
@@ -228,7 +232,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowTime()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowTime()} 's test method.
      */
     @Ignore
     public final void testGetNowTime() {
@@ -236,7 +240,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowOclock()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowOclock()} 's test method.
      */
     @Ignore
     public final void testGetNowOclock() {
@@ -244,7 +248,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowTime_YMDHMSSE()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowTime_YMDHMSSE()} 's test method.
      */
     @Ignore
     public final void testGetNowTime_YMDHMSSE() {
@@ -252,7 +256,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#toYmdhmsse(java.util.Date)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#toYmdhmsse(java.util.Date)} 's test method.
      */
     @Ignore
     public final void testGetNowTime_YMDHMSSEDate() {
@@ -260,7 +264,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#toUniTypeDate(java.util.Date)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#toUniTypeDate(java.util.Date)} 's test method.
      */
     @Ignore
     public final void testGetNowTime_YMDHMSSE_typeUni() {
@@ -268,7 +272,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE()} 's test method.
      */
     @Ignore
     public final void testGetNowDate_YMDE() {
@@ -276,7 +280,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki()} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki()} 's test method.
      */
     @Ignore
     public final void testGetNowDate_YMDE_forMyWiki() {
@@ -284,7 +288,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(int, int, int)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(int, int, int)} 's test method.
      */
     @Ignore
     public final void testGetNowDate_YMDE_forMyWikiIntIntInt() {
@@ -292,7 +296,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(java.util.Calendar)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(java.util.Calendar)} 's test method.
      */
     @Ignore
     public final void testGetNowDate_YMDE_forMyWikiCalendar() {
@@ -300,7 +304,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getRSSURLsMap(java.lang.String)} のためのテスト.・メソッド.
+     * {@link jp.toastkid.libs.utils.Strings#getRSSURLsMap(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testGetRSSURLsMap() {
@@ -308,7 +312,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#levenshteinDistance(java.lang.String, java.lang.String)} のテスト.
+     * {@link jp.toastkid.libs.utils.Strings#levenshteinDistance(java.lang.String, java.lang.String)} 's test method.
      */
     @Test
     public void levenshteinDistanceTest() {
@@ -316,7 +320,7 @@ public final class StringsTest {
         assertEquals(3, Strings.levenshteinDistance("kitten", "sitting"));
     }
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getFolderStrList(java.lang.String, int)} のテスト.
+     * {@link jp.toastkid.libs.utils.Strings#getFolderStrList(java.lang.String, int)} 's test method.
      */
     @Test
     public void getFolderStrListTest() {
@@ -335,14 +339,14 @@ public final class StringsTest {
         assertEquals(Arrays.asList(target), actual);
     }
     /**
-     * {@link jp.toastkid.libs.utils.Strings#addZero(int)} のテスト.
+     * {@link jp.toastkid.libs.utils.Strings#addZero(int)} 's test method.
      */
     @Test
     public void addZeroTest() {
         assertEquals("03", Strings.addZero(3));
     }
     /**
-     * StringUtil#md5Hash のテスト.
+     * StringUtil#md5Hash 's test method.
      */
     @Test
     public void md5HashTest() {
@@ -356,7 +360,7 @@ public final class StringsTest {
         assertEquals(4, set.size());
     }
     /**
-     * StringUtil#longHash のテスト.
+     * StringUtil#longHash 's test method.
      */
     @Test
     public void longHashTest() {
@@ -502,5 +506,18 @@ public final class StringsTest {
         // check nullable.
         assertNull(Strings.extractMatches(null, ""));
         assertNull(Strings.extractMatches("", null));
+    }
+
+    @Test
+    public void testBuilder() {
+        final StringBuilder builder = Strings.builder();
+        assertEquals(0, builder.length());
+        final StringBuilder builder2 = Strings.builder();
+        assertEquals(0, builder2.length());
+        assertNotEquals(builder, builder2);
+        assertNotSame(builder, builder2);
+        final StringBuilder withCapacity30 = Strings.builder(30);
+        assertEquals(30, withCapacity30.capacity());
+
     }
 }

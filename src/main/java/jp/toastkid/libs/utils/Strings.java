@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  * 文字列について様々な処理を行うユーティリティ・クラス<BR>
  * 計算式はカーネル法のものを用いている.<BR>
@@ -944,5 +943,22 @@ public final class Strings {
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(target);
         return (matcher.find()) ? matcher.group(1) : null;
+    }
+
+    /**
+     * init StringBuilder.
+     * @return StringBuilder
+     */
+    public static StringBuilder builder() {
+        return new StringBuilder();
+    }
+
+    /**
+     * init StringBuilder with initialCapacity.
+     * @param initialCapacity
+     * @return StringBuilder
+     */
+    public static StringBuilder builder(final int initialCapacity) {
+        return new StringBuilder(initialCapacity);
     }
 }
