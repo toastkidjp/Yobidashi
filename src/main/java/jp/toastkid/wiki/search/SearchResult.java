@@ -2,11 +2,11 @@ package jp.toastkid.wiki.search;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.eclipse.collections.impl.factory.Maps;
 
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -19,14 +19,19 @@ import jp.toastkid.wiki.models.Defines;
  *
  */
 public final class SearchResult {
+
     /** ファイルパス. */
     public String filePath;
+
     /** 記事名. */
     public String title;
+
     /** 記事の文字数. */
     public int length;
+
     /** 記事の最終更新. */
     public long lastModified;
+
     /** 単語頻度マップ. */
     public Map<String, List<String>> df;
 
@@ -35,8 +40,8 @@ public final class SearchResult {
      * @param pFilePath /path/to/file
      */
     public SearchResult(final String pFilePath) {
-        df = new HashMap<String, List<String>>();
-        this.filePath = pFilePath;
+        this.df           = Maps.mutable.withInitialCapacity(20);
+        this.filePath     = pFilePath;
         this.lastModified = FileUtil.lastModified(pFilePath);
     }
 

@@ -15,10 +15,11 @@ import jp.toastkid.wiki.models.Defines;
  * ファイル単位での検索をする.
  * @author Toast kid
  */
-public final class FileSearchableImpl implements Runnable {
+public final class FileSearchTask implements Runnable {
 
     /** 検索パターンのセット */
     private final Set<Pattern> targetPatterns;
+
     /** 検索結果 */
     private final SearchResult result;
 
@@ -41,7 +42,7 @@ public final class FileSearchableImpl implements Runnable {
      * @param pFilePath 検索対象ファイルのパス
      * @param pPatSet   検索パターンのセット
      */
-    public FileSearchableImpl(
+    public FileSearchTask(
             final String       pFilePath,
             final Set<Pattern> pPatSet
             ) {
@@ -58,11 +59,11 @@ public final class FileSearchableImpl implements Runnable {
      * ファイル単位で文字列を検索する.
      */
     private void strSearchFromFile() {
-        final List<String> contentList
+        final List<String> contents
             = FileUtil.readLines(result.filePath, Defines.ARTICLE_ENCODE);
 
-        Interval.zeroTo(contentList.size()).each(i -> {
-            final String content = contentList.get(i);
+        Interval.zeroTo(contents.size()).each(i -> {
+            final String content = contents.get(i);
             result.length = result.length + content.length();
             targetPatterns.forEach(pat -> {
                 final Matcher matcher = pat.matcher(content);

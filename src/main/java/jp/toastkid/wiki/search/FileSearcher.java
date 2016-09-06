@@ -34,25 +34,32 @@ import jp.toastkid.wiki.models.Article;
  */
 public final class FileSearcher {
 
+    /** クエリ区切り文字. */
+    public static final String QUERY_DELIMITER = " ";
+
     /** マルチスレッドで検索する時の並列数 */
     private int parallel = 12;
 
     /** AND 検索を使用するか否か. */
-    protected boolean isAnd = false;
+    private boolean isAnd = false;
+
     /** 文字列検索の結果を記録する Map.(111231) */
-    protected Map<String, SearchResult> searchResultMap;
+    private Map<String, SearchResult> searchResultMap;
+
     /** アプリケーションで扱うホームフォルダのパス. */
-    protected String homeDirPath;
+    private final String homeDirPath;
+
     /** 最後に検索した時の処理時間.(130302) */
-    protected long lastSearchTime = 0;
+    private long lastSearchTime = 0;
+
     /** 最後に検索した時のファイル数.(130302) */
-    protected int lastFilenum = 0;
+    private int lastFilenum = 0;
+
     /** 記事名のみを検索対象とするか. */
-    protected boolean isTitleOnly = false;
+    private boolean isTitleOnly = false;
+
     /** 検索対象記事名. */
-    protected String selectName;
-    /** クエリ区切り文字. */
-    public static final String QUERY_DELIMITER = " ";
+    private final String selectName;
 
     /** Progress dialog. */
     private final ProgressDialog pd;
@@ -63,27 +70,35 @@ public final class FileSearcher {
      *
      */
     public static class Builder {
+
         private String homeDirPath;
+
         private boolean isAnd;
+
         private boolean isTitleOnly;
+
         private String selectName;
 
         public Builder setHomeDirPath(final String homeDirPath) {
             this.homeDirPath = homeDirPath;
             return this;
         }
+
         public Builder setAnd(final boolean isAnd) {
             this.isAnd = isAnd;
             return this;
         }
+
         public Builder setTitleOnly(final boolean isTitleOnly) {
             this.isTitleOnly = isTitleOnly;
             return this;
         }
+
         public Builder setSelectName(final String selectName) {
             this.selectName = selectName;
             return this;
         }
+
         public FileSearcher build() {
             return new FileSearcher(this);
         }
@@ -140,13 +155,12 @@ public final class FileSearcher {
         final Set<Pattern> patterns = getPattermList(pQuery);
         final File[] files = new File(dirPath).listFiles();
         // 検索の Runnable
-        final MutableList<FileSearchableImpl> runnables
-            = ArrayIterate
+        final MutableList<FileSearchTask> runnables = ArrayIterate
                 .reject(files, file ->
                     StringUtils.isNotEmpty(this.selectName)
                     && !Article.convertTitle(file.getName()).contains(this.selectName)
                 )
-                .collect(file -> new FileSearchableImpl(file.getAbsolutePath(), patterns));
+                .collect(file -> new FileSearchTask(file.getAbsolutePath(), patterns));
         final List<Future<?>> fList = new ArrayList<Future<?>>();
         // 検索の Runnable を初期化する
         for (int i = 0; i < runnables.size(); i++) {
