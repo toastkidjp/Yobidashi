@@ -1,24 +1,23 @@
 package jp.toastkid.libs.utils;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
+import java.time.format.DateTimeFormatter;
 
 /**
- * UNIXTIME とカレンダー関連の便利メソッドを収録しておくクラス.
- * <HR>
- * (130102) 作成<BR>
- * TODO write test.
- * @author Toast kid
+ * Utility class of UNIXTIME.
  *
+ * @author Toast kid
  */
 public final class CalendarUtil {
 
-    /** epub の日付フォーマット. */
-    public static final String DATE_FORMAT_STR = "yyyy-MM-dd'T'HH:mm:ssZ";
+    /** ISO DATE format. It's used in ePub generator. */
+    private static final DateTimeFormatter ISO_DATE
+        = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     /**
      * 引数として渡された UNIX 時間(long型、ミリ秒)から、
@@ -45,50 +44,7 @@ public final class CalendarUtil {
             final long unixMilliSec,
             final String format
             ) {
-        final SimpleDateFormat fmt1 = new SimpleDateFormat( format );
-        final Calendar cal = longToCalendar(unixMilliSec);
-        return fmt1.format(cal.getTime());
-    }
-
-    /**
-     * long 型の UNIX 時間(ミリ秒、秒で取得している場合は * 1000lして渡すこと)から
-     * Calendar 型のオブジェクトを生成して返す.
-     * <HR>
-     * (130102) 作成<BR>
-     * @param unixMilliSec long 型の UNIX 時間(ミリ秒、秒で取得している場合は * 1000lして渡すこと)
-     * @return Calendar 型のオブジェクト
-     */
-    public static Calendar longToCalendar(final long unixMilliSec) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(unixMilliSec);
-        return cal;
-    }
-
-    /**
-     * Calendar 型のオブジェクトから「2012-05-11(金)」のような形式をした年月日表現を生成して返す.
-     * <HR>
-     * (130102) 作成<BR>
-     * @param cal Calendar 型のオブジェクト
-     * @return 「2012-05-11(金)」のような形式をした年月日表現
-     */
-    public static String calendarToFormated(final Calendar cal) {
-        return longToStr(cal.getTimeInMillis());
-    }
-
-    /**
-     * Calendar 型のオブジェクトから「2012-05-11(金)」のような形式をした年月日表現を生成して返す.
-     * 第2引数で指定した形式の年月日表現(年/月/日/曜日)を取得する.
-     * <HR>
-     * (130102) 作成<BR>
-     * @param cal Calendar 型のオブジェクト
-     * @param format (例) "yyyy-MM-dd(E)"
-     * @return 年月日表現
-     */
-    public static String calendarToFormated(
-            final Calendar cal,
-            final String format
-            ) {
-        return longToStr(cal.getTimeInMillis(), format);
+        return ms2LocalDateTime(unixMilliSec).format(DateTimeFormatter.ofPattern(format));
     }
 
     /**
@@ -96,7 +52,7 @@ public final class CalendarUtil {
      * @return ISO Date (yyyy-MM-dd'T'HH:mm:ssZ)
      */
     public static String getCurrentISODate() {
-        return CalendarUtil.longToStr(System.currentTimeMillis(), DATE_FORMAT_STR);
+        return ms2OffsetDateTime(System.currentTimeMillis()).format(ISO_DATE);
     }
 
     /**
@@ -113,8 +69,36 @@ public final class CalendarUtil {
      * @param ms millisecond
      * @return LocalDate
      */
-    public static LocalDate Zmd2LocalDate(final long ms) {
-        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault())
+    public static LocalDate ms2LocalDate(final long ms) {
+        return LocalDateTime
+                .ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    /**
+     * ms -> LocalDateTime object.
+     * @param ms millisecond
+     * @return LocalDateTime
+     */
+    public static LocalDateTime ms2LocalDateTime(final long ms) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault());
+    }
+
+    /**
+     * ms -> ZonedDateTime object.
+     * @param ms millisecond
+     * @return LocalDateTime
+     */
+    public static ZonedDateTime ms2ZonedDateTime(final long ms) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault());
+    }
+
+    /**
+     * ms -> OffsetDateTime object.
+     * @param ms millisecond
+     * @return LocalDateTime
+     */
+    public static OffsetDateTime ms2OffsetDateTime(final long ms) {
+        return OffsetDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault());
     }
 }

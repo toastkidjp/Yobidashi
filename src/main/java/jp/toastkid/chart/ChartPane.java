@@ -1,9 +1,9 @@
 package jp.toastkid.chart;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Config.Key;
 
@@ -240,14 +239,14 @@ public class ChartPane extends VBox {
      */
     public static final List<String> getMonthsList() {
         final List<String> monthSelector = new ArrayList<String>();
-        //monthSelector.add(TAG_TOTAL);
-        final String now = CalendarUtil.calendarToFormated(Calendar.getInstance()).substring(0, 7);
-        final Calendar cal = new GregorianCalendar(2011, 0, 1);
+        final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM");
+        final String now = LocalDateTime.now().format(pattern);
+        final LocalDateTime ldt = LocalDateTime.of(2011, 1, 1, 0, 0);
         int i = 0;
         while (true){
-            final String month = CalendarUtil.calendarToFormated(cal).substring(0, 7);
+            final String month = ldt.format(pattern);
             monthSelector.add(month);
-            cal.add(Calendar.MONTH,1);
+            ldt.plusMonths(1);
             i++;
             if (now.equals(month) || i == 100){
                 break;
