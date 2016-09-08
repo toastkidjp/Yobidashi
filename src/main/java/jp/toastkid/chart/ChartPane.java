@@ -241,16 +241,12 @@ public class ChartPane extends VBox {
         final List<String> monthSelector = new ArrayList<String>();
         final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM");
         final String now = LocalDateTime.now().format(pattern);
-        final LocalDateTime ldt = LocalDateTime.of(2011, 1, 1, 0, 0);
-        int i = 0;
-        while (true){
-            final String month = ldt.format(pattern);
+        LocalDateTime ldt = LocalDateTime.of(2011, 1, 1, 0, 0);
+        String month = ldt.format(pattern);
+        while (!now.equals(month) && monthSelector.size() <= 100){
+            ldt = ldt.plusMonths(1);
+            month = ldt.format(pattern);
             monthSelector.add(month);
-            ldt.plusMonths(1);
-            i++;
-            if (now.equals(month) || i == 100){
-                break;
-            }
         }
         return monthSelector;
     }
