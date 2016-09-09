@@ -7,13 +7,13 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
-import jp.toastkid.libs.utils.Strings;
+import org.junit.Test;
+
+import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
 import jp.toastkid.wiki.models.ViewTemplate;
-
-import org.junit.Test;
 
 /**
  * {@link MarkdownConverter}'s test.
@@ -33,7 +33,7 @@ public class MarkdownConverterTest {
         final List<String> source = Files.readAllLines(FILE.toPath(), StandardCharsets.UTF_8);
         source.add("");
         source.add("----");
-        source.add("最終更新： " + Strings.toYmdhmsse(FILE.lastModified()));
+        source.add("Last updated： " + CalendarUtil.toUniTypeDate(FILE.lastModified()));
 
         final String content = new MarkdownConverter().convert(source);
 

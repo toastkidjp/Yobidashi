@@ -35,7 +35,6 @@ import jp.toastkid.libs.tinysegmenter.TinySegmenter;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.libs.wiki.PostProcessor;
 import jp.toastkid.libs.wiki.WikiConverter;
 import jp.toastkid.wiki.models.Article;
@@ -248,7 +247,8 @@ public final class ArticleGenerator {
             final List<String> source = Files.readAllLines(path, StandardCharsets.UTF_8);
             source.add("");
             source.add("---");
-            source.add("最終更新： " + Strings.toYmdhmsse(Files.getLastModifiedTime(path).toMillis()));
+            source.add("Last updated： "
+                    + CalendarUtil.toUniTypeDate(Files.getLastModifiedTime(path).toMillis()));
             return MARKED.marked(CollectionUtil.implode(source));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);

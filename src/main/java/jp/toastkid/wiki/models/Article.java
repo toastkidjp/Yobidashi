@@ -13,8 +13,8 @@ import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
+import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wiki.ArticleGenerator;
 
 /**
@@ -120,7 +120,7 @@ public class Article implements Comparable<Article> {
      * @return last modified string.
      */
     public String lastModifiedText() {
-        return Strings.toUniTypeDate(file.lastModified());
+        return CalendarUtil.toUniTypeDate(file.lastModified());
     }
 
     @Override

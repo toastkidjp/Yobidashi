@@ -1,10 +1,12 @@
 package jp.toastkid.libs.calendar;
 
-import java.util.Calendar;
-
-import jp.toastkid.libs.utils.Strings;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.eclipse.collections.api.set.primitive.IntSet;
+
+import jp.toastkid.libs.utils.Strings;
 
 /**
  * Html のカレンダーを生成.
@@ -19,10 +21,10 @@ import org.eclipse.collections.api.set.primitive.IntSet;
 public abstract class HtmlCalendar {
 
     /** 今日を示す Calendar Object. 当日判定に利用. */
-    private static Calendar today = Calendar.getInstance();
+    private static LocalDateTime today = LocalDateTime.now();
 
     /** 今日を取得する. */
-    private  static Calendar getToday() {
+    private  static LocalDateTime getToday() {
         return today;
     }
 
@@ -32,21 +34,20 @@ public abstract class HtmlCalendar {
      * TODO 後で月移動をAJAX対応させておくこと
      * (121027) 作成<BR>
      */
-    public static String makeOneMonth(final Calendar cal){
-        final int year  = cal.get(Calendar.YEAR  );
-        final int month = cal.get(Calendar.MONTH );
-        cal.set(year, month, 1);
+    public static String makeOneMonth(final LocalDate ld){
+        final int year  = ld.getYear();
+        final int month = ld.getMonth().getValue();
         final StringBuilder bui = new StringBuilder(2000);
         bui.append("<table border=\"0\" width=\"150\" class=\"calendar\" id=\"leftCal\">");
         bui.append("<tr>");
         bui.append("<th align=\"center\" colspan=\"7\" id=\"pageTitle\">").append(year)
-            .append("年").append((month + 1)).append("月</th>");
+            .append("年").append(month).append("月</th>");
         bui.append("</tr>");
         bui.append("<tr align=\"center\">");
         bui.append("<th><font color=\"red\">日</font></th><th>月</th><th>火</th><th>水</th>")
            .append("<th>木</th><th>金</th><th><font color=\"blue\">土</font></th>");
         bui.append("</tr>");
-        bui.append(makeMonth( cal ));
+        bui.append(makeMonth( ld ));
         bui.append("</table>");
         return bui.toString();
     }
@@ -57,23 +58,20 @@ public abstract class HtmlCalendar {
      * (121021) JavaScript 版と Android 版のコードを流用して作成<BR>
      * @see <a href="http://www.syboos.jp/java/doc/get-fields-value-from-calendar.html">
      * java.util.Calendarよくある使い方 - 指定日時の年・月・日・時・分・秒の取得</a>
-     * @param cal
+     * @param ld
      * @return HTML 表現のカレンダー文字列
      */
-    private static String makeMonth( final Calendar cal ) {
-        final int year  = cal.get(Calendar.YEAR  );
-        final int month = cal.get(Calendar.MONTH );
+    private static String makeMonth( final LocalDate ld ) {
+        final int year  = ld.getYear();
+        final int month = ld.getMonth().getValue();
         // その月の祝日を取得、祝日のない6月や8月は null が返ってくる.
-        final IntSet holidaySet = JapaneseHoliday.findHolidaysIntSet(year, month);
+        final IntSet holidaySet = JapaneseHoliday.findHolidaysIntSet(year, month - 1);
         // 月の初めの曜日を求める
-        cal.set(year, month , 1); // 引数: 1月: 0, 2月: 1, ...
-        final int firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        final int firstDayOfWeek = LocalDate.of(year, month, 1).getDayOfWeek().getValue();
         // 1=日曜..7=土曜
         int dayOfWeek = firstDayOfWeek;
         // 月末の日付を求める
-        cal.add(Calendar.MONTH, 1);
-        cal.add(Calendar.DATE, -1);
-        final int endDayOfMonth = cal.get(Calendar.DATE);
+        final int endDayOfMonth = LocalDate.of(year, month + 1, 1).minusDays(1).getDayOfMonth();
         // 1週間分の文字列生成
         final StringBuilder weekBuild = new StringBuilder(1500);
         weekBuild.append("<tr>");
@@ -82,16 +80,18 @@ public abstract class HtmlCalendar {
             weekBuild.append("<td></td>");
         }
         //Logger.info("" + getToday().get(Calendar.MONTH));
-        final boolean isNowMonth = month == (getToday().get(Calendar.MONTH) + 1);
+        final boolean isCurrentMonth = month == (getToday().getMonth().getValue());
 
         for (int i = 1; i <= endDayOfMonth; i++) {
             weekBuild.append("<td " );
-            final boolean isSaturday = dayOfWeek == Calendar.SATURDAY;
-            if (dayOfWeek == Calendar.SUNDAY){
+            final boolean isSaturday = dayOfWeek == DayOfWeek.SATURDAY.getValue();
+            if (dayOfWeek == DayOfWeek.SUNDAY.getValue()){
                 weekBuild.append("class=\"sunday\" ");
-                if (isNowMonth && i == getToday().get(Calendar.DAY_OF_MONTH) ){
+                if (isCurrentMonth && i == getToday().getDayOfMonth() ){
                     weekBuild.append( "id=\"today\" " );
                 }
+                // 最後に1足すので
+                dayOfWeek = DayOfWeek.MONDAY.getValue() - 1;
             } else if (holidaySet != null && holidaySet.contains(i)){
                 weekBuild.append("class=\"holiday\" "  );
             } else if (isSaturday){
@@ -100,7 +100,6 @@ public abstract class HtmlCalendar {
             weekBuild.append(">").append(i).append("</td>");
             // 土曜日は改行
             if (isSaturday){
-                 dayOfWeek = Calendar.SUNDAY - 1;
                  weekBuild.append("</tr>").append(Strings.LINE_SEPARATOR).append("<tr>");
             }
             dayOfWeek++;

@@ -4,12 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,29 +20,6 @@ import org.apache.commons.lang3.StringUtils;
  * @author Toast kid
  */
 public final class Strings {
-    /**
-     * 年/月/日/時/分/秒/曜日.
-     */
-    private static final ThreadLocal<DateFormat> YMDHMSSE_HOLDER
-        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy年M月dd日(E)HH時mm分ss秒"));
-
-    /**
-     * 書式 = yyyy/M/dd(E) HH:mm:ss..
-     */
-    private static final ThreadLocal<DateFormat> UNI_DF_HOLDER
-        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy/M/dd(E) HH:mm:ss"));
-
-    /**
-     * 書式 = yyyy年 M月 dd日(E).
-     */
-    private static final ThreadLocal<DateFormat> JP_SIMPLE_DATE_FORMAT_HOLDER
-        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy年 M月 d日 (E)"));
-
-    /**
-     * 書式 = yyyy-MM-dd(E).
-     */
-    private static final ThreadLocal<DateFormat> HIFUN_COMBINED_HOLDER
-        = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd(E)"));
 
     /** 半角カタカナの集合 */
     private static final String HALFSIZE_KATAKANA
@@ -536,151 +508,6 @@ public final class Strings {
      */
     public static void printDebugString(final String str){
         System.out.println("Debug_" + str);
-    }
-    /**
-     * Calendar クラスを使って現在時刻の Date オブジェクトを取得する.
-     * <HR>
-     * (111228) 作成
-     * @return 現在時刻の文字列表現
-     */
-    private static Date getCurrentDate() {
-        return Calendar.getInstance().getTime();
-    }
-    /**
-     * Calendar クラスを使って現在時刻を取得する.
-     * <HR>
-     * (111228) 作成
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowTime() {
-        return getCurrentDate().toString();
-    }
-    /**
-     * Calendar クラスを使って現在時刻<b>だけ</b>を取得する.
-     * <HR>
-     * (120119) 作成
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowOclock() {
-        return getCurrentDate().toString().split(" ")[3];
-    }
-    /**
-     * Calendar クラスを使って現在日時(年/月/日/時/分/秒/ミリ秒/曜日)を取得する.
-     * <HR>
-     * (111228) 作成<BR>
-     * @see <a href=
-     * "http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/java/text/SimpleDateFormat.html">
-     * クラス SimpleDateFormat</a>
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowTime_YMDHMSSE() {
-         final SimpleDateFormat fmt1 = new SimpleDateFormat(
-         "yyyy年 M月 d日 H時 m分 s秒 S(E)");
-        return fmt1.format(getCurrentDate()).toString();
-    }
-    /**
-     * Calendar クラスを使って現在日時(年/月/日/時/分/秒/曜日)を取得する.
-     * <HR>
-     * (121015) 作成<BR>
-     * @see <a href=
-     * "http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/java/text/SimpleDateFormat.html">
-     * クラス SimpleDateFormat</a>
-     * @param ms
-     * @return 現在時刻の文字列表現
-     */
-    public static String toYmdhmsse(final long ms) {
-        return toYmdhmsse(new Date(ms));
-    }
-
-    /**
-     * Calendar クラスを使って現在日時(年/月/日/時/分/秒/曜日)を取得する.
-     * <HR>
-     * (121015) 作成<BR>
-     * @see <a href=
-     * "http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/java/text/SimpleDateFormat.html">
-     * クラス SimpleDateFormat</a>
-     * @param date
-     * @return 現在時刻の文字列表現
-     */
-    public static String toYmdhmsse(final Date date) {
-        return YMDHMSSE_HOLDER.get().format(date).toString();
-    }
-
-    /**
-     * Calendar クラスを使って現在日時(書式 = yyyy/M/dd HH:mm:ss(E))を取得する.
-     * <HR>
-     * (121015) 作成<BR>
-     * @see <a href=
-     * "http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/java/text/SimpleDateFormat.html">
-     * クラス SimpleDateFormat</a>
-     * @param ms
-     * @return 現在時刻の文字列表現
-     */
-    public static String toUniTypeDate(final long ms) {
-        return toUniTypeDate(new Date(ms));
-    }
-    /**
-     * Calendar クラスを使って現在日時(書式 = yyyy/M/dd HH:mm:ss(E))を取得する.
-     * <HR>
-     * (121015) 作成<BR>
-     * @see <a href=
-     * "http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/java/text/SimpleDateFormat.html">
-     * クラス SimpleDateFormat</a>
-     * @param date
-     * @return 現在時刻の文字列表現
-     */
-    public static String toUniTypeDate(final Date date) {
-        return UNI_DF_HOLDER.get().format(date).toString();
-    }
-
-    /**
-     * Calendar クラスを使って現在日時(年/月/日/曜日)を取得する.
-     * <HR>
-     * (111228) 作成
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowDate_YMDE() {
-        return JP_SIMPLE_DATE_FORMAT_HOLDER.get().format(getCurrentDate()).toString();
-    }
-
-    /**
-     * Calendar クラスを使って、「2012-05-11(金)」のような形式をした
-     * 現在日時(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120512) MyWiki作成のため、作成
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowDate_YMDE_forMyWiki() {
-        return HIFUN_COMBINED_HOLDER.get().format(getCurrentDate()).toString();
-    }
-    /**
-     * 引数として渡された年月日から「2012-05-11(金)」のような形式をした
-     * 年月日表現(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120516) 作成
-     * @param year 年
-     * @param month 月(0始まり、5月なら <b>4</b> を指定)
-     * @param day 日
-     * @return 「2012-05-11(金)」のような形式をした年月日表現
-     */
-    public static String getNowDate_YMDE_forMyWiki(
-            final int year,
-            final int month,
-            final int day
-            ) {
-        final Calendar calendar = new GregorianCalendar(year,month,day);
-        return HIFUN_COMBINED_HOLDER.get().format(calendar.getTime()).toString();
-    }
-    /**
-     * 引数として渡された Calendar クラスのオブジェクトから、
-     * 「2012-05-11(金)」のような形式をした年月日表現(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120818) 作成<BR>
-     * @param calendar Calendar クラスのオブジェクト
-     * @return 「2012-05-11(金)」のような形式をした年月日表現
-     */
-    public static String getNowDate_YMDE_forMyWiki(final Calendar calendar) {
-        return HIFUN_COMBINED_HOLDER.get().format(calendar.getTime()).toString();
     }
     /**
      * 2つの文字列のレーベンシュタイン距離(置換許容)を計算する.

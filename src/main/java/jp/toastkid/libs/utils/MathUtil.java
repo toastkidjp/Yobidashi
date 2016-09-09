@@ -1,6 +1,6 @@
 package jp.toastkid.libs.utils;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -381,11 +381,8 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
             }
             return set;
         }
-        final Calendar today = Calendar.getInstance();
-        final String seedStr = Integer.toString(
-                (today.get(Calendar.YEAR)
-                + today.get(Calendar.DAY_OF_YEAR))
-                );
+        final LocalDate today = LocalDate.now();
+        final String seedStr = Integer.toString(today.getYear() + today.getDayOfYear());
         final Random rand = getRand(seedStr + word);
         while (set.size() < size) {
             final int nextInt = rand.nextInt(max);

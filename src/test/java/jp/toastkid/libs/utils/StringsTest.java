@@ -272,38 +272,6 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE()} 's test method.
-     */
-    @Ignore
-    public final void testGetNowDate_YMDE() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki()} 's test method.
-     */
-    @Ignore
-    public final void testGetNowDate_YMDE_forMyWiki() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(int, int, int)} 's test method.
-     */
-    @Ignore
-    public final void testGetNowDate_YMDE_forMyWikiIntIntInt() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowDate_YMDE_forMyWiki(java.util.Calendar)} 's test method.
-     */
-    @Ignore
-    public final void testGetNowDate_YMDE_forMyWikiCalendar() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
      * {@link jp.toastkid.libs.utils.Strings#getRSSURLsMap(java.lang.String)} 's test method.
      */
     @Ignore
