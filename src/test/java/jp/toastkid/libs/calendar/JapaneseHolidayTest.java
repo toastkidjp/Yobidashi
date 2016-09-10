@@ -7,8 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 
 import org.eclipse.collections.api.set.primitive.IntSet;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
@@ -60,7 +58,7 @@ public class JapaneseHolidayTest {
         assertTrue(JapaneseHoliday.getNationalHoliday(2016).isEmpty());
     }
     /**
-     * {@link JapaneseHoliday#isHoliday(Date)}'s test.
+     * {@link JapaneseHoliday#isHoliday(LocalDate)}'s test.
      */
     @Test
     public final void testIsHoliday(){
@@ -70,7 +68,7 @@ public class JapaneseHolidayTest {
         assertFalse(JapaneseHoliday.isHoliday(LocalDate.of(2015, 1, 2)));
     }
     /**
-     * {@link JapaneseHoliday#isHoliday(Calendar)}'s test.
+     * {@link JapaneseHoliday#isHoliday()}'s test.
      */
     @Test
     public final void testisHoliday(){
@@ -95,7 +93,7 @@ public class JapaneseHolidayTest {
     }
 
     /**
-     * {@link JapaneseHoliday#queryHoliday(Date)}'s test.
+     * {@link JapaneseHoliday#queryHoliday(LocalDate)}'s test.
      */
     @Test
     public final void testQueryHoliday(){
