@@ -36,7 +36,7 @@ public abstract class HtmlCalendar {
      */
     public static String makeOneMonth(final LocalDate ld){
         final int year  = ld.getYear();
-        final int month = ld.getMonth().getValue();
+        final int month = ld.getMonthValue();
         final StringBuilder bui = new StringBuilder(2000);
         bui.append("<table border=\"0\" width=\"150\" class=\"calendar\" id=\"leftCal\">");
         bui.append("<tr>");
@@ -63,9 +63,9 @@ public abstract class HtmlCalendar {
      */
     private static String makeMonth( final LocalDate ld ) {
         final int year  = ld.getYear();
-        final int month = ld.getMonth().getValue();
+        final int month = ld.getMonthValue();
         // その月の祝日を取得、祝日のない6月や8月は null が返ってくる.
-        final IntSet holidaySet = JapaneseHoliday.findHolidays(year, month - 1);
+        final IntSet holidaySet = JapaneseHoliday.findHolidays(year, month);
         // 月の初めの曜日を求める
         final int firstDayOfWeek = LocalDate.of(year, month, 1).getDayOfWeek().getValue();
         // 1=日曜..7=土曜
@@ -79,8 +79,7 @@ public abstract class HtmlCalendar {
         for (int i = 1; i < dayOfWeek; i++) {
             weekBuild.append("<td></td>");
         }
-        //Logger.info("" + getToday().get(Calendar.MONTH));
-        final boolean isCurrentMonth = month == (getToday().getMonth().getValue());
+        final boolean isCurrentMonth = month == (getToday().getMonthValue());
 
         for (int i = 1; i <= endDayOfMonth; i++) {
             weekBuild.append("<td " );
