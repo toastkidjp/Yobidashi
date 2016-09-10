@@ -65,7 +65,7 @@ public abstract class HtmlCalendar {
         final int year  = ld.getYear();
         final int month = ld.getMonth().getValue();
         // その月の祝日を取得、祝日のない6月や8月は null が返ってくる.
-        final IntSet holidaySet = JapaneseHoliday.findHolidaysIntSet(year, month - 1);
+        final IntSet holidaySet = JapaneseHoliday.findHolidays(year, month - 1);
         // 月の初めの曜日を求める
         final int firstDayOfWeek = LocalDate.of(year, month, 1).getDayOfWeek().getValue();
         // 1=日曜..7=土曜

@@ -2,15 +2,27 @@ package jp.toastkid.libs.calendar;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.primitive.IntSet;
+import org.eclipse.collections.api.set.primitive.MutableIntSet;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
+import org.eclipse.collections.impl.utility.ArrayIterate;
+
+import jp.toastkid.libs.utils.CalendarUtil;
 
 /**
  * 祝日計算クラス.
@@ -68,16 +80,23 @@ import org.eclipse.collections.impl.factory.primitive.IntSets;
  * @author Toast kid
  */
 public final class JapaneseHoliday{
-   private Date[] holidayDates;
+
+    private static final int SEPTEMBER = Month.SEPTEMBER.getValue();
+
+    private static final int SUNDAY = DayOfWeek.SUNDAY.getValue();
+
+    private static final int MONDAY = DayOfWeek.MONDAY.getValue();
+
+    private ImmutableSet<LocalDate> holidayDates;
+
    /**
     * デフォルトコンストラクタ.
     * 現在日の年で、Holiday(int year) コンストラクタを呼び出すのと同じ効果です.
     */
    public JapaneseHoliday(){
-      final Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date());
-      this.init(cal.get(Calendar.YEAR));
+      this.init(LocalDate.now().getYear());
    }
+
    /**
     * 対象年 指定コンストラクタ.
     * @param year 西暦４桁
@@ -85,31 +104,23 @@ public final class JapaneseHoliday{
    public JapaneseHoliday(final int year){
       this.init(year);
    }
+
+   /**
+    * init instance.
+    * @param year
+    */
    private void init(final int year){
-      final TreeSet<Date> set = new TreeSet<Date>();
-      final HolidayType[] holidayTypes = HolidayType.values();
-      for(int i=0;i < holidayTypes.length;i++){
-         final HolidayBundle hb = holidayTypes[i].getBundle(year);
-         if (hb != null){
-            set.add(hb.getDate());
-            final Date chgdt = hb.getChangeDate();
-            if (chgdt != null){
-               set.add(chgdt);
-            }
-         }
-      }
-      final Date[] ds = getNationalHoliday(year);
-      if (ds != null){
-         for(int i=0;i < ds.length;i++){
-            set.add(ds[i]);
-         }
-      }
-      this.holidayDates = new Date[set.size()];
-      int n = 0;
-      for(final Iterator<Date> it=set.iterator();it.hasNext();n++){
-         this.holidayDates[n] = it.next();
-      }
+      final MutableSet<LocalDate> set = Sets.mutable.empty();
+      ArrayIterate.collect(HolidayType.values(), type -> type.getBundle(year))
+          .select(hb -> hb != null)
+          .each(hb -> {
+              set.add(hb.getDate());
+              Optional.ofNullable(hb.getChangeDate()).ifPresent(set::add);
+          });
+      set.addAll(getNationalHoliday(year).toList());
+      this.holidayDates = set.toImmutable();
    }
+
    /** HolidayType は、祝日タイプ→HolidayBundle class を紐付ける enum */
    public enum HolidayType{
       /** 元旦        ：１月１日            */  NEWYEAR_DAY             (NewYearDayBundle.class)
@@ -129,32 +140,35 @@ public final class JapaneseHoliday{
       /** 勤労感謝の日：１１月２３日        */ ,LABOR_THANKS_DAY        (LaborThanksDayBundle.class)
       /** 天皇誕生日  ：１２月２３日        */ ,TENNO_BIRTHDAY          (EmperorBirthDayBundle.class)
       ;
+
       private Class<? extends HolidayBundle> cls;
+
       private HolidayType(final Class<? extends HolidayBundle> cls){
          this.cls = cls;
       }
+
       public HolidayBundle getBundle(final int year){
-    	  Constructor<?> ct;
-    	  HolidayBundle holBand = null;
-    	  try {
-  			ct = this.cls.getDeclaredConstructor(JapaneseHoliday.class,int.class);
-  			holBand = (HolidayBundle)ct.newInstance(null,year);
-	  		} catch (final SecurityException e1) {
-	  			e1.printStackTrace();
-	  			return null;
-	  		} catch (final NoSuchMethodException e1) {
-	  			e1.printStackTrace();
-	  			return null;
-	  		} catch (final IllegalArgumentException e) {
-	  			e.printStackTrace();
-	  		} catch (final InstantiationException e) {
-	  			e.printStackTrace();
-	  		} catch (final IllegalAccessException e) {
-	  			e.printStackTrace();
-	  		} catch (final InvocationTargetException e) {
-	  			e.printStackTrace();
-	  		}
-	  		return holBand;
+          Constructor<?> ct;
+          HolidayBundle holBand = null;
+          try {
+              ct = this.cls.getDeclaredConstructor(JapaneseHoliday.class,int.class);
+              holBand = (HolidayBundle)ct.newInstance(null,year);
+              } catch (final SecurityException e1) {
+                  e1.printStackTrace();
+                  return null;
+              } catch (final NoSuchMethodException e1) {
+                  e1.printStackTrace();
+                  return null;
+              } catch (final IllegalArgumentException e) {
+                  e.printStackTrace();
+              } catch (final InstantiationException e) {
+                  e.printStackTrace();
+              } catch (final IllegalAccessException e) {
+                  e.printStackTrace();
+              } catch (final InvocationTargetException e) {
+                  e.printStackTrace();
+              }
+              return holBand;
       }
    }
    // 月→HolidayBundle class 参照 enum
@@ -191,155 +205,133 @@ public final class JapaneseHoliday{
    /** 祝日Bundle抽象クラス */
    public abstract class HolidayBundle{
       int year;
-      private final Calendar mycal;
+      private final LocalDate ld;
       public abstract int getDay();
       public abstract int getMonth();
       public abstract String getDescription();
-      /** 対象年を指定するコンストラクタ
+
+      /**
+       * 対象年を指定するコンストラクタ
        * @param year 西暦４桁
        */
       public HolidayBundle(final int year){
          this.year = year;
-         this.mycal = Calendar.getInstance();
-         this.mycal.set(this.year,this.getMonth()-1,this.getDay());
+         this.ld = LocalDate.of(this.year, this.getMonth(), this.getDay());
       }
+
       /** 振替休日の存在する場合、振替休日の日を返す.存在しない場合→ -1 を返す.*/
       public int getChangeDay(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
-            final Calendar cal =  Calendar.getInstance();
-            cal.set(this.year,this.getMonth()-1,this.getDay());
-            cal.add(Calendar.DAY_OF_MONTH,1);
-            return cal.get(Calendar.DAY_OF_MONTH);
-         }
-         return -1;
+          return this.getWeekDay() == SUNDAY
+                  ? LocalDate.of(this.year, this.getMonth(), this.getDay())
+                          .plusDays(1L)
+                          .getMonth()
+                          .getValue()
+                  : -1;
       }
+
       /** 振替休日の存在する場合、振替休日のDateを返す.存在しない場合→ null を返す.*/
-      public Date getChangeDate(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
-            final Calendar cal =  Calendar.getInstance();
-            cal.set(this.year,this.getMonth()-1,this.getDay());
-            cal.add(Calendar.DAY_OF_MONTH,1);
-            return cal.getTime();
+      public LocalDate getChangeDate(){
+         if (this.getWeekDay() == SUNDAY){
+            return LocalDate.of(this.year, getMonth(), getDay()).plusDays(1L);
          }
          return null;
       }
+
       /** 祝日の曜日を Calendar.DAY_OF_WEEK に従って求める */
       public int getWeekDay(){
-         return this.mycal.get(Calendar.DAY_OF_WEEK);
+         return this.ld.getDayOfWeek().getValue();
       }
+
       /** 祝日の Date を取得 */
-      public Date getDate(){
-         return this.mycal.getTime();
+      public LocalDate getDate(){
+         return this.ld;
       }
    }
 
    /** 祝日、振替休日を含んで、Date配列で返す.*/
-   public Date[] listHoliDays(){
+   public ImmutableSet<LocalDate> listHoliDays(){
       return this.holidayDates;
    }
 
-   public static Set<Integer> findHolidaysSet(final int year, final int calender_MONTH) {
-       return IntSets.mutable.of(listHolidays(year, calender_MONTH)).collect(i -> {return Integer.valueOf(i);});
-   }
-
-   public static IntSet findHolidaysIntSet(final int year, final int calender_MONTH) {
-       return IntSets.mutable.of(listHolidays(year, calender_MONTH));
+   public static IntSet findHolidays(final int year, final int month) {
+       return listHolidays(year, month);
    }
 
    /**
-    * 指定年、月の祝日、振替休日、国民の休日、日付(int)配列で返す
+    * 指定年、月の祝日、振替休日、国民の休日、日付(int)Setで返す
     * @param year 西暦４桁
-    * @param calender_MONTH java.util.Calendar.MONTHによるフィールド値 0=１月、11=１２月
+    * @param month 月
     * @return java.util.Calendar.DAY_OF_MONTH である配列
     */
-   public static int[] listHolidays(final int year, final int calender_MONTH){
-      if (calender_MONTH < 0 || 11 < calender_MONTH){
-         throw new IllegalArgumentException("calender_MONTH parameter Error");
+   public static IntSet listHolidays(final int year, final int month){
+      if (month < 1 || 12 < month){
+         throw new IllegalArgumentException("month parameter Error");
       }
-      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[calender_MONTH]);
+      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[month]);
       final Constructor<?>[] constructors = mb.getConstructors();
-      if (constructors == null) return null;
-      final Set<Integer> set = new TreeSet<Integer>();
+
+      final MutableIntSet set = IntSets.mutable.empty();
+      if (constructors == null) {
+          return set;
+      }
       for(int i=0;i < constructors.length;i++){
          try{
-	         final HolidayBundle b = (HolidayBundle)constructors[i].newInstance(null,year);
-	         set.add(b.getDay());
-	         final int chgday = b.getChangeDay();
-	         if (chgday > 0) set.add(chgday);
+             final HolidayBundle b = (HolidayBundle)constructors[i].newInstance(null,year);
+             set.add(b.getDay());
+             final int chgday = b.getChangeDay();
+             if (chgday > 0) set.add(chgday);
          }catch(final Exception e){
-        	 e.printStackTrace();
+             e.printStackTrace();
          }
       }
       // 現在、国民の休日の発生は９月しかない
-      if (calender_MONTH == Calendar.SEPTEMBER){
-         final Date[] ds = getNationalHoliday(year);
-         if (ds != null){
-            final Calendar cal = Calendar.getInstance();
-            cal.setTime(ds[0]);
-            set.add(cal.get(Calendar.DAY_OF_MONTH));
-         }
+      if (month == SEPTEMBER){
+         set.addAll(getNationalHoliday(year).collectInt(ld -> ld.getDayOfMonth()));
       }
-      final int[] rtns = new int[set.size()];
-      int i = 0;
-      for(final Iterator<Integer> it=set.iterator();it.hasNext();i++){
-         rtns[i] = it.next();
-      }
-      return rtns;
+      return set;
    }
+
    /**
     * 指定年、月の祝日、振替休日、国民の休日、日付(Date)配列で返す
     * @param year 西暦４桁
-    * @param calender_MONTH java.util.Calendar.MONTHによるフィールド値 0=１月、11=１２月
+    * @param month month
     * @return Date配列
     */
-   public static Date[] listHoliDayDates(final int year, final int calender_MONTH){
-      if (calender_MONTH < 0 || 11 < calender_MONTH){
-         throw new IllegalArgumentException("calender_MONTH parameter Error");
+   public static Set<LocalDate> listHoliDayDates(final int year, final int month){
+      if (month < 1 || 12 < month){
+         throw new IllegalArgumentException("month parameter Error");
       }
-      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[calender_MONTH]);
+      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[month]);
       final Constructor<?>[] constructors = mb.getConstructors();
       if (constructors==null) return null;
-      final Set<Date> set = new TreeSet<Date>();
+      final MutableSet<LocalDate> set = Sets.mutable.empty();
       for(int i=0;i < constructors.length;i++){
          try{
-         final HolidayBundle b = (HolidayBundle)constructors[i].newInstance(null,year);
-         set.add(b.getDate());
-         final Date chgdt = b.getChangeDate();
-         if (chgdt != null) set.add(chgdt);
+             final HolidayBundle b = (HolidayBundle)constructors[i].newInstance(null,year);
+             set.add(b.getDate());
+             final LocalDate chgdt = b.getChangeDate();
+             if (chgdt != null) {
+                 set.add(chgdt);
+             }
          }catch(final Exception e){
+             e.printStackTrace();
          }
       }
       // 現在、国民の休日の発生は９月しかない
-      if (calender_MONTH==Calendar.SEPTEMBER){
-         final Date[] ds = getNationalHoliday(year);
-         if (ds != null){
-            set.add(ds[0]);
-         }
+      if (month == SEPTEMBER){
+         set.addAll(getNationalHoliday(year).toSet());
       }
-      final Date[] rtns = new Date[set.size()];
-      int i=0;
-      for(final Iterator<Date> it=set.iterator();it.hasNext();i++){
-         rtns[i] = it.next();
-      }
-      return rtns;
+      return set.toSortedSet();
    }
 
    /** 日付フォーマット yyyy/MM/dd */
-   public static SimpleDateFormat YMD_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
+   private static DateTimeFormatter YMD_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
    /** Calendar.MONTH に沿った月名の配列 */
    public static String[] MONTH_NAMES = {
-       "JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE",
+       "", "JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE",
        "JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"
        };
-
-   /**
-    * 指定日が祝日なら、true を返す.（指定日による祝日、振替休日チェックの為）
-    * @param cal Calendar Object
-    * @return 祝日名を返す.祝日、振替休日に該当しなければ、null を返す.
-    */
-   public static boolean isHoliday(final Calendar cal) {
-       return queryHoliday(cal) != null;
-   }
 
    /**
     * 指定日が祝日なら、true を返す.（指定日による祝日、振替休日チェックの為）
@@ -352,11 +344,11 @@ public final class JapaneseHoliday{
 
    /**
     * 指定日が祝日なら、true を返す.（指定日による祝日、振替休日チェックの為）
-    * @param dt 指定日
+    * @param ld LocalDate
     * @return 祝日名を返す.祝日、振替休日に該当しなければ、null を返す.
     */
-   public static boolean isHoliday(final Date dt) {
-       return queryHoliday(dt) != null;
+   public static boolean isHoliday(final LocalDate ld) {
+       return queryHoliday(ld) != null;
    }
 
    /**
@@ -365,85 +357,71 @@ public final class JapaneseHoliday{
     * @return 祝日名を返す.祝日、振替休日に該当しなければ、null を返す.
     */
    public static String queryHoliday(final long ms) {
-       final Calendar cal = Calendar.getInstance();
-       cal.setTimeInMillis(ms);
-       return queryHoliday(cal);
+       return queryHoliday(
+               LocalDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault()).toLocalDate());
    }
+
    /**
     * 指定日が祝日なら、祝日名を返す.（指定日による祝日、振替休日チェックの為）
     * @param dt 指定日
     * @return 祝日名を返す.祝日、振替休日に該当しなければ、null を返す.
     */
-   public static String queryHoliday(final Date dt) {
-      final Calendar cal = Calendar.getInstance();
-      cal.setTime(dt);
-      return queryHoliday(cal);
-   }
-   /**
-    * 指定日が祝日なら、祝日名を返す.（指定日による祝日、振替休日チェックの為）
-    * @param dt 指定日
-    * @return 祝日名を返す.祝日、振替休日に該当しなければ、null を返す.
-    */
-   public static String queryHoliday(final Calendar cal) {
-      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[cal.get(Calendar.MONTH)]);
+   public static String queryHoliday(final LocalDate ld) {
+      final MonthBundle mb = MonthBundle.valueOf(MONTH_NAMES[ld.getMonthValue()]);
       final Constructor<?>[] constructors = mb.getConstructors();
       if (constructors==null){
          return null; // 祝日でない！
       }
-      final int targetDay = cal.get(Calendar.DAY_OF_MONTH);
-      final int targetYear = cal.get(Calendar.YEAR);
-      for(int i=0;i < constructors.length;i++){
-         try{
-         final HolidayBundle h = (HolidayBundle)constructors[i].newInstance(null,targetYear);
-         if (targetDay==h.getDay()){ return h.getDescription(); }
-         if (targetDay==h.getChangeDay()){ return "振替休日"+"（"+h.getDescription()+"）"; }
-         }catch(final Exception e){
-         }
+      final int targetDay = ld.getDayOfMonth();
+      final int targetYear = ld.getYear();
+
+      try {
+          for(int i=0;i < constructors.length;i++){
+              final HolidayBundle h = (HolidayBundle)constructors[i].newInstance(null, targetYear);
+              if (targetDay == h.getDay()) {
+                  return h.getDescription();
+              }
+              if (targetDay == h.getChangeDay()) {
+                  return String.format("振替休日（%s）", h.getDescription());
+              }
+          }
+      } catch (final Exception e) {
+          e.printStackTrace();
       }
-      final Date[] natinalHolidayDates = getNationalHoliday(targetYear);
-      if (natinalHolidayDates != null){
-         final String targetDateStr = YMD_FORMAT.format(cal.getTime());
-         for(int i=0;i < natinalHolidayDates.length;i++){
-            if (targetDateStr.equals(YMD_FORMAT.format(natinalHolidayDates[i]))){
-               return "国民の休日";
-            }
-         }
+      final String targetDateStr = YMD_FORMAT.format(ld);
+      if (getNationalHoliday(targetYear).collect(holiday -> YMD_FORMAT.format(holiday))
+              .anySatisfy(targetDateStr::equals)) {
+          return "国民の休日";
       }
       return null;
    }
    /** Weekday String form(JA). */
-   public static String[] WEEKDAYS_JA = {"日","月","火","水","木","金","土" };
+   public static String[] WEEKDAYS_JA = {"月","火","水","木","金","土", "日"};
    /**
     * 曜日String算出.
     * @param ms Epoch time(ms)
     * @return ex: 日
     */
    public static String dateOfWeekJA(final long ms){
-      final Calendar cal = Calendar.getInstance();
-      cal.setTimeInMillis(ms);
-      return WEEKDAYS_JA[cal.get(Calendar.DAY_OF_WEEK)-1];
+      return dateOfWeekJA(CalendarUtil.ms2LocalDate(ms));
    }
    /**
     * 曜日String算出.
     * @param dt Date
     * @return ex: 日
     */
-   public static String dateOfWeekJA(final Date dt){
-      final Calendar cal = Calendar.getInstance();
-      cal.setTime(dt);
-      return WEEKDAYS_JA[cal.get(Calendar.DAY_OF_WEEK)-1];
+   public static String dateOfWeekJA(final LocalDate dt){
+      return WEEKDAYS_JA[dt.getDayOfWeek().getValue() - 1];
    }
    /** Weekday String form. */
-   public static String[] WEEKDAYS_SIMPLE = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
+   public static String[] WEEKDAYS_SIMPLE = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun" };
    /**
     * 曜日String算出.
     * @param dt Date
     * @return ex: Sun
     */
-   public static String dateOfWeekSimple(final Date dt){
-      final Calendar cal = Calendar.getInstance();
-      cal.setTime(dt);
-      return WEEKDAYS_SIMPLE[cal.get(Calendar.DAY_OF_WEEK)-1];
+   public static String dateOfWeekSimple(final LocalDate ld){
+      return WEEKDAYS_SIMPLE[ld.getDayOfWeek().getValue() - 1];
    }
    /**
     * 曜日String算出.
@@ -451,33 +429,31 @@ public final class JapaneseHoliday{
     * @return ex: 木
     */
    public static String dateOfWeekSimple(final long ms){
-      final Calendar cal = Calendar.getInstance();
-      cal.setTimeInMillis(ms);
-      return WEEKDAYS_SIMPLE[cal.get(Calendar.DAY_OF_WEEK)-1];
+      return WEEKDAYS_SIMPLE[CalendarUtil.ms2LocalDate(ms).getDayOfWeek().getValue() - 1];
    }
 
    /**
     * 指定年→国民の休日のみのDate[]の取得.
     * 国民の休日は現在、敬老の日と秋分の日が１日で挟まれた場合のみ.
     * @param year
-    * @return 国民の休日のみのDate[], 存在しない場合は null
+    * @return 国民の休日のみのDate[], 存在しない場合は empty
     */
-   public static Date[] getNationalHoliday(final int year){
+   public static ImmutableList<LocalDate> getNationalHoliday(final int year){
       final HolidayBundle k = HolidayType.RESPECT_FOR_AGE_DAY.getBundle(year);
       final HolidayBundle a = HolidayType.AUTUMN_EQUINOX_DAY.getBundle(year);
-      final int aday = a.getDay();
       final int kday = k.getDay();
+      final int aday = a.getDay();
       final int chgday = k.getChangeDay();
+
       if ((aday - kday) == 2) {
-         final Calendar c = Calendar.getInstance();
-         c.set(year,Calendar.SEPTEMBER,kday+1);
-         return new Date[]{c.getTime()};
-      } else if (chgday > 0 && ((aday - chgday) == 2)) {
-         final Calendar c = Calendar.getInstance();
-         c.set(year,Calendar.SEPTEMBER,chgday+1);
-         return new Date[]{c.getTime()};
+         return Lists.immutable.of(LocalDate.of(year, SEPTEMBER, kday + 1));
       }
-      return null;
+
+      if (chgday > 0 && ((aday - chgday) == 2)) {
+         return Lists.immutable.of(LocalDate.of(year, SEPTEMBER, chgday + 1));
+      }
+
+      return Lists.immutable.empty();
    }
    // 元旦
    class NewYearDayBundle extends HolidayBundle{
@@ -505,10 +481,8 @@ public final class JapaneseHoliday{
       /* １月第２月曜日の日付を求める */
       @Override
       public int getDay(){
-         final Calendar cal = Calendar.getInstance();
-         cal.set(super.year,Calendar.JANUARY,1);
-         final int wday = cal.get(Calendar.DAY_OF_WEEK);
-         return wday > Calendar.MONDAY ? (7*2+1)-(wday - Calendar.MONDAY) : 7+1+(Calendar.MONDAY - wday);
+          final int wday = LocalDate.of(year, 1, 1).getDayOfWeek().getValue();
+          return wday > MONDAY ? (7*2+1)-(wday - MONDAY) : 7+1+(MONDAY - wday);
       }
       @Override
       public int getMonth(){
@@ -580,7 +554,7 @@ public final class JapaneseHoliday{
    }
    // 憲法記念日
    class KenpoukikenDayBundle extends HolidayBundle{
-      public KenpoukikenDayBundle(final int year){
+    public KenpoukikenDayBundle(final int year){
          super(year);
       }
       @Override
@@ -594,17 +568,15 @@ public final class JapaneseHoliday{
       // ５月３日＝Sunday の振替は、６日
       @Override
       public int getChangeDay(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
+         if (this.getWeekDay()==SUNDAY){
             return 6;
          }
          return -1;
       }
       @Override
-      public Date getChangeDate(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
-            final Calendar cal =  Calendar.getInstance();
-            cal.set(this.year,this.getMonth()-1,6);
-            return cal.getTime();
+      public LocalDate getChangeDate(){
+         if (this.getWeekDay() == SUNDAY){
+            return LocalDate.of(year, getMonth(), 6);
          }
          return null;
       }
@@ -629,17 +601,15 @@ public final class JapaneseHoliday{
       // ５月４日＝Sunday の振替は、６日
       @Override
       public int getChangeDay(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
+         if (this.getWeekDay() == SUNDAY){
             return 6;
          }
          return -1;
       }
       @Override
-      public Date getChangeDate(){
-         if (this.getWeekDay()==Calendar.SUNDAY){
-            final Calendar cal =  Calendar.getInstance();
-            cal.set(this.year,this.getMonth()-1,6);
-            return cal.getTime();
+      public LocalDate getChangeDate(){
+         if (this.getWeekDay() == SUNDAY){
+            return LocalDate.of(year, getMonth(), 6);
          }
          return null;
       }
@@ -674,10 +644,8 @@ public final class JapaneseHoliday{
       /* ７月第３月曜日の日付を求める */
       @Override
       public int getDay(){
-         final Calendar cal = Calendar.getInstance();
-         cal.set(super.year,Calendar.JULY,1);
-         final int wday = cal.get(Calendar.DAY_OF_WEEK);
-         return wday > Calendar.MONDAY ? (7*3+1)-(wday - Calendar.MONDAY) : 14+1+(Calendar.MONDAY - wday);
+         final int wday = LocalDate.of(year, Month.JULY.getValue(), 1).getDayOfWeek().getValue();
+         return wday > MONDAY ? (7*3+1)-(wday - MONDAY) : 14+1+(MONDAY - wday);
       }
       @Override
       public int getMonth(){
@@ -695,7 +663,10 @@ public final class JapaneseHoliday{
       }
       @Override
       public int getDay(){
-         return 2016 <= year ? 11 : -1;
+          if (year <= 2015) {
+              throw new IllegalStateException();
+          }
+          return 11;
       }
       @Override
       public int getMonth(){
@@ -708,16 +679,14 @@ public final class JapaneseHoliday{
    }
    // 敬老の日
    class RespectForAgeDayBundle extends HolidayBundle{
-      public RespectForAgeDayBundle(final int year){
+    public RespectForAgeDayBundle(final int year){
          super(year);
       }
       /* ９月第３月曜日の日付を求める */
       @Override
       public int getDay(){
-         final Calendar cal = Calendar.getInstance();
-         cal.set(super.year,Calendar.SEPTEMBER,1);
-         final int wday = cal.get(Calendar.DAY_OF_WEEK);
-         return wday > Calendar.MONDAY ? (7*3+1)-(wday - Calendar.MONDAY) : 14+1+(Calendar.MONDAY - wday);
+         final int wday = LocalDate.of(year, Month.SEPTEMBER.getValue(), 1).getDayOfWeek().getValue();
+         return wday > MONDAY ? (7*3+1)-(wday - MONDAY) : 14+1+(MONDAY - wday);
       }
       @Override
       public int getMonth(){
@@ -759,10 +728,8 @@ public final class JapaneseHoliday{
       /* １０月第２月曜日の日付を求める */
       @Override
       public int getDay(){
-         final Calendar cal = Calendar.getInstance();
-         cal.set(super.year,Calendar.OCTOBER,1);
-         final int wday = cal.get(Calendar.DAY_OF_WEEK);
-         return wday > Calendar.MONDAY ? (7*2+1)-(wday - Calendar.MONDAY) : 7+1+(Calendar.MONDAY - wday);
+          final int wday = LocalDate.of(year, Month.OCTOBER.getValue(), 1).getDayOfWeek().getValue();
+          return wday > MONDAY ? (7*2+1)-(wday - MONDAY) : 7+1+(MONDAY - wday);
       }
       @Override
       public int getMonth(){

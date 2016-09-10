@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -74,6 +75,15 @@ public final class CalendarUtil {
      */
     public static long zoneDateTime2long(final ZonedDateTime zdt) {
         return zdt.toInstant().toEpochMilli();
+    }
+
+    /**
+     * LocalDate to ms.
+     * @param ld
+     * @return ms
+     */
+    public static long localDate2ms(final LocalDate ld) {
+        return ld.atStartOfDay().toEpochSecond(ZoneOffset.ofHours(9)) * 1000L;
     }
 
     /**

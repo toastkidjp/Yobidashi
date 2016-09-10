@@ -91,4 +91,12 @@ public class CalendarUtilTest {
                 CalendarUtil.ms2OffsetDateTime(1473341216746L));
     }
 
+    /**
+     * check {@link CalendarUtil#localDate2ms(LocalDate)}.
+     */
+    @Test
+    public void test_LocalDate2ms() {
+        assertEquals(1451574000000L, CalendarUtil.localDate2ms(LocalDate.of(2016, 1, 1)));
+    }
+
 }
