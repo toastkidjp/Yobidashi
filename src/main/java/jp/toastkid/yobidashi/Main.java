@@ -21,6 +21,8 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * JavaFX による WikiClient.
@@ -90,19 +92,33 @@ public final class Main extends Application {
             LOGGER.error("Caught error.", e);
         }
 
-        stage.getIcons().add(new Image(FileUtil.getUrl(PATH_IMG_ICON).toString()));
+        Mono.create(emitter -> {
+            stage.getIcons().add(new Image(FileUtil.getUrl(PATH_IMG_ICON).toString()));
+            emitter.complete();
+            LOGGER.info("Ended set stage size.");
+        }).subscribeOn(Schedulers.elastic()).subscribe();
+
         final Scene scene = readScene(stage);
         stage.setScene(scene);
-        final Rectangle2D d = Screen.getPrimary().getVisualBounds();
-        stage.setWidth(d.getWidth());
-        stage.setHeight(d.getHeight());
-        controller.setSize(d.getWidth(), d.getHeight());
-        // setup searcher.
-        controller.setupExpandables();
 
-        stage.initStyle(StageStyle.DECORATED);
-        //stage.initStyle(StageStyle.TRANSPARENT);
-        scene.setFill(Color.TRANSPARENT);
+        Mono.create(emitter -> {
+            final Rectangle2D d = Screen.getPrimary().getVisualBounds();
+            stage.setWidth(d.getWidth());
+            stage.setHeight(d.getHeight());
+            controller.setSize(d.getWidth(), d.getHeight());
+            // setup searcher.
+            controller.setupExpandables();
+            emitter.complete();
+            LOGGER.info("Ended set stage size.");
+        }).subscribeOn(Schedulers.elastic()).subscribe();
+
+        Mono.create(emitter -> {
+            stage.initStyle(StageStyle.DECORATED);
+            scene.setFill(Color.TRANSPARENT);
+            emitter.complete();
+            LOGGER.info("Ended set stage size.");
+        }).subscribeOn(Schedulers.elastic()).subscribe();
+
         stage.setOnCloseRequest( (event) -> {
             if (event.getEventType().equals(WindowEvent.WINDOW_CLOSE_REQUEST)) {
                 controller.closeApplication();
