@@ -1,6 +1,5 @@
 package jp.toastkid.name;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -55,9 +55,10 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
 
     @Override
     public Collection<NameInformation> call() {
-        try (final BufferedReader fileReader = Files.newBufferedReader(Paths.get(targetFile.toURI()))) {
+        try (final Stream<String> fileReader
+                = Files.newBufferedReader(Paths.get(targetFile.toURI())).lines()) {
             final Flux<NameInformation> cache
-                = Flux.<NameInformation>create(emitter -> fileReader.lines().forEach(str -> {
+                = Flux.<NameInformation>create(emitter -> fileReader.forEach(str -> {
                     try {
                         emitter.next(READER.get().readValue(str.getBytes("UTF-8")));
                     } catch (final Exception e) {

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -171,7 +172,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
 
     @Override
     public void start(final Stage stage) {
-        dialogStage.show();
+        Platform.runLater(() -> dialogStage.show());
         final Service<Integer> service = new Service<Integer>() {
             @Override
             protected Task<Integer> createTask() {
