@@ -94,7 +94,7 @@ public final class Main extends Application {
 
         Mono.create(emitter -> {
             stage.getIcons().add(new Image(FileUtil.getUrl(PATH_IMG_ICON).toString()));
-            emitter.complete();
+            emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
 
@@ -108,14 +108,14 @@ public final class Main extends Application {
             controller.setSize(d.getWidth(), d.getHeight());
             // setup searcher.
             controller.setupExpandables();
-            emitter.complete();
+            emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
 
         Mono.create(emitter -> {
             stage.initStyle(StageStyle.DECORATED);
             scene.setFill(Color.TRANSPARENT);
-            emitter.complete();
+            emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
 

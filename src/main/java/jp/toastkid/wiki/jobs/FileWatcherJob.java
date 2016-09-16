@@ -47,7 +47,7 @@ public class FileWatcherJob implements Runnable {
                 try {
                     TimeUtil.sleep(BACKUP_INTERVAL);
                 } catch (final InterruptedException e) {
-                    emitter.fail(e);
+                    emitter.error(e);
                 }
             }
         })

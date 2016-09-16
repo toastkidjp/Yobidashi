@@ -62,7 +62,7 @@ public class NameLoader implements Callable<Collection<NameInformation>>{
                     try {
                         emitter.next(READER.get().readValue(str.getBytes("UTF-8")));
                     } catch (final Exception e) {
-                        emitter.fail(e);
+                        emitter.error(e);
                     }
                 })).cache();
             cache.subscribeOn(Schedulers.fromExecutor(Executors.newFixedThreadPool(8)))
