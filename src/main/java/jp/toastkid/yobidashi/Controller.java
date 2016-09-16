@@ -158,12 +158,12 @@ public final class Controller implements Initializable {
         = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
 
     /** scripter appear keyboard shortcut. */
-    private static final KeyCodeCombination APPEAR_SCRIPTER
-        = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
+    //private static final KeyCodeCombination APPEAR_SCRIPTER
+    //    = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
 
     /** run script keyboard shortcut. */
-    private static final KeyCodeCombination RUN_SCRIPT
-        = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+    //private static final KeyCodeCombination RUN_SCRIPT
+    //    = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -314,10 +314,6 @@ public final class Controller implements Initializable {
     @FXML
     private jp.toastkid.name.Controller   nameController;
 
-    /** Script area's controller. */
-    @FXML
-    private jp.toastkid.script.Controller scriptController;
-
     /** BMI area's controller. */
     @FXML
     private jp.toastkid.bmi.Controller bmiController;
@@ -447,7 +443,6 @@ public final class Controller implements Initializable {
 
         es.execute(() -> {
             final long start = System.currentTimeMillis();
-            scriptController.scriptLanguage.getSelectionModel().select(0);
             searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
             highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN)
                     );
@@ -484,7 +479,6 @@ public final class Controller implements Initializable {
      */
     protected void setupExpandables() {
         hideSearcher();
-        scriptController.hideScripter();
         stage.getScene().setOnKeyPressed(e -> {
             // select tab.
             if (FIRST_TAB.match(e)) {
@@ -513,12 +507,12 @@ public final class Controller implements Initializable {
                 } else {
                     openSearcher();
                 }
-            } else if (APPEAR_SCRIPTER.match(e)) {
+            /*} else if (APPEAR_SCRIPTER.match(e)) {
                 if (scriptController.scripterArea.visibleProperty().getValue()) {
                     scriptController.hideScripter();
                 } else {
                     scriptController.openScripter();
-                }
+                }*/
             } else if (ZOOM_INCREMENT.match(e)) {
                 zoom.increment();
             } else if (ZOOM_DECREMENT.match(e)) {
@@ -529,13 +523,6 @@ public final class Controller implements Initializable {
                 hideLeftPane();
             }
         });
-
-        scriptController.scripterInput.setOnKeyPressed((e) -> {
-            if (RUN_SCRIPT.match(e)) {
-                scriptController.runScript();
-            }
-        });
-
         // 特殊な使い方をしているので、ここでこのメソッドを呼んでタブ内のサイズ調整をする.
         tabPane.setPrefHeight(height);
     }
@@ -581,14 +568,6 @@ public final class Controller implements Initializable {
             getCurrentWebView().ifPresent(
                     wv -> wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
         );
-    }
-
-    /**
-     * only call child method.
-     */
-    @FXML
-    protected void openScripter() {
-        scriptController.openScripter();
     }
 
     /**
@@ -2123,6 +2102,9 @@ public final class Controller implements Initializable {
             Application.setUserAgentStylesheet("MODENA");
             stylesheets.add(Style.getPath(styleName));
         }
+
+        // for highlighting script area.
+        //stylesheets.add(getClass().getResource("css/highlights/java-keywords.css").toExternalForm());
         Config.store(Config.Key.STYLESHEET, styleName);
     }
 
@@ -2162,7 +2144,14 @@ public final class Controller implements Initializable {
      */
     public final void setStage(final Stage stage) {
         this.stage = stage;
-        scriptController.setStage(this.stage);
+    }
+
+    /**
+     * only call child method.
+     */
+    @FXML
+    protected void openScripter() {
+        new jp.toastkid.script.Main().show(stage);
     }
 
     /**

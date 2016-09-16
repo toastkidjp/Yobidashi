@@ -91,10 +91,11 @@ public class Style {
 
         // select & toList
         final MutableList<String> sorted = styles
-            .collect(style -> {return style.substring(0, style.lastIndexOf(".")).toUpperCase();})
-            .toList();
+                .select(style -> style.contains("."))
+                .collect(style -> style.substring(0, style.lastIndexOf(".")).toUpperCase())
+                .toList();
 
-        sorted.sort((a, b) -> {return a.compareTo(b);});
+        sorted.sort((a, b) -> a.compareTo(b));
         return sorted;
     }
 
