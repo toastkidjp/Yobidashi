@@ -341,7 +341,24 @@ public final class Controller implements Initializable {
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
-        final ProgressDialog pd = new ProgressDialog.Builder().setText("起動中です……").build();
+        // initialize parallel task.
+        final int availableProcessors = Runtime.getRuntime().availableProcessors();
+        final ExecutorService es = Executors.newFixedThreadPool(
+                availableProcessors + availableProcessors + availableProcessors);
+
+        es.submit(() -> {
+            while (true) {
+                final String text = String.format(
+                        "Memory using: (%,3d[Byte])",
+                        RuntimeUtil.calcUsedMemorySize()
+                        );
+                Platform.runLater(() -> status.setText(text));
+                Thread.sleep(5000L);
+            }
+        });
+
+        final ProgressDialog pd
+            = new ProgressDialog.Builder().setText("Activation in progress...").build();
         pd.start(stage);
 
         urlText.setText(Defines.DEFAULT_HOME);
@@ -350,12 +367,7 @@ public final class Controller implements Initializable {
             pd.addProgress(1);
         }
 
-        // initialize parallel task.
-        final int availableProcessors = Runtime.getRuntime().availableProcessors();
         pd.addText("availableProcessors = " + availableProcessors);
-
-        final ExecutorService es = Executors.newFixedThreadPool(
-                availableProcessors + availableProcessors + availableProcessors);
 
         es.execute(() -> {
             final long start = System.currentTimeMillis();
