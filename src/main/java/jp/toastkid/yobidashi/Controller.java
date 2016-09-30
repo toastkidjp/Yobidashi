@@ -349,8 +349,8 @@ public final class Controller implements Initializable {
         es.submit(() -> {
             while (true) {
                 final String text = String.format(
-                        "Memory using: (%,3d[Byte])",
-                        RuntimeUtil.calcUsedMemorySize()
+                        "Memory: %,3d[MB]",
+                        RuntimeUtil.calcUsedMemorySize() / 1_000_000L
                         );
                 Platform.runLater(() -> status.setText(text));
                 Thread.sleep(5000L);
