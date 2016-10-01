@@ -31,7 +31,6 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import jp.toastkid.libs.fileFilter.ImageFileFilter;
 import jp.toastkid.libs.markdown.MarkdownConverter;
-import jp.toastkid.libs.tinysegmenter.TinySegmenter;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -42,9 +41,11 @@ import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Config.Key;
 import jp.toastkid.wiki.models.Defines;
 import jp.toastkid.wiki.models.ViewTemplate;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
- * WikiClient で共通して使えるメソッドを収録.
+ * Wiki article generator.
  *
  * @author Toast kid
  *
@@ -85,9 +86,6 @@ public final class ArticleGenerator {
     /** txt -> Wiki 変換器. */
     private final WikiConverter converter;
 
-    /** 形態素解析ライブラリ. */
-    private final TinySegmenter ts;
-
     /** リンクのプレフィクス. */
     public String prefix;
 
@@ -102,13 +100,17 @@ public final class ArticleGenerator {
      * @param conf
      */
     public ArticleGenerator() {
-        this.converter = new WikiConverter(Config.get("imageDir"), Config.get("articleDir"));
-        converter.openLinkBrank = true;
-        ts = TinySegmenter.getInstance();
-        ts.isAllowChar     = false;
-        ts.isAllowHiragana = false;
-        ts.isAllowNum      = false;
+        final long start = System.currentTimeMillis();
+        this.converter = Mono.<WikiConverter>create(emitter ->
+            emitter.success(new WikiConverter(Config.get("imageDir"), Config.get("articleDir")))
+        )
+        .subscribeOn(Schedulers.elastic())
+        .block();
+        this.converter.openLinkBrank = true;
+        LOGGER.info("ended init converter. {}[ms]", System.currentTimeMillis() - start);
+
         chooser = new ImageChooser(USER_BACKGROUND);
+        LOGGER.info("ended init ImageChooser. {}[ms]", System.currentTimeMillis() - start);
     }
 
     /**

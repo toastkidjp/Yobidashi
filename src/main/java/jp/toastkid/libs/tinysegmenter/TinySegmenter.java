@@ -22,7 +22,8 @@ public final class TinySegmenter {
     /** 学習スコアのマップ. */
     private final ScoreMap sMap;
     /** 結果に含めない文字の正規表現. */
-    private final Pattern stopChars = Pattern.compile("[。\\?\\*、,\\.．「」\\(\\)（）\\-\\[\\]\\|…・＜＞/_#%&/:『』]", Pattern.DOTALL);
+    private final Pattern stopChars = Pattern.compile(
+            "[。\\?\\*、,\\.．「」\\(\\)（）\\-\\[\\]\\|…・＜＞/_#%&/:『』]", Pattern.DOTALL);
     /** 文字種別の判別器. */
     private final CharacterClassifier cc;
     /** ひらがなを結果に含めるか否か */

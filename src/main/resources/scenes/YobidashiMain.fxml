@@ -162,16 +162,6 @@
                 <content>
                   <VBox prefHeight="200.0" prefWidth="200.0">
                     <children>
-                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="MP3 Player">
-                        <content>
-                          <AnchorPane><children><fx:include fx:id="music" source="MusicPlayer.fxml"/></children></AnchorPane>
-                        </content>
-                      </TitledPane>
-                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Name Generator">
-                        <content>
-                          <AnchorPane><children><fx:include fx:id="name" source="NameMaker.fxml"/></children></AnchorPane>
-                        </content>
-                      </TitledPane>
                       <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
                         <content>
                           <AnchorPane><children><fx:include fx:id="loto6" source="Loto6.fxml"/></children></AnchorPane>

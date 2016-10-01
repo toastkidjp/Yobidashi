@@ -304,16 +304,9 @@ public final class Controller implements Initializable {
 
     /** width. */
     private double width;
+
     /** height. */
     private double height;
-
-    /** Music Player's controller. */
-    @FXML
-    private jp.toastkid.music.Controller  musicController;
-
-    /** NameMaker's controller. */
-    @FXML
-    private jp.toastkid.name.Controller   nameController;
 
     /** BMI area's controller. */
     @FXML
@@ -380,7 +373,7 @@ public final class Controller implements Initializable {
             final long start = System.currentTimeMillis();
             func = new ArticleGenerator();
             pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize Functions class. "
+            pd.addText(Thread.currentThread().getName() + " Ended initialize ArticleGenerator. "
                     + (System.currentTimeMillis() - start) + "ms");
         });
 
@@ -1013,7 +1006,6 @@ public final class Controller implements Initializable {
         final String current = Config.get(Config.Key.VIEW_TEMPLATE);
         new ConfigDialog(getParent()).showConfigDialog();
         Config.reload();
-        musicController.reload();
         if (!current.equals(Config.get(Config.Key.VIEW_TEMPLATE))) {
             reload();
         }
@@ -1636,12 +1628,14 @@ public final class Controller implements Initializable {
      */
     @FXML
     private void loadArticleList() {
+        final long start = System.currentTimeMillis();
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        final List<Article> readArticleNames = Article.readArticleNames(Config.get("articleDir"));
+        final List<Article> readArticleNames = Article.readAllArticleNames(Config.get("articleDir"));
         items.addAll(readArticleNames);
         articleList.requestLayout();
         focusOn();
+        LOGGER.info("ended init loadArticleList. {}[ms]", System.currentTimeMillis() - start);
     }
 
     /**

@@ -169,16 +169,16 @@ public class Article implements Comparable<Article> {
      * @param articleDir dir of articles
      * @return 記事名一覧の Set (ソート済み)
      */
-    public static final List<Article> readArticleNames(final String articleDir) {
+    public static final List<Article> readAllArticleNames(final String articleDir) {
         final File dir = new File(articleDir);
         if (dir == null || !dir.canRead()){
             return Collections.emptyList();
         }
         return ArrayAdapter
-                .newArrayWith(dir.listFiles((f) -> isValidContentFile(f)))
-                .asParallel(Executors.newFixedThreadPool(24), 24)
-                .collect(f -> new Article(f))
+                .newArrayWith(dir.listFiles(Article::isValidContentFile))
+                .collect(Article::new)
                 .select( a -> a.isValid())
+                .asParallel(Executors.newFixedThreadPool(12), 12)
                 .toList();
     }
 
