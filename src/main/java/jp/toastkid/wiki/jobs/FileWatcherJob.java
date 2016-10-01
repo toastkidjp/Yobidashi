@@ -12,8 +12,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.libs.utils.TimeUtil;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * watch file for auto backup.
@@ -39,18 +39,14 @@ public class FileWatcherJob implements Runnable {
             backup.mkdir();
         }
         Flux.<File>create(emitter -> {
-            while (true) {
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> emitter.complete()));
-                targets
-                    .select((file, ms) -> ms < file.lastModified())
-                    .forEachKeyValue((file, ms) -> emitter.next(file));
-                try {
-                    TimeUtil.sleep(BACKUP_INTERVAL);
-                } catch (final InterruptedException e) {
-                    emitter.error(e);
-                }
-            }
+            targets
+                .select((file, ms) -> ms < file.lastModified())
+                .forEachKeyValue((file, ms) -> emitter.next(file));
+            emitter.complete();
         })
+        .delaySubscriptionMillis(BACKUP_INTERVAL)
+        .repeat()
+        .subscribeOn(Schedulers.newElastic("FileWatcher"))
         .subscribe(file -> {
             try {
                 final Path copy = Files.copy(
@@ -86,7 +82,6 @@ public class FileWatcherJob implements Runnable {
      */
     public void clear() {
         targets.clear();
-
     }
 
 }
