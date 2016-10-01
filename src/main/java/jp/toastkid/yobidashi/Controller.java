@@ -115,6 +115,7 @@ import jp.toastkid.wiki.search.SearchResult;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * JavaFX WikiClient's Controller.
@@ -346,16 +347,14 @@ public final class Controller implements Initializable {
         final ExecutorService es = Executors.newFixedThreadPool(
                 availableProcessors + availableProcessors + availableProcessors);
 
-        es.submit(() -> {
-            while (true) {
-                final String text = String.format(
-                        "Memory: %,3d[MB]",
-                        RuntimeUtil.calcUsedMemorySize() / 1_000_000L
-                        );
-                Platform.runLater(() -> status.setText(text));
-                Thread.sleep(5000L);
-            }
-        });
+        Mono.create(emitter -> emitter.success(
+                String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
+                )
+            )
+            .delaySubscriptionMillis(5000L)
+            .repeat()
+            .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
+            .subscribe(text -> Platform.runLater(() -> status.setText(text.toString())));
 
         final ProgressDialog pd
             = new ProgressDialog.Builder().setText("Activation in progress...").build();
