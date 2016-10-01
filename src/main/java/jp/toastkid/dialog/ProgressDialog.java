@@ -17,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.ImageChooser;
 import jp.toastkid.wiki.models.Defines;
 
@@ -43,7 +42,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     private static final String USER_IMAGE_DIR    = Defines.USER_DIR + "/res/images/splash/";
 
     /** FXML ファイルのパス. */
-    private static final String DIALOG_FXML       = Defines.SCENE_DIR + "/ProgressDialog.fxml";
+    private static final String FXML_PATH         = Defines.SCENE_DIR + "/ProgressDialog.fxml";
 
     /** Scene. */
     private Scene scene = null;
@@ -101,7 +100,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         progress = new AtomicInteger(b.progress);
 
         final FXMLLoader loader
-            = new FXMLLoader(FileUtil.getUrl(DIALOG_FXML));
+            = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             if (scene == null) {
                 scene = new Scene(loader.load());

@@ -13,7 +13,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.models.Defines;
 
 /**
@@ -27,7 +26,7 @@ public final class Main extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /** path to scene file. */
-    private static final String FXML = Defines.SCENE_DIR + "/WordCloud.fxml";
+    private static final String FXML_PATH = Defines.SCENE_DIR + "/WordCloud.fxml";
 
     /** Controller object. */
     private Controller controller;
@@ -51,7 +50,7 @@ public final class Main extends Application {
      * @return Parent オブジェクト
      */
     private final void loadDialog(final Window window) {
-        final FXMLLoader loader = new FXMLLoader(FileUtil.getUrl(FXML));
+        final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             if (scene == null) {
                 scene = new Scene(loader.load());

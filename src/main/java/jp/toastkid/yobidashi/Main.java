@@ -43,7 +43,7 @@ public final class Main extends Application {
                 + "\n心当たりのない場合は「temp.html」というファイルを削除してください。";
 
     /** fxml ファイル. */
-    private static final String FXML_PATH = Defines.SCENE_DIR + "/Main.fxml";
+    private static final String FXML_PATH = Defines.SCENE_DIR + "/YobidashiMain.fxml";
 
     /** process lock file. */
     private static final File   LOCK_FILE = new File(Defines.TEMP_FILE_NAME);
@@ -135,7 +135,7 @@ public final class Main extends Application {
      */
     private final Scene readScene(final Stage stage) {
         try {
-            final FXMLLoader loader = new FXMLLoader(FileUtil.getUrl(FXML_PATH));
+            final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
             final VBox loaded = (VBox) loader.load();
             controller = (Controller) loader.getController();
             stage.setTitle(Config.get(Config.Key.WIKI_TITLE));

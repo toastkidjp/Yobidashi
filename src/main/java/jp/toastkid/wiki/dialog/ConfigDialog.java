@@ -12,7 +12,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.models.Defines;
 
 /**
@@ -28,7 +27,7 @@ public final class ConfigDialog  extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigDialog.class);
 
     /** FXML ファイルのパス. */
-    private static final String DIALOG_FXML = Defines.SCENE_DIR + "/ConfigDialog.fxml";
+    private static final String FXML_PATH = Defines.SCENE_DIR + "/ConfigDialog.fxml";
 
     /** コントローラオブジェクト. */
     private ConfigDialogController controller;
@@ -55,7 +54,7 @@ public final class ConfigDialog  extends Application {
      */
     private final void loadDialog(final Window window) {
         final FXMLLoader loader
-            = new FXMLLoader(FileUtil.getUrl(DIALOG_FXML));
+            = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             if (scene == null) {
                 scene = new Scene(loader.load());
