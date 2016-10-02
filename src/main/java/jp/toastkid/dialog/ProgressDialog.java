@@ -230,7 +230,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     public void activate(final Service<?> service)  {
         dialogStage.titleProperty().bind(service.titleProperty());
         controller.pb.progressProperty().bind(service.progressProperty());
-        controller.pin.progressProperty().bind(service.progressProperty());
+        //controller.pin.progressProperty().bind(service.progressProperty());
         controller.label.textProperty().bind(service.messageProperty());
 
         service.restart();

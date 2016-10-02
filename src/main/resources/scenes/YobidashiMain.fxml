@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.collections.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.geometry.*?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import com.jfoenix.controls.JFXSlider?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.yobidashi.Controller">
@@ -55,6 +69,7 @@
                     <MenuItem onAction="#makeMarkdown" text="Markdown" />
                   </items>
                 </Menu>
+                <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="Article length counter" />
                 <MenuItem accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="Copy article" />
                 <MenuItem onAction="#callRename" text="Rename article" />
                 <MenuItem accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
@@ -69,7 +84,6 @@
             <Menu text="Tool">
               <items>
                 <MenuItem accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="Calculator" />
-                <MenuItem accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="文字数カウンタ" />
                 <MenuItem onAction="#callCmd" text="Command Prompt" />
                 <SeparatorMenuItem />
                 <MenuItem accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="Draw chart" />
@@ -83,11 +97,12 @@
                 <MenuItem onAction="#openCssGenerator" text="CSS Generator" />
                 <SeparatorMenuItem />
                 <MenuItem onAction="#callConvertMd" text="Convert to Markdown" />
-                <MenuItem onAction="#callConvertAobun" text="Generate AozoraBunko" />
-                <MenuItem onAction="#callConvertEpub" text="Generate ePub" />
+                <MenuItem onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
+                <MenuItem onAction="#callConvertEpub" text="Convert current article to ePub" />
                 <MenuItem onAction="#callSimpleBachup" text="Simple article backup" />
+                <MenuItem onAction="#callGenerateEpubs" text="Generate ePub" />
                 <SeparatorMenuItem />
-                <MenuItem onAction="#callGenerateEpubs" text="まとめてePub生成" />
+                <MenuItem onAction="#callLogViewer" text="LogViewer" />
               </items>
             </Menu>
             <Menu text="Window">
@@ -100,7 +115,6 @@
             <Menu text="Help">
               <items>
                 <MenuItem onAction="#callApplicationState" text="Application state" />
-                <MenuItem onAction="#callLogViewer" text="LogViewer" />
                 <MenuItem onAction="#callAbout" text="About" />
               </items>
             </Menu>
@@ -162,6 +176,46 @@
                 <content>
                   <VBox prefHeight="200.0" prefWidth="200.0">
                     <children>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Chart tools">
+                        <content>
+                            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+                                <children>
+                                    <ComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="日記の文字数" />
+                                                <String fx:value="出費" />
+                                                <String fx:value="日経平均株価" />
+                                            </FXCollections>
+                                        </items>
+                                        <tooltip><Tooltip text="select graph kind." /></tooltip>
+                                    </ComboBox>
+                                    <ComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
+                                    <JFXButton minWidth="70.0" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
+                                        <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
+                                    </JFXButton>
+                                </children>
+                            </HBox>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Zoom">
+                        <content>
+                            <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+                              <children>
+                                <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="150.0"
+                                 showTickLabels="true" showTickMarks="true" value="1.0">
+                                  <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
+                                </JFXSlider>
+                                <JFXTextField fx:id="zoomInput" promptText="zoom" onAction="#setZoom" prefHeight="25.0" prefWidth="100.0">
+                                  <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
+                                </JFXTextField>
+                                <JFXButton minWidth="80.0" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+                                  <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
+                                </JFXButton>
+                              </children>
+                            </HBox>
+                        </content>
+                      </TitledPane>
                       <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
                         <content>
                           <AnchorPane><children><fx:include fx:id="loto6" source="Loto6.fxml"/></children></AnchorPane>
@@ -198,51 +252,12 @@
     </HBox>
     <HBox fx:id="footer" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
       <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+        <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="500.0" spacing="5.0" VBox.vgrow="NEVER">
           <children>
-            <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
               <font><Font size="12.0" fx:id="x3" /></font>
               <textFill><Color blue="0" green="0.11" red="0" fx:id="x4" /></textFill>
             </Label>
-          </children>
-        </HBox>
-        <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
-            <children>
-                <ComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="日記の文字数" />
-                            <String fx:value="出費" />
-                            <String fx:value="日経平均株価" />
-                        </FXCollections>
-                    </items>
-                    <tooltip><Tooltip text="select graph kind." /></tooltip>
-                </ComboBox>
-                <ComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
-                <JFXButton minWidth="70.0" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
-                    <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
-                </JFXButton>
-            </children>
-        </HBox>
-        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
-          <children>
-            <JFXButton minWidth="80.0" onAction="#callFileLength" prefHeight="25.0" prefWidth="80.0" text="Length">
-              <tooltip><Tooltip text="記事の文字数を表示します。" /></tooltip>
-            </JFXButton>
-          </children>
-        </HBox>
-        <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
-          <children>
-            <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="150.0"
-             showTickLabels="true" showTickMarks="true" value="1.0">
-              <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
-            </JFXSlider>
-            <JFXTextField fx:id="zoomInput" promptText="zoom" onAction="#setZoom" prefHeight="25.0" prefWidth="100.0">
-              <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
-            </JFXTextField>
-            <JFXButton minWidth="80.0" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
-              <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
-            </JFXButton>
           </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">

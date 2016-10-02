@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.image.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<!--?import javafx.scene.image.*?-->
+<!--?import java.lang.*?-->
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import com.jfoenix.controls.JFXProgressBar?>
+<?import com.jfoenix.controls.JFXSpinner?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.toastkid.dialog.ProgressDialogController">
 	<children>
       <VBox fx:id="background" prefHeight="200.0" prefWidth="100.0" />
       <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
-            <ProgressIndicator fx:id="pin" progress="0.0">
+            <JFXSpinner fx:id="pin">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
-            </ProgressIndicator>
+            </JFXSpinner>
             <Label fx:id="label" prefHeight="51.0" prefWidth="299.0" text="Now loading...">
                <HBox.margin>
                   <Insets left="20.0" />
@@ -23,10 +26,10 @@
             </Label>
          </children>
       </HBox>
-      <ProgressBar fx:id="pb" prefHeight="30.0" prefWidth="350.0" progress="0.0" VBox.vgrow="ALWAYS">
+      <JFXProgressBar fx:id="pb" prefHeight="30.0" prefWidth="350.0" progress="0.0" VBox.vgrow="ALWAYS">
         <VBox.margin>
             <Insets />
          </VBox.margin>
-      </ProgressBar>
+      </JFXProgressBar>
 	</children>
 </VBox>

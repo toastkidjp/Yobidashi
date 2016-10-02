@@ -49,9 +49,15 @@ public class Controller implements Initializable {
      */
     @FXML
     private void calculate() {
+        final String heightStr = this.height.getText();
+        final String weightStr = this.weight.getText();
+        if (heightStr.isEmpty() || weightStr.isEmpty()) {
+            return;
+        }
+
         try {
-            final double height = Double.parseDouble(this.height.getText()) / 100.0d;
-            final double weight = Double.parseDouble(this.weight.getText());
+            final double height = Double.parseDouble(heightStr) / 100.0d;
+            final double weight = Double.parseDouble(weightStr);
             result.setText(makeBmiResult(bmi(height, weight), standardWeight(height)));
         } catch (final RuntimeException e) {
             LOGGER.error("Caught error.", e);

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXButton?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
     prefHeight="160.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.loto6.Loto6Controller"
     >
@@ -20,8 +22,8 @@
       </HBox>
       <HBox prefHeight="40.0" prefWidth="300.0">
          <children>
-            <TextField fx:id="inputWord" prefHeight="30.0" prefWidth="200.0" onAction="#generate"/>
-            <Button mnemonicParsing="false" prefWidth="100.0" text="Generate" onAction="#generate"/>
+            <JFXTextField fx:id="inputWord" prefHeight="30.0" prefWidth="200.0" onAction="#generate"/>
+            <JFXButton mnemonicParsing="false" prefWidth="100.0" text="Generate" onAction="#generate"/>
          </children>
       </HBox>
    </children>
