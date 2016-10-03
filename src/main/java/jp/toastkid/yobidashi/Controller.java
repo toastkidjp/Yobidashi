@@ -160,14 +160,6 @@ public final class Controller implements Initializable {
     private static final KeyCodeCombination APPEAR_SEARCHER
         = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
 
-    /** scripter appear keyboard shortcut. */
-    //private static final KeyCodeCombination APPEAR_SCRIPTER
-    //    = new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN);
-
-    /** run script keyboard shortcut. */
-    //private static final KeyCodeCombination RUN_SCRIPT
-    //    = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
-
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
         = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
@@ -292,12 +284,9 @@ public final class Controller implements Initializable {
     @FXML
     public DatePicker calendar;
 
-    /** 主要エリア. */
-    @FXML
-    public VBox mainArea;
-
     /** for desktop control. */
     private static Desktop desktop;
+
     /** functions class. */
     private ArticleGenerator func;
 
@@ -521,12 +510,6 @@ public final class Controller implements Initializable {
                 } else {
                     openSearcher();
                 }
-            /*} else if (APPEAR_SCRIPTER.match(e)) {
-                if (scriptController.scripterArea.visibleProperty().getValue()) {
-                    scriptController.hideScripter();
-                } else {
-                    scriptController.openScripter();
-                }*/
             } else if (ZOOM_INCREMENT.match(e)) {
                 zoom.increment();
             } else if (ZOOM_DECREMENT.match(e)) {
@@ -719,7 +702,7 @@ public final class Controller implements Initializable {
                     .filter(item -> item.title.startsWith(prefix))
                     .findFirst();
             if (!opt.isPresent()) {
-                new JFXSnackbar(mainArea).show(prefix + "'s diary is not exist.", 4000L);
+                new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
             opt.ifPresent(article -> loadUrl(article.toInternalUrl()));
