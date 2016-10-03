@@ -124,7 +124,7 @@
         </MenuBar>
         <HBox prefHeight="25.0">
             <children>
-            <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0">
+            <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
             </JFXTextField>
             <JFXButton fx:id="reload" minWidth="25.0" onAction="#reload" prefWidth="25.0" prefHeight="25.0">
@@ -147,7 +147,7 @@
                 </FXCollections>
               </items>
             </ComboBox>
-            <JFXTextField fx:id="webQuery" promptText="Web検索" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0">
+            <JFXTextField fx:id="webQuery" promptText="Web search" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0" labelFloat="true">
               <tooltip><Tooltip text="Web検索のキーワードをここに入力します。" /></tooltip>
             </JFXTextField>
             <JFXButton fx:id="webSearch" minWidth="25.0" prefHeight="25.0" onAction="#webSearch">
@@ -240,7 +240,7 @@
     <HBox fx:id="searcherArea" prefHeight="0.0" spacing="5.0">
       <children>
         <JFXButton minWidth="40.0" onAction="#hideSearcher" prefHeight="25.0" prefWidth="40.0" text="x" />
-        <JFXTextField fx:id="searcherInput" promptText="ページ内検索" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown">
+        <JFXTextField fx:id="searcherInput" promptText="ページ内検索" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown" labelFloat="true">
           <tooltip><Tooltip text="input search words." /></tooltip>
         </JFXTextField>
         <JFXButton minWidth="40.0" onAction="#searchUp" prefHeight="25.0" prefWidth="40.0" text="↑" />
