@@ -39,7 +39,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     private static final String DEFAULT_IMAGE_DIR = Defines.ASSETS_DIR + "/images/splash/";
 
     /** path to user image directory. */
-    private static final String USER_IMAGE_DIR    = Defines.USER_DIR + "/res/images/splash/";
+    private static final String USER_IMAGE_DIR    = Defines.USER_DIR + "/res/images/background/";
 
     /** FXML ファイルのパス. */
     private static final String FXML_PATH         = Defines.SCENE_DIR + "/ProgressDialog.fxml";
