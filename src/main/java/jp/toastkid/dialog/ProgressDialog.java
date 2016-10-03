@@ -21,7 +21,8 @@ import jp.toastkid.wiki.ImageChooser;
 import jp.toastkid.wiki.models.Defines;
 
 /**
- * 進捗表示ダイアログ.
+ * Progress dialog.
+ *
  * @author Toast kid
  * @see <a href="http://stackoverflow.com/questions/27866432/
  *controls-fx-progress-dialog-modality-alert-modality">Controls FX Progress Dialog Modality
@@ -35,14 +36,14 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
-    /** path to default image directory. */
-    private static final String DEFAULT_IMAGE_DIR = Defines.ASSETS_DIR + "/images/splash/";
+    /** path to user image directory. */
+    private static final String SPLASH_DIR     = Defines.ASSETS_DIR + "/splash/";
 
     /** path to user image directory. */
-    private static final String USER_IMAGE_DIR    = Defines.USER_DIR + "/res/images/background/";
+    private static final String USER_IMAGE_DIR = Defines.USER_DIR + "/res/images/background/";
 
     /** FXML ファイルのパス. */
-    private static final String FXML_PATH         = Defines.SCENE_DIR + "/ProgressDialog.fxml";
+    private static final String FXML_PATH      = Defines.SCENE_DIR + "/ProgressDialog.fxml";
 
     /** Scene. */
     private Scene scene = null;
@@ -56,8 +57,10 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     /** message. */
     private final StringBuilder text;
 
+    /** dialog stage. */
     private final Stage dialogStage;
 
+    /** controller. */
     private final ProgressDialogController controller;
 
     /** splash image file chooser. */
@@ -65,8 +68,8 @@ public final class ProgressDialog extends Application implements AutoCloseable {
 
     /**
      * Builder.
-     * @author Toast kid
      *
+     * @author Toast kid
      */
     public static class Builder {
         private Scene scene;
@@ -94,7 +97,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     }
 
     /**
-     * シーンファイルをロードしておく.
+     * Load scene file.
      */
     private ProgressDialog(final Builder b) {
         progress = new AtomicInteger(b.progress);
@@ -115,7 +118,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
 
-        this.chooser = new ImageChooser(DEFAULT_IMAGE_DIR, USER_IMAGE_DIR);
+        this.chooser = new ImageChooser(SPLASH_DIR, USER_IMAGE_DIR);
         // 画像をランダムで選択して設定.
         findStyle().ifPresent(style -> { controller.background.setStyle(style); });
 
@@ -136,7 +139,11 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      * @return optional string.
      */
     private Optional<String> findStyle() {
-        final String style = "-fx-background-image: url('" + chooser.choose() + "'); "
+        final String choose = chooser.choose();
+        if (choose == null || choose.isEmpty()) {
+            return Optional.empty();
+        }
+        final String style = "-fx-background-image: url('" + choose + "'); "
                 + "-fx-background-position: center center; "
                 + "-fx-background-size: cover;"
                 + "-fx-background-repeat: stretch;";
@@ -165,6 +172,10 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         this.progress.addAndGet(progress);
     }
 
+    /**
+     * get progress.
+     * @return progress value.
+     */
     public final int getProg() {
         return this.progress.get();
     }
@@ -227,10 +238,13 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         return this.text.toString();
     }
 
+    /**
+     * activate this instance.
+     * @param service
+     */
     public void activate(final Service<?> service)  {
         dialogStage.titleProperty().bind(service.titleProperty());
         controller.pb.progressProperty().bind(service.progressProperty());
-        //controller.pin.progressProperty().bind(service.progressProperty());
         controller.label.textProperty().bind(service.messageProperty());
 
         service.restart();

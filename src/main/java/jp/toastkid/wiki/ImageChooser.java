@@ -33,7 +33,7 @@ public class ImageChooser {
         images = Lists.mutable.empty();
         ArrayAdapter.adapt(dirs)
             .select(StringUtils::isNotBlank)
-            .collect(dir -> new File(dir))
+            .collect(File::new)
             .select(f -> f.exists() && f.isDirectory())
             .collect(f -> f.listFiles(IMAGE_FILTER))
             .each(files -> images.addAll(Arrays.asList(files)));

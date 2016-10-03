@@ -44,7 +44,6 @@ import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.Printer;
@@ -138,10 +137,10 @@ public final class Controller implements Initializable {
     private static final String PATH_ABOUT_APP   = "README.md";
 
     /** 「リロード」ボタンの画像ファイルへのパス */
-    private static final String PATH_IMG_RELOAD  = Defines.ASSETS_DIR + "/images/reload.png";
+    private static final String PATH_IMG_RELOAD  = "images/reload.png";
 
     /** 「検索」画像ファイルへのパス. */
-    private static final String PATH_IMG_SEARCH  = Defines.ASSETS_DIR + "/images/search.png";
+    private static final String PATH_IMG_SEARCH  = "images/search.png";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -476,13 +475,17 @@ public final class Controller implements Initializable {
         footer.setOnMousePressed((event) -> moveToBottom());
         pd.addProgress(11);
 
-        reload.setGraphic(   new ImageView(FileUtil.getUrl(PATH_IMG_RELOAD).toString()));
-        webSearch.setGraphic(new ImageView(FileUtil.getUrl(PATH_IMG_SEARCH).toString()));
+        reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
+        webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
         //initReloadButton();
 
         BACKUP.submit(FILE_WATCHER);
         pd.addProgress(11);
         pd.stop();
+    }
+
+    private ImageView makeImageView(final String path) {
+        return new ImageView(getClass().getClassLoader().getResource(path).toString());
     }
 
     /**
@@ -756,7 +759,7 @@ public final class Controller implements Initializable {
         final RadioButton vertically   = new RadioButton("vertically");
         final RadioButton horizontally = new RadioButton("horizontally");
 
-        final ToggleGroup radios = new ToggleGroup() {{
+        new ToggleGroup() {{
             getToggles().addAll(vertically, horizontally);
             vertically.setSelected(true);
         }};
@@ -2086,8 +2089,11 @@ public final class Controller implements Initializable {
                     LOGGER.info("print name:" + printer.getName());
                 }
 
-                final PageLayout pageLayout = printer.createPageLayout(
-                        Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+                printer.createPageLayout(
+                        Paper.A4,
+                        PageOrientation.PORTRAIT,
+                        Printer.MarginType.DEFAULT
+                        );
 
                 final PrinterJob job = PrinterJob.createPrinterJob(printer);
                 if (job == null) {
