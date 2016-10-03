@@ -33,6 +33,8 @@ import com.jfoenix.controls.JFXTextArea;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -81,6 +83,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
@@ -331,6 +334,10 @@ public final class Controller implements Initializable {
 
     /** use for draw word-cloud. */
     private FxWordCloud wordCloud;
+
+    private TranslateTransition splitterClose;
+
+    private TranslateTransition splitterOpen;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -1246,9 +1253,17 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 左側を隠すか表示する.
+     * 左側を表示する.
      */
     private void showLeftPane() {
+        if (splitterOpen == null) {
+            splitterOpen = new TranslateTransition(Duration.seconds(0.25d), splitter);
+            splitterOpen.setFromX(-200);
+            splitterOpen.setToX(0);
+            splitterOpen.setInterpolator(Interpolator.LINEAR);
+            splitterOpen.setCycleCount(1);
+        }
+        splitterOpen.play();
         splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
     }
 
@@ -1256,6 +1271,14 @@ public final class Controller implements Initializable {
      * 左側を隠す.
      */
     private void hideLeftPane() {
+        if (splitterClose == null) {
+            splitterClose = new TranslateTransition(Duration.seconds(0.25d), splitter);
+            splitterClose.setFromX(200);
+            splitterClose.setToX(0);
+            splitterClose.setInterpolator(Interpolator.LINEAR);
+            splitterClose.setCycleCount(1);
+        }
+        splitterClose.play();
         splitter.setDividerPosition(0, 0.0d);
     }
 
