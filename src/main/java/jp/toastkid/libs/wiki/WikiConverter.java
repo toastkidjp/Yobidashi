@@ -134,10 +134,6 @@ public final class WikiConverter {
     private static final Pattern TWITTER_PATTERN
         = Pattern.compile("\\{[T|t]witter\\:(.+?)\\}", Pattern.DOTALL);
 
-    /** Calendar 記述を検出する正規表現. */
-    private static final Pattern CALENDAR_PATTERN
-        = Pattern.compile("\\{[C|c]alendar\\:(.+?)\\}", Pattern.DOTALL);
-
     /** tooltip の正規表現. */
     private static final Pattern TOOLTIP_PATTERN
         = Pattern.compile("\\{tooltip\\:(.+?)\\}", Pattern.DOTALL);
@@ -174,7 +170,6 @@ public final class WikiConverter {
     private static final String DUMMY_TH    = "≫";
     /** regex replacing dummy. */
     private static final String SPLIT_REGEX = String.format("[%s|%s]+", DUMMY_TD, DUMMY_TH);
-
 
     /** Matcher. */
     private Matcher matcher;
@@ -491,7 +486,7 @@ public final class WikiConverter {
                     uLTagDepth = 1;
                 }
             }
-            // TODO 数字付きリスト
+            // 数字付きリスト
             if (!isInCodeBlock && (str.startsWith("#") || ORDERED_LIST_PATTERN.matcher(str).find()) ) {
                 if (source.startsWith("##") && oLTagDepth < 2) {
                     if (isInP) {
