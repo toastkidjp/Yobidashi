@@ -1,4 +1,4 @@
-package jp.toastkid.libs.wiki;
+package jp.toastkid.wiki.lib;
 
 import java.util.List;
 import java.util.regex.Matcher;

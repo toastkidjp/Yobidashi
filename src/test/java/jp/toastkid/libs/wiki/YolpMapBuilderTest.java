@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import jp.toastkid.wiki.lib.YolpMapBuilder;
+
 /**
  * {@link YolpMapBuilder}'s test case.
  * @author Toast kid

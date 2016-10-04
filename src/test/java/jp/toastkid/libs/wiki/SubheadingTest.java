@@ -2,9 +2,10 @@ package jp.toastkid.libs.wiki;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import jp.toastkid.libs.wiki.Subheading;
 
 import org.junit.Test;
+
+import jp.toastkid.wiki.lib.Subheading;
 
 /**
  * Subheading's test case.

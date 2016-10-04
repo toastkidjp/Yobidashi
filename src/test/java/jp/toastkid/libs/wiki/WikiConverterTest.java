@@ -13,6 +13,7 @@ import org.junit.Test;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wiki.lib.WikiConverter;
 import jp.toastkid.wiki.models.Config;
 
 /**
@@ -39,7 +40,7 @@ public final class WikiConverterTest {
     );
 
     /**
-     * {@link jp.toastkid.libs.wiki.WikiConverter#convert(java.lang.String, java.lang.String)}
+     * {@link jp.toastkid.wiki.lib.WikiConverter#convert(java.lang.String, java.lang.String)}
      *のためのテスト・メソッド。
      */
     @Test

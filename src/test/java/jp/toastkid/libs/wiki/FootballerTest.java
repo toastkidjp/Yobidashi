@@ -1,9 +1,10 @@
 package jp.toastkid.libs.wiki;
 
 import static org.junit.Assert.assertEquals;
-import jp.toastkid.libs.wiki.Footballer;
 
 import org.junit.Test;
+
+import jp.toastkid.wiki.lib.Footballer;
 
 /**
  * Footballer's test case.

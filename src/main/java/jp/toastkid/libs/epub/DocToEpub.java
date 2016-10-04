@@ -16,8 +16,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.wiki.WikiConverter;
 import jp.toastkid.wiki.ArticleGenerator;
+import jp.toastkid.wiki.lib.WikiConverter;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;

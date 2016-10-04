@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.toastkid.wiki.lib.PostProcessor;
 import jp.toastkid.wiki.models.ViewTemplate;
 
 /**
@@ -29,7 +30,7 @@ public class PostProcessorTest {
     }
 
     /**
-     * test method for {@link jp.toastkid.libs.wiki.PostProcessor#process(java.lang.String)} .
+     * test method for {@link jp.toastkid.wiki.lib.PostProcessor#process(java.lang.String)} .
      */
     @Test
     public void testProcess() {
@@ -43,7 +44,7 @@ public class PostProcessorTest {
 
     /**
      * test method for
-     * {@link jp.toastkid.libs.wiki.PostProcessor#generateSubheadings
+     * {@link jp.toastkid.wiki.lib.PostProcessor#generateSubheadings
      * (jp.toastkid.wiki.models.ViewTemplate)} .
      */
     @Test

@@ -1,4 +1,4 @@
-package jp.toastkid.libs.wiki;
+package jp.toastkid.wiki.lib;
 
 import jp.toastkid.libs.utils.MathUtil;
 

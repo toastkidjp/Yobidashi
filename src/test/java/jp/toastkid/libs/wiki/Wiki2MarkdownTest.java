@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 import jp.toastkid.libs.utils.CollectionUtil;
+import jp.toastkid.wiki.lib.Wiki2Markdown;
 
 import org.junit.Test;
 
