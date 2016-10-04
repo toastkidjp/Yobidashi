@@ -96,6 +96,7 @@ public class ChartPane extends VBox {
      * @param tableValues
      * @return TableView.
      */
+    @SuppressWarnings("unchecked")
     private static TableView<KeyValue> makeTable(final Collection<KeyValue> tableValues) {
         final TableView<KeyValue> table = new TableView<>();
         final TableColumn<KeyValue, String> keys = new TableColumn<>("Date");
@@ -106,9 +107,9 @@ public class ChartPane extends VBox {
         items.setPrefWidth(500.0);
         final TableColumn<KeyValue, String> costs = new TableColumn<>("Cost");
         costs.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("value"));
-        table.getColumns().addAll(keys, items, costs);
         costs.setPrefWidth(100.0);
 
+        table.getColumns().addAll(keys, items, costs);
         table.getItems().addAll(tableValues);
         return table;
     }

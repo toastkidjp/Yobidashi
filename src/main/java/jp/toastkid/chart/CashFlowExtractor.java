@@ -132,6 +132,6 @@ public final class CashFlowExtractor implements ChartDataExtractor {
         if (prefix == null) {
             throw new IllegalStateException("'prefix' is null.");
         }
-        return String.format("%s: %s %,3d円", ChartPane.DIARY, prefix.substring(2), this.overall);
+        return String.format("%s: %s %,3d円", ChartPane.OUTGO, prefix.substring(2), this.overall);
     }
 }
