@@ -1243,7 +1243,7 @@ public final class Controller implements Initializable {
      */
     private void showLeftPane() {
         if (splitterOpen == null) {
-            splitterOpen = new TranslateTransition(Duration.seconds(0.25d), splitter);
+            splitterOpen = new TranslateTransition(Duration.seconds(0.25d), tabPane);
             splitterOpen.setFromX(-200);
             splitterOpen.setToX(0);
             splitterOpen.setInterpolator(Interpolator.LINEAR);
@@ -1258,7 +1258,7 @@ public final class Controller implements Initializable {
      */
     private void hideLeftPane() {
         if (splitterClose == null) {
-            splitterClose = new TranslateTransition(Duration.seconds(0.25d), splitter);
+            splitterClose = new TranslateTransition(Duration.seconds(0.25d), tabPane);
             splitterClose.setFromX(200);
             splitterClose.setToX(0);
             splitterClose.setInterpolator(Interpolator.LINEAR);

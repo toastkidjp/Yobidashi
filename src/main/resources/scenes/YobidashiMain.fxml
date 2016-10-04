@@ -3,7 +3,6 @@
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.MenuBar?>
@@ -24,6 +23,7 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXSlider?>
+<?import com.jfoenix.controls.JFXComboBox?>
 
 <?import org.fxmisc.richtext.CodeArea?>
 
@@ -134,7 +134,7 @@
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="500.0">
           <children>
-            <ComboBox fx:id="searchKind">
+            <JFXComboBox fx:id="searchKind">
               <tooltip><Tooltip text="Web検索の種類を選択します。" /></tooltip>
               <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -146,7 +146,7 @@
                   <String fx:value="食べログ" />
                 </FXCollections>
               </items>
-            </ComboBox>
+            </JFXComboBox>
             <JFXTextField fx:id="webQuery" promptText="Web search" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0" labelFloat="true">
               <tooltip><Tooltip text="Web検索のキーワードをここに入力します。" /></tooltip>
             </JFXTextField>
@@ -182,7 +182,7 @@
                         <content>
                           <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
                             <children>
-                              <ComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
+                              <JFXComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
                                 <items>
                                   <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="日記の文字数" />
@@ -191,8 +191,8 @@
                                   </FXCollections>
                                 </items>
                                 <tooltip><Tooltip text="select graph kind." /></tooltip>
-                              </ComboBox>
-                              <ComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
+                              </JFXComboBox>
+                              <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
                               <JFXButton minWidth="70.0" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
                                 <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
                               </JFXButton>
@@ -208,7 +208,8 @@
                                showTickLabels="true" showTickMarks="true" value="1.0">
                                 <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
                               </JFXSlider>
-                              <JFXTextField fx:id="zoomInput" promptText="zoom" onAction="#setZoom" prefHeight="25.0" prefWidth="100.0">
+                              <JFXTextField fx:id="zoomInput" onAction="#setZoom" labelFloat="true"
+                                promptText="zoom rate" prefHeight="25.0" prefWidth="100.0">
                                 <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
                               </JFXTextField>
                               <JFXButton minWidth="80.0" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
@@ -262,7 +263,7 @@
             <JFXDatePicker fx:id="calendar" minWidth="100.0" prefHeight="25.0" prefWidth="100.0" onAction="#callCalendar">
                   <tooltip><Tooltip text="カレンダーを表示します。" /></tooltip>
             </JFXDatePicker>
-            <ComboBox fx:id="style" minWidth="140.0" onAction="#callSetOnStyle">
+            <JFXComboBox fx:id="style" minWidth="140.0" onAction="#callSetOnStyle">
               <tooltip><Tooltip text="Style を選択します。" /></tooltip>
               <items>
                 <FXCollections fx:factory="observableArrayList" >
@@ -270,7 +271,7 @@
                   <String fx:value="MODENA" />
                 </FXCollections>
               </items>
-            </ComboBox>
+            </JFXComboBox>
           </children>
         </HBox>
       </children>
