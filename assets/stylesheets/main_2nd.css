@@ -5,7 +5,7 @@ a {
     margin-left: 10px;
 }
 .content-area {
-	background-color: rgba(240, 240, 240, 0.8);
+  background-color: rgba(240, 240, 240, 0.8);
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 .page-blue .header {
@@ -17,192 +17,191 @@ a {
     margin-top: 25px;
 }
 .lineGraphScrollBox {
-	overflow: scroll;
-	width: 100%;
-	white-space: nowrap;
+  overflow: scroll;
+  width: 100%;
+  white-space: nowrap;
 }
 img#wikiIcon {
-	top: 0;
-	width:72px;
-	height:72px;
-	position: fixed;
+  top: 0;
+  width:72px;
+  height:72px;
+  position: fixed;
 }
 textarea#code {
-	background: #FFFFFF;
-	width:99%;
-	height:40%;
+  background: #FFFFFF;
+  width:99%;
+  height:40%;
 }
 input.titleArea{
-	font-size: 18pt;
-	font-weight: bold;
-	width: 90%;
+  font-size: 18pt;
+  font-weight: bold;
+  width: 90%;
 }
 /** (130323) グラフのパラメータ設定エリア */
 div.params {
-	position: fixed;
-	right: 10%;
-	margin-bottom: 0px;
+  position: fixed;
+  right: 10%;
+  margin-bottom: 0px;
 }
 header nav a:hover{
-	font-size: 20pt;
+  font-size: 20pt;
 }
 .header-logo {
     font-size: 30px;
     padding: 20px;
 }
 .nav{
-	padding: 15px;
+  padding: 15px;
 }
 
 /** (121020) ナビゲーションバー拡張 */
 #pageTitle {
-	height: 20px;
-	width: 40%;
-	font-size: 20px;
-	font-weight: bold;
-	background: #000000;
-	border-style: solid;
-	border-width: 1px 1px 1px 1px;
-	border-color: silver;
-	text-shadow: 1.5px 2.5px 2.5px #004daf;
-	text-decoration: none;
-	position: absolute;
-	top: 45px;
-	right: 200px;
+  height: 20px;
+  width: 40%;
+  font-size: 20px;
+  font-weight: bold;
+  background: #000000;
+  border-style: solid;
+  border-width: 1px 1px 1px 1px;
+  border-color: silver;
+  text-shadow: 1.5px 2.5px 2.5px #004daf;
+  text-decoration: none;
+  position: absolute;
+  top: 45px;
+  right: 200px;
 }
 /** (121015) http://css-happylife.com/ 参考 */
 a:hover, span:hover {
-	background:rgba(255,255,255,0.8);
-	border:1px solid #ccc;
-	padding:7px 10px;
-	-webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
-	-moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
-	box-shadow:1px 1px 3px rgba(150,150,150,0.5)
+  background:rgba(255,255,255,0.8);
+  border:1px solid #ccc;
+  padding:7px 10px;
+  -webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  -moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  box-shadow:1px 1px 3px rgba(150,150,150,0.5)
 }
 #gotoPageTop{
-	position:fixed;
-	right:150px;
-	bottom:15px;
-	background: #111693;
-	font-weight: bold;
-	text-shadow: 1.5px 2.5px 2.5px #004daf;
-	transition:all 2.0s ease-in-out
+  position:fixed;
+  right:150px;
+  bottom:15px;
+  background: #111693;
+  font-weight: bold;
+  text-shadow: 1.5px 2.5px 2.5px #004daf;
+  transition:all 2.0s ease-in-out
 }
 #gotoPageTop a{
-	color: #FFF;
-	font-weight: bold;
-	text-shadow: 1.5px 2.5px 2.5px #004daf;
-	text-decoration: none;
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: 1.5px 2.5px 2.5px #004daf;
+  text-decoration: none;
 }
 
 /** Main layout **/
 html, body {
-	font-family: Helvetica, Arial, Sans !important;
+  font-family: Helvetica, Arial, Sans !important;
 }
 body {
-	margin: auto;
-	background-position: 50% 50%;
-	background-color: #EEEECC;
+  margin: auto;
+  background-position: 50% 50%;
+  background-color: #EEEECC;
 }
 
 /** Blog header **/
 
 .header-logo {
-	width: 80%;
+  width: 80%;
     text-overflow: ellipsis;
 }
 
 #header {
-	padding: 8px 0;
-	position: relative;
+  padding: 8px 0;
+  position: relative;
 }
 
 #logo {
-	position: absolute;
-	height: 45px;
-	margin-left: 90px;
-	color: #fff;
-	font-size: 48px;
-	font-weight: bold;
-	letter-spacing: -4px;
-	text-shadow: 1.5px 2.5px 2.5px #004daf;
-	text-decoration: none;
+  position: absolute;
+  height: 45px;
+  margin-left: 90px;
+  color: #fff;
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: -4px;
+  text-shadow: 1.5px 2.5px 2.5px #004daf;
+  text-decoration: none;
 }
 
 #logo span {
-	max-width:0;
-	color: #f00;
-	font-size: 70%;
+  max-width:0;
+  color: #f00;
+  font-size: 70%;
 }
 #logo a{
-	position: absolute;
-	height: 45px;
-	margin-left: 20px;
-	color: #fff;
-	font-size: 48px;
-	font-weight: bold;
-	letter-spacing: -4px;
-	text-shadow: 1.5px 2.5px 2.5px #004daf;
-	text-decoration: none;
+  position: absolute;
+  height: 45px;
+  margin-left: 20px;
+  color: #fff;
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: -4px;
+  text-shadow: 1.5px 2.5px 2.5px #004daf;
+  text-decoration: none;
 }
 #logo a:hover{
-	padding:2px 0px;
+  padding:2px 0px;
 }
 
 #main {
-	-webkit-border-radius: 16px;
-	-moz-border-radius: 16px;
-	padding: 20px;
-	margin-top: 45px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  padding: 20px;
+  margin-top: 45px;
 }
 
 h3 {
-	font-size: 18px;
-	margin-bottom: 15px;
+  font-size: 18px;
+  margin-bottom: 15px;
 }
 
 h3 span {
-	font-size: 80%;
-	font-weight: normal;
+  font-size: 80%;
+  font-weight: normal;
 }
 
 
 /** Footer **/
 
 #footer {
-	border-top: 1px solid #45597A;
-	font-size: 70%;
-	padding: 10px 30px;
-	text-align: center;
-	color: #869AB1;
-	margin-top: 30px;
+  font-size: 70%;
+  padding: 10px 30px;
+  text-align: center;
+  color: #869AB1;
+  margin-top: 30px;
 }
 
 #footer a {
-	color: #869AB1;
-	font-weight: bold;
+  color: #869AB1;
+  font-weight: bold;
 }
 
 /* menubar */
 div.body {
-	position: relative;
+  position: relative;
 }
 
 div.content-area {
-	/*margin-left: 16%;*/
-	padding: 0px 0px 5px 5px;
+  /*margin-left: 16%;*/
+  padding: 0px 0px 5px 5px;
 }
 
 /*
 tooltip HTML sample
 <a href="#" class="tooltip">
-	ここにマウスを当てる
-	<span class="tooltipBody">
-		表示する文字
-		<span class="tooltipAngle">
-			<span class="tooltipAngleInner" />
-		</span>
-	</span>
+  ここにマウスを当てる
+  <span class="tooltipBody">
+    表示する文字
+    <span class="tooltipAngle">
+      <span class="tooltipAngleInner" />
+    </span>
+  </span>
 </a>
 */
 .tooltip {
@@ -257,17 +256,17 @@ tooltip HTML sample
 }
 
 .table {
-	width: 98%;
+  width: 98%;
 }
 
 table {
-	margin: 10px;
-	border-collapse: collapse;
-	border-style: solid;
-	border-width: 2px;
-	border:0.5px solid #0099cc;
-	/* Firefox */
-	-moz-box-shadow: 1px 1px 3px #000;
-	/* Safari,Google Chrome */
-	-webkit-box-shadow: 1px 1px 3px #000;
+  margin: 10px;
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 2px;
+  border:0.5px solid #0099cc;
+  /* Firefox */
+  -moz-box-shadow: 1px 1px 3px #000;
+  /* Safari,Google Chrome */
+  -webkit-box-shadow: 1px 1px 3px #000;
 }
