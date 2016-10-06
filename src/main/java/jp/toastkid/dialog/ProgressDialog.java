@@ -55,7 +55,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     private final AtomicInteger progress;
 
     /** message. */
-    private final StringBuilder text;
+    private String text;
 
     /** dialog stage. */
     private final Stage dialogStage;
@@ -122,11 +122,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         // 画像をランダムで選択して設定.
         findStyle().ifPresent(style -> { controller.background.setStyle(style); });
 
-        this.text = new StringBuilder();
-        if (StringUtils.isNotEmpty(b.text)) {
-            this.text.append(b.text);
-        }
-
+        this.text = b.text;
         if (b.scene == null || b.scene.getStylesheets() == null) {
             return;
         }
@@ -227,7 +223,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      */
     public void addText(final String text) {
         LOGGER.info(getProg() + " " + text);
-        this.text.append(System.lineSeparator()).append(text);
+        this.text = text;
     }
 
     /**
@@ -235,7 +231,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      * @return
      */
     private String getText() {
-        return this.text.toString();
+        return StringUtils.isNotEmpty(this.text) ? this.text : "";
     }
 
     /**
