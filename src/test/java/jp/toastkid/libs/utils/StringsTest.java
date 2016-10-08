@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.collections.api.set.FixedSizeSet;
+import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -361,7 +362,9 @@ public final class StringsTest {
      */
     @Test
     public void replaceMultiTest() {
-        final Map<Character, String> map = new HashMap<Character, String>(){{
+        final Map<Character, String> map = new HashMap<Character, String>(){
+            private static final long serialVersionUID = 1L;
+        {
             put('<', "&lt;");
             put('>', "&gt;");
             put('&', "&amp;");
@@ -375,12 +378,17 @@ public final class StringsTest {
         // nullnull する
         assertEquals(
                 "nullnull",
-                Strings.replace("aa", new HashMap<Character, String>(){{put('a', null);}})
+                Strings.replace("aa", Maps.fixedSize.of('a', null))
                 );
         // とりあえず止まらない
         assertEquals(
                 "null",
-                Strings.replace("null", new HashMap<Character, String>(){{put(null, "tomato");}})
+                Strings.replace("null", new HashMap<Character, String>(){/**
+                     *
+                     */
+                    private static final long serialVersionUID = 1L;
+
+                {put(null, "tomato");}})
                 );
         // ちゃんと処理される
         assertEquals("&lt;b&gt;H&amp;M&lt;/b&gt;", Strings.replace("<b>H&M</b>", map));

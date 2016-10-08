@@ -42,8 +42,8 @@
     </ComboBox>
     <HBox alignment="BOTTOM_RIGHT" prefHeight="92.0" prefWidth="600.0">
       <children>
-        <JFXButton defaultButton="true" mnemonicParsing="false" onAction="#storeConfig" text="OK" />
-        <JFXButton cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+        <JFXButton defaultButton="true" buttonType="RAISED" onAction="#storeConfig" text="OK" />
+        <JFXButton cancelButton="true" buttonType="RAISED" onAction="#cancel" text="Cancel" />
       </children>
     </HBox>
   </children>

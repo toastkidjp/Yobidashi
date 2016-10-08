@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXTextArea;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
@@ -212,6 +214,9 @@ public final class Controller implements Initializable {
     private static final KeyCodeCombination NINTH_TAB
         = new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN);
 
+    @FXML
+    public Pane root;
+
     /** header. */
     @FXML
     public HBox header;
@@ -327,6 +332,9 @@ public final class Controller implements Initializable {
 
     private TranslateTransition splitterOpen;
 
+    @FXML
+    protected JFXSnackbar snackbar;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -335,14 +343,16 @@ public final class Controller implements Initializable {
         final ExecutorService es = Executors.newFixedThreadPool(
                 availableProcessors + availableProcessors + availableProcessors);
 
+        snackbar.registerSnackbarContainer(root);
         Mono.create(emitter -> emitter.success(
                 String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
                 )
             )
             .delaySubscriptionMillis(5000L)
             .repeat()
+            .map(Object::toString)
             .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
-            .subscribe(text -> Platform.runLater(() -> status.setText(text.toString())));
+            .subscribe(message -> setStatus(message, false));
 
         final ProgressDialog pd
             = new ProgressDialog.Builder().setText("Activation in progress...").build();
@@ -1414,7 +1424,8 @@ public final class Controller implements Initializable {
                 children.add(new Label(String.format("%dファイル / %dファイル中",
                         map.size(), fileSearcher.getLastFilenum())));
                 // set up ListView.
-                final ListView<Article> listView = new ListView<>();
+                final ListView<Article> listView = new JFXListView<>();
+                listView.getStyleClass().add("left-tabs");
                 initArticleList(listView);
                 listView.getItems().addAll(
                         map.entrySet().stream()
@@ -2171,13 +2182,26 @@ public final class Controller implements Initializable {
         new jp.toastkid.script.Main().show(stage);
     }
 
+
     /**
      * 引数で渡された文字列を画面下部のステータスラベルに表示する.
      * @param message 文字列
      */
     protected final void setStatus(final String message) {
-        status.setText(message);
-        LOGGER.info(message);
+        setStatus(message, true);
+    }
+
+    /**
+     * 引数で渡された文字列を画面下部のステータスラベルに表示する.
+     * @param message 文字列
+     * @param showLog
+     */
+    protected final void setStatus(final String message, final boolean showLog) {
+        Platform.runLater(() -> status.setText(message));
+        if (showLog) {
+            LOGGER.info(message);
+            snackbar.fireEvent(new SnackbarEvent(message));
+        }
     }
 
     /**

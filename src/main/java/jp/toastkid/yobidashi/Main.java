@@ -2,9 +2,12 @@ package jp.toastkid.yobidashi;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jfoenix.controls.JFXDecorator;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,11 +15,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
@@ -50,9 +51,12 @@ public final class Main extends Application {
     /** コントローラ. */
     private Controller controller;
 
+    /** starting ms. */
+    private long start;
+
     @Override
     public void start(final Stage stage) {
-        final long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
 
         // It must delete lock file when this process was shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -62,18 +66,17 @@ public final class Main extends Application {
             }
         }));
         try {
-            initialize(stage);
+            launch(stage);
         } catch (final Throwable e) {
             LOGGER.error("Caught error.", e);
         }
-        controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
     }
 
     /**
      * initialize method.
      * @param stage
      */
-    private void initialize(final Stage stage) {
+    private void launch(final Stage stage) {
         // (130615) 二重起動防止機能
         if (LOCK_FILE.exists()) {
             new AlertDialog.Builder()
@@ -95,10 +98,14 @@ public final class Main extends Application {
             stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
             emitter.success();
             LOGGER.info("Ended set stage size.");
-        }).subscribeOn(Schedulers.elastic()).subscribe();
+        })
+        .subscribeOn(Schedulers.elastic()).subscribe();
 
-        final Scene scene = readScene(stage);
-        stage.setScene(scene);
+        readScene(stage).ifPresent(scene -> {
+            stage.setScene(scene);
+            stage.show();
+            controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
+        });
 
         Mono.create(emitter -> {
             final Rectangle2D d = Screen.getPrimary().getVisualBounds();
@@ -113,18 +120,10 @@ public final class Main extends Application {
 
         Mono.create(emitter -> {
             stage.initStyle(StageStyle.DECORATED);
-            scene.setFill(Color.TRANSPARENT);
+            //scene.setFill(Color.TRANSPARENT);
             emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
-
-        stage.setOnCloseRequest( (event) -> {
-            if (event.getEventType().equals(WindowEvent.WINDOW_CLOSE_REQUEST)) {
-                controller.closeApplication();
-            }
-        });
-
-        stage.show();
     }
 
     /**
@@ -132,18 +131,22 @@ public final class Main extends Application {
      * @param stage Stage オブジェクト
      * @return Scene オブジェクト
      */
-    private final Scene readScene(final Stage stage) {
+    private final Optional<Scene> readScene(final Stage stage) {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
             final VBox loaded = (VBox) loader.load();
             controller = (Controller) loader.getController();
             stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
             controller.setStage(stage);
-            return new Scene(loaded);
+            final JFXDecorator decorator = new JFXDecorator(stage, loaded);
+            decorator.setCustomMaximize(true);
+            decorator.setOnCloseButtonAction(controller::closeApplication);
+            decorator.setMaximized(true);
+            return Optional.of(new Scene(decorator, 1024, 768));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override

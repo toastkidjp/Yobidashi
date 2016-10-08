@@ -23,7 +23,7 @@
       <HBox prefHeight="40.0" prefWidth="300.0">
          <children>
             <JFXTextField fx:id="inputWord" prefHeight="30.0" prefWidth="200.0" onAction="#generate"/>
-            <JFXButton mnemonicParsing="false" prefWidth="100.0" text="Generate" onAction="#generate"/>
+            <JFXButton buttonType="RAISED" prefWidth="100.0" text="Generate" onAction="#generate"/>
          </children>
       </HBox>
    </children>

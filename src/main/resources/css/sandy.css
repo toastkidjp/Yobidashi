@@ -67,6 +67,14 @@
     -fx-background-color: #777700;
 }
 
+.left-tabs .list-cell:hover .label {
+    -fx-text-fill: white;
+}
+
+.left-tabs .list-cell:selected .label {
+    -fx-text-fill: white;
+}
+
 .scroll-bar .thumb{
     -fx-background-color: #E9E9C5;
     -fx-background-insets: 0;
@@ -126,3 +134,9 @@
     -fx-text-fill: #555500;
 }
 
+.jfx-snackbar-content {
+    -fx-background-color: #323232;
+}
+.jfx-decorator {
+    -fx-background-color: rgba(200, 170, 0, 0.5);
+}

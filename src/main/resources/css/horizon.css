@@ -70,9 +70,18 @@
     -fx-background-color: #007777;
 }
 
+.left-tabs .list-cell:hover .label {
+    -fx-text-fill: white;
+}
+
+.left-tabs .list-cell:selected .label {
+    -fx-text-fill: white;
+}
+
 .left-tabs {
     -fx-background-color: #C5E9E9;
 }
+
 .scroll-bar .thumb{
     -fx-background-color: #C5E9E9;
     -fx-background-insets: 0;

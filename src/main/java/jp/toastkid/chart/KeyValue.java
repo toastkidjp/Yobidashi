@@ -5,7 +5,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javafx.beans.property.LongProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -88,7 +87,7 @@ public class KeyValue {
      * It should be named xxProperty.
      * @return
      */
-    public Property valueProperty() {
+    public LongProperty valueProperty() {
         return value;
     }
 

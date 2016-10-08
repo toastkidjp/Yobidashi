@@ -28,6 +28,7 @@ public final class Pair<T1, T2> {
     /** right value. */
     public final T2 right;
 
+    @SuppressWarnings("unused")
     private Pair() {
         left  = null;
         right = null;

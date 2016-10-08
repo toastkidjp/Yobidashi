@@ -62,6 +62,14 @@
     -fx-background-color: #002277;
 }
 
+.left-tabs .list-cell:hover .label {
+    -fx-text-fill: white;
+}
+
+.left-tabs .list-cell:selected .label {
+    -fx-text-fill: white;
+}
+
 .left-tabs {
     -fx-background-color: #C5CAE9;
 }
@@ -114,4 +122,18 @@
 .menu .label {
     -fx-text-fill: white;
     -fx-background: rgba(0, 0, 100, 0.4);
+}
+.jfx-snackbar-content {
+    -fx-background-color: #323232;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: WHITE;
+}
+
+.jfx-snackbar-action {
+    -fx-text-fill: #ff4081;
+}
+.jfx-decorator {
+    -fx-decorator-color: rgba(0, 0, 100, 0.4);
 }

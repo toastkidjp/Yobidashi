@@ -24,11 +24,14 @@
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXSnackbar?>
 
 <?import org.fxmisc.richtext.CodeArea?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="jp.toastkid.yobidashi.Controller">
+    fx:controller="jp.toastkid.yobidashi.Controller"
+    fx:id="root"
+    >
   <children>
     <HBox prefHeight="25.0" prefWidth="900.0" fx:id="header">
       <children>
@@ -127,7 +130,7 @@
             <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
             </JFXTextField>
-            <JFXButton fx:id="reload" minWidth="25.0" onAction="#reload" prefWidth="25.0" prefHeight="25.0">
+            <JFXButton fx:id="reload" minWidth="25.0" buttonType="RAISED" onAction="#reload" prefWidth="25.0" prefHeight="25.0">
                 <tooltip><Tooltip text="reload this page." /></tooltip>
             </JFXButton>
             </children>
@@ -150,7 +153,7 @@
             <JFXTextField fx:id="webQuery" promptText="Web search" onAction="#webSearch" prefHeight="25.0" prefWidth="200.0" labelFloat="true">
               <tooltip><Tooltip text="Web検索のキーワードをここに入力します。" /></tooltip>
             </JFXTextField>
-            <JFXButton fx:id="webSearch" minWidth="25.0" prefHeight="25.0" onAction="#webSearch">
+            <JFXButton fx:id="webSearch" buttonType="RAISED" minWidth="25.0" prefHeight="25.0" onAction="#webSearch">
               <tooltip><Tooltip text="execute search." /></tooltip>
             </JFXButton>
           </children>
@@ -193,7 +196,7 @@
                                 <tooltip><Tooltip text="select graph kind." /></tooltip>
                               </JFXComboBox>
                               <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
-                              <JFXButton minWidth="70.0" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
+                              <JFXButton minWidth="70.0" buttonType="RAISED" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
                                 <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
                               </JFXButton>
                             </children>
@@ -212,7 +215,7 @@
                                 promptText="zoom rate" prefHeight="25.0" prefWidth="100.0">
                                 <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
                               </JFXTextField>
-                              <JFXButton minWidth="80.0" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+                              <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
                                 <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
                               </JFXButton>
                             </children>
@@ -240,12 +243,12 @@
     </SplitPane>
     <HBox fx:id="searcherArea" prefHeight="0.0" spacing="5.0">
       <children>
-        <JFXButton minWidth="40.0" onAction="#hideSearcher" prefHeight="25.0" prefWidth="40.0" text="x" />
+        <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#hideSearcher" prefHeight="25.0" prefWidth="40.0" text="x" />
         <JFXTextField fx:id="searcherInput" promptText="ページ内検索" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown" labelFloat="true">
           <tooltip><Tooltip text="input search words." /></tooltip>
         </JFXTextField>
-        <JFXButton minWidth="40.0" onAction="#searchUp" prefHeight="25.0" prefWidth="40.0" text="↑" />
-        <JFXButton minWidth="40.0" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
+        <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchUp" prefHeight="25.0" prefWidth="40.0" text="↑" />
+        <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
       </children>
     </HBox>
     <HBox fx:id="footer" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
@@ -274,6 +277,7 @@
             </JFXComboBox>
           </children>
         </HBox>
+        <JFXSnackbar fx:id="snackbar" prefWidth="300" />
       </children>
     </HBox>
   </children>

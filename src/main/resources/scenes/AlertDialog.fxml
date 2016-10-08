@@ -33,8 +33,8 @@
     </VBox>
   </body>
   <actions>
-    <JFXButton fx:id="posi" defaultButton="true" minWidth="80.0" onAction="#close" text="OK" HBox.hgrow="NEVER"/>
-    <JFXButton fx:id="neutral" cancelButton="false" minWidth="80.0" onAction="#close" text="Newtral" visible="false" HBox.hgrow="NEVER"/>
-    <JFXButton fx:id="nega" cancelButton="true" minWidth="80.0" onAction="#close" text="No" HBox.hgrow="NEVER"/>
+    <JFXButton fx:id="posi" defaultButton="true" buttonType="RAISED" minWidth="80.0" onAction="#close" text="OK" HBox.hgrow="NEVER"/>
+    <JFXButton fx:id="neutral" cancelButton="false" buttonType="RAISED" minWidth="80.0" onAction="#close" text="Newtral" visible="false" HBox.hgrow="NEVER"/>
+    <JFXButton fx:id="nega" cancelButton="true" buttonType="RAISED" minWidth="80.0" onAction="#close" text="No" HBox.hgrow="NEVER"/>
   </actions>
 </JFXDialogLayout>

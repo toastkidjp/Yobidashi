@@ -3,3 +3,9 @@
     -fx-background: #150666;
     -fx-control-inner-background: #C8C2EA;
 }
+.jfx-snackbar-content {
+    -fx-background-color: #323232;
+}
+.jfx-decorator {
+    -fx-background-color: WHITE;
+}

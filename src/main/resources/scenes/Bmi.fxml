@@ -26,7 +26,7 @@
             <Label text=" [ kg ]" />
          </children>
       </HBox>
-      <JFXButton text="Calculate" onAction="#calculate"/>
+      <JFXButton text="Calculate" buttonType="RAISED" onAction="#calculate"/>
       <Label text="  BMIの計算式：体重(㎏) / (身長(㎝)^2)" />
       <Label text="  ここに結果を表示します。" />
       <JFXTextArea fx:id="result" text="標準値は22です。"/>
