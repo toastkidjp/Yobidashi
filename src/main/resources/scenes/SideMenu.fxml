@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTabPane?>
+
+<?import jp.toastkid.jfx.common.control.ActionLabel?>
+
+<StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+  fx:controller="jp.toastkid.yobidashi.SideMenuController">
+    <styleClass>
+        <String fx:value="side-menu" />
+    </styleClass>
+    <JFXTabPane fx:id="menuTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
+      <tabs>
+        <Tab text="File">
+          <content>
+            <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
+              <ActionLabel onAction="#clearBackup" text="Delete backup" />
+              <ActionLabel accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="Backup article" />
+              <!--ActionLabel accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" /-->
+            </JFXListView>
+          </content>
+        </Tab>
+        <Tab text="Edit">
+          <content>
+            <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
+              <!--Tab text="New article" accelerator="Ctrl+N">
+                <content>
+                  <ActionLabel onAction="#makeArticle" text="Wiki Article" />
+                  <ActionLabel onAction="#makeMarkdown" text="Markdown" />
+                </content>
+              </Tab-->
+              <ActionLabel accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="Article length counter" />
+              <!--ActionLabel accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="Copy article" />
+              <ActionLabel onAction="#callRename" text="Rename article" />
+              <ActionLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" /-->
+              <!--ActionLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" /-->
+              <ActionLabel accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="Article Search" />
+              <!--ActionLabel onAction="#callDelete" text="Delete article" /-->
+            </JFXListView>
+          </content>
+        </Tab>
+
+        <Tab text="Tool">
+          <content>
+            <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
+              <ActionLabel accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="Calculator" />
+              <ActionLabel onAction="#callCmd" text="Command Prompt" />
+              <!--ActionLabel accelerator="Ctrl+G" mnemonicParsing="true" onAction="#drawChart" text="Draw chart" /-->
+              <!--ActionLabel onAction="#callGallery" text="Gallery" /-->
+              <!--ActionLabel accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" /-->
+              <ActionLabel accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
+              <!--ActionLabel onAction="#callRssFeeder" text="RSS Feeder" /-->
+              <ActionLabel onAction="#openScripter" text="Script Runner" />
+              <ActionLabel onAction="#openNoodleTimer" text="Noodle Timer" />
+              <ActionLabel onAction="#openCssGenerator" text="CSS Generator" />
+              <!--ActionLabel onAction="#callConvertMd" text="Convert to Markdown" />
+              <ActionLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
+              <ActionLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
+              <ActionLabel onAction="#callSimpleBachup" text="Simple article backup" />
+              <ActionLabel onAction="#callGenerateEpubs" text="Generate ePub" />
+              <ActionLabel onAction="#callLogViewer" text="LogViewer" /-->
+            </JFXListView>
+          </content>
+        </Tab>
+
+        <Tab text="Window">
+          <tooltip><Tooltip text="Window menu." /></tooltip>
+          <content>
+            <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
+              <ActionLabel onAction="#fullScreen" text="Full screen" />
+              <!--MenuItem accelerator="F5" mnemonicParsing="true" onAction="#reload" text="Reload" /-->
+              <ActionLabel onAction="#callConfig" text="Config" />
+            </JFXListView>
+          </content>
+        </Tab>
+
+        <Tab text="Help">
+          <content>
+            <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" fx:id="help">
+              <ActionLabel onAction="#callApplicationState" text="Application state" />
+              <ActionLabel onAction="#callAbout" text="About" />
+            </JFXListView>
+          </content>
+        </Tab>
+
+      </tabs>
+    </JFXTabPane>
+</StackPane>

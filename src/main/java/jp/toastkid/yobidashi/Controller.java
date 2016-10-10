@@ -1,13 +1,11 @@
 package jp.toastkid.yobidashi;
 
 import java.awt.Desktop;
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,13 +19,14 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
@@ -39,7 +38,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
@@ -64,7 +62,6 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -77,6 +74,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
@@ -85,14 +83,12 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
-import jp.toastkid.chart.ChartPane;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.Style;
 import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
-import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
@@ -102,13 +98,11 @@ import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.rss.RssFeeder;
-import jp.toastkid.wiki.ApplicationState;
 import jp.toastkid.wiki.Archiver;
 import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.FullScreen;
 import jp.toastkid.wiki.control.ArticleListCell;
-import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.lib.Wiki2Markdown;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Article.Extension;
@@ -135,9 +129,6 @@ public final class Controller implements Initializable {
     /** log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
-    /** about file. */
-    private static final String PATH_ABOUT_APP   = "README.md";
-
     /** 「リロード」ボタンの画像ファイルへのパス */
     private static final String PATH_IMG_RELOAD  = "images/reload.png";
 
@@ -161,14 +152,6 @@ public final class Controller implements Initializable {
     /** searcher appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SEARCHER
         = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-
-    /** Zoom increment keyboard shortcut. */
-    private static final KeyCodeCombination ZOOM_INCREMENT
-        = new KeyCodeCombination(KeyCode.SEMICOLON, KeyCombination.CONTROL_DOWN);
-
-    /** Zoom decrement keyboard shortcut. */
-    private static final KeyCodeCombination ZOOM_DECREMENT
-        = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
 
     /** Show left pane. */
     private static final KeyCodeCombination SHOW_LEFT_PANE
@@ -219,11 +202,11 @@ public final class Controller implements Initializable {
 
     /** header. */
     @FXML
-    public HBox header;
+    public Pane header;
 
     /** footer. */
     @FXML
-    public HBox footer;
+    public Pane footer;
 
     /** URL 入力エリア. */
     @FXML
@@ -250,13 +233,7 @@ public final class Controller implements Initializable {
     /** Web 検索のクエリを記入する部分. */
     @FXML
     public TextField webQuery;
-    /** グラフ種別セレクタ. */
-    @SuppressWarnings("rawtypes")
-    @FXML
-    public ComboBox graphKind;
-    /** 月セレクタ. */
-    @FXML
-    public ComboBox<String> month;
+
     /** スプリッタ―. */
     @FXML
     public SplitPane splitter;
@@ -268,12 +245,6 @@ public final class Controller implements Initializable {
     @FXML
     public Button webSearch;
 
-    /** Zoom Controller. */
-    @FXML
-    public Slider zoom;
-    /** Specify zoom rate. */
-    @FXML
-    public TextField zoomInput;
     /** Stylesheet selector. */
     @FXML
     public ComboBox<String> style;
@@ -335,6 +306,27 @@ public final class Controller implements Initializable {
     @FXML
     protected JFXSnackbar snackbar;
 
+    @FXML
+    protected StackPane titleBurgerContainer;
+
+    @FXML
+    protected JFXHamburger titleBurger;
+
+    @FXML
+    protected StackPane optionsBurger;
+
+    @FXML
+    protected JFXDrawer drawer;
+
+    @FXML
+    protected JFXDrawer rightDrawer;
+
+    @FXML
+    protected SideMenuController sideMenuController;
+
+    @FXML
+    protected ToolsController toolsController;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -379,14 +371,6 @@ public final class Controller implements Initializable {
             func = new ArticleGenerator();
             pd.addProgress(11);
             pd.addText(Thread.currentThread().getName() + " Ended initialize ArticleGenerator. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            initGraphTool();
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize graph tool. "
                     + (System.currentTimeMillis() - start) + "ms");
         });
 
@@ -453,32 +437,61 @@ public final class Controller implements Initializable {
         es.execute(() -> {
             final long start = System.currentTimeMillis();
             searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
-            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN)
-                    );
-            final DoubleProperty valueProperty = zoom.valueProperty();
-            valueProperty.addListener( (value, arg1, arg2) -> {
-                getCurrentWebView().ifPresent(wv -> {wv.zoomProperty().bindBidirectional(valueProperty);});
-                zoomInput.setText(Double.toString(valueProperty.get()));
-            });
+            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
             pd.addProgress(11);
             pd.addText(Thread.currentThread().getName() + " Ended initialize tools. "
                     + (System.currentTimeMillis() - start) + "ms");
         });
 
+        es.execute(() -> {
+            final long start = System.currentTimeMillis();
+            // init the title hamburger icon
+            drawer.setOnDrawerOpening(e -> {
+                titleBurger.getAnimation().setRate(1);
+                titleBurger.getAnimation().play();
+            });
+            drawer.setOnDrawerClosing(e -> {
+                titleBurger.getAnimation().setRate(-1);
+                titleBurger.getAnimation().play();
+            });
+            titleBurgerContainer.setOnMouseClicked(e->{
+                if (drawer.isHidden() || drawer.isHidding()) {
+                    drawer.open();
+                } else {
+                    drawer.close();
+                }
+            });
+            optionsBurger.setOnMouseClicked(e->{
+                if (rightDrawer.isHidden() || rightDrawer.isHidding()) {
+                    rightDrawer.open();
+                } else {
+                    rightDrawer.close();
+                }
+            });
+            pd.addProgress(11);
+            pd.addText(Thread.currentThread().getName() + " Ended initialize drawer. "
+                    + (System.currentTimeMillis() - start) + "ms");
+        });
+
         es.shutdown();
 
-        searchKind.getSelectionModel().select(0);
+//        searchKind.getSelectionModel().select(0);
 
         // move to top.
         header.setOnMousePressed((event) -> moveToTop());
         footer.setOnMousePressed((event) -> moveToBottom());
         pd.addProgress(11);
 
-        reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
-        webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
+//        reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
+//        webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
         //initReloadButton();
 
         BACKUP.submit(FILE_WATCHER);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (BACKUP != null) {
+                BACKUP.shutdownNow();
+            }
+        }));
         pd.addProgress(11);
         pd.stop();
     }
@@ -520,10 +533,6 @@ public final class Controller implements Initializable {
                 } else {
                     openSearcher();
                 }
-            } else if (ZOOM_INCREMENT.match(e)) {
-                zoom.increment();
-            } else if (ZOOM_DECREMENT.match(e)) {
-                zoom.decrement();
             } else if (SHOW_LEFT_PANE.match(e)) {
                 showLeftPane();
             } else if (HIDE_LEFT_PANE.match(e)) {
@@ -615,27 +624,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ズーム率を指定値に変更する.
-     */
-    @FXML
-    private final void setZoom() {
-        try {
-            final double ratio = Double.parseDouble(zoomInput.getText());
-            zoom.setValue(ratio);
-        } catch (final Exception e) {
-            LOGGER.error("Error", e);
-        }
-    }
-
-    /**
-     * ズーム率をデフォルト(=1)に戻す.
-     */
-    @FXML
-    private final void callDefaultZoom() {
-        zoom.setValue(1.0);;
-    }
-
-    /**
      * move to top of current page.
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
@@ -719,18 +707,6 @@ public final class Controller implements Initializable {
         } catch (final Exception e) {
             LOGGER.error("no such element", e);
         }
-    }
-
-    /**
-     * グラフツールを初期化する.
-     */
-    private final void initGraphTool() {
-        @SuppressWarnings("unused")
-        final ObservableList<String> items = month.<String>getItems();
-        items.addAll(ChartPane.getMonthsList());
-        // 初期値セット
-        graphKind.getSelectionModel().select(0);
-        month.getSelectionModel().select(items.size() - 1);
     }
 
     /**
@@ -839,20 +815,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * アプリケーションの状態を取得し、HTMLで表示する.
-     */
-    @FXML
-    private final void callApplicationState() {
-        final Map<String, String> map = ApplicationState.getConfigMap();
-        final StringBuilder bld = new StringBuilder();
-        final String lineSeparator = System.lineSeparator();
-        map.forEach((key, value) ->
-            bld.append(key).append("\t").append(value).append(lineSeparator)
-        );
-        AlertDialog.showMessage(getParent(), "状態", bld.toString());
-    }
-
-    /**
      * call LogViewer.
      */
     @FXML
@@ -868,63 +830,6 @@ public final class Controller implements Initializable {
         func.generateHtml(log, "LogViewer");
         openWebTab();
         loadDefaultFile();
-    }
-
-    /**
-     * call About.
-     */
-    @FXML
-    private final void callAbout() {
-        if (!new File(PATH_ABOUT_APP).exists()) {
-            LOGGER.warn(new File(PATH_ABOUT_APP).getAbsolutePath() + " is not exists.");
-            return;
-        }
-
-        func.generateHtml(
-                new ArticleGenerator().md2Html(PATH_ABOUT_APP),
-                "About"
-                );
-        openWebTab();
-        loadDefaultFile();
-    }
-
-    /**
-     * バックアップ機能を呼び出す。
-     */
-    @FXML
-    private final void callBackUp(final ActionEvent event) {
-        final Window parent = getParent();
-        new AlertDialog.Builder(parent)
-            .setTitle("バックアップ")
-            .setMessage("この処理には時間がかかります。")
-            .setOnPositive("OK", () -> {
-                final ProgressDialog pd = new ProgressDialog.Builder()
-                        .setScene(this.getParent().getScene())
-                        .setText("バックアップ中……").build();
-                final long start = System.currentTimeMillis();
-                String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
-                try {
-                    new ZipArchiver().doDirectory(sArchivePath);
-                    //new ZipArchiver().doDirectory(iArchivePath);
-                } catch (final IOException e) {
-                    LOGGER.error("Error", e);;
-                }
-                final long end = System.currentTimeMillis() - start;
-                pd.stop();
-                sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                        .concat(ZipArchiver.EXTENSION_ZIP);
-                final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
-                        sArchivePath, System.lineSeparator(), end);
-                AlertDialog.showMessage(parent, "バックアップ完了", message);
-            }).build().show();
-    }
-
-    /**
-     * get parent window.
-     * @return parent window.
-     */
-    private Window getParent() {
-        return stage.getScene().getWindow();
     }
 
     /**
@@ -972,11 +877,6 @@ public final class Controller implements Initializable {
             loadUrl(Config.article.toInternalUrl(), true);
             return;
         }
-        // webView でなければそれぞれ reload.
-        LOGGER.info(node.getClass().equals(ChartPane.class) + " " + node.getClass().getName() + " " + ToStringBuilder.reflectionToString(node));
-        if (node instanceof ChartPane) {
-            drawChart(false);
-        }
     }
 
     /**
@@ -998,71 +898,6 @@ public final class Controller implements Initializable {
         }
         openWebTab();
         loadUrl(url);
-    }
-
-    /**
-     * 設定ダイアログを呼び出す.
-     * @param event ActionEvent
-     */
-    @FXML
-    private final void callConfig(final ActionEvent event) {
-        final String current = Config.get(Config.Key.VIEW_TEMPLATE);
-        new ConfigDialog(getParent()).showConfigDialog();
-        Config.reload();
-        if (!current.equals(Config.get(Config.Key.VIEW_TEMPLATE))) {
-            reload();
-        }
-    }
-
-    /**
-     * open CSS Generator.
-     */
-    @FXML
-    private final void openCssGenerator() {
-        try {
-            new jp.toastkid.gui.jfx.cssgen.Main().start(this.stage);
-        } catch (final Exception e) {
-            LOGGER.error("Error", e);;
-        }
-    }
-
-    /**
-     * open Noodle Timer.
-     */
-    @FXML
-    private final void openNoodleTimer() {
-        try {
-            new jp.toastkid.gui.jfx.noodle_timer.Main().start(this.stage);
-        } catch (final Exception e) {
-            LOGGER.error("Error", e);;
-        }
-    }
-
-    /**
-     * グラフを描画する.
-     */
-    @FXML
-    private final void drawChart() {
-        drawChart(true);
-    }
-
-    /**
-     * グラフを描画する.
-     */
-    @FXML
-    private final void drawChart(final boolean openNew) {
-        final String graphTitle = graphKind.getSelectionModel().getSelectedItem().toString();
-        final Pane content = ChartPane.make(graphTitle,
-                "日記" + month.getSelectionModel().getSelectedItem().toString());
-
-        if (openNew) {
-            final Tab tab = makeClosableTab(graphTitle);
-            tab.setContent(content);
-            openTab(tab);
-            return;
-        }
-
-        getCurrentTab().setContent(content);
     }
 
     /**
@@ -1192,7 +1027,7 @@ public final class Controller implements Initializable {
 
             // adding new item:
             final MenuItem length = new MenuItem("文字数計測"){{
-                setOnAction(event -> callFileLength());
+                setOnAction(event -> sideMenuController.callFileLength());
             }};
             final MenuItem fullScreen = new MenuItem("Full Screen"){{
                 setOnAction(event -> callTabFullScreen());
@@ -1216,7 +1051,7 @@ public final class Controller implements Initializable {
                 setOnAction(event -> moveToBottom());
             }};
             final MenuItem searchAll = new MenuItem("全記事検索"){{
-                setOnAction(event -> callSearch());
+                setOnAction(event -> searchArticle("", ""));
             }};
             final MenuItem showLeft = new MenuItem("記事一覧を開く"){{
                 setOnAction(event -> showLeftPane());
@@ -1348,32 +1183,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ファイルの文字数を計測して表示する.
-     * @param event
-     */
-    @FXML
-    private final void callFileLength() {
-        AlertDialog.showMessage(
-                getParent(),
-                "文字数計測",
-                Config.article.makeCharCountResult()
-                );
-    }
-
-    /**
-     * 全記事検索を呼び出す.
-     */
-    @FXML
-    private final void callSearch() {
-        searchArticle("", "");
-    }
-
-    /**
      * 再帰的に呼び出すためメソッドに切り出し.
      * @param q クエリ
      * @param f 記事名フィルタ文字列
      */
-    private void searchArticle(final String q, final String f) {
+    protected void searchArticle(final String q, final String f) {
         final CheckBox isTitleOnly = new JFXCheckBox("記事名で検索");
         final CheckBox isAnd       = new JFXCheckBox("AND 検索"){{setSelected(true);}};
         new AlertDialog.Builder(getParent())
@@ -1517,30 +1331,6 @@ public final class Controller implements Initializable {
      */
     private void loadDefaultFile() {
         loadUrl(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
-    }
-
-    /**
-     * Call system calculator.
-     */
-    @FXML
-    private final void callCalc() {
-        RuntimeUtil.callCalculator();
-    }
-
-    /**
-     * Call command prompt.
-     */
-    @FXML
-    private final void callCmd() {
-        RuntimeUtil.callCmd();
-    }
-
-    /**
-     * switch Full screen mode.
-     */
-    @FXML
-    private final void fullScreen() {
-        stage.setFullScreen(!stage.fullScreenProperty().get());
     }
 
     /**
@@ -1774,30 +1564,6 @@ public final class Controller implements Initializable {
         }
         FILE_WATCHER.add(article.file);
         historyList.requestLayout();
-    }
-
-    /**
-     * バックアップファイルをすべて削除する.
-     */
-    @FXML
-    private final void clearBackup() {
-        new AlertDialog.Builder(stage)
-            .setTitle("Clear History").setMessage("バックアップを削除します。")
-            .setOnPositive("OK", () -> {
-                try {
-                    Files.list(Paths.get("backup/")).parallel()
-                    .forEach(p -> {
-                        try {
-                            Files.deleteIfExists(p);
-                        } catch (final Exception e) {
-                            LOGGER.error("Error", e);;
-                        }
-                    });
-                } catch (final Exception e) {
-                    LOGGER.error("Error", e);;
-                }
-            })
-            .build().show();
     }
 
     /**
@@ -2102,19 +1868,10 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * call capture.
-     * @param filename
+     * apply stylesheet.
      */
     @FXML
-    public void callCapture() {
-        FileUtil.capture(Long.toString(System.nanoTime()), getCurrentRectangle());
-    }
-
-    /**
-     * set stylesheet.
-     */
-    @FXML
-    public void callSetOnStyle() {
+    public void callApplyStyle() {
         final String styleName = style.getItems().get(style.getSelectionModel().getSelectedIndex())
                 .toString();
         if (StringUtils.isEmpty(styleName)) {
@@ -2124,46 +1881,18 @@ public final class Controller implements Initializable {
         if (stylesheets != null) {
             stylesheets.clear();
         }
+        final String commonStyle = getClass().getResource("/css/common").toString();
         if ("MODENA".equals(styleName) || "CASPIAN".equals(styleName)) {
             Application.setUserAgentStylesheet(styleName);
+            stylesheets.add(commonStyle);
         } else {
             Application.setUserAgentStylesheet("MODENA");
-            stylesheets.add(Style.getPath(styleName));
+            stylesheets.addAll(commonStyle, Style.getPath(styleName));
         }
 
         // for highlighting script area.
         //stylesheets.add(getClass().getResource("css/highlights/java-keywords.css").toExternalForm());
         Config.store(Config.Key.STYLESHEET, styleName);
-    }
-
-    /**
-     * get current window size rectangle.
-     * @return
-     */
-    private Rectangle getCurrentRectangle() {
-        return new Rectangle(
-                (int) stage.getX(),
-                (int) stage.getY(),
-                (int) stage.getWidth(),
-                (int) stage.getHeight());
-    }
-
-    /**
-     * アプリケーションを終了する.
-     * <ol>
-     * <li>生成した一時 HTML ファイルを削除.
-     * </ol>
-     */
-    @FXML
-    public final void closeApplication() {
-        try {
-            if (BACKUP != null) {
-                BACKUP.shutdownNow();
-            }
-        } finally {
-            this.stage.close();
-            System.exit(0);
-        }
     }
 
     /**
@@ -2173,15 +1902,6 @@ public final class Controller implements Initializable {
     public final void setStage(final Stage stage) {
         this.stage = stage;
     }
-
-    /**
-     * only call child method.
-     */
-    @FXML
-    protected void openScripter() {
-        new jp.toastkid.script.Main().show(stage);
-    }
-
 
     /**
      * 引数で渡された文字列を画面下部のステータスラベルに表示する.
@@ -2212,4 +1932,22 @@ public final class Controller implements Initializable {
         this.width  = width;
         this.height = height;
     }
+
+    /**
+     * Set stage to SideMenuController.
+     */
+    protected void setupSideMenu() {
+        sideMenuController.setStage(this.stage);
+        sideMenuController.setOnSearch(() -> searchArticle("", ""));
+        toolsController.init(this.stage);
+    }
+
+    /**
+     * get parent window.
+     * @return parent window.
+     */
+    private Window getParent() {
+        return stage.getScene().getWindow();
+    }
+
 }

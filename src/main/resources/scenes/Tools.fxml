@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXSlider?>
+<?import com.jfoenix.controls.JFXTextField?>
+
+<?import jp.toastkid.jfx.common.control.ActionLabel?>
+
+<StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+  fx:controller="jp.toastkid.yobidashi.ToolsController">
+    <styleClass>
+        <String fx:value="tool-menu" />
+    </styleClass>
+    <VBox prefHeight="200.0" prefWidth="200.0">
+        <children>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Chart tools">
+            <content>
+              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+                <children>
+                  <JFXComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
+                    <items>
+                      <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="日記の文字数" />
+                        <String fx:value="出費" />
+                        <String fx:value="日経平均株価" />
+                      </FXCollections>
+                    </items>
+                    <tooltip><Tooltip text="select graph kind." /></tooltip>
+                  </JFXComboBox>
+                  <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
+                  <JFXButton minWidth="70.0" buttonType="RAISED" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
+                    <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
+                  </JFXButton>
+                </children>
+              </HBox>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Zoom">
+            <content>
+              <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+                <children>
+                  <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="150.0"
+                   showTickLabels="true" showTickMarks="true" value="1.0">
+                    <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
+                  </JFXSlider>
+                  <JFXTextField fx:id="zoomInput" onAction="#setZoom" labelFloat="true"
+                    promptText="zoom rate" prefHeight="25.0" prefWidth="100.0">
+                    <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
+                  </JFXTextField>
+                  <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+                    <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
+                  </JFXButton>
+                </children>
+              </HBox>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
+            <content>
+              <AnchorPane><children><fx:include fx:id="loto6" source="Loto6.fxml"/></children></AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
+            <content>
+              <AnchorPane><children><fx:include fx:id="bmi" source="Bmi.fxml"/></children></AnchorPane>
+            </content>
+          </TitledPane>
+        </children>
+  </VBox>
+</StackPane>

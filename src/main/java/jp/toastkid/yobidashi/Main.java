@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.jfoenix.controls.JFXDecorator;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -114,6 +115,7 @@ public final class Main extends Application {
             controller.setSize(d.getWidth(), d.getHeight());
             // setup searcher.
             controller.setupExpandables();
+            controller.setupSideMenu();
             emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
@@ -140,11 +142,12 @@ public final class Main extends Application {
             controller.setStage(stage);
             final JFXDecorator decorator = new JFXDecorator(stage, loaded);
             decorator.setCustomMaximize(true);
-            decorator.setOnCloseButtonAction(controller::closeApplication);
+            decorator.setOnCloseButtonAction(() -> this.closeApplication(stage));
             decorator.setMaximized(true);
             return Optional.of(new Scene(decorator, 1024, 768));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
+            Platform.exit();
         }
         return Optional.empty();
     }
@@ -153,6 +156,16 @@ public final class Main extends Application {
     public void stop() throws Exception {
         super.stop();
         controller = null;
+    }
+
+    /**
+     * Close this application.
+     * @param stage
+     */
+    public final void closeApplication(final Stage stage) {
+        stage.close();
+        Platform.exit();
+        System.exit(0);
     }
 
     /**
