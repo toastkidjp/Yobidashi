@@ -350,7 +350,7 @@ public final class Controller implements Initializable {
             = new ProgressDialog.Builder().setText("Activation in progress...").build();
         pd.start(stage);
 
-        urlText.setText(Defines.DEFAULT_HOME);
+        urlText.setPromptText(Config.get(Config.Key.WIKI_TITLE));
         if (Desktop.isDesktopSupported()) {
             desktop = Desktop.getDesktop();
             pd.addProgress(1);

@@ -11,12 +11,18 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jfoenix.controls.JFXListView;
+
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
+import jp.toastkid.jfx.common.control.ActionLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
@@ -38,9 +44,13 @@ public class SideMenuController {
     /** about file. */
     private static final String PATH_ABOUT_APP   = "README.md";
 
+    @FXML
+    private TabPane menuTabs;
+
     /** for controlling window. */
     private Stage stage;
 
+    /** search command. */
     private Runnable search;
 
     /**
@@ -275,12 +285,29 @@ public class SideMenuController {
         this.search = command;
     }
 
+    private void putAccerelator() {
+        final ObservableMap<KeyCombination, Runnable> accelerators
+            = this.stage.getScene().getAccelerators();
+        menuTabs.getTabs().forEach(tab -> {
+            @SuppressWarnings("unchecked")
+            final JFXListView<ActionLabel> labels = (JFXListView<ActionLabel>) tab.getContent();
+            labels.getItems().forEach(l -> {
+                if (l.getAccelerator() == null) {
+                    return;
+                }
+                accelerators.put(
+                        l.getAccelerator(), () -> l.getOnAction().handle(new ActionEvent()));
+            });
+        });
+    }
+
     /**
      * Set stage for controlling window.
      * @param stage
      */
     public void setStage(final Stage stage) {
         this.stage  = stage;
+        putAccerelator();
     }
 
 }

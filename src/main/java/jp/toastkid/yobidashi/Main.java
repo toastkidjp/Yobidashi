@@ -7,11 +7,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jfoenix.controls.JFXDecorator;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -104,6 +103,17 @@ public final class Main extends Application {
 
         readScene(stage).ifPresent(scene -> {
             stage.setScene(scene);
+            stage.setOnCloseRequest(event -> this.closeApplication(stage));
+            stage.centerOnScreen();
+            final Screen screen = Screen.getScreens().get(0);
+            final Rectangle2D bounds = screen.getVisualBounds();
+            final BoundingBox maximizedBox
+                = new BoundingBox(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            // maximized the stage
+            stage.setX(maximizedBox.getMinX());
+            stage.setY(maximizedBox.getMinY());
+            stage.setWidth(maximizedBox.getWidth());
+            stage.setHeight(maximizedBox.getHeight());
             stage.show();
             controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
         });
@@ -140,11 +150,11 @@ public final class Main extends Application {
             controller = (Controller) loader.getController();
             stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
             controller.setStage(stage);
-            final JFXDecorator decorator = new JFXDecorator(stage, loaded);
+            /*final JFXDecorator decorator = new JFXDecorator(stage, loaded);
             decorator.setCustomMaximize(true);
             decorator.setOnCloseButtonAction(() -> this.closeApplication(stage));
-            decorator.setMaximized(true);
-            return Optional.of(new Scene(decorator, 1024, 768));
+            decorator.setMaximized(true);*/
+            return Optional.of(new Scene(controller.root));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
             Platform.exit();
