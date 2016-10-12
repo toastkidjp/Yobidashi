@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.control.Skin;
 import javafx.scene.input.KeyCombination;
 
 /**
@@ -71,6 +72,11 @@ public class ActionLabel extends Label {
             accelerator = new SimpleObjectProperty<KeyCombination>(this, "accelerator");
         }
         return accelerator;
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new ActionLabelSkin(this);
     }
 
     public ActionLabel() {

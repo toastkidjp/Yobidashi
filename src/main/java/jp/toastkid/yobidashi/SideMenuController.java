@@ -53,6 +53,8 @@ public class SideMenuController {
     /** search command. */
     private Runnable search;
 
+    private Runnable edit;
+
     /**
      * バックアップ機能を呼び出す。
      */
@@ -278,6 +280,22 @@ public class SideMenuController {
     }
 
     /**
+     * Call editor.
+     */
+    @FXML
+    public final void callEditor() {
+        edit.run();
+    }
+
+    /**
+     * Set edit command.
+     * @param edit Command
+     */
+    public void setOnEdit(final Runnable command) {
+        this.edit = command;
+    }
+
+    /**
      * Set search command.
      * @param command
      */
@@ -285,6 +303,9 @@ public class SideMenuController {
         this.search = command;
     }
 
+    /**
+     * for use shortcut when start-up.
+     */
     private void putAccerelator() {
         final ObservableMap<KeyCombination, Runnable> accelerators
             = this.stage.getScene().getAccelerators();
