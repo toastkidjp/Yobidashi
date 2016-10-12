@@ -327,6 +327,8 @@ public final class Controller implements Initializable {
     @FXML
     protected ToolsController toolsController;
 
+    private String urlValue;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -350,7 +352,8 @@ public final class Controller implements Initializable {
             = new ProgressDialog.Builder().setText("Activation in progress...").build();
         pd.start(stage);
 
-        urlText.setPromptText(Config.get(Config.Key.WIKI_TITLE));
+        urlText.setOnMouseClicked(event -> urlText.setText(urlValue));
+        setTitleOnToolbar();
         if (Desktop.isDesktopSupported()) {
             desktop = Desktop.getDesktop();
             pd.addProgress(1);
@@ -402,7 +405,7 @@ public final class Controller implements Initializable {
                                 && !tabUrl.startsWith("about")
                                 && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
                                 ){
-                            urlText.setText(tabUrl);
+                            setUrlText(tabUrl);
                             return;
                         }
 
@@ -418,7 +421,7 @@ public final class Controller implements Initializable {
                                 );
                         if (selected.exists()){
                             Config.article = new Article(selected);
-                            urlText.setText(Config.article.toInternalUrl());
+                            setUrlText(Config.article.toInternalUrl());
                             focusOn();
                         }
                     }
@@ -494,6 +497,14 @@ public final class Controller implements Initializable {
         }));
         pd.addProgress(11);
         pd.stop();
+    }
+
+    private void setTitleOnToolbar() {
+        urlText.setPromptText(Config.get(Config.Key.WIKI_TITLE));
+    }
+
+    private void setUrlText(final String tabUrl) {
+        urlValue = tabUrl;
     }
 
     private ImageView makeImageView(final String path) {
@@ -1495,14 +1506,14 @@ public final class Controller implements Initializable {
 
         // Web ページならそのまま表示.
         if (!StringUtils.isEmpty(url) && url.startsWith("http")) {
-            urlText.setText(url);
+            setUrlText(url);
             currentWebView.ifPresent(wv -> wv.getEngine().load(url));
             return;
         }
 
         // HTMLならそのまま表示.
         if (!StringUtils.isEmpty(url) && url.endsWith(".html")) {
-            urlText.setText(url);
+            setUrlText(url);
             currentWebView.ifPresent(wv -> wv.getEngine().load(url));
             return;
         }
@@ -1537,7 +1548,7 @@ public final class Controller implements Initializable {
             }
             // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
             func.generateArticleFile();
-            urlText.setText(Config.article.toInternalUrl());
+            setUrlText(Config.article.toInternalUrl());
             // タブが入れ替わった可能性があるので、もう1回取得.
             final WebEngine engine = getCurrentWebView().get().getEngine();
             Platform.runLater(() -> {
@@ -1809,7 +1820,7 @@ public final class Controller implements Initializable {
      * 現在選択されているタブの WebView を返す。
      * @return WebView オブジェクトか empty
      */
-    private final Optional<WebView> getCurrentWebView() {
+    protected final Optional<WebView> getCurrentWebView() {
         final ObservableList<Tab> tabs = tabPane.getTabs();
         final Node content = tabs.get(tabPane.getSelectionModel()
                 .getSelectedIndex()).getContent();
@@ -1939,7 +1950,8 @@ public final class Controller implements Initializable {
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
         sideMenuController.setOnSearch(() -> searchArticle("", ""));
-        toolsController.init(this.stage);
+        sideMenuController.setOnEdit(() -> callEditor());
+        toolsController.init(this.stage, this);
     }
 
     /**

@@ -54,6 +54,8 @@ public class ToolsController {
     /** for controlling window. */
     private Stage stage;
 
+    private Controller controller;
+
     /**
      * Draw chart.
      */
@@ -119,7 +121,8 @@ public class ToolsController {
     private void initZoom() {
         final DoubleProperty valueProperty = zoom.valueProperty();
         valueProperty.addListener( (value, arg1, arg2) -> {
-            //getCurrentWebView().ifPresent(wv -> {wv.zoomProperty().bindBidirectional(valueProperty);});
+            controller.getCurrentWebView()
+                .ifPresent(wv -> wv.zoomProperty().bindBidirectional(valueProperty));
             zoomInput.setText(Double.toString(valueProperty.get()));
         });
     }
@@ -127,9 +130,11 @@ public class ToolsController {
     /**
      * Set stage for controlling window.
      * @param stage
+     * @param controller
      */
-    protected void init(final Stage stage) {
+    protected void init(final Stage stage, final Controller controller) {
         this.stage  = stage;
+        this.controller = controller;
         stage.getScene().setOnKeyPressed(e -> {
             if (ZOOM_INCREMENT.match(e)) {
                 zoom.increment();
