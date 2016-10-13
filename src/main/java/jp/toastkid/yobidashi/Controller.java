@@ -110,8 +110,6 @@ import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
 import jp.toastkid.wiki.search.FileSearcher;
 import jp.toastkid.wiki.search.SearchResult;
-import jp.toastkid.wordcloud.FxWordCloud;
-import jp.toastkid.wordcloud.JFXMasonryPane2;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -296,11 +294,10 @@ public final class Controller implements Initializable {
     /** use for full screen. */
     private FullScreen fs;
 
-    /** use for draw word-cloud. */
-    private FxWordCloud wordCloud;
-
+    /** splitter closing transition. */
     private TranslateTransition splitterClose;
 
+    /** splitter opening transition. */
     private TranslateTransition splitterOpen;
 
     @FXML
@@ -392,6 +389,7 @@ public final class Controller implements Initializable {
         // insert WebView to tabPane.
         es.execute(() -> {
             final long start = System.currentTimeMillis();
+            //TODO implementing.
             tabPane.getSelectionModel().selectedItemProperty().addListener(
                     (a, prevTab, nextTab) -> {
                         // (121224) タブ切り替え時の URL 表示の変更
@@ -399,7 +397,8 @@ public final class Controller implements Initializable {
                         if (!opt.isPresent()) {
                             return;
                         }
-                        final WebEngine engine = opt.get().getEngine();
+                        final WebView wv = opt.get();
+                        final WebEngine engine = wv.getEngine();
                         final String tabUrl = engine.getLocation();
                         if (!StringUtils.isEmpty(tabUrl)
                                 && !tabUrl.startsWith("about")
@@ -426,8 +425,6 @@ public final class Controller implements Initializable {
                         }
                     }
                     );
-            wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
-                            .setMinFontSize(8.0).build();
             Platform.runLater( () -> {
                 openWebTab();
                 callHome();
@@ -1070,9 +1067,6 @@ public final class Controller implements Initializable {
             final MenuItem hideLeft = new MenuItem("記事一覧を閉じる"){{
                 setOnAction(event -> hideLeftPane());
             }};
-            final MenuItem wordCloud = new MenuItem("Word cloud"){{
-                setOnAction(event -> callWordCloud());
-            }};
 
             // add new item:
             cmc.getItemsContainer().getChildren().addAll(
@@ -1085,8 +1079,7 @@ public final class Controller implements Initializable {
                     cmc.new MenuItemContainer(moveToTop),
                     cmc.new MenuItemContainer(moveToBottom),
                     cmc.new MenuItemContainer(searchAll),
-                    cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft),
-                    cmc.new MenuItemContainer(wordCloud)
+                    cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft)
                     );
 
             return (PopupWindow)window;
@@ -1133,11 +1126,10 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在選択しているタブを閉じる.1つしか開いていない時は閉じない。
-     * @param e
+     * 現在選択しているタブを閉じる. 1つしか開いていない時は閉じない.
      */
     @FXML
-    private final void closeTab(final ActionEvent event) {
+    private final void closeTab() {
         closeTab(tabPane.getSelectionModel().getSelectedItem());
     }
 
@@ -1149,7 +1141,9 @@ public final class Controller implements Initializable {
         final ObservableList<Tab> tabs = tabPane.getTabs();
         if (1 < tabs.size()) {
             tabs.remove(tab);
+            return;
         }
+        showSnackbar("Can't close tab when current tabs count 1.");
     }
 
     /**
@@ -1229,8 +1223,7 @@ public final class Controller implements Initializable {
 
                 final Map<String, SearchResult> map = fileSearcher.search(query);
                 if (map.isEmpty()){
-                    AlertDialog.showMessage(
-                            getParent(), "見つかりませんでした。", "見つかりませんでした。");
+                    showSnackbar(String.format("Not found article with '%s'.", query));
                     searchArticle(queryInput.getText(), filterInput.getText());
                     return;
                 }
@@ -1272,7 +1265,7 @@ public final class Controller implements Initializable {
      * @param parent Parent TabPane
      * @return 空の Tab
      */
-    public static Tab makeClosableTab(final String title, final TabPane parent) {
+    private static Tab makeClosableTab(final String title, final TabPane parent) {
         final Tab tab = new Tab(title);
         tab.setClosable(true);
 
@@ -1280,22 +1273,6 @@ public final class Controller implements Initializable {
         closeButton.setOnAction(e -> parent.getTabs().remove(tab));
         tab.setGraphic(closeButton);
         return tab;
-    }
-
-    /**
-     * ワードクラウド表示機能を呼び出す.
-     */
-    @FXML
-    private final void callWordCloud() {
-        final Tab tab = makeClosableTab(Config.article.title + "のワードクラウド");
-        final JFXMasonryPane2 pane = new JFXMasonryPane2();
-        final ScrollPane value = new ScrollPane(pane);
-        value.setFitToHeight(true);
-        value.setFitToWidth(true);
-        tab.setContent(value);
-        wordCloud.draw(pane, Config.article.file);
-        Platform.runLater(()-> value.requestLayout());
-        openTab(tab);
     }
 
     /**
@@ -1931,8 +1908,16 @@ public final class Controller implements Initializable {
         Platform.runLater(() -> status.setText(message));
         if (showLog) {
             LOGGER.info(message);
-            snackbar.fireEvent(new SnackbarEvent(message));
+            showSnackbar(message);
         }
+    }
+
+    /**
+     * Show message with Snackbar.
+     * @param message
+     */
+    private void showSnackbar(final String message) {
+        snackbar.fireEvent(new SnackbarEvent(message));
     }
 
     /**
@@ -1951,7 +1936,22 @@ public final class Controller implements Initializable {
         sideMenuController.setStage(this.stage);
         sideMenuController.setOnSearch(() -> searchArticle("", ""));
         sideMenuController.setOnEdit(() -> callEditor());
-        toolsController.init(this.stage, this);
+        sideMenuController.setOnNewTab(() -> openWebTab());
+        sideMenuController.setOnCloseTab(() -> closeTab());
+        sideMenuController.setOnSlideShow(() -> slideShow());
+        sideMenuController.setOnWordCloud((title, content) -> {
+            final Tab tab = makeClosableTab(title);
+            tab.setContent(content);
+            openTab(tab);
+        });
+        toolsController.init(this.stage);
+        toolsController.setOnDrawChart((title, content) -> {
+            final Tab tab = makeClosableTab(title);
+            tab.setContent(content);
+            openTab(tab);
+        });
+        LOGGER.info("setOnDrawChart init");
+        toolsController.setWebView(() -> getCurrentWebView().get());
     }
 
     /**

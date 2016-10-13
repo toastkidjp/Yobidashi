@@ -16,6 +16,7 @@ import com.jfoenix.controls.JFXListView;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
@@ -29,6 +30,8 @@ import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.wiki.ApplicationState;
 import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.models.Config;
+import jp.toastkid.wordcloud.FxWordCloud;
+import jp.toastkid.wordcloud.JFXMasonryPane2;
 
 /**
  * Side menu's controller.
@@ -44,8 +47,12 @@ public class SideMenuController {
     /** about file. */
     private static final String PATH_ABOUT_APP   = "README.md";
 
+    /** menu tabs. */
     @FXML
     private TabPane menuTabs;
+
+    /** use for draw word-cloud. */
+    private FxWordCloud wordCloud;
 
     /** for controlling window. */
     private Stage stage;
@@ -53,7 +60,19 @@ public class SideMenuController {
     /** search command. */
     private Runnable search;
 
+    /** edit article command. */
     private Runnable edit;
+
+    /** open tab command. */
+    private Runnable open;
+
+    /** close tab command. */
+    private Runnable close;
+
+    /** slide show command. */
+    private Runnable slide;
+
+    private OpenTabAction tabAction;
 
     /**
      * バックアップ機能を呼び出す。
@@ -173,6 +192,21 @@ public class SideMenuController {
     }
 
     /**
+     * ワードクラウド表示機能を呼び出す.
+     */
+    @FXML
+    private final void callWordCloud() {
+        final JFXMasonryPane2 pane = new JFXMasonryPane2();
+        final ScrollPane value = new ScrollPane(pane);
+        value.setFitToHeight(true);
+        value.setFitToWidth(true);
+
+        wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
+                        .setMinFontSize(8.0).build();
+        wordCloud.draw(pane, Config.article.file);
+        tabAction.draw(Config.article.title + "のワードクラウド", pane);
+    }
+    /**
      * call About.
      */
     @FXML
@@ -238,7 +272,7 @@ public class SideMenuController {
      * @param filename
      */
     @FXML
-    public void callCapture() {
+    private void callCapture() {
         FileUtil.capture(Long.toString(System.nanoTime()), getCurrentRectangle());
     }
 
@@ -283,16 +317,56 @@ public class SideMenuController {
      * Call editor.
      */
     @FXML
-    public final void callEditor() {
+    private final void callEditor() {
         edit.run();
+    }
+
+    /**
+     * Open new tab.
+     */
+    @FXML
+    private final void openWebTab() {
+        open.run();
+    }
+
+    /**
+     * Close new tab.
+     */
+    @FXML
+    private final void closeTab() {
+        close.run();
+    }
+
+    /**
+     * Show slide show.
+     */
+    @FXML
+    private final void slideShow() {
+        slide.run();
     }
 
     /**
      * Set edit command.
      * @param edit Command
      */
-    public void setOnEdit(final Runnable command) {
+    protected void setOnEdit(final Runnable command) {
         this.edit = command;
+    }
+
+    /**
+     * Set open tab command.
+     * @param edit Command
+     */
+    protected void setOnNewTab(final Runnable command) {
+        this.open = command;
+    }
+
+    /**
+     * Set close tab command.
+     * @param edit Command
+     */
+    protected void setOnCloseTab(final Runnable command) {
+        this.close = command;
     }
 
     /**
@@ -301,6 +375,14 @@ public class SideMenuController {
      */
     protected void setOnSearch(final Runnable command) {
         this.search = command;
+    }
+
+    /**
+     * Set show slide show command.
+     * @param command
+     */
+    protected void setOnSlideShow(final Runnable command) {
+        this.slide = command;
     }
 
     /**
@@ -326,9 +408,17 @@ public class SideMenuController {
      * Set stage for controlling window.
      * @param stage
      */
-    public void setStage(final Stage stage) {
+    protected void setStage(final Stage stage) {
         this.stage  = stage;
         putAccerelator();
+    }
+
+    /**
+     * Set WordCloud Action.
+     * @param tabAction
+     */
+    protected void setOnWordCloud(final OpenTabAction tabAction) {
+        this.tabAction = tabAction;
     }
 
 }

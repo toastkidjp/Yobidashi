@@ -1,10 +1,13 @@
 package jp.toastkid.yobidashi;
 
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
@@ -13,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
 
@@ -24,7 +28,7 @@ import jp.toastkid.chart.ChartPane;
 public class ToolsController {
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToolsController.class);
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -33,6 +37,10 @@ public class ToolsController {
     /** Zoom decrement keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_DECREMENT
         = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
+
+    /** Draw chart shortcut. */
+    private static final KeyCombination DRAW_CHART
+        = new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
 
     /** グラフ種別セレクタ. */
     @SuppressWarnings("rawtypes")
@@ -54,33 +62,17 @@ public class ToolsController {
     /** for controlling window. */
     private Stage stage;
 
-    private Controller controller;
+    private OpenTabAction chart;
 
     /**
      * Draw chart.
      */
     @FXML
     private final void drawChart() {
-        drawChart(true);
-    }
-
-    /**
-     * Draw chart.
-     */
-    @FXML
-    private final void drawChart(final boolean openNew) {
-        final String graphTitle = graphKind.getSelectionModel().getSelectedItem().toString();
-        final Pane content = ChartPane.make(graphTitle,
+        final String title = graphKind.getSelectionModel().getSelectedItem().toString();
+        final Pane content = ChartPane.make(title,
                 "日記" + month.getSelectionModel().getSelectedItem().toString());
-
-        /*if (openNew) {
-            final Tab tab = makeClosableTab(graphTitle);
-            tab.setContent(content);
-            openTab(tab);
-            return;
-        }
-
-        getCurrentTab().setContent(content);*/
+        chart.draw(title, content);
     }
 
     /**
@@ -104,6 +96,14 @@ public class ToolsController {
         zoom.setValue(1.0);;
     }
 
+    protected void setWebView(final Supplier<WebView> wvSupplier) {
+        zoom.valueProperty().bindBidirectional(wvSupplier.get().zoomProperty());
+    }
+
+    protected void setOnDrawChart(final OpenTabAction chart) {
+        this.chart = chart;
+    }
+
     /**
      * Initialize chart tool.
      */
@@ -120,11 +120,7 @@ public class ToolsController {
      */
     private void initZoom() {
         final DoubleProperty valueProperty = zoom.valueProperty();
-        valueProperty.addListener( (value, arg1, arg2) -> {
-            controller.getCurrentWebView()
-                .ifPresent(wv -> wv.zoomProperty().bindBidirectional(valueProperty));
-            zoomInput.setText(Double.toString(valueProperty.get()));
-        });
+        zoomInput.setText(Double.toString(valueProperty.get()));
     }
 
     /**
@@ -132,16 +128,13 @@ public class ToolsController {
      * @param stage
      * @param controller
      */
-    protected void init(final Stage stage, final Controller controller) {
+    protected void init(final Stage stage) {
         this.stage  = stage;
-        this.controller = controller;
-        stage.getScene().setOnKeyPressed(e -> {
-            if (ZOOM_INCREMENT.match(e)) {
-                zoom.increment();
-            } else if (ZOOM_DECREMENT.match(e)) {
-                zoom.decrement();
-            }
-        });
+        final ObservableMap<KeyCombination, Runnable> accelerators
+            = stage.getScene().getAccelerators();
+        accelerators.put(DRAW_CHART,     this::drawChart);
+        accelerators.put(ZOOM_INCREMENT, zoom::increment);
+        accelerators.put(ZOOM_DECREMENT, zoom::decrement);
         initChartTool();
         initZoom();
     }

@@ -2,7 +2,6 @@ package jp.toastkid.yobidashi;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,21 +100,21 @@ public final class Main extends Application {
         })
         .subscribeOn(Schedulers.elastic()).subscribe();
 
-        readScene(stage).ifPresent(scene -> {
+        readScene(stage).subscribeOn(Schedulers.immediate()).subscribe(scene -> {
             stage.setScene(scene);
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             final Screen screen = Screen.getScreens().get(0);
             final Rectangle2D bounds = screen.getVisualBounds();
-            final BoundingBox maximizedBox
-                = new BoundingBox(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            final BoundingBox maximizedBox = new BoundingBox(
+                    bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
             // maximized the stage
             stage.setX(maximizedBox.getMinX());
             stage.setY(maximizedBox.getMinY());
             stage.setWidth(maximizedBox.getWidth());
             stage.setHeight(maximizedBox.getHeight());
             stage.show();
-            controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
+            controller.setStatus("Complete - " + (System.currentTimeMillis() - start) + "[ms]");
         });
 
         Mono.create(emitter -> {
@@ -143,7 +142,7 @@ public final class Main extends Application {
      * @param stage Stage オブジェクト
      * @return Scene オブジェクト
      */
-    private final Optional<Scene> readScene(final Stage stage) {
+    private final Mono<Scene> readScene(final Stage stage) {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
             final VBox loaded = (VBox) loader.load();
@@ -154,12 +153,12 @@ public final class Main extends Application {
             decorator.setCustomMaximize(true);
             decorator.setOnCloseButtonAction(() -> this.closeApplication(stage));
             decorator.setMaximized(true);*/
-            return Optional.of(new Scene(controller.root));
+            return Mono.just(new Scene(controller.root));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
             Platform.exit();
         }
-        return Optional.empty();
+        return Mono.empty();
     }
 
     @Override

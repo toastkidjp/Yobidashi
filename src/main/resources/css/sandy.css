@@ -134,9 +134,6 @@
     -fx-text-fill: #555500;
 }
 
-.jfx-snackbar-content {
-    -fx-background-color: #323232;
-}
 .jfx-decorator {
     -fx-background-color: rgba(200, 170, 0, 0.5);
 }
