@@ -69,3 +69,11 @@
 .jfx-snackbar-toast {
     -fx-text-fill: WHITE;
 }
+
+.jfx-tool-bar .jfx-options-burger{
+	-fx-padding: 22px;
+}
+
+.jfx-tool-bar .jfx-options-burger StackPane{
+	-fx-pref-width:4px;
+}
