@@ -71,9 +71,17 @@
 }
 
 .jfx-tool-bar .jfx-options-burger{
-	-fx-padding: 22px;
+  -fx-padding: 22px;
 }
 
 .jfx-tool-bar .jfx-options-burger StackPane{
-	-fx-pref-width:4px;
+  -fx-pref-width:4px;
+}
+
+.jfx-tab-pane .tab-header-background{
+    -fx-background-color: rgba(50.0, 0.0, 100.0, 0.57);
+}
+
+.jfx-tab-pane .tab-label {
+    -fx-text-fill: #FFFFFF;
 }
