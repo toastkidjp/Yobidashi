@@ -110,6 +110,7 @@ import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
 import jp.toastkid.wiki.search.FileSearcher;
 import jp.toastkid.wiki.search.SearchResult;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -389,7 +390,6 @@ public final class Controller implements Initializable {
         // insert WebView to tabPane.
         es.execute(() -> {
             final long start = System.currentTimeMillis();
-            //TODO implementing.
             tabPane.getSelectionModel().selectedItemProperty().addListener(
                     (a, prevTab, nextTab) -> {
                         // (121224) タブ切り替え時の URL 表示の変更
@@ -1798,9 +1798,12 @@ public final class Controller implements Initializable {
      * @return WebView オブジェクトか empty
      */
     protected final Optional<WebView> getCurrentWebView() {
-        final ObservableList<Tab> tabs = tabPane.getTabs();
-        final Node content = tabs.get(tabPane.getSelectionModel()
-                .getSelectedIndex()).getContent();
+        final int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            return Optional.empty();
+        }
+
+        final Node content = tabPane.getTabs().get(selectedIndex).getContent();
         return content instanceof WebView
                 ? Optional.of((WebView) content)
                 : Optional.empty();
@@ -1939,6 +1942,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnNewTab(() -> openWebTab());
         sideMenuController.setOnCloseTab(() -> closeTab());
         sideMenuController.setOnSlideShow(() -> slideShow());
+        sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnWordCloud((title, content) -> {
             final Tab tab = makeClosableTab(title);
             tab.setContent(content);
@@ -1950,8 +1954,20 @@ public final class Controller implements Initializable {
             tab.setContent(content);
             openTab(tab);
         });
-        LOGGER.info("setOnDrawChart init");
-        toolsController.setWebView(() -> getCurrentWebView().get());
+
+        //TODO implementing.
+        toolsController.setFlux(Flux.<WebView>create(emitter ->
+            tabPane.getSelectionModel().selectedItemProperty()
+                .addListener((a, prevTab, nextTab) -> {
+                    if (prevTab != null) {
+                        final WebView prev = (WebView) prevTab.getContent();
+                        if (prev != null) {
+                            prev.zoomProperty().unbind();
+                        }
+                    }
+                    getCurrentWebView().ifPresent(emitter::next);;
+                })
+        ));
     }
 
     /**

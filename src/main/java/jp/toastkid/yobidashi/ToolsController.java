@@ -1,11 +1,8 @@
 package jp.toastkid.yobidashi;
 
-import java.util.function.Supplier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
@@ -19,6 +16,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Right side tools controller.
@@ -96,10 +95,6 @@ public class ToolsController {
         zoom.setValue(1.0);;
     }
 
-    protected void setWebView(final Supplier<WebView> wvSupplier) {
-        zoom.valueProperty().bindBidirectional(wvSupplier.get().zoomProperty());
-    }
-
     protected void setOnDrawChart(final OpenTabAction chart) {
         this.chart = chart;
     }
@@ -119,8 +114,7 @@ public class ToolsController {
      * Initialize zoom.
      */
     private void initZoom() {
-        final DoubleProperty valueProperty = zoom.valueProperty();
-        zoomInput.setText(Double.toString(valueProperty.get()));
+        zoomInput.textProperty().bind(zoom.valueProperty().asString());
     }
 
     /**
@@ -137,6 +131,18 @@ public class ToolsController {
         accelerators.put(ZOOM_DECREMENT, zoom::decrement);
         initChartTool();
         initZoom();
+    }
+
+    /**
+     * Set current WebView publisher.
+     * @param wvPublisher
+     */
+    public void setFlux(final Flux<WebView> wvPublisher) {
+        wvPublisher.subscribeOn(Schedulers.elastic())
+            .subscribe(wv -> {
+                zoom.setValue(wv.getZoom());
+                zoom.valueProperty().bindBidirectional(wv.zoomProperty());
+            });
     }
 
 }
