@@ -13,7 +13,6 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -145,14 +144,10 @@ public final class Main extends Application {
     private final Mono<Scene> readScene(final Stage stage) {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
-            final VBox loaded = (VBox) loader.load();
+            loader.load();
             controller = (Controller) loader.getController();
             stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
             controller.setStage(stage);
-            /*final JFXDecorator decorator = new JFXDecorator(stage, loaded);
-            decorator.setCustomMaximize(true);
-            decorator.setOnCloseButtonAction(() -> this.closeApplication(stage));
-            decorator.setMaximized(true);*/
             return Mono.just(new Scene(controller.root));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);

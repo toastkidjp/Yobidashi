@@ -58,9 +58,7 @@ public class ToolsController {
     @FXML
     public TextField zoomInput;
 
-    /** for controlling window. */
-    private Stage stage;
-
+    /** Chart action. */
     private OpenTabAction chart;
 
     /**
@@ -123,7 +121,6 @@ public class ToolsController {
      * @param controller
      */
     protected void init(final Stage stage) {
-        this.stage  = stage;
         final ObservableMap<KeyCombination, Runnable> accelerators
             = stage.getScene().getAccelerators();
         accelerators.put(DRAW_CHART,     this::drawChart);

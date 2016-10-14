@@ -39,6 +39,7 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
@@ -68,7 +69,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -129,10 +129,10 @@ public final class Controller implements Initializable {
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
     /** 「リロード」ボタンの画像ファイルへのパス */
-    private static final String PATH_IMG_RELOAD  = "images/reload.png";
+    //private static final String PATH_IMG_RELOAD  = "images/reload.png";
 
     /** 「検索」画像ファイルへのパス. */
-    private static final String PATH_IMG_SEARCH  = "images/search.png";
+    //private static final String PATH_IMG_SEARCH  = "images/search.png";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -504,47 +504,33 @@ public final class Controller implements Initializable {
         urlValue = tabUrl;
     }
 
-    private ImageView makeImageView(final String path) {
+/*    private ImageView makeImageView(final String path) {
         return new ImageView(getClass().getClassLoader().getResource(path).toString());
     }
-
+*/
     /**
-     * setup searcher and scripter. this method call by FXWikiClient.
+     * Set up searcher and scripter. this method call by FXWikiClient.
      */
     protected void setupExpandables() {
         hideSearcher();
-        stage.getScene().setOnKeyPressed(e -> {
-            // select tab.
-            if (FIRST_TAB.match(e)) {
-                selectTab(0);
-            } else if (SECOND_TAB.match(e)) {
-                selectTab(1);
-            } else if (THIRD_TAB.match(e)) {
-                selectTab(2);
-            } else if (FOURTH_TAB.match(e)) {
-                selectTab(3);
-            } else if (FIFTH_TAB.match(e)) {
-                selectTab(4);
-            } else if (SIXTH_TAB.match(e)) {
-                selectTab(5);
-            } else if (SEVENTH_TAB.match(e)) {
-                selectTab(6);
-            } else if (EIGHTH_TAB.match(e)) {
-                selectTab(7);
-            } else if (NINTH_TAB.match(e)) {
-                selectTab(8);
-            }
-
-            if (APPEAR_SEARCHER.match(e)) {
-                if (searcherArea.visibleProperty().getValue()) {
-                    hideSearcher();
-                } else {
-                    openSearcher();
-                }
-            } else if (SHOW_LEFT_PANE.match(e)) {
-                showLeftPane();
-            } else if (HIDE_LEFT_PANE.match(e)) {
-                hideLeftPane();
+        final ObservableMap<KeyCombination, Runnable> accelerators
+            = stage.getScene().getAccelerators();
+        accelerators.put(FIRST_TAB,   () -> selectTab(0));
+        accelerators.put(SECOND_TAB,  () -> selectTab(1));
+        accelerators.put(THIRD_TAB,   () -> selectTab(2));
+        accelerators.put(FOURTH_TAB,  () -> selectTab(3));
+        accelerators.put(FIFTH_TAB,   () -> selectTab(4));
+        accelerators.put(SIXTH_TAB,   () -> selectTab(5));
+        accelerators.put(SEVENTH_TAB, () -> selectTab(6));
+        accelerators.put(EIGHTH_TAB,  () -> selectTab(7));
+        accelerators.put(NINTH_TAB,   () -> selectTab(8));
+        accelerators.put(SHOW_LEFT_PANE, this::showLeftPane);
+        accelerators.put(HIDE_LEFT_PANE, this::hideLeftPane);
+        accelerators.put(APPEAR_SEARCHER, () -> {
+            if (searcherArea.visibleProperty().getValue()) {
+                hideSearcher();
+            } else {
+                openSearcher();
             }
         });
         // 特殊な使い方をしているので、ここでこのメソッドを呼んでタブ内のサイズ調整をする.
@@ -556,7 +542,6 @@ public final class Controller implements Initializable {
      * @param index
      */
     private void selectTab(final int index) {
-
         if (index < 0 || tabPane.getTabs().size() < index ) {
             LOGGER.info(index + " " + tabPane.getTabs().size());
             return;
@@ -581,8 +566,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * キーワードをハイライトする.
-     * @param word キーワード
+     * Highlight keyword.
+     * @param word keyword which is wanted highlighting
      * @see <a href="http://aoe-tk.hatenablog.com/entry/2015/06/15/001217">
      * JavaFXのWebViewの検索を実現するのにもっと簡単な方法がありました</a>
      */
@@ -747,7 +732,7 @@ public final class Controller implements Initializable {
             .setOnPositive("OK", () -> {
                 final ProgressDialog pd = new ProgressDialog.Builder()
                         .setScene(this.getParent().getScene())
-                        .setText("ePub 生成中……").build();
+                        .setText("ePub generating……").build();
                 pd.start(stage);
                 new EpubGenerator().toEpub(vertically.isSelected());
                 pd.stop();
@@ -764,7 +749,7 @@ public final class Controller implements Initializable {
         .setOnPositive("OK", () -> {
             final ProgressDialog pd = new ProgressDialog.Builder()
                     .setScene(this.getParent().getScene())
-                    .setText("ePub 生成中……").build();
+                    .setText("ePub generating……").build();
             pd.start(stage);
             new EpubGenerator().runEpubGenerator();
             pd.stop();
@@ -780,7 +765,7 @@ public final class Controller implements Initializable {
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
         new AlertDialog.Builder(getParent()).addControl(datePicker)
-            .setTitle("日付選択")
+            .setTitle("Select date")
             .setMessage("バックアップする最初の日を選択してください。")
             .setOnPositive("Backup", () -> {
                 final LocalDate value = datePicker.getValue();
@@ -823,7 +808,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * call LogViewer.
+     * Call LogViewer.
      */
     @FXML
     private final void callLogViewer() {
@@ -841,7 +826,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ホーム記事を登録する.
+     * Set "home"(it means appearing when start-up) article.
      */
     @FXML
     private final void setHome() {
@@ -1185,6 +1170,13 @@ public final class Controller implements Initializable {
     private final void stop() {
         Platform.runLater( () ->
             getCurrentWebView().ifPresent(wv -> wv.getEngine().getLoadWorker().cancel()));
+    }
+
+    /**
+     * Alias for using method reference.
+     */
+    private void searchArticle() {
+        searchArticle("", "");
     }
 
     /**
@@ -1668,7 +1660,7 @@ public final class Controller implements Initializable {
                 try {
                     success = isCopy
                             ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
-                                    : file.renameTo(dest);
+                            : file.renameTo(dest);
                 } catch (final IOException e) {
                     LOGGER.error("Error", e);;
                 }
@@ -1770,7 +1762,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * open file by editor.
+     * Open file by editor.
      *
      * @param openTarget
      */
@@ -1786,7 +1778,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * return current tab.
+     * Return current tab.
      * @return current tab.
      */
     private final Tab getCurrentTab() {
@@ -1794,8 +1786,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在選択されているタブの WebView を返す。
-     * @return WebView オブジェクトか empty
+     * Return WebView object in current tab。
+     * @return WebView object(Optional)
      */
     protected final Optional<WebView> getCurrentWebView() {
         final int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
@@ -1810,7 +1802,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * urlText の入力値を開く.
+     * Open urlText's value.
      */
     @FXML
     public final void readUrlText(final ActionEvent event) {
@@ -1818,7 +1810,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * PrinterJob を呼ぶ.
+     * Call PrinterJob.
      *
      * @see <a href="http://d.hatena.ne.jp/tatsu-no-toshigo/20141208/1417957734">
      * 続・JavaFX8の印刷機能によるHTMLのPDF変換</a>
@@ -1854,7 +1846,7 @@ public final class Controller implements Initializable {
                 LOGGER.info("jobName [{}]\n", job.getJobSettings().getJobName());
                 wv.get().getEngine().print(job);
                 job.endJob();
-                AlertDialog.showMessage(getParent(), "PDF印刷完了", "PDF印刷が正常に完了しました。");
+                AlertDialog.showMessage(getParent(), "Complete print to PDF", "PDF印刷が正常に完了しました。");
             }).build().show();
     }
 
@@ -1887,7 +1879,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * stage をセットする.
+     * Set passed stage on this object.
      * @param stage
      */
     public final void setStage(final Stage stage) {
@@ -1895,19 +1887,19 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 引数で渡された文字列を画面下部のステータスラベルに表示する.
-     * @param message 文字列
+     * Show passed message on status label and snackbar.
+     * @param message message string
      */
     protected final void setStatus(final String message) {
         setStatus(message, true);
     }
 
     /**
-     * 引数で渡された文字列を画面下部のステータスラベルに表示する.
-     * @param message 文字列
-     * @param showLog
+     * Show passed message on status label.
+     * @param message message string
+     * @param showLog logging and show snackbar
      */
-    protected final void setStatus(final String message, final boolean showLog) {
+    private final void setStatus(final String message, final boolean showLog) {
         Platform.runLater(() -> status.setText(message));
         if (showLog) {
             LOGGER.info(message);
@@ -1937,37 +1929,37 @@ public final class Controller implements Initializable {
      */
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
-        sideMenuController.setOnSearch(() -> searchArticle("", ""));
-        sideMenuController.setOnEdit(() -> callEditor());
-        sideMenuController.setOnNewTab(() -> openWebTab());
-        sideMenuController.setOnCloseTab(() -> closeTab());
-        sideMenuController.setOnSlideShow(() -> slideShow());
+        sideMenuController.setOnSearch(this::searchArticle);
+        sideMenuController.setOnEdit(this::callEditor);
+        sideMenuController.setOnNewTab(this::openWebTab);
+        sideMenuController.setOnCloseTab(this::closeTab);
+        sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);
-        sideMenuController.setOnWordCloud((title, content) -> {
-            final Tab tab = makeClosableTab(title);
-            tab.setContent(content);
-            openTab(tab);
-        });
+        sideMenuController.setOnWordCloud(this::openSpecifiedTab);
         toolsController.init(this.stage);
-        toolsController.setOnDrawChart((title, content) -> {
-            final Tab tab = makeClosableTab(title);
-            tab.setContent(content);
-            openTab(tab);
-        });
+        toolsController.setOnDrawChart(this::openSpecifiedTab);
 
-        //TODO implementing.
         toolsController.setFlux(Flux.<WebView>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {
-                    if (prevTab != null) {
+                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
                         final WebView prev = (WebView) prevTab.getContent();
-                        if (prev != null) {
-                            prev.zoomProperty().unbind();
-                        }
+                        prev.zoomProperty().unbind();
                     }
                     getCurrentWebView().ifPresent(emitter::next);;
                 })
         ));
+    }
+
+    /**
+     * Open specified tab with title.
+     * @param title tab's title
+     * @param content tab's content(Pane)
+     */
+    private void openSpecifiedTab(final String title, final Pane content) {
+        final Tab tab = makeClosableTab(title);
+        tab.setContent(content);
+        openTab(tab);
     }
 
     /**
