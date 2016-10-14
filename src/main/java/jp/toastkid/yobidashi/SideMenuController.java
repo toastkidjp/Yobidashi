@@ -74,6 +74,8 @@ public class SideMenuController {
 
     private OpenTabAction tabAction;
 
+    private Runnable reload;
+
     /**
      * バックアップ機能を呼び出す。
      */
@@ -346,6 +348,14 @@ public class SideMenuController {
     }
 
     /**
+     * Reload current tab.
+     */
+    @FXML
+    private final void reload() {
+        reload.run();
+    }
+
+    /**
      * Set edit command.
      * @param edit Command
      */
@@ -419,6 +429,14 @@ public class SideMenuController {
      */
     protected void setOnWordCloud(final OpenTabAction tabAction) {
         this.tabAction = tabAction;
+    }
+
+    /**
+     * Set reloading command.
+     * @param reload
+     */
+    public void setOnReload(final Runnable reload) {
+        this.reload = reload;
     }
 
 }
