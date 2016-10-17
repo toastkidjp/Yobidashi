@@ -31,6 +31,8 @@ public class ActionLabelSkin extends LabeledSkinBase<Label, BehaviorBase<Label>>
         if (label.getAccelerator() == null) {
             return;
         }
+
+        label.setText(label.getText() + "\t|\t" + label.getAccelerator().getDisplayText());
         getSkinnable().getScene().getAccelerators()
             .put(label.getAccelerator(), () -> label.getOnAction().handle(new ActionEvent()));
     }
