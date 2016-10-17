@@ -125,11 +125,14 @@ public final class Controller implements Initializable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
-    /** log file. */
+    /** /path/to/log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
-    /** about file. */
+    /** /path/to/path to about file. */
     private static final String PATH_ABOUT_APP   = "README.md";
+
+    /** /path/to/path to bookmark file. */
+    private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
 
     /** 「リロード」ボタンの画像ファイルへのパス */
     //private static final String PATH_IMG_RELOAD  = "images/reload.png";
@@ -373,6 +376,7 @@ public final class Controller implements Initializable {
         es.execute(() -> {
             final long start = System.currentTimeMillis();
             prepareArticleList();
+            prepareBookmarks();
             pd.addProgress(11);
             pd.addText(Thread.currentThread().getName() + " Ended read article names. "
                     + (System.currentTimeMillis() - start) + "ms");
@@ -427,7 +431,7 @@ public final class Controller implements Initializable {
                         // (130317) 「現在選択中のファイル名」にセット
                         final File selected = new File(
                                 Config.get(Config.Key.ARTICLE_DIR),
-                                ArticleGenerator.toBytedString_EUC_JP(nextTab.getText()) + Article.Extension.WIKI.text()
+                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.WIKI.text()
                                 );
                         if (selected.exists()){
                             Config.article = new Article(selected);
@@ -669,15 +673,6 @@ public final class Controller implements Initializable {
         return url.endsWith(Defines.TEMP_FILE_NAME)
                 ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
                 : "window.scrollTo(0, document.body.scrollHeight);";
-    }
-
-    /**
-     * ギャラリーを開く.
-     */
-    @FXML
-    public final void callGallery() {
-        func.generateGallery();
-        loadUrl(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1402,10 +1397,12 @@ public final class Controller implements Initializable {
      * 記事一覧リストの準備.
      */
     private void prepareArticleList() {
-        initArticleList(articleList);
+        Mono.create(emitter -> {
+            initArticleList(articleList);
+            emitter.success("");
+        }).subscribe(empty -> loadArticleList());
         initArticleList(historyList);
-        initArticleList(bookmarkList);
-        loadArticleList();
+        // TODO implementing
     }
 
     /**
@@ -1425,7 +1422,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ファイル一覧をロードする.
+     * Load all articles list.
      */
     @FXML
     private void loadArticleList() {
@@ -1437,6 +1434,26 @@ public final class Controller implements Initializable {
         articleList.requestLayout();
         focusOn();
         LOGGER.info("ended init loadArticleList. {}[ms]", System.currentTimeMillis() - start);
+    }
+
+    /**
+     * Prepare bookmark list.
+     */
+    private void prepareBookmarks() {
+        final ObservableList<Article> bookmarks = bookmarkList.getItems();
+        Mono.create(emitter -> {
+            initArticleList(bookmarkList);
+            emitter.success("");
+            })
+            .publishOn(Schedulers.elastic())
+            .subscribeOn(Schedulers.elastic())
+            .subscribe(
+                empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
+                    .collect(ArticleGenerator::titleToFileName)
+                    .collect(fileName -> fileName + ".txt")
+                    .collect(Article::find)
+                    .each(bookmarks::add)
+                    );
     }
 
     /**
@@ -1605,7 +1622,7 @@ public final class Controller implements Initializable {
                 .build().show();
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
-            Config.article = Article.find(ArticleGenerator.toBytedString_EUC_JP(newFileName) + ext.text());
+            Config.article = Article.find(ArticleGenerator.titleToFileName(newFileName) + ext.text());
             callEditor();
         }
     }
@@ -1661,7 +1678,7 @@ public final class Controller implements Initializable {
                 }
                 final File dest = new File(
                         Config.get(Config.Key.ARTICLE_DIR),
-                        ArticleGenerator.toBytedString_EUC_JP(newTitle) + Config.article.extention()
+                        ArticleGenerator.titleToFileName(newTitle) + Config.article.extention()
                         );
                 if (dest.exists()){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");

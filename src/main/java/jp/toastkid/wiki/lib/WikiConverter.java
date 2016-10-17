@@ -53,10 +53,6 @@ public final class WikiConverter {
     /** 折り畳みのデフォルト表示文字列 */
     private static final String MESSAGE_DEFAULT_EXPAND = "ここをクリックすると開きます.";
 
-    /** メニューバーのファイル名(定数) */
-    private static final String MENUBAR_FILE_NAME
-        = ArticleGenerator.toBytedString_EUC_JP("MenuBar") + ".txt";
-
     /**
      * {center}中央揃え{center}検出用正規表現.
      */
@@ -177,8 +173,6 @@ public final class WikiConverter {
     private String title = "";
     /** 画像フォルダのパス. */
     private final String imgDir;
-    /** ソースフォルダのパス. */
-    private final String sourceDir;
     /** File オブジェクト. */
     private File file;
     /** メニューバーを含めるか否か. */
@@ -191,12 +185,10 @@ public final class WikiConverter {
     /**
      * 指定されたパスで変換器を初期化する.
      * @param imgDir 画像のフォルダ
-     * @param sourceDir ソースファイルのフォルダ
      */
-    public WikiConverter(final String imgDir, final String sourceDir) {
+    public WikiConverter(final String imgDir) {
         this.imgDir    = StringUtils.isNotBlank(imgDir)
                             ? new File(imgDir.replace("\\", "/")).toURI().toString() : "";
-        this.sourceDir = sourceDir;
     }
     /**
      * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.

@@ -29,7 +29,6 @@ import am.ik.marked4j.Marked;
 import am.ik.marked4j.MarkedBuilder;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
-import jp.toastkid.libs.fileFilter.ImageFileFilter;
 import jp.toastkid.libs.markdown.MarkdownConverter;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
@@ -101,11 +100,11 @@ public final class ArticleGenerator {
      */
     public ArticleGenerator() {
         final long start = System.currentTimeMillis();
-        this.converter = Mono.<WikiConverter>create(emitter ->
-            emitter.success(new WikiConverter(Config.get("imageDir"), Config.get("articleDir")))
-        )
-        .subscribeOn(Schedulers.elastic())
-        .block();
+        this.converter = Mono.<WikiConverter>create(
+                emitter -> emitter.success(new WikiConverter(Config.get("imageDir")))
+            )
+            .subscribeOn(Schedulers.elastic())
+            .block();
         this.converter.openLinkBrank = true;
         LOGGER.info("ended init converter. {}[ms]", System.currentTimeMillis() - start);
 
@@ -391,7 +390,7 @@ public final class ArticleGenerator {
      * @param str
      * @return str の EUC-JP の16進数表現
      */
-    public static String toBytedString_EUC_JP(final String str){
+    public static String titleToFileName(final String str){
         //String converted = bytedStrDecode(str, "EUC-JP");
         byte[] by = null;
         try {
@@ -449,71 +448,6 @@ public final class ArticleGenerator {
         }
         final ByteBuffer bybuf = ByteBuffer.wrap(b);
         return charset.decode(bybuf).toString();
-    }
-
-    /**
-     * ギャラリーのHTMLを生成する.
-     */
-    public void generateGallery() {
-        final List<File[]> dirs = new ArrayList<>();
-        final File root = new File(Config.get("imageDir"));
-        final String title = "Gallery";
-        if (!root.exists() || !root.isDirectory()) {
-            generateHtml("<p>画像フォルダ「" + Config.get("imageDir") + "」は存在しません。</p>", title);
-            return;
-        }
-
-        dirs.add(root.listFiles(new ImageFileFilter(true)));
-        final StringBuilder contents = new StringBuilder(4000);
-        for (int i = 0; i < dirs.size(); i++) {
-            final File[] pics = dirs.get(i);
-            if (pics == null || pics.length == 0) {
-                continue;
-            }
-
-            int colspan = 0;
-            // expander
-            final String expanderId = "expander_ranking_" + i;
-
-            final StringBuilder table = new StringBuilder(1000);
-            table.append("<table><tr>");
-
-            for (final File p : pics) {
-                if (p.isDirectory()) {
-                    dirs.add(p.listFiles(new ImageFileFilter(true)));
-                    continue;
-                }
-                final String imgPath = FileUtil.getHtmlFilePath(p.getAbsolutePath());
-                table.append("<td><p>").append(p.getName()).append("</p><a href=\"")
-                    .append(imgPath)
-                    .append("\" target=_brank>")
-                    // lazyload による遅延ロード
-                    .append("<img width=\"150\" height=\"150\" class=\"lazy\" data-original=\"")
-                    .append(imgPath)
-                    .append("\"></a></td>")
-                    .append(System.lineSeparator());
-                colspan++;
-                if (colspan == 4) {
-                    table.append("</tr><tr>");
-                    colspan = 0;
-                }
-            }
-            // table close
-            table.append("</tr></table>");
-
-            contents.append(bindArgs(
-                    PATH_GALLERY_ITEM,
-                    Maps.mutable.of(
-                            "subtitle",   pics[0].getParent().replace("\\", "/"),
-                            "expanderId", expanderId,
-                            "table",      table.toString()
-                            )
-                ));
-        }
-        generateHtml(
-                bindArgs(PATH_GALLERY, Maps.fixedSize.of("content", contents.toString())),
-                title
-                );
     }
 
     /**

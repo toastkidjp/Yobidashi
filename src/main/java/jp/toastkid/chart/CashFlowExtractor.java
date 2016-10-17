@@ -65,7 +65,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
             return Collections.emptyMap();
         }
 
-        final String prefix = ArticleGenerator.toBytedString_EUC_JP(pPrefix);
+        final String prefix = ArticleGenerator.titleToFileName(pPrefix);
         final List<String> articleTitles = ArrayIterate.select(
                 new File(pathToDir).list(), item -> item.startsWith(prefix)).asUnmodifiable();
 

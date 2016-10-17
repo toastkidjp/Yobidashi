@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -208,7 +209,7 @@ public final class FileUtil {
      * @param pEncode 指定するファイルの文字コード
      * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
      */
-    public static List<String> readLines(
+    public static MutableList<String> readLines(
             final String pFilePath,
             final String pEncode
             ) {
@@ -222,11 +223,11 @@ public final class FileUtil {
      * @param pEncode 指定したファイルの文字コード
      * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
      */
-    public static List<String> readLines(
+    public static MutableList<String> readLines(
             final File pFile,
             final String pEncode
             ) {
-        final List<String> resSet = new ArrayList<String>(100);
+        final MutableList<String> resSet = Lists.mutable.empty();
         try (final BufferedReader fileReader = FileUtil.makeFileReader(pFile, pEncode);) {
             String str = fileReader.readLine();
             while(str != null) {
@@ -1790,7 +1791,11 @@ public final class FileUtil {
      * @return
      */
     public static String removeExtension(final String filePath) {
-        return filePath.substring(0, filePath.lastIndexOf("."));
+        final int index = filePath.lastIndexOf(".");
+        if (index == -1) {
+            return filePath;
+        }
+        return filePath.substring(0, index);
     }
 
     /**

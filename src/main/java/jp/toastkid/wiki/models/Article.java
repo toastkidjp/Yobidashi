@@ -94,7 +94,7 @@ public class Article implements Comparable<Article> {
      */
     public String toInternalUrl() {
         return String.format("/%s/%s%s", this.extention().substring(1),
-                ArticleGenerator.toBytedString_EUC_JP(this.title), this.extention());
+                ArticleGenerator.titleToFileName(this.title), this.extention());
     }
 
     /**
