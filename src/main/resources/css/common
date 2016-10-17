@@ -1,0 +1,87 @@
+.title-label{
+    -fx-font-size: 16.0px;
+    -fx-padding : 14.0px;
+    -fx-text-fill: rgba(0.0, 0.0, 0.0, 0.87);
+}
+
+.jfx-drawer-overlay-pane {
+    -fx-background-color: rgba(0.0,0.0,0.0,0.1)
+}
+
+.jfx-layout-heading {
+    -fx-font-size: 20.0px;
+    -fx-font-weight: BOLD;
+    -fx-alignment: center-left;
+    -fx-padding: 5.0 0.0 5.0 0.0;
+}
+
+.jfx-hamburger{
+    -fx-padding: 10.0;
+    -fx-spacing: 4px;
+    -fx-cursor: hand;
+}
+
+.jfx-hamburger StackPane{
+    -fx-pref-width: 30px;
+    -fx-pref-height: 4px;
+    -fx-background-color: #FFF ;
+    -fx-background-radius: 5px;
+}
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: #5264AE;
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-tool-bar HBox {
+    -fx-alignment:center;
+    -fx-spacing: 25.0;
+    -fx-padding: 0.0 10.0;
+}
+
+.jfx-tool-bar Label{
+    -fx-text-fill: WHITE;
+}
+
+
+.jfx-tool-bar .jfx-options-burger{
+    -fx-padding: 22px;
+}
+
+
+.jfx-text-field, .jfx-password-field, .jfx-text-area{
+    -fx-background-color: transparent ;
+    -fx-font-weight: BOLD;
+    -fx-prompt-text-fill: #808080;
+    -fx-alignment: top-left ;
+    -fx-max-width: 300.0;
+    -fx-pref-width:300.0;
+    -fx-focus-color: #4059A9;
+    -fx-unfocus-color: #4d4d4d;
+}
+
+.jfx-snackbar-content {
+    -fx-background-color: #323232;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: WHITE;
+}
+
+.jfx-tool-bar .jfx-options-burger{
+  -fx-padding: 22px;
+}
+
+.jfx-tool-bar .jfx-options-burger StackPane{
+  -fx-pref-width:4px;
+}
+
+.jfx-tab-pane .tab-header-background{
+    -fx-background-color: rgba(50.0, 0.0, 100.0, 0.57);
+}
+
+.jfx-tab-pane .tab-label {
+    -fx-text-fill: #FFFFFF;
+}

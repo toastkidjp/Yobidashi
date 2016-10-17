@@ -7,71 +7,23 @@
         <script src="assets/javascripts/jquery-2.1.1.min.js" charset="utf-8"></script>
         <script src="assets/javascripts/GitHub-jQuery-Repo-Widget/jquery.githubRepoWidget.min.js" charset="utf-8"></script>
         <script src="assets/javascripts/highlightjs/highlight.pack.js"></script>
-
         <link rel="stylesheet" type="text/css" href="assets/javascripts/highlightjs/styles/github.css">
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/football.css" />
         <link rel="stylesheet" type="text/css" href="assets/stylesheets/material/css/base.css">
+        <link rel="stylesheet" type="text/css" href="assets/stylesheets/football.css" />
         <link rel="stylesheet" type="text/css" href="assets/stylesheets/main_2nd.css" />
         <link rel="stylesheet" type="text/css" href="assets/stylesheets/ascii_art.css" />
         <link rel="stylesheet" type="text/css" href="assets/stylesheets/additional.css" />
         <link rel="stylesheet" type="text/css" href="user/css/html/user.css" />
     </head>
     <body class="page-blue bg" ${bodyAdditional}>
-        <header class="header">
-          <ul class="nav nav-list pull-left">
-            <li>
-        <a class="menu-toggle" href="#menu">
-          <span class="access-hide">Menu</span>
-          <span class="icon icon-menu"></span>
-          <span class="header-close icon icon-close"></span>
-        </a>
-      </li>
-    </ul>
-    <p class="header-logo">${title} - ${wikiTitle}</p>
-      <ul class="nav nav-list pull-right">
-        <li>
-          <a class="menu-toggle" href="#profile">
-            <span class="access-hide">Right Side Menu</span>
-            <span class="avatar avatar-sm"><img alt="alt text for your avatar" src="${wikiIcon}"></span>
-            <span class="header-close icon icon-close"></span>
-          </a>
-        </li>
-      </ul>
-        </header>
-        <br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <nav class="menu" id="menu">
-      <div class="menu-scroll">
-        <div class="menu-wrap">
-          <div class="menu-content">
-              <h3 class="menu-logo side-menu-title">Menu</h3>
-              <hr/>
-            ${menu}
-          </div>
+      <div id="content">
+        <div class="container">
+          ${content}
         </div>
       </div>
-    </nav>
-    <nav class="menu menu-right" id="profile">
-      <div class="menu-scroll">
-        <div class="menu-wrap">
-          <div class="menu-content">
-              ${subheadings}
-          </div>
-        </div>
-      </div>
-      </nav>
-        <a id="head"></a>
-        <div id="content">
-      <div class="container">
-              ${content}
-          </div>
-        </div>
-        <p id="footer"></p>
-        <span id="jump2head"><a href="#head">Jump to head</a></span>
     </body>
     <script type="text/javascript">
         // for highlighting
         hljs.initHighlightingOnLoad();
     </script>
-    <script src="assets/stylesheets/material/js/base.js" type="text/javascript"></script>
 </html>

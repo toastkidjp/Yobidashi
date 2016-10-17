@@ -136,7 +136,7 @@ public class PostProcessor {
             input = input.substring("md:".length());
         }
 
-        final String bytedStr = ArticleGenerator.toBytedString_EUC_JP(input);
+        final String bytedStr = ArticleGenerator.titleToFileName(input);
         final boolean isExist
             = new File(articleDir, bytedStr.concat(".").concat(findExtension(isMd))).exists();
         final StringBuilder generatedLink = new StringBuilder(180);

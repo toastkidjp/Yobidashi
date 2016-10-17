@@ -122,7 +122,7 @@ public final class DocToEpub {
             final boolean recursive
         ) {
         final List<File> targets = ARTICLES.asParallel(Executors.newFixedThreadPool(20), 20)
-                .select(file -> file.getName().startsWith(ArticleGenerator.toBytedString_EUC_JP(prefix)))
+                .select(file -> file.getName().startsWith(ArticleGenerator.titleToFileName(prefix)))
                 .toList();
         if (recursive) {
             final List<File> recursiveFiles = new ArrayList<File>();
@@ -139,7 +139,7 @@ public final class DocToEpub {
                         while (matcher.find()) {
                             final File f = new File(
                                     ARTICLE_PATH,
-                                    ArticleGenerator.toBytedString_EUC_JP(matcher.group(1)).concat(".txt")
+                                    ArticleGenerator.titleToFileName(matcher.group(1)).concat(".txt")
                                 );
                             if (f.exists() && !recursiveFiles.contains(f)) {
                                 recursiveFiles.add(f);
@@ -161,7 +161,7 @@ public final class DocToEpub {
         final List<File> files = new ArrayList<File>(targets.size());
         targets.parallelStream()
             .map(prefix -> new File(ARTICLE_PATH,
-                    ArticleGenerator.toBytedString_EUC_JP(prefix).concat(".txt")))
+                    ArticleGenerator.titleToFileName(prefix).concat(".txt")))
             .filter(ARTICLES::contains)
             .forEach(f -> files.add(f));
         return files;
@@ -177,7 +177,7 @@ public final class DocToEpub {
             final PageLayout layout
             ) {
         final List<ContentMetaData> targetPaths = new ArrayList<ContentMetaData>();
-        final WikiConverter converter = new WikiConverter("", ARTICLE_PATH);
+        final WikiConverter converter = new WikiConverter("");
         final String imageDir = Config.get("imageDir").replace("\\", "/");
         converter.containsMenubar = false;
         targets.forEach((file) -> {

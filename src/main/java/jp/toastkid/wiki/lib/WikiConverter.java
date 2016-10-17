@@ -53,10 +53,6 @@ public final class WikiConverter {
     /** 折り畳みのデフォルト表示文字列 */
     private static final String MESSAGE_DEFAULT_EXPAND = "ここをクリックすると開きます.";
 
-    /** メニューバーのファイル名(定数) */
-    private static final String MENUBAR_FILE_NAME
-        = ArticleGenerator.toBytedString_EUC_JP("MenuBar") + ".txt";
-
     /**
      * {center}中央揃え{center}検出用正規表現.
      */
@@ -177,8 +173,6 @@ public final class WikiConverter {
     private String title = "";
     /** 画像フォルダのパス. */
     private final String imgDir;
-    /** ソースフォルダのパス. */
-    private final String sourceDir;
     /** File オブジェクト. */
     private File file;
     /** メニューバーを含めるか否か. */
@@ -191,12 +185,10 @@ public final class WikiConverter {
     /**
      * 指定されたパスで変換器を初期化する.
      * @param imgDir 画像のフォルダ
-     * @param sourceDir ソースファイルのフォルダ
      */
-    public WikiConverter(final String imgDir, final String sourceDir) {
+    public WikiConverter(final String imgDir) {
         this.imgDir    = StringUtils.isNotBlank(imgDir)
                             ? new File(imgDir.replace("\\", "/")).toURI().toString() : "";
-        this.sourceDir = sourceDir;
     }
     /**
      * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.
@@ -268,67 +260,6 @@ public final class WikiConverter {
             LOGGER.error("Caught error!", e);
         }
         return strs;
-    }
-
-    /**
-     * return toggle html.
-     * @param id toggle id.
-     * @return toggle html.
-     */
-    private String getToggle(final String id) {
-        return "<span class=\"menu-collapse-toggle collapsed\" data-target=\"#" + id + "\" "
-                + "data-toggle=\"collapse\"><i class=\"icon "
-                + "icon-close menu-collapse-toggle-close\"></i>"
-                + "<i class=\"icon icon-add menu-collapse-toggle-default\"></i></span>"
-                + "<ul class=\"menu-collapse collapse\" id=\"" + id + "\">";
-    }
-
-    /**
-     * Make menu bar html.
-     * @param articleDirPath
-     * @return menu bar html string
-     */
-    public String makeMenubar(final String articleDirPath) {
-        final String menubarFilePath = sourceDir + MENUBAR_FILE_NAME;
-        if (!new File(menubarFilePath).exists()) {
-            return "";
-        }
-        final StringBuilder menuBuf = new StringBuilder(2000);
-        menuBuf.append("<ul class=\"nav\">");
-        // メニューバーソース読み込み
-        final List<String> menuBarStrs = FileUtil.readLines(
-                menubarFilePath,
-                Defines.ARTICLE_ENCODE
-                );
-        int depth = 0;
-        int uid = 0;
-        for (int i = 0; i < menuBarStrs.size(); i++) {
-            final String str = menuBarStrs.get(i);
-            if (str.startsWith("-- ")) {
-                final String id = str.substring(str.indexOf(" "));
-                if (depth != 2) {
-                    menuBuf.append(getToggle("toggle" + uid++)).append(Strings.LINE_SEPARATOR);
-                }
-                menuBuf.append("<li>").append(convertLine(id)).append("</li>")
-                    .append(Strings.LINE_SEPARATOR);
-                depth = 2;
-            }
-            if (str.startsWith("- ")) {
-                menuBuf.append("<li>").append("<span data-target=\"#toggle").append(uid)
-                    .append("\" data-toggle=\"collapse\">")
-                    .append(str.substring(str.indexOf(" ")))
-                    .append("</span>").append(Strings.LINE_SEPARATOR);
-                depth = 1;
-            }
-            if (StringUtils.isEmpty(str) && depth != 0) {
-                menuBuf.append("</ul></li>").append(Strings.LINE_SEPARATOR);
-                depth = 0;
-            }
-        }
-        menuBuf.append("</ul>");
-        menuBuf.append(Strings.LINE_SEPARATOR);
-        menuBuf.append(Strings.LINE_SEPARATOR);
-        return menuBuf.toString();
     }
 
     /**

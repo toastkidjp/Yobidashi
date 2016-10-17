@@ -46,10 +46,7 @@ public final class WikiConverterTest {
     @Test
     public void testGetConvertedTXT() {
         final StringBuilder converted = new StringBuilder(3000);
-        final WikiConverter converter = new WikiConverter(
-                Config.get("imageDir"),
-                Config.get("articleDir")
-        );
+        final WikiConverter converter = new WikiConverter(Config.get("imageDir"));
         final String content = converter.convert(TEST_FILE.getAbsolutePath(), RESOURCE_ENCODE)
                                 .replaceAll("class=\"redLink\"", "");
         converted.append(content);

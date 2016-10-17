@@ -38,7 +38,7 @@ public class MarkdownConverterTest {
         final String content = new MarkdownConverter().convert(source);
 
         final String html = ArticleGenerator.bindArgs(
-            ViewTemplate.MATERIAL.getPath(),
+            ViewTemplate.SECOND.getPath(),
             new HashMap<String, String>(){
                 /** default uid. */
                 private static final long serialVersionUID = 1L;

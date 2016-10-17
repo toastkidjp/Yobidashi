@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
-import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.models.ViewTemplate;
 
 /**
@@ -21,7 +20,7 @@ public final class ArticleGeneratorTest {
     @Test
     public final void testGetHTMLContent() {
         final String htmlContent = ArticleGenerator.bindArgs(
-            ViewTemplate.MATERIAL.getPath(),
+            ViewTemplate.SECOND.getPath(),
             Maps.mutable.with("title", "タイトルでござい", "content", "こんてんと")
         );
         assertTrue(

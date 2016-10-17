@@ -209,7 +209,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.wiki.ArticleGenerator#toBytedString_EUC_JP(java.lang.String)} 's test method.
+     * {@link jp.toastkid.wiki.ArticleGenerator#titleToFileName(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testToBytedString_EUC_JP() {

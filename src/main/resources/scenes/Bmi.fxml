@@ -13,21 +13,18 @@
    fx:controller="jp.toastkid.bmi.Controller"
     >
     <children>
-      <Label text="  BMIを計算するツールです" />
       <HBox prefHeight="18.0" prefWidth="300.0">
-         <children>
-            <NumberTextField fx:id="height" onAction="#calculate" promptText="Height" labelFloat="true"/>
-            <Label text=" [ cm ]" />
-         </children>
+        <children>
+          <NumberTextField fx:id="height" onAction="#calculate" promptText="Height [cm]" labelFloat="true"/>
+        </children>
       </HBox>
       <HBox prefHeight="18.0" prefWidth="300.0">
-         <children>
-            <NumberTextField fx:id="weight" onAction="#calculate" promptText="Weight" labelFloat="true"/>
-            <Label text=" [ kg ]" />
-         </children>
+        <children>
+          <NumberTextField fx:id="weight" onAction="#calculate" promptText="Weight [kg]" labelFloat="true"/>
+        </children>
       </HBox>
       <JFXButton text="Calculate" buttonType="RAISED" onAction="#calculate"/>
-      <Label text="  BMIの計算式：体重(㎏) / (身長(㎝)^2)" />
+      <Label text="  BMIの計算式：体重(kg) / (身長(cm)^2)" />
       <Label text="  ここに結果を表示します。" />
       <JFXTextArea fx:id="result" text="標準値は22です。"/>
    </children>

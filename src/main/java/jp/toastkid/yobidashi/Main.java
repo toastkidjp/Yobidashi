@@ -2,19 +2,17 @@ package jp.toastkid.yobidashi;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jfoenix.controls.JFXDecorator;
-
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -101,10 +99,21 @@ public final class Main extends Application {
         })
         .subscribeOn(Schedulers.elastic()).subscribe();
 
-        readScene(stage).ifPresent(scene -> {
+        readScene(stage).subscribeOn(Schedulers.immediate()).subscribe(scene -> {
             stage.setScene(scene);
+            stage.setOnCloseRequest(event -> this.closeApplication(stage));
+            stage.centerOnScreen();
+            final Screen screen = Screen.getScreens().get(0);
+            final Rectangle2D bounds = screen.getVisualBounds();
+            final BoundingBox maximizedBox = new BoundingBox(
+                    bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            // maximized the stage
+            stage.setX(maximizedBox.getMinX());
+            stage.setY(maximizedBox.getMinY());
+            stage.setWidth(maximizedBox.getWidth());
+            stage.setHeight(maximizedBox.getHeight());
             stage.show();
-            controller.setStatus("完了 - " + (System.currentTimeMillis() - start) + "[ms]");
+            controller.setStatus("Complete - " + (System.currentTimeMillis() - start) + "[ms]");
         });
 
         Mono.create(emitter -> {
@@ -114,6 +123,7 @@ public final class Main extends Application {
             controller.setSize(d.getWidth(), d.getHeight());
             // setup searcher.
             controller.setupExpandables();
+            controller.setupSideMenu();
             emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
@@ -131,28 +141,35 @@ public final class Main extends Application {
      * @param stage Stage オブジェクト
      * @return Scene オブジェクト
      */
-    private final Optional<Scene> readScene(final Stage stage) {
+    private final Mono<Scene> readScene(final Stage stage) {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
-            final VBox loaded = (VBox) loader.load();
+            loader.load();
             controller = (Controller) loader.getController();
             stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
             controller.setStage(stage);
-            final JFXDecorator decorator = new JFXDecorator(stage, loaded);
-            decorator.setCustomMaximize(true);
-            decorator.setOnCloseButtonAction(controller::closeApplication);
-            decorator.setMaximized(true);
-            return Optional.of(new Scene(decorator, 1024, 768));
+            return Mono.just(new Scene(controller.root));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
+            Platform.exit();
         }
-        return Optional.empty();
+        return Mono.empty();
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
         controller = null;
+    }
+
+    /**
+     * Close this application.
+     * @param stage
+     */
+    public final void closeApplication(final Stage stage) {
+        stage.close();
+        Platform.exit();
+        System.exit(0);
     }
 
     /**
