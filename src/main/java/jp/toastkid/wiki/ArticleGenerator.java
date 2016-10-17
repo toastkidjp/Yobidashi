@@ -54,12 +54,6 @@ public final class ArticleGenerator {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleGenerator.class);
 
-    /** Gallery 全体のView. */
-    private static final String PATH_GALLERY      = Defines.TEMPLATE_DIR + "/gallery.html";
-
-    /** Gallery 1section分のTemplate. */
-    private static final String PATH_GALLERY_ITEM = Defines.TEMPLATE_DIR + "/gallery_item.html";
-
     /** Slide template. */
     private static final String PATH_SLIDE        = Defines.TEMPLATE_DIR + "/slide.html";
 

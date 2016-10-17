@@ -162,23 +162,31 @@ public final class WikiConverter {
 
     /** td's dummy. */
     private static final String DUMMY_TD    = "≪";
+
     /** th's dummy. */
     private static final String DUMMY_TH    = "≫";
+
     /** regex replacing dummy. */
     private static final String SPLIT_REGEX = String.format("[%s|%s]+", DUMMY_TD, DUMMY_TH);
 
     /** Matcher. */
     private Matcher matcher;
+
     /** title. */
     private String title = "";
-    /** 画像フォルダのパス. */
+
+    /** Path to image dir. */
     private final String imgDir;
-    /** File オブジェクト. */
+
+    /** File Object. */
     private File file;
+
     /** メニューバーを含めるか否か. */
     public boolean containsMenubar = true;
+
     /** リンクを target=_brank で生成するか. */
     public boolean openLinkBrank   = false;
+
     /** 前回の処理で回収した画像のパス一覧. DocToEpubで参照. */
     public Set<String> latestImagePaths;
 

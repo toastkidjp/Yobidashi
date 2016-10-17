@@ -7,24 +7,31 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.wiki.models.Defines;
 
 /**
- * サッカーのフォーメーションの定義
+ * Definition of football formation.
  *
  * @author Toast kid
  *
  */
 public final class Formation {
+
     /** リソースフォルダ */
     private static final String RESOURCES_DIR = Defines.ASSETS_DIR + "/resources/football/";
+
     /** サッカーのプレイ人数 */
     private static final int ELEVEN   = 11;
+
     /** 4-4-2 の 守備的 MF 2人 */
     public  static final int DV_4_4_2 = 0;
+
     /** 4-2-3-1 */
     public  static final int TV_4_5_1 = 1;
+
     /** 4-2-3-1 */
     public  static final int DV_4_5_1 = 2;
+
     /** 3-5-1-1 */
     private static final int TV_3_6_1 = 3;
+
     /**
      * ピッチの HTML を構築して返す.
      * @param team
@@ -76,6 +83,7 @@ public final class Formation {
         output.append("</td></tr></table>");
         return output.toString();
     }
+
     /**
      * ポジションごとの文字色を返す.この文字色はサカつくシリーズの定義に由来する.
      * @param pos ポジション(Footballer クラスの定数)
@@ -92,6 +100,7 @@ public final class Formation {
             return "pitch_fw";
         }
     }
+
     /**
      * フォーメーションに応じたポジション一覧を返す.
      * @param formation このクラスのフォーメーション定数

@@ -202,75 +202,82 @@ public final class Controller implements Initializable {
     private static final KeyCodeCombination NINTH_TAB
         = new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN);
 
+    /** root pane. */
     @FXML
-    public Pane root;
+    protected Pane root;
 
     /** header. */
     @FXML
-    public Pane header;
+    private Pane header;
 
     /** footer. */
     @FXML
-    public Pane footer;
+    private Pane footer;
 
-    /** URL 入力エリア. */
+    /** URL Input Area. */
     @FXML
-    public TextField urlText;
-    /** 左側のタブ(記事一覧/履歴ほか). */
-    @FXML
-    public TabPane leftTabs;
-    /** 右側のタブ(WebView). */
-    @FXML
-    public TabPane tabPane;
+    private TextField urlText;
 
-    /** 記事一覧. */
+    /** Left-side tabs area(Articles). */
     @FXML
-    public ListView<Article> articleList;
+    private TabPane leftTabs;
 
-    /** 履歴一覧. */
+    /** Right-side tabs area(WebView). */
     @FXML
-    public ListView<Article> historyList;
+    private TabPane tabPane;
+
+    /** List of articles. */
+    @FXML
+    private ListView<Article> articleList;
+
+    /** List of histories. */
+    @FXML
+    private ListView<Article> historyList;
 
     /** List of Bookmark article. */
     @FXML
     private ListView<Article> bookmarkList;
 
-    /** 画面下部のステータスラベル. */
+    /** Status message. */
     @FXML
-    public Label status;
-    /** 検索種別セレクタ. */
+    private Label status;
+
+    /** Search category selector. */
     @SuppressWarnings("rawtypes")
     @FXML
-    public ComboBox searchKind;
-    /** Web 検索のクエリを記入する部分. */
-    @FXML
-    public TextField webQuery;
+    private ComboBox searchCategory;
 
-    /** スプリッタ―. */
+    /** Web search query. */
     @FXML
-    public SplitPane splitter;
+    private TextField webQuery;
 
-    /** リロードボタン. */
+    /** Splitter of TabPane. */
     @FXML
-    public Button reload;
+    private SplitPane splitter;
+
+    /** Reload button. */
+    @FXML
+    private Button reload;
+
     /** Web search button. */
     @FXML
-    public Button webSearch;
+    private Button webSearch;
 
     /** Stylesheet selector. */
     @FXML
-    public ComboBox<String> style;
+    private ComboBox<String> style;
 
     /** in article searcher area. */
     @FXML
-    public HBox searcherArea;
+    private HBox searcherArea;
+
     /** in article searcher input box. */
     @FXML
-    public TextField searcherInput;
+    private TextField searcherInput;
 
     /** calendar. */
     @FXML
-    public DatePicker calendar;
+    private DatePicker calendar;
 
     /** for desktop control. */
     private static Desktop desktop;
@@ -293,11 +300,11 @@ public final class Controller implements Initializable {
 
     /** search history. */
     private final TextField queryInput
-        = new AutoCompleteTextField(){{setPromptText("検索キーワードを入力");}};
+        = new AutoCompleteTextField(){{setPromptText("Input search keyword.");}};
 
     /** filter input. */
     private final TextField filterInput
-        = new AutoCompleteTextField(){{setPromptText("記事名の一部を入力");}};
+        = new AutoCompleteTextField(){{setPromptText("Input part of article name.");}};
 
     /** for auto backup. */
     private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
@@ -314,32 +321,40 @@ public final class Controller implements Initializable {
     /** splitter opening transition. */
     private TranslateTransition splitterOpen;
 
+    /** Snackbar. */
     @FXML
-    protected JFXSnackbar snackbar;
+    private JFXSnackbar snackbar;
 
+    /** Container of title burger. */
     @FXML
-    protected StackPane titleBurgerContainer;
+    private StackPane titleBurgerContainer;
 
+    /** title hamburger. */
     @FXML
-    protected JFXHamburger titleBurger;
+    private JFXHamburger titleBurger;
 
+    /** Option menu container. */
     @FXML
-    protected StackPane optionsBurger;
+    private StackPane optionsBurger;
 
+    /** Left-side drawer. */
     @FXML
-    protected JFXDrawer drawer;
+    private JFXDrawer leftDrawer;
 
+    /** Right-side drawer. */
     @FXML
-    protected JFXDrawer rightDrawer;
+    private JFXDrawer rightDrawer;
 
+    /** Side Menu pane controller. */
     @FXML
-    protected SideMenuController sideMenuController;
+    private SideMenuController sideMenuController;
 
+    /** Tools pane controller. */
     @FXML
-    protected ToolsController toolsController;
+    private ToolsController toolsController;
 
+    /** URL value. */
     private String urlValue;
-
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -461,19 +476,19 @@ public final class Controller implements Initializable {
         es.execute(() -> {
             final long start = System.currentTimeMillis();
             // init the title hamburger icon
-            drawer.setOnDrawerOpening(e -> {
+            leftDrawer.setOnDrawerOpening(e -> {
                 titleBurger.getAnimation().setRate(1);
                 titleBurger.getAnimation().play();
             });
-            drawer.setOnDrawerClosing(e -> {
+            leftDrawer.setOnDrawerClosing(e -> {
                 titleBurger.getAnimation().setRate(-1);
                 titleBurger.getAnimation().play();
             });
             titleBurgerContainer.setOnMouseClicked(e->{
-                if (drawer.isHidden() || drawer.isHidding()) {
-                    drawer.open();
+                if (leftDrawer.isHidden() || leftDrawer.isHidding()) {
+                    leftDrawer.open();
                 } else {
-                    drawer.close();
+                    leftDrawer.close();
                 }
             });
             optionsBurger.setOnMouseClicked(e->{
@@ -884,8 +899,8 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void webSearch(final ActionEvent event) {
-        final String kind  = searchKind.getItems()
-                .get(searchKind.getSelectionModel().getSelectedIndex())
+        final String kind  = searchCategory.getItems()
+                .get(searchCategory.getSelectionModel().getSelectedIndex())
                 .toString();
         final String query = webQuery.getText();
         if (StringUtils.isEmpty(query)){

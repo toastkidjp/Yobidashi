@@ -39,13 +39,12 @@ This software contains following open source softwares. Thanks a lot. :bow:
 
 | Name | License | Comment |
 |:---|:---|:---|
-| [Reactor core](https://projectreactor.io/) | Apache License Version 2.0 | Implementation of Reactive Extensions.
+| [Reactor Core](https://projectreactor.io/) | Apache License Version 2.0 | Implementation of Reactive Extensions.
 | [Eclipse Collections](https://www.eclipse.org/collections/) | Eclipse Public License ver 1.0 | Fantastic Java Collection library.
 | [commons-lang3](https://commons.apache.org/proper/commons-lang/) | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 | [Marked4J](https://github.com/making/marked4j) |  [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Markdown parser for Java |
 | [jackson-databind](https://github.com/FasterXML/jackson-databind) | Apache License Version 2.0 | convert string to POJO.
 | [slf4j-api](http://www.slf4j.org/) | [MIT license](http://www.slf4j.org/license.html) | Logging
-| slf4j-log4j12 | [MIT license](http://www.slf4j.org/license.html) | Logging
 | [Groovy](http://www.groovy-lang.org/) | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.
 | [Clojure](http://clojure.org/) | Eclipse Public License ver 1.0 | Use at ScriptRunner.
 
@@ -56,9 +55,8 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | [jQuery](https://jquery.com/) | MIT License
 | [GitHub jQuery Repo Widget](https://github.com/JoelSutherland/GitHub-jQuery-Repo-Widget) | MIT License | jQuery Plugin using preview GitHub Repository.
 | [highlight.js](https://highlightjs.org/) | BSD 3-clause | Implement syntax hilighting.
-| [reveal.js](https://github.com/hakimel/reveal.js) | MIT License | enable HTML slide show.
 | [jquery.lazyload.js](http://www.appelsiini.net/projects/lazyload) | [MIT License](https://github.com/tuupola/jquery_lazyload/blob/master/LICENSE.md)
-| [bootstrap](http://getbootstrap.com/) | Apache License 2.0 | bootstrap
+| [reveal.js](https://github.com/hakimel/reveal.js) | MIT License | enable HTML slide show.
 | [Material](https://github.com/daemonite/material) | MIT | CSS Framework of Material design.
 
 ### For testing

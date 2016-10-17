@@ -62,7 +62,7 @@
 
       <!-- Content Area -->
       <center>
-        <JFXDrawer fx:id="drawer" defaultDrawerSize="400" direction="LEFT">
+        <JFXDrawer fx:id="leftDrawer" defaultDrawerSize="400" direction="LEFT">
           <styleClass>
             <String fx:value="body" />
           </styleClass>

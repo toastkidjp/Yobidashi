@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * JavaFX による WikiClient.
+ * JavaFX Wiki-Client.
  * @author Toast kid
  * @version 0.0.1
  */
@@ -32,7 +32,7 @@ public final class Main extends Application {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    /** アイコン画像ファイルへのパス */
+    /** Path to icon of this app. */
     private static final String PATH_IMG_ICON = "images/Icon.png";
 
     /** 二重起動している際のメッセージ. */
@@ -40,13 +40,13 @@ public final class Main extends Application {
         = "すでに別プロセスで起動しています。"
                 + "\n心当たりのない場合は「temp.html」というファイルを削除してください。";
 
-    /** fxml ファイル. */
+    /** fxml file. */
     private static final String FXML_PATH = Defines.SCENE_DIR + "/YobidashiMain.fxml";
 
     /** process lock file. */
     private static final File   LOCK_FILE = new File(Defines.TEMP_FILE_NAME);
 
-    /** コントローラ. */
+    /** Controller. */
     private Controller controller;
 
     /** starting ms. */

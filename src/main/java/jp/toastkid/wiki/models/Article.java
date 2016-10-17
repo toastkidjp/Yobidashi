@@ -73,8 +73,6 @@ public class Article implements Comparable<Article> {
         this.file      = file;
         this.title     = convertTitle(file.getName());
         this.extension = FileUtil.findExtension(file).get();
-        //this.byteLength = (file.length() / 1024L);
-        //FileUtil.countCharacters(this.file.getAbsolutePath(), Defines.ARTICLE_ENCODE);
     }
 
     /**
