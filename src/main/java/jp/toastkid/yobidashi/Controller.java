@@ -219,12 +219,19 @@ public final class Controller implements Initializable {
     /** 右側のタブ(WebView). */
     @FXML
     public TabPane tabPane;
+
     /** 記事一覧. */
     @FXML
     public ListView<Article> articleList;
+
     /** 履歴一覧. */
     @FXML
     public ListView<Article> historyList;
+
+    /** List of Bookmark article. */
+    @FXML
+    private ListView<Article> bookmarkList;
+
     /** 画面下部のステータスラベル. */
     @FXML
     public Label status;
@@ -329,6 +336,7 @@ public final class Controller implements Initializable {
     protected ToolsController toolsController;
 
     private String urlValue;
+
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -1396,6 +1404,7 @@ public final class Controller implements Initializable {
     private void prepareArticleList() {
         initArticleList(articleList);
         initArticleList(historyList);
+        initArticleList(bookmarkList);
         loadArticleList();
     }
 

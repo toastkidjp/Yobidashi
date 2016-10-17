@@ -8,8 +8,7 @@ import java.io.Serializable;
  *
  */
 public enum ViewTemplate implements Serializable {
-    SECOND(  Defines.TEMPLATE_DIR + "/main_2nd.html"),
-    MATERIAL(Defines.TEMPLATE_DIR + "/main_material.html");
+    SECOND(  Defines.TEMPLATE_DIR + "/main_2nd.html");
 
     private String path;
 
@@ -27,18 +26,7 @@ public enum ViewTemplate implements Serializable {
      * @return
      */
     public static ViewTemplate parse(final String str) {
-        if (str == null) {
-            return MATERIAL;
-        }
-        switch (str.toLowerCase()) {
-            case "second":
-            case "2nd":
-                return SECOND;
-            case "material":
-            case "materialize":
-            default:
-                return MATERIAL;
-        }
+        return SECOND;
     }
     /**
      * テンプレートに合わせた テンプレートファイル名を返す.

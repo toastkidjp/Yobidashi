@@ -77,15 +77,27 @@
                     <TabPane fx:id="leftTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
                       <tabs>
                         <Tab text="Articles">
-                          <tooltip><Tooltip text="記事一覧リストです。" /></tooltip>
+                          <tooltip><Tooltip text="All articles" /></tooltip>
                           <content>
                             <ListView fx:id="articleList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
                           </content>
                         </Tab>
                         <Tab text="History">
-                          <tooltip><Tooltip text="閲覧履歴リストです。" /></tooltip>
+                          <tooltip><Tooltip text="Viewed articles" /></tooltip>
                           <content>
                             <ListView fx:id="historyList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+                          </content>
+                        </Tab>
+                        <Tab text="Bookmark">
+                          <tooltip><Tooltip text="Bookmark articles" /></tooltip>
+                          <content>
+                            <ListView fx:id="bookmarkList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+                          </content>
+                        </Tab>
+                        <Tab text="Internal links">
+                          <tooltip><Tooltip text="Bookmark articles" /></tooltip>
+                          <content>
+                            <ListView fx:id="internalLinkList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
                           </content>
                         </Tab>
                       </tabs>

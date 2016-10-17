@@ -166,7 +166,6 @@ public final class ArticleGenerator {
                     put("wikiIcon",    Config.get("wikiIcon"));
                     put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
                     put("subheadings", subheading);
-                    put("menu",        post.process(makeMenu(template)));
                     put("content",
                         new StringBuilder().append("<div class=\"body\">")
                             .append(LINE_SEPARATOR)
@@ -208,21 +207,6 @@ public final class ArticleGenerator {
                 Defines.TEMP_FILE_NAME,
                 Defines.ARTICLE_ENCODE
             );
-    }
-
-    /**
-     * テンプレートに合わせた Menubar を返す.
-     * @param tmpl ViewTemplate
-     * @return テンプレートに合わせた Menubar
-     */
-    private final String makeMenu(final ViewTemplate tmpl) {
-        switch (tmpl) {
-            case MATERIAL:
-            case SECOND:
-                return converter.makeMenubar(Config.get("articleDir"));
-            default:
-                return "";
-        }
     }
 
     /**

@@ -56,7 +56,7 @@ public class PostProcessorTest {
                 + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></a><br/>"
                 + System.lineSeparator() + "</ul>";
 
-        assertEquals(extected, processor.generateSubheadings(ViewTemplate.MATERIAL));
+        assertEquals(extected, processor.generateSubheadings(ViewTemplate.SECOND));
     }
 
 }
