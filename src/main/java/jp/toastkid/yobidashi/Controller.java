@@ -128,6 +128,9 @@ public final class Controller implements Initializable {
     /** log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
+    /** about file. */
+    private static final String PATH_ABOUT_APP   = "README.md";
+
     /** 「リロード」ボタンの画像ファイルへのパス */
     //private static final String PATH_IMG_RELOAD  = "images/reload.png";
 
@@ -1270,8 +1273,7 @@ public final class Controller implements Initializable {
     /**
      * Markdown に変換する.
      */
-    @FXML
-    private void callConvertMd() {
+    private void convertMd() {
         final Tab tab = makeClosableTab("(MD)" + Config.article.title);
         final TextArea pane = new JFXTextArea();
         final double prefWidth = tabPane.getWidth();
@@ -1935,7 +1937,10 @@ public final class Controller implements Initializable {
         sideMenuController.setOnCloseTab(this::closeTab);
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);
+        sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openSpecifiedTab);
+        sideMenuController.setOnConvertMd(this::convertMd);
+        sideMenuController.setOnAbout(this::about);
         toolsController.init(this.stage);
         toolsController.setOnDrawChart(this::openSpecifiedTab);
 
@@ -1949,6 +1954,20 @@ public final class Controller implements Initializable {
                     getCurrentWebView().ifPresent(emitter::next);;
                 })
         ));
+    }
+
+    /**
+     * Show about this app.
+     */
+    private void about() {
+        if (!new File(PATH_ABOUT_APP).exists()) {
+            LOGGER.warn(new File(PATH_ABOUT_APP).getAbsolutePath() + " is not exists.");
+            return;
+        }
+
+        func.generateHtml(new ArticleGenerator().md2Html(PATH_ABOUT_APP), "About");
+        openWebTab();
+        loadDefaultFile();
     }
 
     /**

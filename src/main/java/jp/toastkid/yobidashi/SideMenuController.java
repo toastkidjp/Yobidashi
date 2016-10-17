@@ -1,7 +1,6 @@
 package jp.toastkid.yobidashi;
 
 import java.awt.Rectangle;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,9 +43,6 @@ public class SideMenuController {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SideMenuController.class);
 
-    /** about file. */
-    private static final String PATH_ABOUT_APP   = "README.md";
-
     /** menu tabs. */
     @FXML
     private TabPane menuTabs;
@@ -75,6 +71,12 @@ public class SideMenuController {
     private OpenTabAction tabAction;
 
     private Runnable reload;
+
+    private Runnable preview;
+
+    private Runnable convert2Md;
+
+    private Runnable about;
 
     /**
      * バックアップ機能を呼び出す。
@@ -170,7 +172,7 @@ public class SideMenuController {
         new ConfigDialog(parent.get()).showConfigDialog();
         Config.reload();
         if (!current.equals(Config.get(Config.Key.VIEW_TEMPLATE))) {
-            //reload();
+            reload.run();
         }
     }
 
@@ -213,18 +215,7 @@ public class SideMenuController {
      */
     @FXML
     private final void callAbout() {
-        if (!new File(PATH_ABOUT_APP).exists()) {
-            LOGGER.warn(new File(PATH_ABOUT_APP).getAbsolutePath() + " is not exists.");
-            return;
-        }
-
-        // TODO implement
-        /*func.generateHtml(
-                new ArticleGenerator().md2Html(PATH_ABOUT_APP),
-                "About"
-                );
-        openWebTab();
-        loadDefaultFile();*/
+        about.run();
     }
 
     /**
@@ -356,6 +347,22 @@ public class SideMenuController {
     }
 
     /**
+     * Preview HTML source.
+     */
+    @FXML
+    private final void callHtmlSource() {
+        preview.run();
+    }
+
+    /**
+     * Convert current article to Markdown.
+     */
+    @FXML
+    private void callConvertMd() {
+        convert2Md.run();
+    }
+
+    /**
      * Set edit command.
      * @param edit Command
      */
@@ -396,6 +403,38 @@ public class SideMenuController {
     }
 
     /**
+     * Set WordCloud Action.
+     * @param tabAction
+     */
+    protected void setOnWordCloud(final OpenTabAction tabAction) {
+        this.tabAction = tabAction;
+    }
+
+    /**
+     * Set reloading command.
+     * @param reload
+     */
+    protected void setOnReload(final Runnable reload) {
+        this.reload = reload;
+    }
+
+    /**
+     * Set preview HTML source.
+     * @param preview
+     */
+    protected void setOnPreviewSource(final Runnable preview) {
+        this.preview = preview;
+    }
+
+    /**
+     * Set convert command.
+     * @param convert2Md command.
+     */
+    protected void setOnConvertMd(final Runnable convert2Md) {
+        this.convert2Md = convert2Md;
+    }
+
+    /**
      * for use shortcut when start-up.
      */
     private void putAccerelator() {
@@ -424,19 +463,11 @@ public class SideMenuController {
     }
 
     /**
-     * Set WordCloud Action.
-     * @param tabAction
+     * Set "About" command.
+     * @param about command
      */
-    protected void setOnWordCloud(final OpenTabAction tabAction) {
-        this.tabAction = tabAction;
-    }
-
-    /**
-     * Set reloading command.
-     * @param reload
-     */
-    public void setOnReload(final Runnable reload) {
-        this.reload = reload;
+    protected void setOnAbout(final Runnable about) {
+        this.about = about;
     }
 
 }

@@ -44,7 +44,7 @@
               <!--ActionLabel accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="Copy article" />
               <ActionLabel onAction="#callRename" text="Rename article" /-->
               <ActionLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
-              <!--ActionLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" /-->
+              <ActionLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" />
               <ActionLabel accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="Article Search" />
               <!--ActionLabel onAction="#callDelete" text="Delete article" /-->
             </JFXListView>
