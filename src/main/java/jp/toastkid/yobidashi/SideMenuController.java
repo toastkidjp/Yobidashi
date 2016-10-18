@@ -232,8 +232,16 @@ public class SideMenuController {
      * only call child method.
      */
     @FXML
-    protected void openScripter() {
+    private void openScripter() {
         new jp.toastkid.script.Main().show(stage);
+    }
+
+    /**
+     * only call child method.
+     */
+    @FXML
+    private void openNameGenerator() {
+        new jp.toastkid.name.Main().show(stage);
     }
 
     /**

@@ -62,6 +62,7 @@
               <!--ActionLabel onAction="#callRssFeeder" text="RSS Feeder" /-->
               <ActionLabel onAction="#openScripter" text="Script Runner" />
               <ActionLabel onAction="#openNoodleTimer" text="Noodle Timer" />
+              <ActionLabel onAction="#openNameGenerator" text="Name Generator" />
               <ActionLabel onAction="#openCssGenerator" text="CSS Generator" />
               <!--ActionLabel onAction="#callConvertMd" text="Convert to Markdown" />
               <ActionLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
