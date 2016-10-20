@@ -380,6 +380,11 @@ public final class Controller implements Initializable {
         pd.start(stage);
 
         urlText.setOnMouseClicked(event -> urlText.setText(urlValue));
+        urlText.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.booleanValue()) {
+                urlText.clear();
+            }
+        });
         setTitleOnToolbar();
         if (Desktop.isDesktopSupported()) {
             desktop = Desktop.getDesktop();
@@ -526,8 +531,15 @@ public final class Controller implements Initializable {
         pd.stop();
     }
 
+    /**
+     * Set title.
+     */
     private void setTitleOnToolbar() {
-        urlText.setPromptText(Config.get(Config.Key.WIKI_TITLE));
+        final StringBuilder title = new StringBuilder();
+        if (Config.article != null && Config.article.title != null) {
+            title.append(Config.article.title).append(" - ");
+        }
+        urlText.setPromptText(title.append(Config.get(Config.Key.WIKI_TITLE)).toString());
     }
 
     private void setUrlText(final String tabUrl) {
@@ -1568,6 +1580,7 @@ public final class Controller implements Initializable {
                 final int yOffset
                     = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
                 engine.load(Defines.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+                setTitleOnToolbar();
                 Config.article.yOffset = isReload ? yOffset : 0;
             });
             // deep copy を渡す.

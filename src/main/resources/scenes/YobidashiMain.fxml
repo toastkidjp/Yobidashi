@@ -44,7 +44,7 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="25.0" prefWidth="700.0" labelFloat="true">
+              <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>
             </leftItems>

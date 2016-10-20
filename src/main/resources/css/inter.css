@@ -21,8 +21,8 @@
 
 .text-field {
     -fx-background: white;
-    -fx-prompt-text-fill: black;
-    -fx-text-fill: black;
+    -fx-prompt-text-fill: white;
+    -fx-text-fill: white;
 }
 
 .text-field:focused {

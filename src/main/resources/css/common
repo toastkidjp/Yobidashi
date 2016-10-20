@@ -1,7 +1,8 @@
-.title-label{
+.title-label {
     -fx-font-size: 16.0px;
     -fx-padding : 14.0px;
-    -fx-text-fill: rgba(0.0, 0.0, 0.0, 0.87);
+    -fx-text-fill: WHITE;
+    -fx-prompt-text-fill: white;
 }
 
 .jfx-drawer-overlay-pane {
