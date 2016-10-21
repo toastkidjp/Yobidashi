@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -379,6 +380,9 @@ public final class Controller implements Initializable {
 
         final ProgressDialog pd = new ProgressDialog.Builder()
             .setCommand(new Task<Integer>() {
+                int tasks = 7;
+                final AtomicInteger done = new AtomicInteger(0);
+
                 @Override
                 public Integer call() {
                     // 長い時間のかかるタスク
@@ -387,7 +391,7 @@ public final class Controller implements Initializable {
                         if (Desktop.isDesktopSupported()) {
                             desktop = Desktop.getDesktop();
 
-                            Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
+                            Platform.runLater(() -> updateProgress(done.incrementAndGet(), 100));
                         }
 
                         updateMessage("availableProcessors = " + availableProcessors);
@@ -396,23 +400,22 @@ public final class Controller implements Initializable {
                             final long start = System.currentTimeMillis();
                             prepareArticleList();
                             prepareBookmarks();
-                            Platform.runLater(() -> {
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended read article names. "
-                                        + (System.currentTimeMillis() - start) + "ms");
-                            });
+
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended read article names. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
                             func = new ArticleGenerator();
-                            Platform.runLater(() -> {
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended initialize ArticleGenerator. "
-                                        + (System.currentTimeMillis() - start) + "ms");
-                            });
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize ArticleGenerator. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         es.execute(() -> {
@@ -422,12 +425,11 @@ public final class Controller implements Initializable {
                                 setStylesheet();
                                 splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
                             });
-                            Platform.runLater(() -> {
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended initialize stylesheets. "
-                                        + (System.currentTimeMillis() - start) + "ms");
-                            });
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize stylesheets. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         // insert WebView to tabPane.
@@ -468,26 +470,26 @@ public final class Controller implements Initializable {
                                         }
                                     }
                                     );
-                            Platform.runLater( () -> {
+                            Platform.runLater(() -> {
                                 openWebTab();
                                 callHome();
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended initialize right tabs. "
-                                        + (System.currentTimeMillis() - start) + "ms");
                             });
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize right tabs. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
                             searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
                             highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
-                            Platform.runLater( () -> {
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended initialize tools. "
-                                        + (System.currentTimeMillis() - start) + "ms");
-                            });
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize tools. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         es.execute(() -> {
@@ -515,12 +517,11 @@ public final class Controller implements Initializable {
                                     rightDrawer.close();
                                 }
                             });
-                            Platform.runLater(() -> {
-                                updateProgress(getProgress() + 11, 100);
-                                updateMessage(Thread.currentThread().getName()
-                                        + " Ended initialize drawer. "
-                                        + (System.currentTimeMillis() - start) + "ms");
-                            });
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize drawer. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
                         });
 
                         es.shutdown();
@@ -546,6 +547,14 @@ public final class Controller implements Initializable {
                         updateProgress(100, 100);
                     }
                     return 0;
+                }
+
+                private void setProgress(final String message) {
+                    Platform.runLater(() -> {
+                        LOGGER.info("progress {}, {}/{}", getProgress(), done.get(), tasks);
+                        updateProgress(done.incrementAndGet(), tasks);
+                        updateMessage(message);
+                    });
                 }
 
             })
