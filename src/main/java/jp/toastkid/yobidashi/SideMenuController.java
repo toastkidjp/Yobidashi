@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.jfoenix.controls.JFXListView;
 
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
@@ -78,6 +79,8 @@ public class SideMenuController {
 
     private Runnable about;
 
+    private Runnable log;
+
     /**
      * バックアップ機能を呼び出す。
      */
@@ -88,24 +91,35 @@ public class SideMenuController {
             .setTitle("バックアップ")
             .setMessage("この処理には時間がかかります。")
             .setOnPositive("OK", () -> {
-                final ProgressDialog pd = new ProgressDialog.Builder()
+                new ProgressDialog.Builder()
                         .setScene(parent.getScene())
-                        .setText("バックアップ中……").build();
-                final long start = System.currentTimeMillis();
-                String sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
-                try {
-                    new ZipArchiver().doDirectory(sArchivePath);
-                    //new ZipArchiver().doDirectory(iArchivePath);
-                } catch (final IOException e) {
-                    LOGGER.error("Error", e);;
-                }
-                final long end = System.currentTimeMillis() - start;
-                pd.stop();
-                sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                        .concat(ZipArchiver.EXTENSION_ZIP);
-                final String message = String.format("バックアップを完了しました。：%s%s%d[ms]",
-                        sArchivePath, System.lineSeparator(), end);
-                AlertDialog.showMessage(parent, "バックアップ完了", message);
+                        .setCommand(new Task<Integer>() {
+                            private String sArchivePath;
+                            private long end;
+                            @Override
+                            protected Integer call() throws Exception {
+                                final long start = System.currentTimeMillis();
+                                sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
+                                try {
+                                    new ZipArchiver().doDirectory(sArchivePath);
+                                    //new ZipArchiver().doDirectory(iArchivePath);
+                                } catch (final IOException e) {
+                                    LOGGER.error("Error", e);;
+                                }
+                                end = System.currentTimeMillis() - start;
+                                return 100;
+                            }
+                            @Override
+                            protected void succeeded() {
+                                sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
+                                        .concat(ZipArchiver.EXTENSION_ZIP);
+                                final String message
+                                    = String.format("バックアップを完了しました。：%s%s%d[ms]",
+                                        sArchivePath, System.lineSeparator(), end);
+                                AlertDialog.showMessage(parent, "バックアップ完了", message);
+                            }
+                        })
+                        .build();
             }).build().show();
     }
 
@@ -371,6 +385,14 @@ public class SideMenuController {
     }
 
     /**
+     * Show log viewer.
+     */
+    @FXML
+    private void callLogViewer() {
+        log.run();
+    }
+
+    /**
      * Set edit command.
      * @param edit Command
      */
@@ -476,6 +498,14 @@ public class SideMenuController {
      */
     protected void setOnAbout(final Runnable about) {
         this.about = about;
+    }
+
+    /**
+     * Set "LogViewer" command.
+     * @param log command
+     */
+    protected void setOnOpenLogViewer(final Runnable log) {
+        this.log = log;
     }
 
 }

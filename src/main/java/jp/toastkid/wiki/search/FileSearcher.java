@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -17,6 +18,7 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
+import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.libs.utils.Strings;
@@ -60,9 +62,6 @@ public final class FileSearcher {
 
     /** 検索対象記事名. */
     private final String selectName;
-
-    /** Progress dialog. */
-    private final ProgressDialog pd;
 
     /**
      * Builder.
@@ -119,7 +118,6 @@ public final class FileSearcher {
         this.isAnd       = b.isAnd;
         this.isTitleOnly = b.isTitleOnly;
         this.selectName  = b.selectName;
-        pd = new ProgressDialog.Builder().build();
     }
 
     /**
@@ -128,17 +126,27 @@ public final class FileSearcher {
      * (111231) 作成
      */
     public Map<String, SearchResult> search(final String pQuery) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ProgressDialog pd = new ProgressDialog.Builder().setCommand(new Task<Integer>(){
+            @Override
+            protected Integer call() throws Exception {
+                final long start = System.currentTimeMillis();
+                lastFilenum      = 0;
+                searchResultMap  = Maps.mutable.empty();
+                dirSearch(homeDirPath, pQuery);
+                // 検索にかかった時間
+                lastSearchTime   = System.currentTimeMillis() - start;
+                updateMessage("検索完了: " + lastSearchTime + "[ms]");
+                latch.countDown();
+                return 100;
+            }
+
+        }).build();
+        pd.start(new Stage());
         try {
-            pd.start(new Stage());
-            final long start = System.currentTimeMillis();
-            lastFilenum      = 0;
-            searchResultMap  = Maps.mutable.empty();
-            dirSearch(homeDirPath, pQuery);
-            // 検索にかかった時間
-            lastSearchTime   = System.currentTimeMillis() - start;
-            pd.addText("検索完了: " + lastSearchTime + "[ms]");
-        } finally {
-            pd.stop();
+            latch.await();
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
         }
         return searchResultMap;
     }

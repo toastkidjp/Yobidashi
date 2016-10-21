@@ -40,6 +40,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
@@ -375,160 +376,188 @@ public final class Controller implements Initializable {
             .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
             .subscribe(message -> setStatus(message, false));
 
-        final ProgressDialog pd
-            = new ProgressDialog.Builder().setText("Activation in progress...").build();
-        pd.start(stage);
+        final ProgressDialog pd = new ProgressDialog.Builder()
+            .setCommand(new Task<Integer>() {
+                @Override
+                public Integer call() {
+                    // 長い時間のかかるタスク
+                    try {
+                        urlText.setOnMouseClicked(event -> urlText.setText(urlValue));
+                        urlText.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                            if (newValue.booleanValue()) {
+                                urlText.clear();
+                            }
+                        });
+                        setTitleOnToolbar();
+                        if (Desktop.isDesktopSupported()) {
+                            desktop = Desktop.getDesktop();
 
-        urlText.setOnMouseClicked(event -> urlText.setText(urlValue));
-        urlText.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.booleanValue()) {
-                urlText.clear();
-            }
-        });
-        setTitleOnToolbar();
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-            pd.addProgress(1);
-        }
-
-        pd.addText("availableProcessors = " + availableProcessors);
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            prepareArticleList();
-            prepareBookmarks();
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended read article names. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            func = new ArticleGenerator();
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize ArticleGenerator. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            Platform.runLater( () -> {
-                readStyleSheets();
-                setStylesheet();
-                splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
-            });
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize stylesheets. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        // insert WebView to tabPane.
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            tabPane.getSelectionModel().selectedItemProperty().addListener(
-                    (a, prevTab, nextTab) -> {
-                        // (121224) タブ切り替え時の URL 表示の変更
-                        final Optional<WebView> opt = getCurrentWebView();
-                        if (!opt.isPresent()) {
-                            return;
-                        }
-                        final WebView wv = opt.get();
-                        final WebEngine engine = wv.getEngine();
-                        final String tabUrl = engine.getLocation();
-                        if (!StringUtils.isEmpty(tabUrl)
-                                && !tabUrl.startsWith("about")
-                                && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
-                                ){
-                            setUrlText(tabUrl);
-                            return;
+                            Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
                         }
 
-                        final String text = nextTab.getText();
-                        if (StringUtils.isEmpty(text)) {
-                            return;
-                        }
+                        updateMessage("availableProcessors = " + availableProcessors);
 
-                        // (130317) 「現在選択中のファイル名」にセット
-                        final File selected = new File(
-                                Config.get(Config.Key.ARTICLE_DIR),
-                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.WIKI.text()
-                                );
-                        if (selected.exists()){
-                            Config.article = new Article(selected);
-                            setUrlText(Config.article.toInternalUrl());
-                            focusOn();
-                        }
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            prepareArticleList();
+                            prepareBookmarks();
+                            Platform.runLater(() -> {
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended read article names. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            func = new ArticleGenerator();
+                            Platform.runLater(() -> {
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended initialize ArticleGenerator. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            Platform.runLater( () -> {
+                                readStyleSheets();
+                                setStylesheet();
+                                splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
+                            });
+                            Platform.runLater(() -> {
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended initialize stylesheets. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        // insert WebView to tabPane.
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            tabPane.getSelectionModel().selectedItemProperty().addListener(
+                                    (a, prevTab, nextTab) -> {
+                                        // (121224) タブ切り替え時の URL 表示の変更
+                                        final Optional<WebView> opt = getCurrentWebView();
+                                        if (!opt.isPresent()) {
+                                            return;
+                                        }
+                                        final WebView wv = opt.get();
+                                        final WebEngine engine = wv.getEngine();
+                                        final String tabUrl = engine.getLocation();
+                                        if (!StringUtils.isEmpty(tabUrl)
+                                                && !tabUrl.startsWith("about")
+                                                && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
+                                                ){
+                                            setUrlText(tabUrl);
+                                            return;
+                                        }
+
+                                        final String text = nextTab.getText();
+                                        if (StringUtils.isEmpty(text)) {
+                                            return;
+                                        }
+
+                                        // (130317) 「現在選択中のファイル名」にセット
+                                        final File selected = new File(
+                                                Config.get(Config.Key.ARTICLE_DIR),
+                                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.WIKI.text()
+                                                );
+                                        if (selected.exists()){
+                                            Config.article = new Article(selected);
+                                            setUrlText(Config.article.toInternalUrl());
+                                            focusOn();
+                                        }
+                                    }
+                                    );
+                            Platform.runLater( () -> {
+                                openWebTab();
+                                callHome();
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended initialize right tabs. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
+                            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
+                            Platform.runLater( () -> {
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended initialize tools. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            // init the title hamburger icon
+                            leftDrawer.setOnDrawerOpening(e -> {
+                                titleBurger.getAnimation().setRate(1);
+                                titleBurger.getAnimation().play();
+                            });
+                            leftDrawer.setOnDrawerClosing(e -> {
+                                titleBurger.getAnimation().setRate(-1);
+                                titleBurger.getAnimation().play();
+                            });
+                            titleBurgerContainer.setOnMouseClicked(e->{
+                                if (leftDrawer.isHidden() || leftDrawer.isHidding()) {
+                                    leftDrawer.open();
+                                } else {
+                                    leftDrawer.close();
+                                }
+                            });
+                            optionsBurger.setOnMouseClicked(e->{
+                                if (rightDrawer.isHidden() || rightDrawer.isHidding()) {
+                                    rightDrawer.open();
+                                } else {
+                                    rightDrawer.close();
+                                }
+                            });
+                            Platform.runLater(() -> {
+                                updateProgress(getProgress() + 11, 100);
+                                updateMessage(Thread.currentThread().getName()
+                                        + " Ended initialize drawer. "
+                                        + (System.currentTimeMillis() - start) + "ms");
+                            });
+                        });
+
+                        es.shutdown();
+                        //searchKind.getSelectionModel().select(0);
+
+                        // move to top.
+                        header.setOnMousePressed((event) -> moveToTop());
+                        footer.setOnMousePressed((event) -> moveToBottom());
+                        Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
+
+                        //reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
+                        //webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
+                        //initReloadButton();
+
+                        BACKUP.submit(FILE_WATCHER);
+                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                            if (BACKUP != null) {
+                                BACKUP.shutdownNow();
+                            }
+                        }));
+                        Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
+                    } catch (final Exception ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        updateProgress(100, 100);
                     }
-                    );
-            Platform.runLater( () -> {
-                openWebTab();
-                callHome();
-            });
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize right tabs. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
-            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize tools. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
-
-        es.execute(() -> {
-            final long start = System.currentTimeMillis();
-            // init the title hamburger icon
-            leftDrawer.setOnDrawerOpening(e -> {
-                titleBurger.getAnimation().setRate(1);
-                titleBurger.getAnimation().play();
-            });
-            leftDrawer.setOnDrawerClosing(e -> {
-                titleBurger.getAnimation().setRate(-1);
-                titleBurger.getAnimation().play();
-            });
-            titleBurgerContainer.setOnMouseClicked(e->{
-                if (leftDrawer.isHidden() || leftDrawer.isHidding()) {
-                    leftDrawer.open();
-                } else {
-                    leftDrawer.close();
+                    return 0;
                 }
-            });
-            optionsBurger.setOnMouseClicked(e->{
-                if (rightDrawer.isHidden() || rightDrawer.isHidding()) {
-                    rightDrawer.open();
-                } else {
-                    rightDrawer.close();
-                }
-            });
-            pd.addProgress(11);
-            pd.addText(Thread.currentThread().getName() + " Ended initialize drawer. "
-                    + (System.currentTimeMillis() - start) + "ms");
-        });
 
-        es.shutdown();
-
-//        searchKind.getSelectionModel().select(0);
-
-        // move to top.
-        header.setOnMousePressed((event) -> moveToTop());
-        footer.setOnMousePressed((event) -> moveToBottom());
-        pd.addProgress(11);
-
-//        reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
-//        webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
-        //initReloadButton();
-
-        BACKUP.submit(FILE_WATCHER);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (BACKUP != null) {
-                BACKUP.shutdownNow();
-            }
-        }));
-        pd.addProgress(11);
-        pd.stop();
+            })
+            .build();
+        pd.start(stage);
     }
 
     /**
@@ -765,10 +794,15 @@ public final class Controller implements Initializable {
             .setOnPositive("OK", () -> {
                 final ProgressDialog pd = new ProgressDialog.Builder()
                         .setScene(this.getParent().getScene())
-                        .setText("ePub generating……").build();
+                        .setCommand(new Task<Integer>() {
+                            @Override
+                            protected Integer call() throws Exception {
+                                new EpubGenerator().toEpub(vertically.isSelected());
+                                return 100;
+                            }
+                        })
+                        .build();
                 pd.start(stage);
-                new EpubGenerator().toEpub(vertically.isSelected());
-                pd.stop();
             }).build().show();
     }
 
@@ -782,10 +816,15 @@ public final class Controller implements Initializable {
         .setOnPositive("OK", () -> {
             final ProgressDialog pd = new ProgressDialog.Builder()
                     .setScene(this.getParent().getScene())
-                    .setText("ePub generating……").build();
+                    .setCommand(new Task<Integer>() {
+                        @Override
+                        protected Integer call() throws Exception {
+                            new EpubGenerator().runEpubGenerator();
+                            return 100;
+                        }
+                    })
+                    .build();
             pd.start(stage);
-            new EpubGenerator().runEpubGenerator();
-            pd.stop();
         }).build().show();
     }
 
@@ -838,24 +877,6 @@ public final class Controller implements Initializable {
         source.and(browser).subscribe(tuple ->
             tuple.getT2().getEngine().loadContent(tuple.getT1().replace("\n", "<br/>"))
         );
-    }
-
-    /**
-     * Call LogViewer.
-     */
-    @FXML
-    private final void callLogViewer() {
-        if (!new File(PATH_APP_LOG).exists()) {
-            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
-            return;
-        }
-        final String log = String.format(
-                "<pre>%s</pre>",
-                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
-                );
-        func.generateHtml(log, "LogViewer");
-        openWebTab();
-        loadDefaultFile();
     }
 
     /**
@@ -1981,6 +2002,23 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Call LogViewer.
+     */
+    private final void openLogViewer() {
+        if (!new File(PATH_APP_LOG).exists()) {
+            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
+            return;
+        }
+        final String log = String.format(
+                "<pre>%s</pre>",
+                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
+                );
+        func.generateHtml(log, "LogViewer");
+        openWebTab();
+        loadDefaultFile();
+    }
+
+    /**
      * Set stage to SideMenuController.
      */
     protected void setupSideMenu() {
@@ -1994,6 +2032,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openSpecifiedTab);
         sideMenuController.setOnConvertMd(this::convertMd);
+        sideMenuController.setOnOpenLogViewer(this::openLogViewer);
         sideMenuController.setOnAbout(this::about);
         toolsController.init(this.stage);
         toolsController.setOnDrawChart(this::openSpecifiedTab);

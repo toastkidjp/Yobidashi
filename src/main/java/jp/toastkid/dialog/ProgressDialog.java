@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,14 +47,8 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     /** Scene. */
     private Scene scene = null;
 
-    /** 表示中. */
-    private boolean active = true;
-
     /** progress indicator. */
     private final AtomicInteger progress;
-
-    /** message. */
-    private String text;
 
     /** dialog stage. */
     private final Stage dialogStage;
@@ -66,6 +59,9 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     /** splash image file chooser. */
     private final ImageChooser chooser;
 
+    /** command with long time. */
+    private Task<Integer> command;
+
     /**
      * Builder.
      *
@@ -73,21 +69,15 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      */
     public static class Builder {
         private Scene scene;
-        private String text;
-        private int progress;
+        private Task<Integer> command;
 
         public Builder setScene(final Scene scene) {
             this.scene = scene;
             return this;
         }
 
-        public Builder setText(final String text) {
-            this.text = text;
-            return this;
-        }
-
-        public Builder setProgress(final int progress) {
-            this.progress = progress;
+        public Builder setCommand(final Task<Integer> command) {
+            this.command = command;
             return this;
         }
 
@@ -100,7 +90,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      * Load scene file.
      */
     private ProgressDialog(final Builder b) {
-        progress = new AtomicInteger(b.progress);
+        progress = new AtomicInteger(0);
 
         final FXMLLoader loader
             = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
@@ -118,11 +108,12 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
 
+        this.command = b.command;
+
         this.chooser = new ImageChooser(SPLASH_DIR, USER_IMAGE_DIR);
         // 画像をランダムで選択して設定.
         findStyle().ifPresent(style -> { controller.background.setStyle(style); });
 
-        this.text = b.text;
         if (b.scene == null || b.scene.getStylesheets() == null) {
             return;
         }
@@ -182,25 +173,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         final Service<Integer> service = new Service<Integer>() {
             @Override
             protected Task<Integer> createTask() {
-                return new Task<Integer>() {
-                    @Override
-                    public Integer call() {
-                        // 長い時間のかかるタスク
-                        try {
-                            while (active && getProg() < 100) {
-                                updateTitle(getProg() + "%");
-                                updateProgress(getProg(), 100);
-                                updateMessage(getText());
-                                Thread.sleep(10L);
-                            }
-                        } catch (final Exception ex) {
-                            ex.printStackTrace();
-                        } finally {
-                            updateProgress(100, 100);
-                        }
-                        return progress.get();
-                    }
-                };
+                return ProgressDialog.this.command;
             }
 
             /**
@@ -223,15 +196,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      */
     public void addText(final String text) {
         LOGGER.info(getProg() + " " + text);
-        this.text = text;
-    }
-
-    /**
-     * get text.
-     * @return
-     */
-    private String getText() {
-        return StringUtils.isNotEmpty(this.text) ? this.text : "";
     }
 
     /**
@@ -253,8 +217,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
             super.stop();
         } catch (final Exception e) {
             LOGGER.error("Error", e);;
-        } finally {
-            active = false;
         }
     }
 

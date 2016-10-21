@@ -68,8 +68,8 @@
               <ActionLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
               <ActionLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
               <ActionLabel onAction="#callSimpleBachup" text="Simple article backup" />
-              <ActionLabel onAction="#callGenerateEpubs" text="Generate ePub" />
-              <ActionLabel onAction="#callLogViewer" text="LogViewer" /-->
+              <ActionLabel onAction="#callGenerateEpubs" text="Generate ePub" /-->
+              <ActionLabel onAction="#callLogViewer" text="LogViewer" />
             </JFXListView>
           </content>
         </Tab>
