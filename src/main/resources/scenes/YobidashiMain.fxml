@@ -26,6 +26,8 @@
 <?import com.jfoenix.controls.JFXDrawer?>
 <?import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition?>
 
+<?import jp.toastkid.jfx.common.control.ActionLabel?>
+
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.yobidashi.Controller"
     fx:id="root"
@@ -39,12 +41,13 @@
             <leftItems>
               <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
                 <StackPane fx:id="titleBurgerContainer">
-                  <JFXHamburger fx:id="titleBurger">
+                  <JFXHamburger fx:id="titleBurger" >
                     <HamburgerBackArrowBasicTransition />
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="url" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" labelFloat="true">
+              <ActionLabel fx:id="title" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" onAction="#moveToTop" />
+              <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="URL" prefHeight="40.0" minWidth="300.0"  prefWidth="500.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>
             </leftItems>
@@ -52,7 +55,7 @@
               <JFXRippler fx:id="optionsRippler" maskType="CIRCLE"
                 style="-fx-ripple-color:WHITE;">
                 <StackPane fx:id="optionsBurger">
-                  <JFXHamburger styleClass="jfx-options-burger"/>
+                  <JFXHamburger styleClass="jfx-options-burger" />
                 </StackPane>
               </JFXRippler>
             </rightItems>

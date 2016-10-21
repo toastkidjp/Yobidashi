@@ -215,6 +215,10 @@ public final class Controller implements Initializable {
     @FXML
     private Pane footer;
 
+    /** title label. */
+    @FXML
+    private Label title;
+
     /** URL Input Area. */
     @FXML
     private TextField urlText;
@@ -354,9 +358,6 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
-    /** URL value. */
-    private String urlValue;
-
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -382,12 +383,6 @@ public final class Controller implements Initializable {
                 public Integer call() {
                     // 長い時間のかかるタスク
                     try {
-                        urlText.setOnMouseClicked(event -> urlText.setText(urlValue));
-                        urlText.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                            if (newValue.booleanValue()) {
-                                urlText.clear();
-                            }
-                        });
                         setTitleOnToolbar();
                         if (Desktop.isDesktopSupported()) {
                             desktop = Desktop.getDesktop();
@@ -452,7 +447,7 @@ public final class Controller implements Initializable {
                                                 && !tabUrl.startsWith("about")
                                                 && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
                                                 ){
-                                            setUrlText(tabUrl);
+                                            urlText.setText(tabUrl);
                                             return;
                                         }
 
@@ -468,7 +463,7 @@ public final class Controller implements Initializable {
                                                 );
                                         if (selected.exists()){
                                             Config.article = new Article(selected);
-                                            setUrlText(Config.article.toInternalUrl());
+                                            urlText.setText(Config.article.toInternalUrl());
                                             focusOn();
                                         }
                                     }
@@ -531,8 +526,6 @@ public final class Controller implements Initializable {
                         es.shutdown();
                         //searchKind.getSelectionModel().select(0);
 
-                        // move to top.
-                        header.setOnMousePressed((event) -> moveToTop());
                         footer.setOnMousePressed((event) -> moveToBottom());
                         Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
 
@@ -564,15 +557,10 @@ public final class Controller implements Initializable {
      * Set title.
      */
     private void setTitleOnToolbar() {
-        final StringBuilder title = new StringBuilder();
-        if (Config.article != null && Config.article.title != null) {
-            title.append(Config.article.title).append(" - ");
-        }
-        urlText.setPromptText(title.append(Config.get(Config.Key.WIKI_TITLE)).toString());
-    }
-
-    private void setUrlText(final String tabUrl) {
-        urlValue = tabUrl;
+        title.setText(Config.article == null || Config.article.title == null
+                ? Config.get(Config.Key.WIKI_TITLE)
+                : Config.article.title + " - " + Config.get(Config.Key.WIKI_TITLE)
+                );
     }
 
 /*    private ImageView makeImageView(final String path) {
@@ -692,6 +680,7 @@ public final class Controller implements Initializable {
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
+    @FXML
     private final void moveToTop() {
         getCurrentWebView().ifPresent(wv ->
             wv.getEngine().executeScript(findScrollTop(wv.getEngine().getLocation()))
@@ -1551,14 +1540,14 @@ public final class Controller implements Initializable {
 
         // Web ページならそのまま表示.
         if (!StringUtils.isEmpty(url) && url.startsWith("http")) {
-            setUrlText(url);
+            urlText.setText(url);
             currentWebView.ifPresent(wv -> wv.getEngine().load(url));
             return;
         }
 
         // HTMLならそのまま表示.
         if (!StringUtils.isEmpty(url) && url.endsWith(".html")) {
-            setUrlText(url);
+            urlText.setText(url);
             currentWebView.ifPresent(wv -> wv.getEngine().load(url));
             return;
         }
@@ -1593,7 +1582,7 @@ public final class Controller implements Initializable {
             }
             // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
             func.generateArticleFile();
-            setUrlText(Config.article.toInternalUrl());
+            urlText.setText(Config.article.toInternalUrl());
             // タブが入れ替わった可能性があるので、もう1回取得.
             final WebEngine engine = getCurrentWebView().get().getEngine();
             Platform.runLater(() -> {
@@ -1601,6 +1590,7 @@ public final class Controller implements Initializable {
                 final int yOffset
                     = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
                 engine.load(Defines.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
+                urlText.setText(url);
                 setTitleOnToolbar();
                 Config.article.yOffset = isReload ? yOffset : 0;
             });
