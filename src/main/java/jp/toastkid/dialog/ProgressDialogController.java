@@ -13,9 +13,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 
 /**
+ * Progress Dialog's contoller.
  *
  * @author Toast kid
- *
  */
 public class ProgressDialogController implements Initializable {
 
@@ -34,6 +34,5 @@ public class ProgressDialogController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         pb.setProgress(0.0d);
     }
-
 
 }

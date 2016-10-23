@@ -10,7 +10,6 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -380,7 +379,7 @@ public final class Controller implements Initializable {
 
         final ProgressDialog pd = new ProgressDialog.Builder()
             .setCommand(new Task<Integer>() {
-                int tasks = 7;
+                final int tasks = 9;
                 final AtomicInteger done = new AtomicInteger(0);
 
                 @Override
@@ -390,11 +389,18 @@ public final class Controller implements Initializable {
                         setTitleOnToolbar();
                         if (Desktop.isDesktopSupported()) {
                             desktop = Desktop.getDesktop();
-
-                            Platform.runLater(() -> updateProgress(done.incrementAndGet(), 100));
                         }
+                        setProgress("availableProcessors = " + availableProcessors);
 
-                        updateMessage("availableProcessors = " + availableProcessors);
+                        es.execute(() -> {
+                            final long start = System.currentTimeMillis();
+                            func = new ArticleGenerator();
+                            final String message = Thread.currentThread().getName()
+                                    + " Ended initialize ArticleGenerator. "
+                                    + (System.currentTimeMillis() - start) + "ms";
+                            setProgress(message);
+                            LOGGER.info(message);
+                        });
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
@@ -403,16 +409,6 @@ public final class Controller implements Initializable {
 
                             final String message = Thread.currentThread().getName()
                                     + " Ended read article names. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            func = new ArticleGenerator();
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize ArticleGenerator. "
                                     + (System.currentTimeMillis() - start) + "ms";
                             setProgress(message);
                             LOGGER.info(message);
@@ -524,23 +520,21 @@ public final class Controller implements Initializable {
                             LOGGER.info(message);
                         });
 
+                        es.execute(() -> {
+                            footer.setOnMousePressed(event -> moveToBottom());
+                            setProgress("Ended set footer action.");
+                        });
+
+                        es.execute(() -> {
+                            BACKUP.submit(FILE_WATCHER);
+                            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                                if (BACKUP != null) {
+                                    BACKUP.shutdownNow();
+                                }
+                            }));
+                            setProgress("Ended launching backup job.");
+                        });
                         es.shutdown();
-                        //searchKind.getSelectionModel().select(0);
-
-                        footer.setOnMousePressed((event) -> moveToBottom());
-                        Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
-
-                        //reload.setGraphic(makeImageView(PATH_IMG_RELOAD));
-                        //webSearch.setGraphic(makeImageView(PATH_IMG_SEARCH));
-                        //initReloadButton();
-
-                        BACKUP.submit(FILE_WATCHER);
-                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                            if (BACKUP != null) {
-                                BACKUP.shutdownNow();
-                            }
-                        }));
-                        Platform.runLater(() -> updateProgress(getProgress() + 11, 100));
                     } catch (final Exception ex) {
                         ex.printStackTrace();
                     } finally {
@@ -551,9 +545,10 @@ public final class Controller implements Initializable {
 
                 private void setProgress(final String message) {
                     Platform.runLater(() -> {
-                        LOGGER.info("progress {}, {}/{}", getProgress(), done.get(), tasks);
-                        updateProgress(done.incrementAndGet(), tasks);
+                        final int i = done.incrementAndGet();
+                        updateProgress(i, tasks);
                         updateMessage(message);
+                        LOGGER.info("Progress {}, {}/{}, {}", getProgress(), i, tasks, message);
                     });
                 }
 
@@ -572,10 +567,6 @@ public final class Controller implements Initializable {
                 );
     }
 
-/*    private ImageView makeImageView(final String path) {
-        return new ImageView(getClass().getClassLoader().getResource(path).toString());
-    }
-*/
     /**
      * Set up searcher and scripter. this method call by FXWikiClient.
      */
@@ -1273,7 +1264,7 @@ public final class Controller implements Initializable {
                 }
 
                 final Tab tab = makeClosableTab(
-                        String.format("「%s」の%s検索結果", query, isAnd.isSelected() ? "AND" : "OR"),
+                        String.format("「%s」's %s search result", query, isAnd.isSelected() ? "AND" : "OR"),
                         leftTabs
                         );
                 // prepare tab's content.
@@ -1282,8 +1273,8 @@ public final class Controller implements Initializable {
                 leftTabs.getSelectionModel().select(tab);
                 final ObservableList<Node> children = box.getChildren();
                 children.add(new Label(
-                        String.format("実行時間: %d[ms]", fileSearcher.getLastSearchTime())));
-                children.add(new Label(String.format("%dファイル / %dファイル中",
+                        String.format("Search time: %d[ms]", fileSearcher.getLastSearchTime())));
+                children.add(new Label(String.format("%dFiles / %dFiles",
                         map.size(), fileSearcher.getLastFilenum())));
                 // set up ListView.
                 final ListView<Article> listView = new JFXListView<>();
@@ -1299,7 +1290,7 @@ public final class Controller implements Initializable {
 
                 children.add(listView);
                 tab.setContent(box);
-                setStatus("検索完了：" + (System.currentTimeMillis() - start) + "[ms]");
+                setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
             }).build().show();
     }
 
@@ -1446,9 +1437,14 @@ public final class Controller implements Initializable {
         Mono.create(emitter -> {
             initArticleList(articleList);
             emitter.success("");
-        }).subscribe(empty -> loadArticleList());
+        })
+        .subscribeOn(Schedulers.newSingle("I/O"))
+        .subscribe(empty -> {
+            final long start = System.currentTimeMillis();
+            loadArticleList();
+            LOGGER.info("Ended init loadArticleList. {}[ms]", System.currentTimeMillis() - start);
+            });
         initArticleList(historyList);
-        // TODO implementing
     }
 
     /**
@@ -1472,14 +1468,12 @@ public final class Controller implements Initializable {
      */
     @FXML
     private void loadArticleList() {
-        final long start = System.currentTimeMillis();
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        final List<Article> readArticleNames = Article.readAllArticleNames(Config.get("articleDir"));
-        items.addAll(readArticleNames);
-        articleList.requestLayout();
-        focusOn();
-        LOGGER.info("ended init loadArticleList. {}[ms]", System.currentTimeMillis() - start);
+        Flux.fromIterable(Article.readAllArticleNames(Config.get("articleDir")))
+            .subscribeOn(Schedulers.newSingle("I/O"))
+            .doOnTerminate(this::focusOn)
+            .subscribe(items::add);
     }
 
     /**

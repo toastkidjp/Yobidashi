@@ -93,9 +93,10 @@ public final class Main extends Application {
         }
 
         Mono.create(emitter -> {
-            stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
+            stage.getIcons()
+                .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
             emitter.success();
-            LOGGER.info("Ended set stage size.");
+            LOGGER.info("Ended set app icon.");
         })
         .subscribeOn(Schedulers.elastic()).subscribe();
 
@@ -103,6 +104,8 @@ public final class Main extends Application {
             stage.setScene(scene);
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
+            stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
+            stage.initStyle(StageStyle.DECORATED);
             final Screen screen = Screen.getScreens().get(0);
             final Rectangle2D bounds = screen.getVisualBounds();
             final BoundingBox maximizedBox = new BoundingBox(
@@ -127,13 +130,6 @@ public final class Main extends Application {
             emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
-
-        Mono.create(emitter -> {
-            stage.initStyle(StageStyle.DECORATED);
-            //scene.setFill(Color.TRANSPARENT);
-            emitter.success();
-            LOGGER.info("Ended set stage size.");
-        }).subscribeOn(Schedulers.elastic()).subscribe();
     }
 
     /**
@@ -142,18 +138,18 @@ public final class Main extends Application {
      * @return Scene オブジェクト
      */
     private final Mono<Scene> readScene(final Stage stage) {
+        final long start = System.currentTimeMillis();
+        final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
             loader.load();
             controller = (Controller) loader.getController();
-            stage.setTitle(Config.get(Config.Key.WIKI_TITLE));
             controller.setStage(stage);
-            return Mono.just(new Scene(controller.root));
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
             Platform.exit();
         }
-        return Mono.empty();
+        LOGGER.info("Ended loading scene graph. {}[ms]", System.currentTimeMillis() - start);
+        return Mono.just(new Scene(controller.root));
     }
 
     @Override

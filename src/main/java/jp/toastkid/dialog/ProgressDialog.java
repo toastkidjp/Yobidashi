@@ -2,13 +2,11 @@ package jp.toastkid.dialog;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -46,9 +44,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
 
     /** Scene. */
     private Scene scene = null;
-
-    /** progress indicator. */
-    private final AtomicInteger progress;
 
     /** dialog stage. */
     private final Stage dialogStage;
@@ -90,8 +85,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
      * Load scene file.
      */
     private ProgressDialog(final Builder b) {
-        progress = new AtomicInteger(0);
-
         final FXMLLoader loader
             = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
@@ -137,39 +130,8 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         return Optional.of(style);
     }
 
-    /**
-     * set Progress indicator.
-     * @param progres
-     */
-    public final void setProgress(final int progress) {
-        if (progress < 0 || 100 <= progress) {
-            return;
-        }
-        this.progress.set(progress);
-    }
-
-    /**
-     * set Progress indicator.
-     * @param progres
-     */
-    public final void addProgress(final int progress) {
-        if (progress < 0 || 100 <= progress) {
-            return;
-        }
-        this.progress.addAndGet(progress);
-    }
-
-    /**
-     * get progress.
-     * @return progress value.
-     */
-    public final int getProg() {
-        return this.progress.get();
-    }
-
     @Override
     public void start(final Stage stage) {
-        Platform.runLater(() -> dialogStage.show());
         final Service<Integer> service = new Service<Integer>() {
             @Override
             protected Task<Integer> createTask() {
@@ -187,22 +149,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
             }
         };
 
-        activate(service);
-    }
-
-    /**
-     * add text.
-     * @param text
-     */
-    public void addText(final String text) {
-        LOGGER.info(getProg() + " " + text);
-    }
-
-    /**
-     * activate this instance.
-     * @param service
-     */
-    public void activate(final Service<?> service)  {
         dialogStage.titleProperty().bind(service.titleProperty());
         controller.pb.progressProperty().bind(service.progressProperty());
         controller.label.textProperty().bind(service.messageProperty());
