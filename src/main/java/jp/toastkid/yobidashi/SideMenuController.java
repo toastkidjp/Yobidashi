@@ -23,7 +23,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
-import jp.toastkid.jfx.common.control.ActionLabel;
+import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
@@ -472,7 +472,7 @@ public class SideMenuController {
             = this.stage.getScene().getAccelerators();
         menuTabs.getTabs().forEach(tab -> {
             @SuppressWarnings("unchecked")
-            final JFXListView<ActionLabel> labels = (JFXListView<ActionLabel>) tab.getContent();
+            final JFXListView<MenuLabel> labels = (JFXListView<MenuLabel>) tab.getContent();
             labels.getItems().forEach(l -> {
                 if (l.getAccelerator() == null) {
                     return;

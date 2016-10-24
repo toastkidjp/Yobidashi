@@ -14,13 +14,13 @@ import javafx.scene.control.Label;
  * @author Toast kid
  *
  */
-public class ActionLabelSkin extends LabeledSkinBase<Label, BehaviorBase<Label>> {
+public class MenuLabelSkin extends LabeledSkinBase<Label, BehaviorBase<Label>> {
 
     /**
-     * Initialize with {@link ActionLabel}.
-     * @param label {@link ActionLabel}
+     * Initialize with {@link MenuLabel}.
+     * @param label {@link MenuLabel}
      */
-    public ActionLabelSkin(final ActionLabel label) {
+    public MenuLabelSkin(final MenuLabel label) {
         super(label, new BehaviorBase<>(label, Collections.emptyList()));
 
         // Labels do not block the mouse by default, unlike most other UI Controls.

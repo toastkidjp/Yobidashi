@@ -26,7 +26,7 @@
 <?import com.jfoenix.controls.JFXDrawer?>
 <?import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition?>
 
-<?import jp.toastkid.jfx.common.control.ActionLabel?>
+<?import jp.toastkid.jfx.common.control.MenuLabel?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.yobidashi.Controller"
@@ -46,7 +46,7 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <ActionLabel fx:id="title" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" onAction="#moveToTop" />
+              <MenuLabel fx:id="title" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" onAction="#moveToTop" />
               <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="URL" prefHeight="40.0" minWidth="300.0"  prefWidth="500.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>

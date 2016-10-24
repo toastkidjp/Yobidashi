@@ -14,7 +14,7 @@ import javafx.scene.input.KeyCombination;
  *
  * @author Toast kid
  */
-public class ActionLabel extends Label {
+public class MenuLabel extends Label {
 
     /**
      * The action handler associated with this text field, or
@@ -32,7 +32,7 @@ public class ActionLabel extends Label {
 
         @Override
         public Object getBean() {
-            return ActionLabel.this;
+            return MenuLabel.this;
         }
 
         @Override
@@ -76,14 +76,14 @@ public class ActionLabel extends Label {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new ActionLabelSkin(this);
+        return new MenuLabelSkin(this);
     }
 
-    public ActionLabel() {
+    public MenuLabel() {
         this("");
     }
 
-    public ActionLabel(final String text) {
+    public MenuLabel(final String text) {
         super(text);
         setOnMouseClicked(event -> getOnAction().handle(new ActionEvent()));
     }

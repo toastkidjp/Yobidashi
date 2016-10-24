@@ -16,7 +16,7 @@
 <?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXTextField?>
 
-<?import jp.toastkid.jfx.common.control.ActionLabel?>
+<?import jp.toastkid.jfx.common.control.MenuLabel?>
 
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
   fx:controller="jp.toastkid.yobidashi.ToolsController">
