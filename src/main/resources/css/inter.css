@@ -137,6 +137,31 @@
 .tab-label {
     -fx-text-fill: #FFFFFF;
 }
-.jfx-decorator {
-    -fx-background-color: rgba(200, 200, 250, 0.7);
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: rgba(0, 0, 100, 0.5);
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-snackbar-content {
+    -fx-background-color: rgba(0, 0, 100, 0.5);
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: WHITE;
+}
+
+.jfx-text-field, .jfx-password-field, .jfx-text-area{
+    -fx-background-color: transparent ;
+    -fx-font-weight: BOLD;
+    -fx-prompt-text-fill: WHITE;
+    -fx-text-fill: WHITE;
+    -fx-alignment: top-left ;
+    -fx-max-width: 300.0;
+    -fx-pref-width:300.0;
+    -fx-focus-color: #4059A9;
+    -fx-unfocus-color: #4d4d4d;
 }

@@ -28,10 +28,11 @@
     -fx-background-color: #FFF ;
     -fx-background-radius: 5px;
 }
+
 .jfx-tool-bar{
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
-    -fx-background-color: #5264AE;
+    -fx-background-color: #EEEEFF;
     -fx-pref-width: 100.0%;
     -fx-pref-height: 64.0px;
 }
@@ -50,7 +51,6 @@
 .jfx-tool-bar .jfx-options-burger{
     -fx-padding: 22px;
 }
-
 
 .jfx-text-field, .jfx-password-field, .jfx-text-area{
     -fx-background-color: transparent ;
