@@ -151,17 +151,26 @@
     -fx-text-fill: #005522;
     -fx-background: rgba(0, 100, 0, 0.4);
 }
+
+.title-label {
+    -fx-font-size: 16.0px;
+    -fx-padding : 14.0px;
+    -fx-text-fill: WHITE;
+    -fx-prompt-text-fill: white;
+}
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: #C5E9CA;
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
 .jfx-snackbar-content {
-    -fx-background-color: #323232;
+    -fx-background-color: #007722;
 }
 
 .jfx-snackbar-toast {
     -fx-text-fill: WHITE;
-}
-
-.jfx-snackbar-action {
-    -fx-text-fill: #ff4081;
-}
-.jfx-decorator {
-    -fx-decorator-color: WHITE;
 }

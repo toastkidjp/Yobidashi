@@ -51,12 +51,12 @@
             <content>
               <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
                 <children>
-                  <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="150.0"
+                  <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="250.0"
                    showTickLabels="true" showTickMarks="true" value="1.0">
                     <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
                   </JFXSlider>
                   <JFXTextField fx:id="zoomInput" onAction="#setZoom" labelFloat="true"
-                    promptText="zoom rate" prefHeight="25.0" prefWidth="100.0">
+                    promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
                     <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
                   </JFXTextField>
                   <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">

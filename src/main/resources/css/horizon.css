@@ -149,3 +149,19 @@
     -fx-text-fill: #005555;
     -fx-background: rgba(0, 100, 100, 0.4);
 }
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: rgba(0, 160, 160, 0.15);
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-snackbar-content {
+    -fx-background-color: #007777;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: WHITE;
+}

@@ -3,9 +3,19 @@
     -fx-background: #150666;
     -fx-control-inner-background: #C8C2EA;
 }
-.jfx-snackbar-content {
-    -fx-background-color: #323232;
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: #150666;
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
 }
-.jfx-decorator {
-    -fx-background-color: WHITE;
+
+.jfx-snackbar-content {
+    -fx-background-color: #150666;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: WHITE;
 }
