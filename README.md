@@ -56,7 +56,6 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | [GitHub jQuery Repo Widget](https://github.com/JoelSutherland/GitHub-jQuery-Repo-Widget) | MIT License | jQuery Plugin using preview GitHub Repository.
 | [highlight.js](https://highlightjs.org/) | BSD 3-clause | Implement syntax hilighting.
 | [jquery.lazyload.js](http://www.appelsiini.net/projects/lazyload) | [MIT License](https://github.com/tuupola/jquery_lazyload/blob/master/LICENSE.md)
-| [reveal.js](https://github.com/hakimel/reveal.js) | MIT License | enable HTML slide show.
 | [Material](https://github.com/daemonite/material) | MIT | CSS Framework of Material design.
 
 ### For testing

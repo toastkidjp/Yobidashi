@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +52,6 @@ public final class ArticleGenerator {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleGenerator.class);
-
-    /** Slide template. */
-    private static final String PATH_SLIDE        = Defines.TEMPLATE_DIR + "/slide.html";
 
     /** background directory. */
     private static final String USER_BACKGROUND   = Defines.USER_DIR + "/res/images/background/";
@@ -182,24 +178,6 @@ public final class ArticleGenerator {
             Defines.TEMP_FILE_NAME,
             Defines.ARTICLE_ENCODE
         );
-    }
-
-    /**
-     * generate html slide powered by reveal.js.
-
-     * @param title title of slide
-     * @param content HTML content
-     * @param theme theme of slide
-     */
-    public void generateSlide(final String title, final String content, final String theme) {
-        FileUtil.outPutStr(
-                ArticleGenerator.bindArgs(
-                    PATH_SLIDE,
-                    Maps.mutable.of("title", title, "content", content, "theme", theme)
-                ),
-                Defines.TEMP_FILE_NAME,
-                Defines.ARTICLE_ENCODE
-            );
     }
 
     /**

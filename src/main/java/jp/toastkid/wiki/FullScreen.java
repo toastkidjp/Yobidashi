@@ -1,17 +1,14 @@
 package jp.toastkid.wiki;
 
-import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import com.jfoenix.controls.JFXButton;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -35,10 +32,8 @@ import javafx.stage.Window;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.jfx.common.control.Stopwatch;
-import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.wiki.models.Config;
-import jp.toastkid.wiki.models.Defines;
 
 /**
  * For appear article full screen.
@@ -55,9 +50,6 @@ public class FullScreen {
 
     /** Jump key. */
     private static final KeyCodeCombination JUMP_KEY = new KeyCodeCombination(KeyCode.J, KeyCombination.CONTROL_DOWN);
-
-    /** path to theme's css dir. */
-    private static final String THEME_DIR = Defines.ASSETS_DIR + "/javascripts/reveal/css/theme/";
 
     /** css file name filter. */
     private static final FilenameFilter CSS_FILTER = (dir, name) -> name.endsWith(".css");
@@ -148,31 +140,7 @@ public class FullScreen {
         final Button reset = new JFXButton("Reset");
         reset.setOnAction(eve -> stopwatch.reset());
 
-        return new HBox(stopwatch, start, reset, makeThemeChooser());
-    }
-
-    /**
-     * make theme chooser.
-     * @return ComboBox
-     */
-    private ComboBox<String> makeThemeChooser() {
-        final ObservableList<String> items = styles.getItems();
-        items.addAll(
-                ArrayAdapter.adapt(new File(THEME_DIR).list(CSS_FILTER))
-                    .collect(name -> FileUtil.removeExtension(name))
-                    );
-        styles.setOnAction(event -> setTheme(styles.getSelectionModel().getSelectedItem()));
-        return styles;
-    }
-
-    /**
-     * set theme css.
-     * @param theme css name without extension.
-     */
-    private void setTheme(final String theme) {
-        webView.getEngine().executeScript(
-                String.format("document.getElementById('theme').href = '%s%s.css';", THEME_DIR, theme));
-        Config.store(Config.Key.SLIDE_THEME, theme);
+        return new HBox(stopwatch, start, reset);
     }
 
     /**
