@@ -24,3 +24,4 @@ gradlew*
 script.py
 sample
 *.log
+/build_e/
