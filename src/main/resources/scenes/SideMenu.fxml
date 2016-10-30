@@ -60,15 +60,15 @@
               <MenuLabel accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" />
               <MenuLabel accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
               <!--MenuLabel onAction="#callRssFeeder" text="RSS Feeder" /-->
-              <MenuLabel onAction="#openScripter" text="Script Runner" />
+              <MenuLabel accelerator="Ctrl+K" mnemonicParsing="true" onAction="#openScripter" text="Script Runner" />
               <MenuLabel onAction="#openNoodleTimer" text="Noodle Timer" />
               <MenuLabel onAction="#openNameGenerator" text="Name Generator" />
               <MenuLabel onAction="#openCssGenerator" text="CSS Generator" />
               <!--MenuLabel onAction="#callConvertMd" text="Convert to Markdown" />
               <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
-              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
+              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" /-->
               <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
-              <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" /-->
+              <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" />
               <MenuLabel onAction="#callLogViewer" text="LogViewer" />
             </JFXListView>
           </content>
@@ -78,7 +78,7 @@
           <tooltip><Tooltip text="Window menu." /></tooltip>
           <content>
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
-              <MenuLabel onAction="#fullScreen" text="Full screen" />
+              <MenuLabel accelerator="F11" mnemonicParsing="true" onAction="#fullScreen" text="Full screen" />
               <MenuLabel accelerator="F5" mnemonicParsing="true" onAction="#reload" text="Reload" />
               <MenuLabel onAction="#callConfig" text="Config" />
             </JFXListView>

@@ -4,18 +4,22 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
@@ -25,9 +29,12 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
+import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.wiki.ApplicationState;
+import jp.toastkid.wiki.Archiver;
+import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wordcloud.FxWordCloud;
@@ -69,16 +76,22 @@ public class SideMenuController {
     /** slide show command. */
     private Runnable slide;
 
+    /** tab action/ */
     private OpenTabAction tabAction;
 
+    /** Command of reload. */
     private Runnable reload;
 
+    /** Command of preview. */
     private Runnable preview;
 
+    /** Command of converting to Markdown. */
     private Runnable convert2Md;
 
+    /** Command of showing about page. */
     private Runnable about;
 
+    /** Command of showing log viewer. */
     private Runnable log;
 
     /**
@@ -390,6 +403,52 @@ public class SideMenuController {
     @FXML
     private void callLogViewer() {
         log.run();
+    }
+
+    /**
+     * call simple backup.
+     */
+    @FXML
+    public final void callSimpleBachup() {
+        final DatePicker datePicker = new JFXDatePicker();
+        datePicker.show();
+        datePicker.setShowWeekNumbers(true);
+        getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
+            .addControl(datePicker)
+            .setTitle("Select date")
+            .setMessage("バックアップする最初の日を選択してください。")
+            .setOnPositive("Backup", () -> {
+                final LocalDate value = datePicker.getValue();
+                if (value == null) {
+                    return;
+                }
+                final long epochDay = CalendarUtil.zoneDateTime2long(
+                        value.atStartOfDay().atZone(ZoneId.systemDefault()));
+                new Archiver().simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+            }).build().show()
+        );
+    }
+
+    /**
+     * Jsonの設定値を基に ePub を生成するメソッドを呼び出す.
+     */
+    @FXML
+    public final void callGenerateEpubs() {
+        getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
+                .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
+                .setOnPositive("OK", () -> {
+                    final ProgressDialog pd = new ProgressDialog.Builder()
+                            .setScene(parent.getScene())
+                            .setCommand(new Task<Integer>() {
+                                @Override
+                                protected Integer call() throws Exception {
+                                    new EpubGenerator().runEpubGenerator();
+                                    return 100;
+                                }
+                            })
+                            .build();
+                    pd.start(stage);
+                }).build().show());
     }
 
     /**

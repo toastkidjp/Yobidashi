@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXListView;
@@ -91,7 +89,6 @@ import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.utils.AobunUtils;
-import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
@@ -99,7 +96,6 @@ import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.rss.RssFeeder;
-import jp.toastkid.wiki.Archiver;
 import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.FullScreen;
@@ -792,50 +788,6 @@ public final class Controller implements Initializable {
                         })
                         .build();
                 pd.start(stage);
-            }).build().show();
-    }
-
-    /**
-     * Jsonの設定値を基に ePub を生成するメソッドを呼び出す.
-     */
-    @FXML
-    public final void callGenerateEpubs() {
-        new AlertDialog.Builder(getParent())
-        .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
-        .setOnPositive("OK", () -> {
-            final ProgressDialog pd = new ProgressDialog.Builder()
-                    .setScene(this.getParent().getScene())
-                    .setCommand(new Task<Integer>() {
-                        @Override
-                        protected Integer call() throws Exception {
-                            new EpubGenerator().runEpubGenerator();
-                            return 100;
-                        }
-                    })
-                    .build();
-            pd.start(stage);
-        }).build().show();
-    }
-
-    /**
-     * call simple backup.
-     */
-    @FXML
-    public final void callSimpleBachup() {
-        final DatePicker datePicker = new JFXDatePicker();
-        datePicker.show();
-        datePicker.setShowWeekNumbers(true);
-        new AlertDialog.Builder(getParent()).addControl(datePicker)
-            .setTitle("Select date")
-            .setMessage("バックアップする最初の日を選択してください。")
-            .setOnPositive("Backup", () -> {
-                final LocalDate value = datePicker.getValue();
-                if (value == null) {
-                    return;
-                }
-                final long epochDay = CalendarUtil.zoneDateTime2long(
-                        value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                new Archiver().simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
             }).build().show();
     }
 
