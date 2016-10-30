@@ -18,6 +18,11 @@
     <body class="page-blue bg" ${bodyAdditional}>
       <div id="content">
         <div class="container">
+          <h1><a class="waves-attach waves-effect" href="JavaScript:open('expander_subhead')">
+            見出し(クリックで展開)</a></h1>
+          <div class="expander" id="expander_subhead" style="display: none;">
+            ${subheadings}
+          </div><script>close("expander0");</script>
           ${content}
         </div>
       </div>

@@ -170,11 +170,11 @@ public final class HtmlUtil {
      * @param text テキスト
      * @return ハイパーリンクの文字列表現
      */
-    public static final String getLink(
+    public static final String makeLink(
            final String url,
            final String text
            ) {
-       return getLink(url, text, false);
+       return makeLink(url, text, false);
     }
     /**
      * テキストのハイパーリンクを生成して返す.
@@ -183,7 +183,7 @@ public final class HtmlUtil {
      * @param openBlank true の時は target=_brank でリンクを生成する.
      * @return ハイパーリンクの文字列表現
      */
-    public static final String getLink(
+    public static final String makeLink(
             final String url,
             final String text,
             final boolean openBlank
@@ -193,7 +193,7 @@ public final class HtmlUtil {
         link.append(url);
         link.append("\"");
         if (openBlank) {
-            link.append(" target=_blank ");
+            link.append(" target='_blank' rel='noopener'");
         }
         link.append(">");
         link.append(text);

@@ -4,7 +4,11 @@ a {
 .side-menu-title {
     margin-left: 10px;
 }
-.content-area {
+#expander_subhead {
+  background-color: rgba(240, 240, 255, 0.9);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+.container {
   background-color: rgba(240, 240, 240, 0.9);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }

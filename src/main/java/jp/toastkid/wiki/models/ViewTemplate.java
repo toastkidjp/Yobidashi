@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  */
 public enum ViewTemplate implements Serializable {
-    SECOND(  Defines.TEMPLATE_DIR + "/main_2nd.html");
+    SECOND(  Defines.TEMPLATE_DIR + "/main.html");
 
     private String path;
 

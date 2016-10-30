@@ -184,14 +184,13 @@ public class PostProcessor {
         }
 
         if (subheadings != null) {
-            subheadings.each((subheading) -> {
-                headingHtml
+            subheadings.each(subheading -> headingHtml
                     .append("<li>")
                     .append("<a class='waves-attach waves-effect' href=\"#")
                     .append(subheading.id).append("\">")
-                    .append(subheading.title).append("</a>").append("<br/>")
-                    .append(Strings.LINE_SEPARATOR);
-            });
+                    .append(subheading.title).append("</a></li><br/>")
+                    .append(Strings.LINE_SEPARATOR)
+            );
         }
 
         if (notEmpty) {

@@ -126,29 +126,29 @@ public final class HtmlUtilTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.HtmlUtil#getLink(java.lang.String, java.lang.String)} の動作を確認する.
+     * {@link jp.toastkid.libs.utils.HtmlUtil#makeLink(java.lang.String, java.lang.String)} の動作を確認する.
      */
     @Test
-    public final void testGetLinkStringString() {
+    public final void testMakeLinkStringString() {
         assertEquals(
                 "<a href=\"http://sample.jp\">tomato</a>",
-                HtmlUtil.getLink("http://sample.jp", "tomato")
+                HtmlUtil.makeLink("http://sample.jp", "tomato")
                 );
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.HtmlUtil#getLink(java.lang.String, java.lang.String, boolean)}
+     * {@link jp.toastkid.libs.utils.HtmlUtil#makeLink(java.lang.String, java.lang.String, boolean)}
      * の動作を確認する.
      */
     @Test
-    public final void testGetLinkStringStringBoolean() {
+    public final void testMakeLinkStringStringBoolean() {
         assertEquals(
-                "<a href=\"http://sample.jp\" target=_blank >tomato</a>",
-                HtmlUtil.getLink("http://sample.jp", "tomato", true)
+                "<a href=\"http://sample.jp\" target='_blank' rel='noopener'>tomato</a>",
+                HtmlUtil.makeLink("http://sample.jp", "tomato", true)
                 );
         assertEquals(
                 "<a href=\"http://sample.jp\">tomato</a>",
-                HtmlUtil.getLink("http://sample.jp", "tomato", false)
+                HtmlUtil.makeLink("http://sample.jp", "tomato", false)
                 );
     }
 
