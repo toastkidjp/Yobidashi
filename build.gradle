@@ -42,7 +42,6 @@ dependencies {
 
     // Dependencies for use Script Engine.
     compile 'org.codehaus.groovy:groovy-all:2.4.5'
-    compile 'org.clojure:clojure:1.8.0'
 
     compile 'org.eclipse.collections:eclipse-collections:8.0.0-M1'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
