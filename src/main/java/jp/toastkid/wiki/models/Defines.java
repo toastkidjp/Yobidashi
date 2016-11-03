@@ -38,6 +38,9 @@ public final class Defines {
     /** dir of user files. */
     public static final String USER_DIR           = "user";
 
+    /** Slide's css dir. */
+    public static final String SLIDE_CSS_DIR      = USER_DIR + "/css/slide/";
+
     /** 設定ファイルフォルダのパス. */
     public static final String CONF_DIR           = USER_DIR + "/conf/";
 

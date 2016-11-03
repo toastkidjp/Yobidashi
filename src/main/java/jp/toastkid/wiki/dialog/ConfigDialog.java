@@ -26,10 +26,10 @@ public final class ConfigDialog  extends Application {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigDialog.class);
 
-    /** FXML ファイルのパス. */
+    /** Path to FXML. */
     private static final String FXML_PATH = Defines.SCENE_DIR + "/ConfigDialog.fxml";
 
-    /** コントローラオブジェクト. */
+    /** Controller object. */
     private ConfigDialogController controller;
 
     /** Stage. */

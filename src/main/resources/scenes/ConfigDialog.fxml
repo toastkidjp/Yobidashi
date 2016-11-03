@@ -35,7 +35,6 @@
       </tooltip>
       <items>
         <FXCollections fx:factory="observableArrayList">
-          <String fx:value="MATERIAL" />
           <String fx:value="SECOND" />
         </FXCollections>
       </items>

@@ -1325,18 +1325,10 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * show slide show.
+     * Show slide show.
      */
     @FXML
     private void slideShow() {
-        /*
-        func.generateSlide(
-                Config.article.title,
-                func.convertArticle2Slide(),
-                Config.get(Config.Key.SLIDE_THEME, "white")
-                );
-        //*/
-        //callTabFullScreen();
         new jp.toastkid.slideshow.Main().show(this.stage, Config.article.file.getAbsolutePath());
     }
 
