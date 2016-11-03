@@ -131,12 +131,6 @@ public final class Controller implements Initializable {
     /** /path/to/path to bookmark file. */
     private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
 
-    /** 「リロード」ボタンの画像ファイルへのパス */
-    //private static final String PATH_IMG_RELOAD  = "images/reload.png";
-
-    /** 「検索」画像ファイルへのパス. */
-    //private static final String PATH_IMG_SEARCH  = "images/search.png";
-
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
 
@@ -629,8 +623,8 @@ public final class Controller implements Initializable {
     private final void highlight(
             final Optional<String> word, final String script) {
         word.ifPresent(keyword ->
-            getCurrentWebView().ifPresent(
-                    wv -> wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
+            getCurrentWebView().ifPresent(wv ->
+                wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
         );
     }
 
@@ -730,7 +724,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * load diary specified LocalDate.
+     * Load diary specified LocalDate.
      * @param date
      */
     private void loadDiary(final LocalDate date) {
@@ -750,18 +744,18 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 青空文庫変換を呼ぶ.
+     * Call method of converting to Aozora-Bunko style text.
      */
     @FXML
     public final void callConvertAobun() {
         final String absolutePath = Config.article.file.getAbsolutePath();
         AobunUtils.docToTxt(absolutePath);
-        AlertDialog.showMessage(getParent(), "変換完了",
+        AlertDialog.showMessage(getParent(), "Complete Converting",
                 Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath));
     }
 
     /**
-     * ePub を生成するメソッドを呼び出す.
+     * Call method of converting to ePub.
      */
     @FXML
     public final void callConvertEpub() {
@@ -792,7 +786,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * HTML ソースを表示する.
+     * Show HTML source.
      */
     @FXML
     public final void callHtmlSource() {
@@ -868,11 +862,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Web 検索機能.
+     * Search Web with query.
      * @param event ActionEvent
      */
     @FXML
-    private final void webSearch(final ActionEvent event) {
+    private final void webSearch() {
         final String kind  = searchCategory.getItems()
                 .get(searchCategory.getSelectionModel().getSelectedIndex())
                 .toString();
@@ -898,8 +892,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 新しい WebView のタブを開く.
-     * @param e
+     * Open new tab having WebView.
      */
     @FXML
     private void openWebTab() {
@@ -907,8 +900,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 新しい WebView のタブを開く.
-     * @param title タブのタイトル
+     * Open new tab having WebView with title.
+     * @param title tab's title
      */
     private void openWebTab(final String title) {
 
@@ -963,9 +956,9 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * make closable tab.
+     * Make closable tab.
      * @param title tab's title
-     * @return
+     * @return Tab
      */
     private Tab makeClosableTab(final String title) {
         final Tab tab = new Tab(title);
@@ -976,7 +969,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * show Context(Popup) menu.
+     * Show Context(Popup) menu.
      * @see <a href="http://stackoverflow.com/questions/27047447/
      *customized-context-menu-on-javafx-webview-webengine">
      *customized-context-menu-on-javafx-webview-webengine</a>
@@ -1068,7 +1061,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 左側を表示する.
+     * Show left panel.
      */
     private void showLeftPane() {
         if (splitterOpen == null) {
@@ -1157,7 +1150,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 読み込みを中止する.
+     * Stop loading.
      * TODO 動作未検証
      * @param event
      */
@@ -1247,10 +1240,10 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * make empty closable tab.
+     * Make empty closable tab.
      * @param title Tab's title
      * @param parent Parent TabPane
-     * @return 空の Tab
+     * @return empty Tab
      */
     private static Tab makeClosableTab(final String title, final TabPane parent) {
         final Tab tab = new Tab(title);
@@ -1263,7 +1256,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Markdown に変換する.
+     * Convert to Markdown.
      */
     private void convertMd() {
         final Tab tab = makeClosableTab("(MD)" + Config.article.title);
@@ -1285,7 +1278,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * call RSS Feeder．
+     * Call RSS Feeder．
      */
     @FXML
     private final void callRssFeeder() {
@@ -1333,7 +1326,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * フォルダを開く.
+     * Open folder.
      * @param event 開くフォルダを決めるのに使う.
      */
     @FXML
@@ -1370,7 +1363,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ホーム画面を呼び出す.
+     * Open home.
      */
     @FXML
     private final void callHome() {
@@ -1378,7 +1371,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 記事一覧リストの準備.
+     * Prepare common article list.
      */
     private void prepareArticleList() {
         Mono.create(emitter -> {
@@ -1464,8 +1457,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ページをロードする.
-     * @param url ロードする URL
+     * Load passed url.
+     * @param url URL
      * @return yOffset.
      */
     private void loadUrl(final String url) {
@@ -1473,8 +1466,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ページをロードする.
-     * @param url ロードする URL
+     * Load passed url.
+     * @param url URL
      * @param isReload リロードの場合、yOffsetを保持.
      * @return yOffset.
      */
@@ -1564,7 +1557,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 閲覧履歴をクリアする.
+     * Clear view history.
      */
     @FXML
     private final void clearHistory() {
@@ -1578,7 +1571,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 新規に記事を作成する.
+     * Make new article.
      * <HR>
      * (130304) 作成<BR>
      */
@@ -1588,7 +1581,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * make new Markdown.
+     * Make new Markdown.
      * .
      */
     @FXML
@@ -1617,29 +1610,29 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 記事のコピー処理を呼び出す。
+     * Call copy article。
      * <HR>
      * (130707) メッセージ変更<BR>
      * (130512) 作成<BR>
      */
     @FXML
-    private final void callCopy(final ActionEvent event) {
+    private final void callCopy() {
         callRenameArticle(true);
     }
 
     /**
-     * 記事のリネーム処理を呼び出す。
+     * Call rename article。
      * <HR>
      * (130707) メッセージ変更<BR>
      * (130512) 作成<BR>
      */
     @FXML
-    private final void callRename(final ActionEvent event) {
+    private final void callRename() {
         callRenameArticle(false);
     }
 
     /**
-     * 記事のリネーム処理を呼び出す。
+     * Rename article。
      * <HR>
      * @param isCopy コピーをするか
      * (130707) メッセージ変更<BR>
@@ -1717,8 +1710,7 @@ public final class Controller implements Initializable {
      * ファイル一覧から削除するよう処理変更<BR>
      * (130305) 作成<BR>
      */
-    @FXML
-    public final void callDelete(final ActionEvent event) {
+    private final void callDelete() {
         // 削除対象のファイルオブジェクト
         final Article article = Config.article;
         final String deleteTarget = article.title;
@@ -1933,7 +1925,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * height をセットする.
+     * Set width and height to Controller.
      * @param height 縦幅
      */
     public final void setSize(final double width, final double height) {
@@ -1973,10 +1965,22 @@ public final class Controller implements Initializable {
         sideMenuController.setOnWordCloud(this::openSpecifiedTab);
         sideMenuController.setOnConvertMd(this::convertMd);
         sideMenuController.setOnOpenLogViewer(this::openLogViewer);
+        sideMenuController.setOnCopy(this::callCopy);
+        sideMenuController.setOnRename(this::callRename);
+        sideMenuController.setOnDelete(this::callDelete);
         sideMenuController.setOnAbout(this::about);
+        sideMenuController.setOnQuit(() -> {
+            this.stage.close();
+            System.exit(0);
+        });
+    }
+
+    /**
+     * Set up Tool Menu.
+     */
+    protected void setupToolMenu() {
         toolsController.init(this.stage);
         toolsController.setOnDrawChart(this::openSpecifiedTab);
-
         toolsController.setFlux(Flux.<WebView>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {

@@ -127,6 +127,7 @@ public final class Main extends Application {
             // setup searcher.
             controller.setupExpandables();
             controller.setupSideMenu();
+            controller.setupToolMenu();
             emitter.success();
             LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();

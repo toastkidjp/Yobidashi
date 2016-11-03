@@ -94,6 +94,19 @@ public class SideMenuController {
     /** Command of showing log viewer. */
     private Runnable log;
 
+
+    /** Command of quit this app. */
+    private Runnable onQuit;
+
+    /** Command of copy article. */
+    private Runnable onCopy;
+
+    /** Command of rename article. */
+    private Runnable onRename;
+
+    /** Command of delete article. */
+    private Runnable onDelete;
+
     /**
      * バックアップ機能を呼び出す。
      */
@@ -409,7 +422,7 @@ public class SideMenuController {
      * call simple backup.
      */
     @FXML
-    public final void callSimpleBachup() {
+    private final void callSimpleBachup() {
         final DatePicker datePicker = new JFXDatePicker();
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
@@ -433,7 +446,7 @@ public class SideMenuController {
      * Jsonの設定値を基に ePub を生成するメソッドを呼び出す.
      */
     @FXML
-    public final void callGenerateEpubs() {
+    private final void callGenerateEpubs() {
         getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
                 .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
                 .setOnPositive("OK", () -> {
@@ -449,6 +462,38 @@ public class SideMenuController {
                             .build();
                     pd.start(stage);
                 }).build().show());
+    }
+
+    /**
+     * Quit this app.
+     */
+    @FXML
+    private void quit() {
+        onQuit.run();
+    }
+
+    /**
+     * Copy article.
+     */
+    @FXML
+    private void callCopy() {
+        onCopy.run();
+    }
+
+    /**
+     * rename article.
+     */
+    @FXML
+    private void callRename() {
+        onRename.run();
+    }
+
+    /**
+     * Delete article.
+     */
+    @FXML
+    private void callDelete() {
+        onDelete.run();
     }
 
     /**
@@ -565,6 +610,38 @@ public class SideMenuController {
      */
     protected void setOnOpenLogViewer(final Runnable log) {
         this.log = log;
+    }
+
+    /**
+     * Set on quit command.
+     * @param onQuit
+     */
+    protected void setOnQuit(final Runnable onQuit) {
+        this.onQuit = onQuit;
+    }
+
+    /**
+     * Set on copy command.
+     * @param onCopy
+     */
+    protected void setOnCopy(final Runnable onCopy) {
+        this.onCopy = onCopy;
+    }
+
+    /**
+     * Set on rename command.
+     * @param onRename
+     */
+    protected void setOnRename(final Runnable onRename) {
+        this.onRename = onRename;
+    }
+
+    /**
+     * Set on delete command.
+     * @param onDelete
+     */
+    protected void setOnDelete(final Runnable onDelete) {
+        this.onDelete = onDelete;
     }
 
 }

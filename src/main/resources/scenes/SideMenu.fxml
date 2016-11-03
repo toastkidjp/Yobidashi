@@ -28,6 +28,7 @@
               <MenuLabel accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="Close tab" />
               <MenuLabel accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="Slide show"/>
               <!--MenuLabel accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" /-->
+              <MenuLabel onAction="#quit" text="Quit"/>
             </JFXListView>
           </content>
         </Tab>
@@ -41,12 +42,12 @@
                 </content>
               </Tab-->
               <MenuLabel accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="Article length counter" />
-              <!--MenuLabel accelerator="Ctrl+C" mnemonicParsing="true" onAction="#callCopy" text="Copy article" />
-              <MenuLabel onAction="#callRename" text="Rename article" /-->
+              <MenuLabel onAction="#callCopy" text="Copy article" />
+              <MenuLabel onAction="#callRename" text="Rename article" />
               <MenuLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
               <MenuLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" />
               <MenuLabel accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="Article Search" />
-              <!--MenuLabel onAction="#callDelete" text="Delete article" /-->
+              <MenuLabel onAction="#callDelete" text="Delete article" />
             </JFXListView>
           </content>
         </Tab>
