@@ -23,7 +23,7 @@ public class PostProcessor {
 
     /** subhead format. */
     private static final String SUBHEAD_FORMAT
-        = "<a class='waves-attach waves-effect' id=\"%s\" href=\"#%s\">■</a>";
+        = "<a id=\"%s\" href=\"#%s\">■</a>";
 
     /** internal link pattern. */
     private static final Pattern INTERNAL_LINK_PATTERN
@@ -141,11 +141,11 @@ public class PostProcessor {
             = new File(articleDir, bytedStr.concat(".").concat(findExtension(isMd))).exists();
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
-        generatedLink.append("<a class='waves-attach waves-effect ");
+        generatedLink.append("<a ");
         if (!isExist) {
-            generatedLink.append("redLink");
+            generatedLink.append("class='redLink' ");
         }
-        generatedLink.append("' ")
+        generatedLink
             .append("href=\"/").append(findExtension(isMd)).append("/")
             .append(bytedStr)
             .append(".").append(findExtension(isMd));
@@ -186,9 +186,9 @@ public class PostProcessor {
         if (subheadings != null) {
             subheadings.each(subheading -> headingHtml
                     .append("<li>")
-                    .append("<a class='waves-attach waves-effect' href=\"#")
+                    .append("<a href=\"#")
                     .append(subheading.id).append("\">")
-                    .append(subheading.title).append("</a></li><br/>")
+                    .append(subheading.title).append("</a></li>")
                     .append(Strings.LINE_SEPARATOR)
             );
         }
@@ -207,7 +207,7 @@ public class PostProcessor {
     private String getTag(final ViewTemplate template) {
         switch (template.toString()) {
             case "MATERIAL":
-                return "ul class=\"nav\"";
+                return "ul";
             default:
                 return "ol";
         }

@@ -1,0 +1,267 @@
+/** Main layout **/
+html, body {
+  font-family: Roboto, Helvetica, Arial, Sans !important;
+}
+
+body {
+  margin: auto;
+  background-position: 50% 50%;
+  background-color: #EEEECC;
+}
+
+.bg {
+    min-height: 100%;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+a {
+    color: #111693;
+    text-decoration: none;
+}
+
+a:link.redLink	{
+	color:#ba0000;
+}
+
+a:hover, span:hover {
+  background:rgba(255,255,255,0.8);
+  border:1px solid #ccc;
+  padding:7px 10px;
+  -webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  -moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  box-shadow:1px 1px 3px rgba(150,150,150,0.5)
+}
+
+#expander_subhead {
+  background-color: rgba(240, 240, 255, 0.9);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.container {
+  background-color: rgba(240, 240, 240, 0.9);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+#main {
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  padding: 20px;
+  margin-top: 45px;
+}
+
+/* menubar */
+div.body {
+  position: relative;
+}
+
+/*
+tooltip HTML sample
+<a href="#" class="tooltip">
+  ここにマウスを当てる
+  <span class="tooltipBody">
+    表示する文字
+    <span class="tooltipAngle">
+      <span class="tooltipAngleInner" />
+    </span>
+  </span>
+</a>
+*/
+.tooltip {
+    position: relative;
+}
+.tooltip .tooltipBody {
+    border: solid 2px #f98325;
+    position: absolute;
+    left: 1em;
+    top: -2.7em;
+    text-decoration: none;
+    visibility: hidden;
+    padding: 3px 5px;
+    width: 200px;
+    zoom: 1;
+}
+.tooltip:hover ,
+.tooltip:hover .tooltipBody {
+    background-color: white;
+    visibility: visible;
+    z-index: 10;
+}
+.tooltip .tooltipBody .tooltipAngle {
+    border-right: solid 10px transparent;
+    border-left-width: 0;
+    border-top: solid 10px #f98325;
+    line-height: 0;
+    position: absolute;
+    left: 1em;
+    bottom: -10px;
+}
+.tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {
+    border-right: solid 5px transparent;
+    border-left-width: 0;
+    border-top: solid 5px white;
+    line-height: 0;
+    position: absolute;
+    left: 2px;
+    bottom: 5px;
+}
+
+/*	not supported tanseparent for border by IE6. */
+* html .tooltip .tooltipBody .tooltipAngle {
+    border-right-color: white;
+    bottom: -11px;
+}
+* html .tooltip .tooltipBody .tooltipAngle .tooltipAngleInner {
+    border-right-color: #f98325;
+}
+.highlight {
+  background-color: yellow;
+}
+
+
+
+
+
+
+
+
+
+h1, .h1 {
+  font-size: 44px;
+  line-height: 48px;
+}
+
+h2,.h2 {
+  font-size: 36px;
+  line-height: 40px;
+}
+
+h3,.h3 {
+  font-size: 28px;
+  line-height: 32px;
+}
+
+h4,.h4 {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+h5,.h5 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+h6,.h6 {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+/*
+table {
+  margin: 10px;
+  border-style: solid;
+  border-width: 2px;
+  border:0.5px solid #0099cc;
+  -moz-box-shadow: 1px 1px 3px #000;
+  -webkit-box-shadow: 1px 1px 3px #000;
+}
+*/
+
+.table {
+  background-color: #FFFFFF;
+  width: 98%;
+  margin: 10px;
+  border-collapse: collapse;
+  border: 0.5px solid #0099CC;
+  -moz-box-shadow: 1px 1px 3px #001;
+  -webkit-box-shadow: 1px 1px 3px #001;
+}
+
+.table td, .table th {
+    border: 1px solid #E0E0E0;
+    line-height: 24px;
+    padding: 12px 16px 11px;
+    vertical-align: top;
+}
+
+th {
+    text-align: left;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: #eeeeee;
+}
+
+.table-stripe > tbody > tr:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 16px;
+    padding-left: 16px;
+}
+
+@media only screen and (min-width: 1440px) {
+  .container {
+    max-width: 1408px;
+  }
+}
+
+ol, ul {
+  margin: 24px 0;
+  padding: 0 0 0 32px;
+}
+
+p {
+  line-height: 26px;
+  padding-left: 1em;
+}
+
+dd, dt, li {
+  line-height: 26px;
+}
+
+/**
+ * Ascii art.
+ */
+.aaArea {
+  font-family:'IPAMonaPGothic,ＭＳ Ｐゴシック' !important;
+  font-size: 12pt;
+  -webkit-text-size-adjust: 100%;
+}
+
+/**
+ * Football pitch
+ */
+span.pitch_name {
+	font-weight: bold;
+	font-size: smaller;
+	color: white;
+}
+span.pitch_name:hover{
+	font-size: larger;
+	background:rgba(255,255,255,0.8);
+	padding:7px 10px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	border-radius:5px;
+	-webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+	-moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+	box-shadow:1px 1px 3px rgba(150,150,150,0.5)
+}
+span.pitch_gk {
+	text-shadow: 1.5px 2.5px 2.5px maroon;
+}
+span.pitch_df {
+	text-shadow: 1.5px 2.5px 2.5px blue;
+}
+span.pitch_mf {
+	text-shadow: 1.5px 2.5px 2.5px green;
+}
+span.pitch_fw {
+	text-shadow: 1.5px 2.5px 2.5px gold;
+}

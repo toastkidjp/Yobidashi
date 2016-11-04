@@ -5,27 +5,20 @@
         <script src="assets/javascripts/expander.js" charset="utf-8"></script>
         <!--Import jQuery before materialize.js-->
         <script src="assets/javascripts/jquery-2.1.1.min.js" charset="utf-8"></script>
-        <script src="assets/javascripts/GitHub-jQuery-Repo-Widget/jquery.githubRepoWidget.min.js" charset="utf-8"></script>
         <script src="assets/javascripts/highlightjs/highlight.pack.js"></script>
         <link rel="stylesheet" type="text/css" href="assets/javascripts/highlightjs/styles/github.css">
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/material/css/base.css">
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/football.css" />
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/main_2nd.css" />
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/ascii_art.css" />
-        <link rel="stylesheet" type="text/css" href="assets/stylesheets/additional.css" />
+        <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css" />
         <link rel="stylesheet" type="text/css" href="user/css/html/user.css" />
     </head>
-    <body class="page-blue bg" ${bodyAdditional}>
-      <div id="content">
+    <body class="bg" ${bodyAdditional}>
         <div class="container">
-          <h1><a class="waves-attach waves-effect" href="JavaScript:open('expander_subhead')">
+          <h1><a href="JavaScript:open('expander_subhead')">
             見出し(クリックで展開)</a></h1>
           <div class="expander" id="expander_subhead" style="display: none;">
             ${subheadings}
           </div><script>close("expander0");</script>
           ${content}
         </div>
-      </div>
     </body>
     <script type="text/javascript">
         // for highlighting

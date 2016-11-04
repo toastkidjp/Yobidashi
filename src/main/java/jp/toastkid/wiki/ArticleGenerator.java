@@ -156,12 +156,10 @@ public final class ArticleGenerator {
                     put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
                     put("subheadings", subheading);
                     put("content",
-                        new StringBuilder().append("<div class=\"body\">")
-                            .append(LINE_SEPARATOR)
+                        new StringBuilder()
                             .append("<div class=\"content-area\">")
                             .append(LINE_SEPARATOR)
                             .append(processed)
-                            .append("</div>")
                             .toString()
                             );
                     if (new File(USER_BACKGROUND).exists()) {

@@ -552,7 +552,7 @@ public final class WikiConverter {
             if (!isInExpand && str.trim().startsWith("{expand") ) {
                 isInExpand = true;
                 final StringBuilder expandStart = new StringBuilder();
-                expandStart.append("<a class='waves-attach waves-effect' href=\"JavaScript:open('expander").append(expanderCount)
+                expandStart.append("<a href=\"JavaScript:open('expander").append(expanderCount)
                     .append("')\">");
                 if (str.indexOf(":") != -1) {
                     expandStart.append(str.split(":")[1].replaceFirst("}$", ""));
@@ -947,8 +947,7 @@ public final class WikiConverter {
                 final String link = matcher.group(2);
                 final StringBuilder generatedLink = new StringBuilder(180);
                 // (121010) ソースフォルダをリンクパスに追加
-                generatedLink.append("<a class='waves-attach waves-effect' ");
-                generatedLink.append("href=\"");
+                generatedLink.append("<a href=\"");
                 generatedLink.append(link);
                 generatedLink.append("\"");
                 if (openLinkBrank) {
@@ -979,7 +978,7 @@ public final class WikiConverter {
                 final String found = matcher.group(1);
                 str = str.replaceFirst(
                         WIKIPEDIA_PATTERN.pattern(),
-                        Strings.join("<a class='waves-attach waves-effect' target=\"_blank\" href=\"https://ja.wikipedia.org/wiki/" + found + "\">", found, "</a>")
+                        Strings.join("<a target=\"_blank\" href=\"https://ja.wikipedia.org/wiki/" + found + "\">", found, "</a>")
                         );
             }
         }
@@ -991,7 +990,7 @@ public final class WikiConverter {
                 final String found = matcher.group(1);
                 final boolean isHashTag = found.startsWith("#");
                 final StringBuilder link = new StringBuilder()
-                    .append("<a class='waves-attach waves-effect' target=\"_blank\" href=\"https://twitter.com/")
+                    .append("<a target=\"_blank\" href=\"https://twitter.com/")
                     .append(isHashTag ? "hashtag/" : "")
                     .append(isHashTag ? found.substring(1) : found)
                     .append(isHashTag ? "?src=hash" : "")
