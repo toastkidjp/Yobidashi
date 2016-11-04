@@ -195,9 +195,10 @@ public final class WikiConverter {
      * @param imgDir 画像のフォルダ
      */
     public WikiConverter(final String imgDir) {
-        this.imgDir    = StringUtils.isNotBlank(imgDir)
+        this.imgDir = StringUtils.isNotBlank(imgDir)
                             ? new File(imgDir.replace("\\", "/")).toURI().toString() : "";
     }
+
     /**
      * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.
      * <HR>
@@ -207,6 +208,7 @@ public final class WikiConverter {
     public void convertedToHtml(final String filePath, final String fileEncode) {
         convertedToHtml(filePath, fileEncode, "");
     }
+
     /**
      * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.
      * <HR>
@@ -225,6 +227,7 @@ public final class WikiConverter {
                 :  outputDir + Strings.getDirSeparator() + file.getName().replaceFirst("\\.txt", ".html");
         FileUtil.outPutStr(convert(filePath, fileEncode), outputTo, outputEncode);
     }
+
     /**
      * .txt ファイルを読み込み、Wiki 変換した文字列を返す.
      * @param filePath 変換するソースのテキストファイルパス
@@ -877,13 +880,11 @@ public final class WikiConverter {
         if (str.toLowerCase().indexOf("github") != -1) {
             matcher = GITHUB_PATTERN.matcher(str);
             while (matcher.find()) {
-                final String match = matcher.group(1);
                 str = str.replaceAll(
-                        GITHUB_PATTERN.pattern(),
-                        "<div class=\"github-widget\" data-repo=\"" + match + "\"></div>"
-                        );
+                        GITHUB_PATTERN.pattern(), GitHubWidgetFactory.make(matcher.group(1)));
             }
         }
+
         // color
         if (str.indexOf("&color(") != -1) {
             matcher = COLOR_PAT.matcher(str);
