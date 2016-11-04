@@ -155,6 +155,7 @@ public final class ArticleGenerator {
                     put("wikiIcon",    Config.get("wikiIcon"));
                     put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
                     put("subheadings", subheading);
+                    put("jarPath",     getClass().getClassLoader().getResource("assets/").toString());
                     put("content",
                         new StringBuilder()
                             .append("<div class=\"content-area\">")
