@@ -15,6 +15,7 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXColorPicker?>
 
 <?import jp.toastkid.jfx.common.control.MenuLabel?>
 
@@ -74,6 +75,11 @@
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
             <content>
               <AnchorPane><children><fx:include fx:id="bmi" source="Bmi.fxml"/></children></AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Color Picker">
+            <content>
+              <AnchorPane><children><JFXColorPicker /></children></AnchorPane>
             </content>
           </TitledPane>
         </children>
