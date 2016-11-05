@@ -10,20 +10,20 @@ body {
 }
 
 .bg {
-    min-height: 100%;
-    background-size: cover;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-position: center center;
+  min-height: 100%;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 
 a {
-    color: #111693;
-    text-decoration: none;
+  color: #111693;
+  text-decoration: none;
 }
 
 a:link.redLink	{
-	color:#ba0000;
+  color:#ba0000;
 }
 
 a:hover, span:hover {
@@ -60,9 +60,9 @@ div.body {
 /*
 tooltip HTML sample
 <a href="#" class="tooltip">
-  ここにマウスを当てる
+  縺薙％縺ｫ繝槭え繧ｹ繧貞ｽ薙※繧�
   <span class="tooltipBody">
-    表示する文字
+    陦ｨ遉ｺ縺吶ｋ譁�蟄�
     <span class="tooltipAngle">
       <span class="tooltipAngleInner" />
     </span>
@@ -229,7 +229,7 @@ dd, dt, li {
  * Ascii art.
  */
 .aaArea {
-  font-family:'IPAMonaPGothic,ＭＳ Ｐゴシック' !important;
+  font-family:'IPAMonaPGothic,�ｼｭ�ｼｳ �ｼｰ繧ｴ繧ｷ繝�繧ｯ' !important;
   font-size: 12pt;
   -webkit-text-size-adjust: 100%;
 }
@@ -238,30 +238,60 @@ dd, dt, li {
  * Football pitch
  */
 span.pitch_name {
-	font-weight: bold;
-	font-size: smaller;
-	color: white;
+  font-weight: bold;
+  font-size: smaller;
+  color: white;
 }
 span.pitch_name:hover{
-	font-size: larger;
-	background:rgba(255,255,255,0.8);
-	padding:7px 10px;
-	-webkit-border-radius:5px;
-	-moz-border-radius:5px;
-	border-radius:5px;
-	-webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
-	-moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
-	box-shadow:1px 1px 3px rgba(150,150,150,0.5)
+  font-size: larger;
+  background:rgba(255,255,255,0.8);
+  padding:7px 10px;
+  -webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border-radius:5px;
+  -webkit-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  -moz-box-shadow:1px 1px 3px rgba(150,150,150,0.5);
+  box-shadow:1px 1px 3px rgba(150,150,150,0.5)
 }
 span.pitch_gk {
-	text-shadow: 1.5px 2.5px 2.5px maroon;
+  text-shadow: 1.5px 2.5px 2.5px maroon;
 }
 span.pitch_df {
-	text-shadow: 1.5px 2.5px 2.5px blue;
+  text-shadow: 1.5px 2.5px 2.5px blue;
 }
 span.pitch_mf {
-	text-shadow: 1.5px 2.5px 2.5px green;
+  text-shadow: 1.5px 2.5px 2.5px green;
 }
 span.pitch_fw {
-	text-shadow: 1.5px 2.5px 2.5px gold;
+  text-shadow: 1.5px 2.5px 2.5px gold;
+}
+
+blockquote {
+  background-color: rgba(220, 240, 245, 0.9);
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-style: italic;
+  font-size: 20px;
+  border-left: 4px solid #220066;
+  padding: 2em 2em;
+  position: relative;
+}
+
+blockquote:before {
+  content: "″";
+  font-size: 500%;
+  line-height: 1em;
+  color: rgba(220, 240, 245, 0.99);
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+blockquote:after {
+  content: "″";
+  font-size: 500%;
+  line-height: 0em;
+  color: rgba(220, 240, 245, 0.99);
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
