@@ -134,7 +134,7 @@
     -fx-text-fill: #555500;
 }
 
-.jfx-tool-bar{
+.jfx-tool-bar {
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
     -fx-background-color: #777700;
@@ -142,6 +142,9 @@
     -fx-pref-height: 64.0px;
 }
 
+.jfx-tool-bar  .label {
+	-fx-text-fill: #FFFFFF;
+}
 .jfx-snackbar-content {
     -fx-background-color: #777700;
 }

@@ -26,8 +26,8 @@
 
 .text-field {
     -fx-background: #005522;
-    -fx-prompt-text-fill: gold;
-    -fx-text-fill: white;
+    -fx-prompt-text-fill: white;
+    -fx-text-fill: #006633;
     -fx-opacity: 0.5;
 }
 
@@ -53,12 +53,12 @@
 }
 
 .left-tabs .list-cell {
-    -fx-text-fill: #005522;
+    -fx-text-fill: #FFEEFF;
     -fx-background-color: rgba(0, 160, 0, 0.15);
 }
 
 .left-tabs .list-cell:even {
-    -fx-text-fill: #005522;
+    -fx-text-fill: #FFEEFF;
     -fx-background-color: rgba(0, 100, 0, 0.15);
 }
 
@@ -148,23 +148,20 @@
 }
 
 .menu .label {
-    -fx-text-fill: #005522;
+    -fx-text-fill: white;
     -fx-background: rgba(0, 100, 0, 0.4);
-}
-
-.title-label {
-    -fx-font-size: 16.0px;
-    -fx-padding : 14.0px;
-    -fx-text-fill: WHITE;
-    -fx-prompt-text-fill: white;
 }
 
 .jfx-tool-bar{
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
-    -fx-background-color: #C5E9CA;
+    -fx-background-color: #11B56E;
     -fx-pref-width: 100.0%;
     -fx-pref-height: 64.0px;
+}
+
+.jfx-tool-bar  .label {
+    -fx-text-fill: #FFFFFF;
 }
 
 .jfx-snackbar-content {
@@ -172,5 +169,5 @@
 }
 
 .jfx-snackbar-toast {
-    -fx-text-fill: WHITE;
+    -fx-text-fill: white;
 }

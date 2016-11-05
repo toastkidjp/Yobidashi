@@ -12,19 +12,75 @@
     -fx-border-style: null;
     -fx-background-radius: 0;
 }
-.combo-box-base  {
-    -fx-border-style: null;
-    -fx-background-radius: 0, 0, 0, 0;
+
+.combo-box .label{
+    -fx-text-fill: #000000;
 }
+
 .menu .label {
     -fx-text-fill: #000000;
 }
+
+.left-tabs .list-cell {
+    -fx-text-fill: #000000;
+    -fx-background-color: #FECAFC;
+}
+
+.left-tabs .list-cell:even {
+    -fx-text-fill: #FECAFC;
+    -fx-background-color: #000000;
+}
+
+.left-tabs .list-cell:selected {
+    -fx-text-fill: #CCAAAC;
+    -fx-background-color: #333333;
+}
+
+.left-tabs .list-cell:hover {
+    -fx-text-fill: #CCAAAC;
+    -fx-background-color: #333333;
+}
+
+.left-tabs .list-cell .label {
+    -fx-text-fill: #333333;
+}
+
+.left-tabs .list-cell:even .label {
+    -fx-text-fill: #FECAFC;
+}
+
+.left-tabs .list-cell:hover .label {
+    -fx-text-fill: #FECAFC;
+}
+
+.left-tabs .list-cell:selected .label {
+    -fx-text-fill: #FECAFC;
+}
+
 .label {
     -fx-text-fill: #FECAFC;
 }
-.tab-label {
-    -fx-text-fill: #FFFFFF;
+
+.tab  .tab-label {
+    -fx-text-fill: #333333;
 }
+
+.tab:selected  .tab-label {
+    -fx-text-fill: #FECAFC;
+}
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: #323232;
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-tool-bar  .label {
+    -fx-text-fill: #FECAFC;
+}
+
 .jfx-snackbar-content {
     -fx-background-color: #323232;
 }
@@ -35,4 +91,8 @@
 
 .jfx-snackbar-action {
     -fx-text-fill: #ff4081;
+}
+
+.jfx-hamburger StackPane{
+    -fx-background-color: #FECAFC;
 }

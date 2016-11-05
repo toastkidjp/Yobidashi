@@ -3,3 +3,23 @@
     -fx-background: #58FAF4;
     -fx-control-inner-background: #E4FEFF;
 }
+
+.jfx-tool-bar{
+    -fx-font-size: 20.0;
+    -fx-font-weight: BOLD;
+    -fx-background-color: rgba(36, 207, 204, 0.9);
+    -fx-pref-width: 100.0%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-tool-bar  .label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.jfx-snackbar-content {
+    -fx-background-color: #E4FEFF;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: rgba(36, 207, 204, 0.5);
+}

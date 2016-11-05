@@ -19,15 +19,19 @@
     -fx-text-fill: black;
 }
 
+.label {
+  -fx-text-fill: white;
+}
+
 .text-field {
     -fx-background: white;
-    -fx-prompt-text-fill: white;
+    -fx-prompt-text-fill: gray;
     -fx-text-fill: white;
 }
 
 .text-field:focused {
     -fx-base: white;
-    -fx-text-fill: #000033;
+    -fx-text-fill: white;
 }
 
 .text-area {
