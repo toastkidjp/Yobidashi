@@ -3,10 +3,6 @@
     -fx-background-color: rgba(0, 0, 100, 0.5);
 }
 
-.text {
-    -fx-font-family: 'Roboto';
-}
-
 .menu {
     -fx-text-fill: white;
 }
@@ -19,7 +15,7 @@
     -fx-text-fill: black;
 }
 
-.label {
+#status {
   -fx-text-fill: white;
 }
 
@@ -42,9 +38,20 @@
     -fx-base: gray;
 }
 
+.tab-label {
+    -fx-text-fill: #FFFFFF;
+}
+
 .tab-pane {
-    -fx-base: rgba(150, 150, 150, 0.6);
-    -fx-background-color: black;
+    -fx-base: #AAAAAA;
+}
+
+.tab {
+    -fx-background-color: #777777;
+}
+
+.tab:selected {
+    -fx-background-color: #005577;
 }
 
 .list-view {
@@ -135,10 +142,6 @@
 }
 
 .combo-box .list-cell {
-    -fx-text-fill: #FFFFFF;
-}
-
-.tab-label {
     -fx-text-fill: #FFFFFF;
 }
 
