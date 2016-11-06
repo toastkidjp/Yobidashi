@@ -160,7 +160,7 @@ public final class FileSearcher {
      */
     private void dirSearch(final String dirPath, final String pQuery) {
         final ExecutorService exs = Executors.newFixedThreadPool(getParallel());
-        final Set<Pattern> patterns = getPattermList(pQuery);
+        final Set<Pattern> patterns = convertPatterns(pQuery);
         final File[] files = new File(dirPath).listFiles();
         // 検索の Runnable
         final MutableList<FileSearchTask> runnables = ArrayIterate
@@ -251,22 +251,14 @@ public final class FileSearcher {
      * 検索クエリを半角スペースで区切る.
      * @param query 検索クエリ、QUERY_DELIMITER 区切りで複数指定可能
      */
-    protected Set<Pattern> getPattermList(final String query) {
+    private Set<Pattern> convertPatterns(final String query) {
         if (!query.contains(QUERY_DELIMITER)) {
-            return Sets.fixedSize.of(Pattern.compile(patternEscape(query), Pattern.DOTALL));
+            return Sets.fixedSize.of(Pattern.compile(Strings.escapeForRegex(query), Pattern.DOTALL));
         }
         return ArrayAdapter.adapt(query.split(QUERY_DELIMITER))
                 .reject(StringUtils::isEmpty)
-                .collect(str -> Pattern.compile(str, Pattern.DOTALL))
+                .collect(str -> Pattern.compile(Strings.escapeForRegex(str), Pattern.DOTALL))
                 .toSet();
     }
 
-    /**
-     * For avoiding java.util.regex.PatternSyntaxException: Unclosed group near index.
-     * @param query
-     * @return ( and ) escaped.
-     */
-    private String patternEscape(final String query) {
-        return Strings.replace(Strings.replace(query, '(', "\\("), ')', "\\)");
-    }
 }

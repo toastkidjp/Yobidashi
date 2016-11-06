@@ -773,6 +773,16 @@ public final class Strings {
     }
 
     /**
+     * For avoiding java.util.regex.PatternSyntaxException: Unclosed group near index.
+     * @param query
+     * @return ( and ) escaped.
+     */
+    public static String escapeForRegex(final String str) {
+        return str.replace("{", "\\{").replace("}", "\\}").replace("(", "\\(").replace(")", "\\)")
+                .replace("|", "\\|").replace("?", "\\?").replace(".", "\\.").replace("*", "\\*");
+    }
+
+    /**
      * init StringBuilder.
      * @return StringBuilder
      */

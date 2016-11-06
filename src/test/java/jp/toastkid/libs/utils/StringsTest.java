@@ -484,6 +484,9 @@ public final class StringsTest {
         assertNull(Strings.extractMatches("", null));
     }
 
+    /**
+     * test {@link Strings#builder()}.
+     */
     @Test
     public void testBuilder() {
         final StringBuilder builder = Strings.builder();
@@ -494,6 +497,13 @@ public final class StringsTest {
         assertNotSame(builder, builder2);
         final StringBuilder withCapacity30 = Strings.builder(30);
         assertEquals(30, withCapacity30.capacity());
+    }
 
+    /**
+     * test {@link Strings#escapeForRegex(String)}.
+     */
+    @Test
+    public void testEscapeForRegex() {
+        assertEquals("\\{\\(\\)\\}", Strings.escapeForRegex("{()}"));
     }
 }
