@@ -46,7 +46,9 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <MenuLabel fx:id="title" prefHeight="40.0" minWidth="400.0"  prefWidth="500.0" onAction="#moveToTop" />
+              <MenuLabel fx:id="title" prefHeight="40.0" minWidth="600.0"  prefWidth="800.0" onAction="#moveToTop">
+                <tooltip><Tooltip fx:id="titleTooltip" /></tooltip>
+              </MenuLabel>
               <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="URL" prefHeight="40.0" minWidth="300.0"  prefWidth="500.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>

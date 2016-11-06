@@ -68,6 +68,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -208,6 +209,10 @@ public final class Controller implements Initializable {
     /** title label. */
     @FXML
     private Label title;
+
+    /** title's tooltip. */
+    @FXML
+    private Tooltip titleTooltip;
 
     /** URL Input Area. */
     @FXML
@@ -551,10 +556,11 @@ public final class Controller implements Initializable {
      * Set title.
      */
     private void setTitleOnToolbar() {
-        title.setText(Config.article == null || Config.article.title == null
+        final String text = Config.article == null || Config.article.title == null
                 ? Config.get(Config.Key.WIKI_TITLE)
-                : Config.article.title + " - " + Config.get(Config.Key.WIKI_TITLE)
-                );
+                : Config.article.title + " - " + Config.get(Config.Key.WIKI_TITLE);
+        title.setText(text);
+        titleTooltip.setText(text);
     }
 
     /**
