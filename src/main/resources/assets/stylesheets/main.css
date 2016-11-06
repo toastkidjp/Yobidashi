@@ -57,18 +57,6 @@ div.body {
   position: relative;
 }
 
-/*
-tooltip HTML sample
-<a href="#" class="tooltip">
-  縺薙％縺ｫ繝槭え繧ｹ繧貞ｽ薙※繧�
-  <span class="tooltipBody">
-    陦ｨ遉ｺ縺吶ｋ譁�蟄�
-    <span class="tooltipAngle">
-      <span class="tooltipAngleInner" />
-    </span>
-  </span>
-</a>
-*/
 .tooltip {
     position: relative;
 }
@@ -120,14 +108,6 @@ tooltip HTML sample
   background-color: yellow;
 }
 
-
-
-
-
-
-
-
-
 h1, .h1 {
   font-size: 44px;
   line-height: 48px;
@@ -158,16 +138,6 @@ h6,.h6 {
   line-height: 20px;
 }
 
-/*
-table {
-  margin: 10px;
-  border-style: solid;
-  border-width: 2px;
-  border:0.5px solid #0099cc;
-  -moz-box-shadow: 1px 1px 3px #000;
-  -webkit-box-shadow: 1px 1px 3px #000;
-}
-*/
 
 .table {
   background-color: #FFFFFF;
@@ -267,31 +237,41 @@ span.pitch_fw {
 }
 
 blockquote {
-  background-color: rgba(220, 240, 245, 0.9);
+  background-color: rgba(250, 250, 240, 0.8);
   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-style: italic;
-  font-size: 20px;
-  border-left: 4px solid #220066;
+  font-size: 120%;
+  color: #333333;
   padding: 2em 2em;
   position: relative;
 }
 
 blockquote:before {
-  content: "″";
-  font-size: 500%;
+  content: "「";
+  font-size: 300%;
   line-height: 1em;
-  color: rgba(220, 240, 245, 0.99);
+  color: #220066;
   position: absolute;
   left: 0;
   top: 0;
 }
 
 blockquote:after {
-  content: "″";
-  font-size: 500%;
+  content: "」";
+  font-size: 300%;
   line-height: 0em;
-  color: rgba(220, 240, 245, 0.99);
+  color: #220066;
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 0.5em;
+}
+
+pre {
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    border-color: navy;
+    background-color: #EEEEFF;
+    font-size: 120%;
+    margin-left: 10px;
+    padding: 5px;
 }
