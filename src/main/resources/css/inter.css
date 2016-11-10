@@ -2,6 +2,30 @@
     -fx-base: rgba(0, 0, 100, 0.2);
     -fx-background-color: rgba(0, 0, 100, 0.5);
 }
+.spinner-label {
+  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-text-fill: white;
+}
+
+.week-number-cell {
+  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-text-fill: white;
+}
+
+.day-name-cell {
+  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-text-fill: white;
+}
+
+.day-cell {
+  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-text-fill: white;
+}
+
+.date-picker-display-node {
+  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-text-fill: white;
+}
 
 .menu {
     -fx-text-fill: white;
