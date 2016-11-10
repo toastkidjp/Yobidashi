@@ -1223,10 +1223,10 @@ public final class Controller implements Initializable {
                 leftTabs.getTabs().add(tab);
                 leftTabs.getSelectionModel().select(tab);
                 final ObservableList<Node> children = box.getChildren();
-                children.add(new Label(
+                children.add(makeSearchHeaderLable(
                         String.format("Search time: %d[ms]", fileSearcher.getLastSearchTime())));
-                children.add(new Label(String.format("%dFiles / %dFiles",
-                        map.size(), fileSearcher.getLastFilenum())));
+                children.add(makeSearchHeaderLable(
+                        String.format("%dFiles / %dFiles", map.size(), fileSearcher.getLastFilenum())));
                 // set up ListView.
                 final ListView<Article> listView = new JFXListView<>();
                 listView.getStyleClass().add("left-tabs");
@@ -1243,6 +1243,17 @@ public final class Controller implements Initializable {
                 tab.setContent(box);
                 setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
             }).build().show();
+    }
+
+    /**
+     * Make Label with white background.
+     * @param text
+     * @return
+     */
+    private Label makeSearchHeaderLable(final String text) {
+        final Label header = new Label(text);
+        header.setStyle("-fx-background-color: rgba(244, 244, 245, 0.88);");
+        return header;
     }
 
     /**
