@@ -81,6 +81,17 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         }
     }
 
+    public ProgressDialog() {
+        this(new Builder().setCommand(new Task<Integer>(){
+            @Override
+            protected Integer call() throws Exception {
+                updateMessage("Please wait 5s...");
+                Thread.sleep(5000L);
+                return 0;
+            }
+        }));
+    }
+
     /**
      * Load scene file.
      */
@@ -153,7 +164,9 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         controller.pb.progressProperty().bind(service.progressProperty());
         controller.label.textProperty().bind(service.messageProperty());
 
-        service.restart();
+        if (service != null) {
+            service.restart();
+        }
         dialogStage.show();
     }
 
@@ -166,12 +179,12 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         }
     }
 
-    public static void main(final String... args) {
-        Application.launch(ProgressDialog.class);
-    }
-
     @Override
     public void close() throws Exception {
         this.stop();
+    }
+
+    public static void main(final String... args) {
+        Application.launch(ProgressDialog.class);
     }
 }
