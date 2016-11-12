@@ -69,7 +69,7 @@ public class ToolsController {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
         final Pane content = ChartPane.make(title,
                 "日記" + month.getSelectionModel().getSelectedItem().toString());
-        chart.draw(title, content);
+        chart.open(title, content);
     }
 
     /**

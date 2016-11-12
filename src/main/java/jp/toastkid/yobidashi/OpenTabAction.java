@@ -9,5 +9,5 @@ import javafx.scene.layout.Pane;
  *
  */
 interface OpenTabAction {
-    void draw(final String title, final Pane content);
+    void open(final String title, final Pane content);
 }

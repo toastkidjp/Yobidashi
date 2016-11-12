@@ -40,9 +40,6 @@ dependencies {
     providedCompile files("${javafxHome}/jre/lib/ext/jfxrt.jar")
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    // Dependencies for use Script Engine.
-    compile 'org.codehaus.groovy:groovy-all:2.4.5'
-
     compile 'org.eclipse.collections:eclipse-collections:8.0.0-M1'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
     compile 'org.apache.commons:commons-lang3:3.4'
@@ -61,6 +58,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'
 }
+
 compileJava {
     //add required JavaFX libs to compile classpath
     sourceSets.main.compileClasspath += configurations.providedCompile

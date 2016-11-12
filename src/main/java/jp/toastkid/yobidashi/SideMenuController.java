@@ -94,7 +94,6 @@ public class SideMenuController {
     /** Command of showing log viewer. */
     private Runnable log;
 
-
     /** Command of quit this app. */
     private Runnable onQuit;
 
@@ -106,6 +105,13 @@ public class SideMenuController {
 
     /** Command of delete article. */
     private Runnable onDelete;
+
+    /** Action of launch Script runner tab. */
+    private OpenTabAction scriptOpener;
+
+    private jp.toastkid.script.Main scriptRunner;
+
+    private jp.toastkid.name.Main nameGenerator;
 
     /**
      * バックアップ機能を呼び出す。
@@ -236,7 +242,7 @@ public class SideMenuController {
     }
 
     /**
-     * ワードクラウド表示機能を呼び出す.
+     * Call word cloud.
      */
     @FXML
     private final void callWordCloud() {
@@ -248,7 +254,7 @@ public class SideMenuController {
         wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
                         .setMinFontSize(8.0).build();
         wordCloud.draw(pane, Config.article.file);
-        tabAction.draw(Config.article.title + "のワードクラウド", pane);
+        tabAction.open(Config.article.title + "のワードクラウド", pane);
     }
     /**
      * call About.
@@ -273,7 +279,10 @@ public class SideMenuController {
      */
     @FXML
     private void openScripter() {
-        new jp.toastkid.script.Main().show(stage);
+        if (scriptRunner == null) {
+            scriptRunner = new jp.toastkid.script.Main();
+        }
+        scriptOpener.open("Script Runner", scriptRunner.getRoot());
     }
 
     /**
@@ -281,7 +290,10 @@ public class SideMenuController {
      */
     @FXML
     private void openNameGenerator() {
-        new jp.toastkid.name.Main().show(stage);
+        if (nameGenerator == null) {
+            nameGenerator = new jp.toastkid.name.Main();
+        }
+        nameGenerator.show(stage);
     }
 
     /**
@@ -642,6 +654,14 @@ public class SideMenuController {
      */
     protected void setOnDelete(final Runnable onDelete) {
         this.onDelete = onDelete;
+    }
+
+    /**
+     * Set on opening Script Runner's action.
+     * @param scriptOpener
+     */
+    protected void setOnOpenScriptRunner(final OpenTabAction scriptOpener) {
+        this.scriptOpener = scriptOpener;
     }
 
 }

@@ -1837,7 +1837,7 @@ public final class Controller implements Initializable {
         }
 
         // for highlighting script area.
-        //stylesheets.add(getClass().getResource("css/highlights/java-keywords.css").toExternalForm());
+        stylesheets.add(getClass().getClassLoader().getResource("keywords.css").toExternalForm());
         Config.store(Config.Key.STYLESHEET, styleName);
     }
 
@@ -1927,6 +1927,7 @@ public final class Controller implements Initializable {
             this.stage.close();
             System.exit(0);
         });
+        sideMenuController.setOnOpenScriptRunner(this::openSpecifiedTab);
     }
 
     /**
