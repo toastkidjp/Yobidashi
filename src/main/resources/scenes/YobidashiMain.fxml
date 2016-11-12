@@ -2,6 +2,7 @@
 
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.Label?>
@@ -49,7 +50,7 @@
               <MenuLabel fx:id="title" prefHeight="40.0" minWidth="600.0"  prefWidth="800.0" onAction="#moveToTop">
                 <tooltip><Tooltip fx:id="titleTooltip" /></tooltip>
               </MenuLabel>
-              <JFXTextField fx:id="urlText" onAction="#readUrlText" promptText="URL" prefHeight="40.0" minWidth="300.0"  prefWidth="500.0" labelFloat="true">
+              <JFXTextField fx:id="urlText" onAction="#readUrlText" prefHeight="40.0" minWidth="300.0"  prefWidth="500.0" labelFloat="true">
                 <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>
             </leftItems>
@@ -119,29 +120,28 @@
     <HBox fx:id="searcherArea" prefHeight="0.0" spacing="5.0">
       <children>
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#hideSearcher" prefHeight="25.0" prefWidth="40.0" text="x" />
-        <JFXTextField fx:id="searcherInput" promptText="ページ内検索" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown" labelFloat="true">
+        <JFXTextField fx:id="searcherInput" promptText="Search in the page" prefHeight="0.0" prefWidth="400.0" onAction="#searchDown" labelFloat="true">
           <tooltip><Tooltip text="input search words." /></tooltip>
         </JFXTextField>
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchUp" prefHeight="25.0" prefWidth="40.0" text="↑" />
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
       </children>
     </HBox>
-    <HBox fx:id="footer" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
-      <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="500.0" spacing="5.0" VBox.vgrow="NEVER">
-          <children>
-            <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
-              <font><Font size="12.0" fx:id="x3" /></font>
-              <textFill><Color blue="0" green="0.11" red="0" fx:id="x4" /></textFill>
-            </Label>
-          </children>
-        </HBox>
+    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER">
+      <left>
+        <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+          <font><Font size="14.0" /></font>
+          <textFill><Color blue="0" green="0.11" red="0" fx:id="x4" /></textFill>
+          <BorderPane.margin><Insets left="10.0" /></BorderPane.margin>
+        </Label>
+      </left>
+      <right>
         <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
           <children>
-            <JFXDatePicker fx:id="calendar" minWidth="100.0" prefHeight="25.0" prefWidth="100.0" onAction="#callCalendar">
+            <JFXDatePicker fx:id="calendar" minWidth="150.0" prefHeight="25.0" prefWidth="200.0" onAction="#callCalendar">
                   <tooltip><Tooltip text="カレンダーを表示します。" /></tooltip>
             </JFXDatePicker>
-            <JFXComboBox fx:id="style" minWidth="140.0" onAction="#callApplyStyle">
+            <JFXComboBox fx:id="style" minWidth="180.0" onAction="#callApplyStyle">
               <tooltip><Tooltip text="Style を選択します。" /></tooltip>
               <items>
                 <FXCollections fx:factory="observableArrayList" >
@@ -149,11 +149,12 @@
                   <String fx:value="MODENA" />
                 </FXCollections>
               </items>
+              <HBox.margin><Insets right="10.0" /></HBox.margin>
             </JFXComboBox>
           </children>
         </HBox>
-        <JFXSnackbar fx:id="snackbar" prefWidth="300" />
-      </children>
-    </HBox>
+      </right>
+      <bottom><JFXSnackbar fx:id="snackbar" prefWidth="300.0" /></bottom>
+    </BorderPane>
   </children>
 </VBox>
