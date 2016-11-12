@@ -2,26 +2,23 @@ package jp.toastkid.wiki.search;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Map;
-
 import org.junit.Ignore;
 
-import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wiki.models.Config;
-import jp.toastkid.wiki.search.FileSearcher;
-import jp.toastkid.wiki.search.SearchResult;
 
 /**
  * ファイル検索クラスのテスト.
  * @author Toast kid
  *
  */
-public final class FileSearcherTest {
+public final class ArticleSearcherTest {
 
     /** 中身を検索させるので false. */
     private static final boolean IS_TITLE_ONLY = false;
+
     /** AND 検索させるので true. */
     private static final boolean IS_AND        = true;
+
     /** 検索対象クエリ. */
     private static final String  QUERY         = "ラーメン 二郎";
 
@@ -31,10 +28,9 @@ public final class FileSearcherTest {
      */
     @Ignore
     public final void testSearch() {
-        final FileSearcher fs = new FileSearcher.Builder()
+        final ArticleSearcher fs = new ArticleSearcher.Builder()
             .setHomeDirPath(Config.get("articleDir"))
             .setAnd(IS_AND)
-            .setTitleOnly(IS_TITLE_ONLY)
             .build();
         fs.setParallel(5);
         search(fs);
@@ -48,23 +44,8 @@ public final class FileSearcherTest {
      * 渡された FileSearcher で検索を実行する.
      * @param fs
      */
-    private void search(final FileSearcher fs) {
-        final Map<String, SearchResult> map = fs.search(QUERY);
-        final StringBuilder searchResult = new StringBuilder(4000);
-        // (130302) 検索結果の HTML を生成
-        if (!map.isEmpty()) {
-            searchResult.append(map.size() + "件のページが見つかりました.<BR>");
-            searchResult.append("処理時間：" + fs.getLastSearchTime() + "[ms]／");
-            searchResult.append(Strings.LINE_SEPARATOR);
-            searchResult.append("検索したファイル数：" + fs.getLastFilenum());
-            searchResult.append(Strings.LINE_SEPARATOR);
-            searchResult.append("検索結果" + map);
-
-        } else {
-            searchResult.append("見つかりませんでした.");
-        }
-        System.out.println(searchResult.toString());
-        System.out.println("検索完了：" + fs.getLastSearchTime() + "[ms]");
+    private void search(final ArticleSearcher fs) {
+        fs.search(QUERY);
     }
 
     /**
@@ -72,8 +53,8 @@ public final class FileSearcherTest {
      */
     @Ignore
     public void setAndGetParallelTest() {
-        final FileSearcher fs = new FileSearcher.Builder()
-            .setHomeDirPath("").setAnd(false).setTitleOnly(false).build();
+        final ArticleSearcher fs = new ArticleSearcher.Builder()
+            .setHomeDirPath("").setAnd(false).build();
         fs.setParallel(-2);
         assertEquals(1, fs.getParallel());
         fs.setParallel(-1);

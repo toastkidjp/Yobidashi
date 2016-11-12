@@ -15,7 +15,7 @@ import jp.toastkid.wiki.models.Defines;
  * ファイル単位での検索をする.
  * @author Toast kid
  */
-public final class FileSearchTask implements Runnable {
+public final class ArticleSearchTask implements Runnable {
 
     /** 検索パターンのセット */
     private final Set<Pattern> targetPatterns;
@@ -42,7 +42,7 @@ public final class FileSearchTask implements Runnable {
      * @param pFilePath 検索対象ファイルのパス
      * @param pPatSet   検索パターンのセット
      */
-    public FileSearchTask(
+    public ArticleSearchTask(
             final String       pFilePath,
             final Set<Pattern> pPatSet
             ) {

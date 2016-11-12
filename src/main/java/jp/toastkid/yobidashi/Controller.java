@@ -9,13 +9,11 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,7 +23,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
-import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXTextArea;
@@ -106,8 +103,7 @@ import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Article.Extension;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
-import jp.toastkid.wiki.search.FileSearcher;
-import jp.toastkid.wiki.search.SearchResult;
+import jp.toastkid.wiki.search.ArticleSearcher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -1179,17 +1175,13 @@ public final class Controller implements Initializable {
      * @param f 記事名フィルタ文字列
      */
     protected void searchArticle(final String q, final String f) {
-        final CheckBox isTitleOnly = new JFXCheckBox("記事名で検索");
         final CheckBox isAnd       = new JFXCheckBox("AND 検索"){{setSelected(true);}};
         new AlertDialog.Builder(getParent())
             .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
             //"記事名のみを対象に検索"
-            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isTitleOnly, isAnd)
+            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isAnd)
             .setOnPositive("OK", () -> {
                 final String query = queryInput.getText().trim();
-                if (StringUtils.isEmpty(query)) {
-                    return;
-                }
                 ((AutoCompleteTextField) queryInput).getEntries().add(query);
 
                 // 入っていない時もあるので.
@@ -1200,76 +1192,21 @@ public final class Controller implements Initializable {
 
                 final long start = System.currentTimeMillis();
 
-                final FileSearcher fileSearcher = new FileSearcher.Builder()
+                final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
                         .setHomeDirPath(Config.get("articleDir"))
                         .setAnd(isAnd.isSelected())
-                        .setTitleOnly(isTitleOnly.isSelected())
                         .setSelectName(filter)
+                        .setEmptyAction(() -> {
+                            showSnackbar(String.format("Not found article with '%s'.", query));
+                            searchArticle(queryInput.getText(), filterInput.getText());
+                        })
+                        .setSuccessAction(this::setStatus)
+                        .setTabPane(leftTabs)
+                        .setListViewInitializer(this::initArticleList)
+                        .setHeight(articleList.getHeight())
                         .build();
-
-                final Map<String, SearchResult> map = fileSearcher.search(query);
-                if (map.isEmpty()){
-                    showSnackbar(String.format("Not found article with '%s'.", query));
-                    searchArticle(queryInput.getText(), filterInput.getText());
-                    return;
-                }
-
-                final Tab tab = makeClosableTab(
-                        String.format("「%s」's %s search result", query, isAnd.isSelected() ? "AND" : "OR"),
-                        leftTabs
-                        );
-                // prepare tab's content.
-                final VBox box = new VBox();
-                leftTabs.getTabs().add(tab);
-                leftTabs.getSelectionModel().select(tab);
-                final ObservableList<Node> children = box.getChildren();
-                children.add(makeSearchHeaderLable(
-                        String.format("Search time: %d[ms]", fileSearcher.getLastSearchTime())));
-                children.add(makeSearchHeaderLable(
-                        String.format("%dFiles / %dFiles", map.size(), fileSearcher.getLastFilenum())));
-                // set up ListView.
-                final ListView<Article> listView = new JFXListView<>();
-                listView.getStyleClass().add("left-tabs");
-                initArticleList(listView);
-                listView.getItems().addAll(
-                        map.entrySet().stream()
-                            .map(entry -> new Article(new File(entry.getValue().filePath)))
-                            .sorted()
-                            .collect(Collectors.toList())
-                        );
-                listView.setMinHeight(articleList.getHeight());
-
-                children.add(listView);
-                tab.setContent(box);
-                setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
+                fileSearcher.search(query);
             }).build().show();
-    }
-
-    /**
-     * Make Label with white background.
-     * @param text
-     * @return
-     */
-    private Label makeSearchHeaderLable(final String text) {
-        final Label header = new Label(text);
-        header.setStyle("-fx-background-color: rgba(244, 244, 245, 0.88);");
-        return header;
-    }
-
-    /**
-     * Make empty closable tab.
-     * @param title Tab's title
-     * @param parent Parent TabPane
-     * @return empty Tab
-     */
-    private static Tab makeClosableTab(final String title, final TabPane parent) {
-        final Tab tab = new Tab(title);
-        tab.setClosable(true);
-
-        final Button closeButton = new Button("x");
-        closeButton.setOnAction(e -> parent.getTabs().remove(tab));
-        tab.setGraphic(closeButton);
-        return tab;
     }
 
     /**

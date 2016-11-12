@@ -156,8 +156,11 @@ public final class FxWordCloud {
         final String k = pair.getOne();
         final int v = pair.getTwo();
         final Label text = new Label(k);
-        text.setFont(new Font(Math.max(maxFontSize * ((double) v / (double) max), minFontSize)));
+        final Font font
+            = new Font("Roboto", Math.max(maxFontSize * ((double) v / (double) max), minFontSize));
+        text.setFont(font);
         text.setTextFill(Color.color(Math.random(), Math.random(), Math.random()));
+        text.setStyle("fx-font-weight: bold;");
         Tooltip.install(text, new Tooltip(k + ": " + v));
         return text;
     }
