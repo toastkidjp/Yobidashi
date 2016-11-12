@@ -4,14 +4,14 @@
 This tool works as ten hands (I don't say this tool works as ten hands).
 
 # Features
-1. Writing article with Confluense(TM) like markup.
+1. Writing article with Confluense(TM) like markup or Markdown.
 2. Generate article's word cloud.
-3. Slideshow.
-4. JVM Script Runner.
+3. Slide show.
+4. JVM Language Script Runner(Groovy/Clojure/JavaScript).
 5. BMI Calculator.
 6. Drawing chart.
-7. Web search.
-8. MP3 file Player.
+7. Cup noodle timer.
+8. CSS Generator.
 9. Name Generator.
 10. Loto6 number generator.
 

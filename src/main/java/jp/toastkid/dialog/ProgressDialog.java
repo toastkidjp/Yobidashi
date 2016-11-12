@@ -1,6 +1,7 @@
 package jp.toastkid.dialog;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
     /** path to user image directory. */
-    private static final String SPLASH_DIR     = Defines.ASSETS_DIR + "/splash/";
+    private static final String SPLASH_DIR     = "images/splash/default.jpg";
 
     /** path to user image directory. */
     private static final String USER_IMAGE_DIR = Defines.USER_DIR + "/res/images/background/";
@@ -103,7 +104,7 @@ public final class ProgressDialog extends Application implements AutoCloseable {
                 scene = new Scene(loader.load());
             }
         } catch (final IOException e) {
-            LOGGER.error("Error", e);;
+            LOGGER.error("Error", e);
         }
         controller = loader.getController();
         dialogStage = new Stage(StageStyle.DECORATED);
@@ -114,9 +115,14 @@ public final class ProgressDialog extends Application implements AutoCloseable {
 
         this.command = b.command;
 
-        this.chooser = new ImageChooser(SPLASH_DIR, USER_IMAGE_DIR);
+        this.chooser = new ImageChooser(USER_IMAGE_DIR);
+        try {
+            chooser.add(ProgressDialog.class.getClassLoader().getResource(SPLASH_DIR).toURI());
+        } catch (final URISyntaxException e) {
+            LOGGER.error("Error", e);
+        }
         // 画像をランダムで選択して設定.
-        findStyle().ifPresent(style -> { controller.background.setStyle(style); });
+        findStyle().ifPresent(controller.background::setStyle);
 
         if (b.scene == null || b.scene.getStylesheets() == null) {
             return;
@@ -184,7 +190,11 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         this.stop();
     }
 
-    public static void main(final String... args) {
+    /**
+     * Main method.
+     * @param args
+     */
+    public static void main(final String[] args) {
         Application.launch(ProgressDialog.class);
     }
 }

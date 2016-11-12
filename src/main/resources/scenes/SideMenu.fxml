@@ -66,8 +66,8 @@
               <MenuLabel onAction="#openNameGenerator" text="Name Generator" />
               <MenuLabel onAction="#openCssGenerator" text="CSS Generator" />
               <!--MenuLabel onAction="#callConvertMd" text="Convert to Markdown" />
-              <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
-              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" /-->
+              <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" /-->
+              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
               <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
               <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" />
               <MenuLabel onAction="#callLogViewer" text="LogViewer" />

@@ -337,11 +337,17 @@ public final class ArticleGenerator {
             final String pathToTemplate,
             final Map<String, String> params
             ) {
+        return bindArgsInternal(
+                FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE), params);
+    }
+
+    private static final String bindArgsInternal(
+            final List<String> strs,
+            final Map<String, String> params
+            ) {
         try {
             return TEMPLATE_ENGINE.createTemplate(
-                    Lists.immutable.ofAll(
-                    FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE)
-                    ).makeString(LINE_SEPARATOR)).make(params).toString();
+                    Lists.immutable.ofAll(strs).makeString(LINE_SEPARATOR)).make(params).toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
             LOGGER.error("Caught error.", e);
         }

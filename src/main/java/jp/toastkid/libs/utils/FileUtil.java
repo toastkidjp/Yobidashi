@@ -271,6 +271,12 @@ public final class FileUtil {
         return lines;
     }
 
+    /**
+     * Make file reader.
+     * @param filePath
+     * @param pEncode
+     * @return
+     */
     private static BufferedReader makeReader(final String filePath, final String pEncode) {
         final BufferedReader fileReader;
         final InputStream in = FileUtil.getStream(filePath);
@@ -281,6 +287,7 @@ public final class FileUtil {
         }
         return fileReader;
     }
+
     /**
      * 引数として渡したファイル(String，String)に記述されているデータをMap<String，String>に格納して返す<BR>
      * 要素は一行につき一つ記録しておくこと<BR>
@@ -1571,10 +1578,9 @@ public final class FileUtil {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (final InputStream in = classLoader.getResourceAsStream(filePath);) {
             if (in != null) {
-                return new BufferedInputStream(
-                        classLoader.getResourceAsStream(filePath)
-                    );
+                return new BufferedInputStream(classLoader.getResourceAsStream(filePath));
             }
+            return Files.newInputStream(Paths.get(filePath));
         } catch (final IOException e) {
             e.printStackTrace();
         }

@@ -198,7 +198,7 @@ public final class DocToEpub {
                     ? EpubDefine.STYLESHEET_VERTICAL
                     : EpubDefine.STYLESHEET_HORIZONTAL;
             final String convertedSource = ArticleGenerator.bindArgs(
-                    Defines.ASSETS_DIR + "/resources/epub/OEBPS/template.xhtml",
+                    Resource.TEMPLATE,
                     Maps.mutable.of(
                             "title", title,
                             "content", content.toString(),

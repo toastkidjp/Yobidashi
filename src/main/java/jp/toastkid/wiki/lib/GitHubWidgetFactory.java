@@ -27,7 +27,7 @@ public class GitHubWidgetFactory {
         final String[] pair = orgRepoPair.split("/");
         final StringBuilder widget = new StringBuilder();
 
-        widget.append("<table>");
+        widget.append("<table class=\"table table-hover table-stripe\">");
         widget.append("<tr><td colspan='6'>");
         widget.append("<a href='").append(GITHUB).append(pair[0]).append("'>")
             .append(pair[0]).append("</a>");

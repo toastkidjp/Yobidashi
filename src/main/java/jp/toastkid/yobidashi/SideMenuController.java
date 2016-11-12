@@ -20,8 +20,10 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -474,6 +476,38 @@ public class SideMenuController {
                             .build();
                     pd.start(stage);
                 }).build().show());
+    }
+
+    /**
+     * Call method of converting to ePub.
+     */
+    @FXML
+    public final void callConvertEpub() {
+        final RadioButton vertically   = new RadioButton("vertically");
+        final RadioButton horizontally = new RadioButton("horizontally");
+
+        new ToggleGroup() {{
+            getToggles().addAll(vertically, horizontally);
+            vertically.setSelected(true);
+        }};
+
+        getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
+                .setTitle("ePub").setMessage("Current Article convert to ePub.")
+                .addControl(vertically, horizontally)
+                .setOnPositive("OK", () -> {
+                    final ProgressDialog pd = new ProgressDialog.Builder()
+                            .setScene(parent.getScene())
+                            .setCommand(new Task<Integer>() {
+                                @Override
+                                protected Integer call() throws Exception {
+                                    new EpubGenerator().toEpub(vertically.isSelected());
+                                    return 100;
+                                }
+                            })
+                            .build();
+                    pd.start(stage);
+                }).build().show()
+                );
     }
 
     /**

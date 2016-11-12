@@ -2,10 +2,11 @@ package jp.toastkid.libs.epub;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -263,13 +264,12 @@ public final class EpubMaker {
             final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(meta.zipFilePath));
             // ファイル圧縮処理
             for (final Pair<String, String> p : files) {
-                final String fname = p.left;
                 final String path  = p.right;
-                final File f = new File(fname);
+                final File f = new File(p.left);
                 if (f.isDirectory()) {
                     putEntryDirectory(out, f);
                 } else {
-                    putEntryFile(out, f, path);
+                    putEntryFile(out, p.left, path);
                 }
             }
             // 出力ストリームを閉じる
@@ -278,26 +278,28 @@ public final class EpubMaker {
         } catch (final IOException e) {
             LOGGER.error("Caught Error.", e);
         }
-        //LOGGER.info("圧縮終了");
+        LOGGER.info("圧縮終了");
     }
 
     /**
      * ZipOutputStreamに対してファイルを登録する.
      * @param out ZipOutputStream
-     * @param file 登録するファイル
+     * @param stream 登録するファイル
      * @throws FileNotFoundException
      * @throws IOException
      */
     private static void putEntryFile(
             final ZipOutputStream out,
-            final File file,
+            final String name,
             final String path
             ) throws FileNotFoundException, IOException {
         final byte[] buf = new byte[128];
-        try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));) {
+
+        try (final BufferedInputStream in = new BufferedInputStream(FileUtil.getStream(name));) {
             // エントリを作成する
-            final String entryPath = path + file.getName();
-            LOGGER.info(entryPath + " | " + file.getAbsolutePath());
+            final Path p = Paths.get(name);
+            final String entryPath = path + p.getName(p.getNameCount() - 1);
+            LOGGER.info(entryPath + " | " + name);
             final ZipEntry entry = new ZipEntry(entryPath);
             out.putNextEntry(entry);
             // データを圧縮して書き込む

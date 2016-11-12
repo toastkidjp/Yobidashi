@@ -56,7 +56,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
@@ -64,7 +63,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -95,7 +93,6 @@ import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.rss.RssFeeder;
 import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.FullScreen;
 import jp.toastkid.wiki.control.ArticleListCell;
 import jp.toastkid.wiki.lib.Wiki2Markdown;
@@ -754,37 +751,6 @@ public final class Controller implements Initializable {
         AobunUtils.docToTxt(absolutePath);
         AlertDialog.showMessage(getParent(), "Complete Converting",
                 Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath));
-    }
-
-    /**
-     * Call method of converting to ePub.
-     */
-    @FXML
-    public final void callConvertEpub() {
-        final RadioButton vertically   = new RadioButton("vertically");
-        final RadioButton horizontally = new RadioButton("horizontally");
-
-        new ToggleGroup() {{
-            getToggles().addAll(vertically, horizontally);
-            vertically.setSelected(true);
-        }};
-
-        new AlertDialog.Builder(getParent())
-            .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
-            .addControl(vertically, horizontally)
-            .setOnPositive("OK", () -> {
-                final ProgressDialog pd = new ProgressDialog.Builder()
-                        .setScene(this.getParent().getScene())
-                        .setCommand(new Task<Integer>() {
-                            @Override
-                            protected Integer call() throws Exception {
-                                new EpubGenerator().toEpub(vertically.isSelected());
-                                return 100;
-                            }
-                        })
-                        .build();
-                pd.start(stage);
-            }).build().show();
     }
 
     /**
