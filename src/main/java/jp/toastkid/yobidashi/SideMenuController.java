@@ -9,6 +9,8 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,19 +27,24 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
+import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
+import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
+import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wiki.ApplicationState;
 import jp.toastkid.wiki.Archiver;
 import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.dialog.ConfigDialog;
+import jp.toastkid.wiki.lib.Wiki2Markdown;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
@@ -46,7 +53,6 @@ import jp.toastkid.wordcloud.JFXMasonryPane2;
  * Side menu's controller.
  *
  * @author Toast kid
- *
  */
 public class SideMenuController {
 
@@ -88,7 +94,7 @@ public class SideMenuController {
     private Runnable preview;
 
     /** Command of converting to Markdown. */
-    private Runnable convert2Md;
+    private OpenTabAction convert2Md;
 
     /** Command of showing about page. */
     private Runnable about;
@@ -186,12 +192,7 @@ public class SideMenuController {
      */
     @FXML
     protected final void callFileLength() {
-        getParent().ifPresent(parent -> AlertDialog.showMessage(
-                parent,
-                "文字数計測",
-                Config.article.makeCharCountResult()
-                )
-            );
+        showMessageDialog("文字数計測", Config.article.makeCharCountResult());
     }
 
     /**
@@ -229,18 +230,26 @@ public class SideMenuController {
      */
     @FXML
     private final void callApplicationState() {
-        final Optional<Window> parent = getParent();
-        if (!parent.isPresent()) {
-            return;
-        }
-
         final Map<String, String> map = ApplicationState.getConfigMap();
         final StringBuilder bld = new StringBuilder();
         final String lineSeparator = System.lineSeparator();
         map.forEach((key, value) ->
             bld.append(key).append("\t").append(value).append(lineSeparator)
         );
-        AlertDialog.showMessage(parent.get(), "状態", bld.toString());
+        showMessageDialog("Application State", bld.toString());
+    }
+
+    /**
+     * Call method of converting to Aozora-Bunko style text.
+     */
+    @FXML
+    public final void callConvertAobun() {
+        final String absolutePath = Config.article.file.getAbsolutePath();
+        AobunUtils.docToTxt(absolutePath);
+        showMessageDialog(
+                "Complete Converting",
+                Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath)
+        );
     }
 
     /**
@@ -421,7 +430,23 @@ public class SideMenuController {
      */
     @FXML
     private void callConvertMd() {
-        convert2Md.run();
+        final CodeArea pane = new CodeArea();
+        pane.setParagraphGraphicFactory(LineNumberFactory.get(pane));
+
+        final double prefWidth = stage.getWidth() * 0.8;
+        pane.setPrefWidth(prefWidth);
+        pane.setPrefHeight(stage.getHeight());
+
+        try {
+            pane.replaceText(CollectionUtil.implode(
+                    Wiki2Markdown.convert(Files.readAllLines(Config.article.file.toPath()))
+                    ));
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);
+            showMessageDialog("IOException", e.getMessage());
+            return;
+        }
+        convert2Md.open("[MD] " + Config.article.title, new AnchorPane(pane));
     }
 
     /**
@@ -610,7 +635,7 @@ public class SideMenuController {
      * Set convert command.
      * @param convert2Md command.
      */
-    protected void setOnConvertMd(final Runnable convert2Md) {
+    protected void setOnConvertMd(final OpenTabAction convert2Md) {
         this.convert2Md = convert2Md;
     }
 
@@ -696,6 +721,15 @@ public class SideMenuController {
      */
     protected void setOnOpenScriptRunner(final OpenTabAction scriptOpener) {
         this.scriptOpener = scriptOpener;
+    }
+
+    /**
+     * Show simple message dialog.
+     * @param title title
+     * @param message message
+     */
+    private void showMessageDialog(final String title, final String message) {
+        getParent().ifPresent(parent -> AlertDialog.showMessage(parent, title, message));
     }
 
 }

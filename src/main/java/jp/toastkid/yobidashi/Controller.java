@@ -25,7 +25,6 @@ import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
-import com.jfoenix.controls.JFXTextArea;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
@@ -56,12 +55,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -72,7 +69,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
@@ -84,18 +80,14 @@ import jp.toastkid.jfx.common.Style;
 import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
-import jp.toastkid.libs.utils.AobunUtils;
-import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
-import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.rss.RssFeeder;
 import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.FullScreen;
 import jp.toastkid.wiki.control.ArticleListCell;
-import jp.toastkid.wiki.lib.Wiki2Markdown;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Article.Extension;
 import jp.toastkid.wiki.models.Config;
@@ -743,17 +735,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Call method of converting to Aozora-Bunko style text.
-     */
-    @FXML
-    public final void callConvertAobun() {
-        final String absolutePath = Config.article.file.getAbsolutePath();
-        AobunUtils.docToTxt(absolutePath);
-        AlertDialog.showMessage(getParent(), "Complete Converting",
-                Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath));
-    }
-
-    /**
      * Show HTML source.
      */
     @FXML
@@ -1088,36 +1069,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 1つ前のページに戻る.
-     */
-    @FXML
-    private final void back() {
-        final Optional<WebView> opt = getCurrentWebView();
-        opt.ifPresent(wv -> {
-            final WebHistory history = wv.getEngine().getHistory();
-            final int index = history.getCurrentIndex();
-            if (0 < index) {
-                history.go(index - 1);
-            }
-        });
-    }
-
-    /**
-     * 1つ先のページに進む.
-     */
-    @FXML
-    private final void forward() {
-        final Optional<WebView> opt = getCurrentWebView();
-        opt.ifPresent(wv -> {
-            final WebHistory history = wv.getEngine().getHistory();
-            final int index = history.getCurrentIndex();
-            if (index < history.getMaxSize()) {
-                history.go(index + 1);
-            }
-        });
-    }
-
-    /**
      * Stop loading.
      * TODO 動作未検証
      * @param event
@@ -1156,8 +1107,6 @@ public final class Controller implements Initializable {
                     ((AutoCompleteTextField) filterInput).getEntries().add(filter);
                 }
 
-                final long start = System.currentTimeMillis();
-
                 final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
                         .setHomeDirPath(Config.get("articleDir"))
                         .setAnd(isAnd.isSelected())
@@ -1173,28 +1122,6 @@ public final class Controller implements Initializable {
                         .build();
                 fileSearcher.search(query);
             }).build().show();
-    }
-
-    /**
-     * Convert to Markdown.
-     */
-    private void convertMd() {
-        final Tab tab = makeClosableTab("(MD)" + Config.article.title);
-        final TextArea pane = new JFXTextArea();
-        final double prefWidth = tabPane.getWidth();
-        pane.setPrefWidth(prefWidth);
-        pane.setPrefHeight(tabPane.getPrefHeight());
-        try {
-            pane.setText(CollectionUtil.implode(
-                    Wiki2Markdown.convert(Files.readAllLines(Config.article.file.toPath()))
-                    ));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);;
-            AlertDialog.showMessage(getParent(), "IOException", e.getMessage());
-            return;
-        }
-        tab.setContent(new ScrollPane(pane));
-        openTab(tab);
     }
 
     /**
@@ -1883,7 +1810,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openSpecifiedTab);
-        sideMenuController.setOnConvertMd(this::convertMd);
+        sideMenuController.setOnConvertMd(this::openSpecifiedTab);
         sideMenuController.setOnOpenLogViewer(this::openLogViewer);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);
