@@ -1810,6 +1810,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openSpecifiedTab);
+        sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
         sideMenuController.setOnConvertMd(this::openSpecifiedTab);
         sideMenuController.setOnOpenLogViewer(this::openLogViewer);
         sideMenuController.setOnCopy(this::callCopy);
@@ -1864,6 +1865,15 @@ public final class Controller implements Initializable {
         final Tab tab = makeClosableTab(title);
         tab.setContent(content);
         openTab(tab);
+    }
+
+    /**
+     * Open external content on tab with title.
+     * @param title tab's title
+     */
+    private void openExternalWebContent(final String title) {
+        openWebTab(title);
+        loadDefaultFile();
     }
 
     /**

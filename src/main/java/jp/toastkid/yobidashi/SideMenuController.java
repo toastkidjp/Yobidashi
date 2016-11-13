@@ -1,6 +1,7 @@
 package jp.toastkid.yobidashi;
 
 import java.awt.Rectangle;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -28,6 +30,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.dialog.AlertDialog;
@@ -42,6 +45,7 @@ import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wiki.ApplicationState;
 import jp.toastkid.wiki.Archiver;
+import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.lib.Wiki2Markdown;
@@ -117,9 +121,17 @@ public class SideMenuController {
     /** Action of launch Script runner tab. */
     private OpenTabAction scriptOpener;
 
+    /** JVM Language Script Runner. */
     private jp.toastkid.script.Main scriptRunner;
 
+    /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
+
+    /** Article Generator. */
+    private ArticleGenerator articleGenerator;
+
+    /** Action of Open external file. */
+    private Consumer<String> openExternal;
 
     /**
      * バックアップ機能を呼び出す。
@@ -568,6 +580,43 @@ public class SideMenuController {
     }
 
     /**
+     * TODO implementing
+     */
+    @FXML
+    private void openExternalFile() {
+
+        if (articleGenerator == null) {
+            articleGenerator = new ArticleGenerator();
+        }
+
+        final FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File("."));
+        final File result = fc.showOpenDialog(stage.getScene().getWindow());
+        if (!result.exists() || !result.canRead()) {
+            return;
+        }
+
+        final StringBuilder content = new StringBuilder();
+        FileUtil.findExtension(result).ifPresent(ext -> {
+            switch (ext) {
+                case ".txt":
+                case ".wiki":
+                    content.append(articleGenerator.wiki2Html(result.getAbsolutePath()));
+                    break;
+                case ".md":
+                    content.append(articleGenerator.md2Html(result.getAbsolutePath()));
+                    break;
+            }
+        });
+
+        if (content.length() == 0) {
+            return;
+        }
+        articleGenerator.generateHtml(content.toString(), result.getAbsolutePath());
+        openExternal.accept(result.getAbsolutePath());
+    }
+
+    /**
      * Set edit command.
      * @param edit Command
      */
@@ -721,6 +770,14 @@ public class SideMenuController {
      */
     protected void setOnOpenScriptRunner(final OpenTabAction scriptOpener) {
         this.scriptOpener = scriptOpener;
+    }
+
+    /**
+     * Set on opening external content action.
+     * @param openExternal
+     */
+    protected void setOnOpenExternalFile(final Consumer<String> openExternal) {
+        this.openExternal = openExternal;
     }
 
     /**
