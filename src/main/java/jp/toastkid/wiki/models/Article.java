@@ -72,7 +72,7 @@ public class Article implements Comparable<Article> {
 
         this.file      = file;
         this.title     = convertTitle(file.getName());
-        this.extension = FileUtil.findExtension(file).get();
+        this.extension = FileUtil.findExtension(file).orElse("");
     }
 
     /**

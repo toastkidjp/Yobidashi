@@ -227,6 +227,11 @@ public final class FileUtil {
             final File pFile,
             final String pEncode
             ) {
+
+        if (pFile == null || !pFile.exists() || !pFile.canRead()) {
+            return Lists.fixedSize.empty();
+        }
+
         final MutableList<String> resSet = Lists.mutable.empty();
         try (final BufferedReader fileReader = FileUtil.makeFileReader(pFile, pEncode);) {
             String str = fileReader.readLine();

@@ -2,10 +2,12 @@ package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -88,5 +90,15 @@ public class FileUtilTest {
     @Test
     public void testRemoveExtension() {
         assertEquals("a", FileUtil.removeExtension("a.txt"));
+    }
+
+    /**
+     * test {@link FileUtil#readLines(File, String)}.
+     */
+    @Test
+    public void testReadLines() {
+        final List<String> readLines = FileUtil.readLines("not_exists", "UTF-8");
+        assertNotNull(readLines);
+        assertTrue(readLines.isEmpty());
     }
 }

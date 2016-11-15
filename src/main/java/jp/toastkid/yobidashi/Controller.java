@@ -268,7 +268,7 @@ public final class Controller implements Initializable {
     private static Desktop desktop;
 
     /** functions class. */
-    private ArticleGenerator func;
+    private ArticleGenerator articleGenerator;
 
     /** Stage. */
     private Stage stage;
@@ -374,7 +374,7 @@ public final class Controller implements Initializable {
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
-                            func = new ArticleGenerator();
+                            articleGenerator = new ArticleGenerator();
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize ArticleGenerator. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -1135,7 +1135,7 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(content)) {
             content = "コンテンツを取得できませんでした.";
         }
-        func.generateHtml(content, "RSS Feeder");
+        articleGenerator.generateHtml(content, "RSS Feeder");
         loadDefaultFile();
         setStatus("取得完了：" + (System.currentTimeMillis() - start) + "[ms]");
     }
@@ -1367,11 +1367,11 @@ public final class Controller implements Initializable {
                 callEditor();
             }
 
-            if (func == null) {
+            if (articleGenerator == null) {
                 return;
             }
             // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
-            func.generateArticleFile();
+            articleGenerator.generateArticleFile();
             urlText.setText(Config.article.toInternalUrl());
             // タブが入れ替わった可能性があるので、もう1回取得.
             final WebEngine engine = getCurrentWebView().get().getEngine();
@@ -1792,7 +1792,7 @@ public final class Controller implements Initializable {
                 "<pre>%s</pre>",
                 FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
                 );
-        func.generateHtml(log, "LogViewer");
+        articleGenerator.generateHtml(log, "LogViewer");
         openWebTab();
         loadDefaultFile();
     }
@@ -1851,7 +1851,7 @@ public final class Controller implements Initializable {
             return;
         }
 
-        func.generateHtml(new ArticleGenerator().md2Html(PATH_ABOUT_APP), "About");
+        articleGenerator.generateHtml(articleGenerator.md2Html(PATH_ABOUT_APP), "About");
         openWebTab();
         loadDefaultFile();
     }

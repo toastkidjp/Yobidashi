@@ -87,7 +87,10 @@ public class Style {
         }
 
         // read from user css dir.
-        styles.addAll(Lists.fixedSize.of(new File(Style.USER_DEFINED_PATH).list()));
+        final File userDir = new File(Style.USER_DEFINED_PATH);
+        if (userDir.exists() && userDir.isDirectory()) {
+            styles.addAll(Lists.fixedSize.of(userDir.list()));
+        }
 
         // select & toList
         final MutableList<String> sorted = styles
