@@ -251,17 +251,13 @@ public final class ArticleSearcher {
                 continue;
             }
             // 記事名検索の場合、ここで結果を入れる.
-            if (Article.convertTitle(readingFile.getName()).indexOf(pQuery) != -1) {
+            if (Article.convertTitle(readingFile.getName()).contains(this.selectName)) {
                 searchResultMap.put(
                         readingFile.getName(),
                         SearchResult.makeSimple(readingFile.getAbsolutePath())
                 );
                 progress.set(progress.get() + 1.0);
             }
-        }
-        // 記事名検索の時はこれを実施
-        if (futures.isEmpty()) {
-            return;
         }
         // 内容検索の時は Future を確認
         while (!futures.isEmpty()) {
