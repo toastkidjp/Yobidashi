@@ -40,7 +40,7 @@ dependencies {
     providedCompile files("${javafxHome}/jre/lib/ext/jfxrt.jar")
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'org.eclipse.collections:eclipse-collections:8.0.0-M1'
+    compile 'org.eclipse.collections:eclipse-collections:8.0.0'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
     compile 'org.apache.commons:commons-lang3:3.4'
 
