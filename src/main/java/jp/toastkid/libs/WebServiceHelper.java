@@ -19,8 +19,8 @@ public class WebServiceHelper {
      *
      */
     public enum Type {
-        Y_DICTIONARY("Y!辞書"), WEBLIO("Weblio"), TABELOG("食べログ"), WIKIPEDIA("Wikipe"),
-        REALTIME_SEARCH("Y!RTS"), WEB_SEARCH("Y!"), LYRICS("歌詞");
+        Y_DICTIONARY("Y!辞書"), WEBLIO("Weblio"), TABELOG("食べログ"), WIKIPEDIA("Wikipedia"),
+        REALTIME_SEARCH("Y!RTS"), WEB_SEARCH("Y!");
 
         /** 検索種別の日本語名. */
         private final String text;
@@ -101,13 +101,6 @@ public class WebServiceHelper {
                 return "http://ejje.weblio.jp/content/" + targetQuery;
             case Y_DICTIONARY:
                 return "http://dic.search.yahoo.co.jp/search?ei=UTF-8&fr=top_ga1_sa&p=" + targetQuery;
-            case LYRICS:
-                try {
-                    targetQuery = URLEncoder.encode(query, "EUC-JP");
-                } catch (final UnsupportedEncodingException e1) {
-                   e1.printStackTrace();
-                }
-                return "http://music.goo.ne.jp/search/result.php?t=&n=" + targetQuery;
             case WEB_SEARCH:
             default:
                 return "http://search.yahoo.co.jp/search?p=" + targetQuery

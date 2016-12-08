@@ -42,12 +42,10 @@ public final class Config {
      */
     public enum Key {
         AUTHOR("author"),
-        WIKI_TITLE("wikiTitle"),
+        APP_TITLE("appTitle"),
         EDITOR_PATH("editorPath"),
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
-        VIEW_TEMPLATE("viewTemplate"),
-        SLIDE_THEME("slideTheme"),
         HOME("home"),
         MUSIC_DIR("musicDir"),
         IMAGE_DIR("imageDir");

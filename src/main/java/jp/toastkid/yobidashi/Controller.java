@@ -39,6 +39,7 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
@@ -104,6 +105,8 @@ import reactor.core.scheduler.Schedulers;
  *
  */
 public final class Controller implements Initializable {
+
+    private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
@@ -338,6 +341,8 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
+    private jp.toastkid.speed_dial.Controller speedDialController;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -375,6 +380,10 @@ public final class Controller implements Initializable {
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
                             articleGenerator = new ArticleGenerator();
+                            Platform.runLater(() -> {
+                                //TODO delete openWebTab();
+                                callHome();
+                            });
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize ArticleGenerator. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -446,10 +455,6 @@ public final class Controller implements Initializable {
                                         }
                                     }
                                     );
-                            Platform.runLater(() -> {
-                                openWebTab();
-                                callHome();
-                            });
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize right tabs. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -542,8 +547,8 @@ public final class Controller implements Initializable {
      */
     private void setTitleOnToolbar() {
         final String text = Config.article == null || Config.article.title == null
-                ? Config.get(Config.Key.WIKI_TITLE)
-                : Config.article.title + " - " + Config.get(Config.Key.WIKI_TITLE);
+                ? Config.get(Config.Key.APP_TITLE)
+                : Config.article.title + " - " + Config.get(Config.Key.APP_TITLE);
         title.setText(text);
         titleTooltip.setText(text);
     }
@@ -832,6 +837,44 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Open new tab having SpeedDial.
+     * TODO implementing
+     */
+    private void openSpeedDialTab() {
+        if (speedDialController == null) {
+            speedDialController = readSpeedDial();
+            speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
+            speedDialController.setZero();
+            speedDialController.setBackground(articleGenerator.getBackground());
+            speedDialController.setOnSearch((query, type) -> {
+                openWebTab("読み込み中……");
+                loadUrl(WebServiceHelper.buildRequestUrl(query, type));
+            });
+        }
+
+        final Tab tab = makeClosableTab("Speed Dial");
+        tab.setContent(speedDialController.getRoot());
+        openTab(tab);
+    }
+
+    /**
+     * Init speed dial's controller.
+     * @return Controller
+     */
+    private final jp.toastkid.speed_dial.Controller readSpeedDial() {
+        try {
+            final FXMLLoader loader = new FXMLLoader(
+                    getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
+            loader.load();
+            return (jp.toastkid.speed_dial.Controller) loader.getController();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
      * 渡されたタブを新規に開いて、そのタブを current にする.
      * @param tab Tab.
      */
@@ -841,7 +884,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Open new tab having WebView.
+     * Open new tab having SpeedDial.
      */
     @FXML
     private void openWebTab() {
@@ -893,6 +936,9 @@ public final class Controller implements Initializable {
                     if (next == Worker.State.SUCCEEDED) {
                         tab.setText(StringUtils.isNotBlank(engine.getTitle())
                                 ? engine.getTitle() : title);
+                        if (Config.article == null) {
+                            return;
+                        }
                         final int j = Config.article.yOffset;
                         if (j == 0) {
                             return;
@@ -1214,7 +1260,8 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void callHome() {
-        loadUrl(Config.get(Config.Key.HOME));
+        //loadUrl(Config.get(Config.Key.HOME));
+        openSpeedDialTab();
     }
 
     /**
@@ -1698,7 +1745,7 @@ public final class Controller implements Initializable {
                 if (job == null) {
                     return;
                 }
-                job.getJobSettings().setJobName(Config.get(Config.Key.WIKI_TITLE));
+                job.getJobSettings().setJobName(Config.get(Config.Key.APP_TITLE));
                 LOGGER.info("jobName [{}]\n", job.getJobSettings().getJobName());
                 wv.get().getEngine().print(job);
                 job.endJob();
@@ -1804,7 +1851,7 @@ public final class Controller implements Initializable {
         sideMenuController.setStage(this.stage);
         sideMenuController.setOnSearch(this::searchArticle);
         sideMenuController.setOnEdit(this::callEditor);
-        sideMenuController.setOnNewTab(this::openWebTab);
+        sideMenuController.setOnNewTab(this::openSpeedDialTab);
         sideMenuController.setOnCloseTab(this::closeTab);
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);

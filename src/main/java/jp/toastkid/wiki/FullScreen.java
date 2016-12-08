@@ -1,9 +1,6 @@
 package jp.toastkid.wiki;
 
-import java.io.FilenameFilter;
 import java.util.Iterator;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.jfoenix.controls.JFXButton;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
@@ -14,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
@@ -33,7 +29,6 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.jfx.common.control.Stopwatch;
 import jp.toastkid.libs.utils.MathUtil;
-import jp.toastkid.wiki.models.Config;
 
 /**
  * For appear article full screen.
@@ -51,17 +46,11 @@ public class FullScreen {
     /** Jump key. */
     private static final KeyCodeCombination JUMP_KEY = new KeyCodeCombination(KeyCode.J, KeyCombination.CONTROL_DOWN);
 
-    /** css file name filter. */
-    private static final FilenameFilter CSS_FILTER = (dir, name) -> name.endsWith(".css");
-
     /** stage. */
     private final Stage stage = new Stage();
 
     /** WebView. */
     private final WebView webView;
-
-    /** Style sheets. */
-    private final ComboBox<String> styles;
 
     /** use for reloading. */
     private String title;
@@ -73,7 +62,6 @@ public class FullScreen {
      */
     public FullScreen(final double width, final double height) {
         webView = new WebView();
-        styles  = new ComboBox<>();
         initWebView();
 
         final AnchorPane ap = new AnchorPane();
@@ -87,10 +75,6 @@ public class FullScreen {
 
         final NumberTextField page = new NumberTextField();
         page.setOnAction(e -> jump(page.getText()));
-
-        // 初期値セット
-        final String theme = Config.get(Config.Key.SLIDE_THEME);
-        styles.getSelectionModel().select(StringUtils.isNotBlank(theme) ? theme : "white");
 
         final Scene scene = new Scene(new VBox(ap, new HBox(page, makeFooter())));
         scene.setOnKeyTyped(e -> {

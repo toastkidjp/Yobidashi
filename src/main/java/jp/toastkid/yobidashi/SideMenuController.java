@@ -229,12 +229,9 @@ public class SideMenuController {
             return;
         }
 
-        final String current = Config.get(Config.Key.VIEW_TEMPLATE);
         new ConfigDialog(parent.get()).showConfigDialog();
         Config.reload();
-        if (!current.equals(Config.get(Config.Key.VIEW_TEMPLATE))) {
-            reload.run();
-        }
+        reload.run();
     }
 
     /**
@@ -401,7 +398,7 @@ public class SideMenuController {
      * Open new tab.
      */
     @FXML
-    private final void openWebTab() {
+    private final void openSpeedDialTab() {
         open.run();
     }
 

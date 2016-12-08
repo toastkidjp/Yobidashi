@@ -1,9 +1,10 @@
 package jp.toastkid.libs;
 
-import static org.junit.Assert.*;
-import jp.toastkid.libs.WebServiceHelper.Type;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import jp.toastkid.libs.WebServiceHelper.Type;
 
 /**
  * WebServiceHelper's Test
@@ -18,7 +19,6 @@ public class WebServiceHelperTest {
     @Test
     public final void testTypeGetText() {
         assertEquals("Y!辞書", Type.Y_DICTIONARY.getText());
-        assertEquals("歌詞", Type.LYRICS.getText());
         assertEquals("Y!RTS", Type.REALTIME_SEARCH.getText());
         assertEquals("食べログ", Type.TABELOG.getText());
         assertEquals("Weblio", Type.WEBLIO.getText());
@@ -32,7 +32,6 @@ public class WebServiceHelperTest {
     @Test
     public final void testTypeFind() {
         assertEquals(Type.Y_DICTIONARY, Type.find("Y!辞書"));
-        assertEquals(Type.LYRICS, Type.find("歌詞"));
         assertEquals(Type.REALTIME_SEARCH, Type.find("Y!RTS"));
         assertEquals(Type.TABELOG, Type.find("食べログ"));
         assertEquals(Type.WEBLIO, Type.find("Weblio"));

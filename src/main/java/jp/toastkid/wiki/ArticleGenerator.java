@@ -498,4 +498,12 @@ public final class ArticleGenerator {
         return converted.makeString(LINE_SEPARATOR);
     }
 
+    /**
+     * Return background image URL.
+     * @return image URL
+     */
+    public String getBackground() {
+        return chooser.choose();
+    }
+
 }
