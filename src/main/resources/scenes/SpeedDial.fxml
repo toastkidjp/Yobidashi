@@ -23,49 +23,46 @@
       <children>
         <Label fx:id="title" contentDisplay="CENTER"
           text="Title" textAlignment="CENTER"
-          style="-fx-background-color: rgba(255, 255, 255, 0.9);"
+          style="-fx-background-color: rgba(255, 255, 255, 0.5);"
           >
           <font><Font size="60.0" /></font>
         </Label>
       </children>
     </VBox>
   </top>
-   <center>
-     <VBox prefHeight="400.0" alignment="CENTER" >
-       <children>
-       <HBox alignment="CENTER" >
-         <children>
+  <center>
+    <VBox prefHeight="400.0" alignment="CENTER" >
+      <children>
+        <HBox alignment="CENTER" >
+          <children>
             <JFXTextField fx:id="input" onAction="#search"
               minWidth="400.0" promptText="Input query"
-              style="-fx-background-color: rgba(20.0, 0.0, 50.0, 0.9);-fx-font-size: 20pt;"
-              >
-            </JFXTextField>
+              style="-fx-background-color: rgba(25.0, 20.0, 50.0, 0.5);
+                     -fx-font-size: 20pt;"
+              />
             <VBox>
-               <children>
-                 <JFXComboBox fx:id="type" minWidth="180.0">
-                   <tooltip>
-                        <Tooltip text="Style を選択します。" />
-                     </tooltip>
-                   <items>
-                     <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Y!" />
-                        <String fx:value="Y!辞書" />
-                        <String fx:value="Weblio" />
-                        <String fx:value="食べログ" />
-                        <String fx:value="Wikipedia" />
-                        <String fx:value="Y!RTS" />
-                     </FXCollections>
-                   </items>
-                 </JFXComboBox>
-                 <JFXButton onAction="#search" prefWidth="180.0" text="Search!" />
-               </children>
+              <children>
+                <JFXComboBox fx:id="type" minWidth="180.0">
+                  <tooltip>
+                    <Tooltip text="Style を選択します。" />
+                  </tooltip>
+                  <items>
+                    <FXCollections fx:factory="observableArrayList">
+                      <String fx:value="Y!" />
+                      <String fx:value="Y!辞書" />
+                      <String fx:value="Weblio" />
+                      <String fx:value="食べログ" />
+                      <String fx:value="Wikipedia" />
+                      <String fx:value="Y!RTS" />
+                    </FXCollections>
+                  </items>
+                </JFXComboBox>
+                <JFXButton onAction="#search" prefWidth="180.0" text="Search!" />
+              </children>
             </VBox>
-         </children>
-      </HBox>
+          </children>
+        </HBox>
       </children>
-      </VBox>
-   </center>
-   <bottom>
-      <JFXDatePicker BorderPane.alignment="CENTER" />
-   </bottom>
+    </VBox>
+  </center>
 </BorderPane>

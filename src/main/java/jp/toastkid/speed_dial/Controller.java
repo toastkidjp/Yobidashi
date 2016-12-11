@@ -37,6 +37,9 @@ public class Controller {
     /** Search action. */
     private BiConsumer<String, String> webSearchAction;
 
+    /** Empty action. */
+    private Runnable emptyAction;
+
     /**
      * Return root pane.
      * @return root pane.
@@ -79,6 +82,7 @@ public class Controller {
         final String query = input.getText();
         final String t = type.getSelectionModel().getSelectedItem();
         if (StringUtils.isBlank(query) || StringUtils.isBlank(t)) {
+            emptyAction.run();
             return;
         }
         webSearchAction.accept(query, t);
@@ -101,6 +105,14 @@ public class Controller {
                 + "-fx-background-position: center center; "
                 + "-fx-background-size: cover;"
                 + "-fx-background-repeat: stretch;");
+    }
+
+    /**
+     * Set on empty action.
+     * @param emptyAction
+     */
+    public void setOnEmptyAction(final Runnable emptyAction) {
+        this.emptyAction = emptyAction;
     }
 
 }

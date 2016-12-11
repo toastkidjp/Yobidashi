@@ -396,6 +396,7 @@ public final class Controller implements Initializable {
                             final long start = System.currentTimeMillis();
                             prepareArticleList();
                             prepareBookmarks();
+                            leftTabs.getSelectionModel().select(2);
 
                             final String message = Thread.currentThread().getName()
                                     + " Ended read article names. "
@@ -852,7 +853,6 @@ public final class Controller implements Initializable {
 
     /**
      * Open new tab having SpeedDial.
-     * TODO implementing
      */
     private void openSpeedDialTab() {
         if (speedDialController == null) {
@@ -864,6 +864,7 @@ public final class Controller implements Initializable {
                 openWebTab("読み込み中……");
                 loadUrl(WebServiceHelper.buildRequestUrl(query, type));
             });
+            speedDialController.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
         }
 
         final Tab tab = makeClosableTab("Speed Dial");
