@@ -38,6 +38,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -491,13 +492,7 @@ public final class Controller implements Initializable {
                                     leftDrawer.close();
                                 }
                             });
-                            optionsBurger.setOnMouseClicked(e->{
-                                if (rightDrawer.isHidden() || rightDrawer.isHidding()) {
-                                    rightDrawer.open();
-                                } else {
-                                    rightDrawer.close();
-                                }
-                            });
+                            optionsBurger.setOnMouseClicked(e->switchRightDrawer());
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize drawer. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -540,6 +535,25 @@ public final class Controller implements Initializable {
             })
             .build();
         pd.start(stage);
+    }
+
+    /**
+     * Switch right drawer's state.
+     */
+    private void switchRightDrawer() {
+        if (isRightDrawerClosing()) {
+            rightDrawer.open();
+            return;
+        }
+        rightDrawer.close();
+    }
+
+    /**
+     * Return drawer hiding.
+     * @return
+     */
+    private boolean isRightDrawerClosing() {
+        return rightDrawer.isHidden() || rightDrawer.isHidding();
     }
 
     /**
@@ -846,14 +860,16 @@ public final class Controller implements Initializable {
             speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
             speedDialController.setZero();
             speedDialController.setBackground(articleGenerator.getBackground());
-            speedDialController.setOnSearch((query, type) -> {
+            speedDialController.setOnWebSearch((query, type) -> {
                 openWebTab("読み込み中……");
                 loadUrl(WebServiceHelper.buildRequestUrl(query, type));
             });
         }
 
         final Tab tab = makeClosableTab("Speed Dial");
-        tab.setContent(speedDialController.getRoot());
+        final Pane sdRoot = speedDialController.getRoot();
+        sdRoot.setPrefWidth(width * 0.8);
+        tab.setContent(sdRoot);
         openTab(tab);
     }
 
@@ -1001,58 +1017,69 @@ public final class Controller implements Initializable {
                 item.getItem().setText(item.getItem().getText());
             }
 
-            // adding new item:
-            final MenuItem length = new MenuItem("文字数計測"){{
-                setOnAction(event -> sideMenuController.callFileLength());
-            }};
-            final MenuItem fullScreen = new MenuItem("Full Screen"){{
-                setOnAction(event -> callTabFullScreen());
-            }};
-            final MenuItem slideShow = new MenuItem("スライドショー"){{
-                setOnAction(event -> slideShow());
-            }};
-            final MenuItem openTab = new MenuItem("新しいタブを開く"){{
-                setOnAction(event -> openWebTab());
-            }};
-            final MenuItem source = new MenuItem("ソースを表示"){{
-                setOnAction(event -> callHtmlSource());
-            }};
-            final MenuItem search = new MenuItem("ページ内検索"){{
-                setOnAction(event -> openSearcher());
-            }};
-            final MenuItem moveToTop = new MenuItem("ページの先頭に移動"){{
-                setOnAction(event -> moveToTop());
-            }};
-            final MenuItem moveToBottom = new MenuItem("ページの最後に移動"){{
-                setOnAction(event -> moveToBottom());
-            }};
-            final MenuItem searchAll = new MenuItem("全記事検索"){{
-                setOnAction(event -> searchArticle("", ""));
-            }};
-            final MenuItem showLeft = new MenuItem("記事一覧を開く"){{
-                setOnAction(event -> showLeftPane());
-            }};
-            final MenuItem hideLeft = new MenuItem("記事一覧を閉じる"){{
-                setOnAction(event -> hideLeftPane());
-            }};
-
             // add new item:
             cmc.getItemsContainer().getChildren().addAll(
-                    cmc.new MenuItemContainer(length),
-                    cmc.new MenuItemContainer(fullScreen),
-                    cmc.new MenuItemContainer(slideShow),
-                    cmc.new MenuItemContainer(openTab),
-                    cmc.new MenuItemContainer(source),
-                    cmc.new MenuItemContainer(search),
-                    cmc.new MenuItemContainer(moveToTop),
-                    cmc.new MenuItemContainer(moveToBottom),
-                    cmc.new MenuItemContainer(searchAll),
-                    cmc.new MenuItemContainer(isHideLeftPane() ? showLeft : hideLeft)
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "文字数計測", event -> sideMenuController.callFileLength()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Full Screen", event -> callTabFullScreen()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Slide show", event -> slideShow()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Open new tab", event -> openWebTab()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Show HTML source", event -> callHtmlSource()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Find in page", event -> openSearcher()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Go to top of this page", event -> moveToTop()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Go to bottom of this page", event -> moveToBottom()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Search all article", event -> searchArticle("", "")),
+                    makeContextMenuItemContainerWithAction(
+                            cmc,
+                            isRightDrawerClosing() ? "Open tools" : "Close tools",
+                            event -> switchRightDrawer()
+                            ),
+                    cmc.new MenuItemContainer(
+                            isHideLeftPane()
+                            ? makeMenuItemWithAction("記事一覧を開く",   event -> showLeftPane())
+                            : makeMenuItemWithAction("記事一覧を閉じる", event -> hideLeftPane())
+                            )
                     );
 
             return (PopupWindow)window;
         }
         return null;
+    }
+
+    /**
+     * Make MenuItemContainer with ActionEvent's EventHandler.
+     * @param cmc ContextMenuContent
+     * @param labelText label text.
+     * @param action event
+     * @return MenuItem
+     */
+    private MenuItemContainer makeContextMenuItemContainerWithAction(
+            final ContextMenuContent cmc,
+            final String labelText,
+            final EventHandler<ActionEvent> action
+            ) {
+        return cmc.new MenuItemContainer(makeMenuItemWithAction(labelText, action));
+    }
+
+    /**
+     * Make MenuItem with ActionEvent's EventHandler.
+     * @param labelText label text.
+     * @param action event
+     * @return MenuItem
+     */
+    private MenuItem makeMenuItemWithAction(
+            final String labelText,
+            final EventHandler<ActionEvent> action
+            ) {
+        return new MenuItem(labelText){{ setOnAction(action);}};
     }
 
     /**
@@ -1869,6 +1896,7 @@ public final class Controller implements Initializable {
             System.exit(0);
         });
         sideMenuController.setOnOpenScriptRunner(this::openSpecifiedTab);
+        sideMenuController.setOnOpenTools(this::switchRightDrawer);
     }
 
     /**

@@ -15,26 +15,30 @@
 <?import com.jfoenix.controls.JFXDatePicker?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="900.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8"
-  xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.toastkid.speed_dial.Controller"
-  fx:id="root"
+  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="jp.toastkid.speed_dial.Controller" fx:id="root"
   >
-
   <top>
-    <Label fx:id="title" alignment="CENTER" contentDisplay="CENTER"
-      prefHeight="395.0" prefWidth="1200.0" text="Title" textAlignment="CENTER"
-      style="-fx-background-color: rgba(255, 255, 255, 0.9);"
-      >
-      <font><Font size="60.0" /></font>
-    </Label>
+    <VBox prefHeight="395.0" alignment="CENTER">
+      <children>
+        <Label fx:id="title" contentDisplay="CENTER"
+          text="Title" textAlignment="CENTER"
+          style="-fx-background-color: rgba(255, 255, 255, 0.9);"
+          >
+          <font><Font size="60.0" /></font>
+        </Label>
+      </children>
+    </VBox>
   </top>
    <center>
-      <HBox prefHeight="349.0" prefWidth="1052.0" style="-fx-background-color: rgba(255, 255, 255, 0.9);">
+     <VBox prefHeight="400.0" alignment="CENTER" >
+       <children>
+       <HBox alignment="CENTER" >
          <children>
-            <JFXTextField fx:id="input" alignment="CENTER" onAction="#search" minWidth="400.0" prefHeight="80.0" prefWidth="1062.0" promptText="Input query">
-              <font>
-                  <Font size="30.0" />
-               </font>
+            <JFXTextField fx:id="input" onAction="#search"
+              minWidth="400.0" promptText="Input query"
+              style="-fx-background-color: rgba(20.0, 0.0, 50.0, 0.9);-fx-font-size: 20pt;"
+              >
             </JFXTextField>
             <VBox>
                <children>
@@ -53,11 +57,13 @@
                      </FXCollections>
                    </items>
                  </JFXComboBox>
-                 <JFXButton onAction="#search" prefWidth="140.0" text="Search!" />
+                 <JFXButton onAction="#search" prefWidth="180.0" text="Search!" />
                </children>
             </VBox>
          </children>
       </HBox>
+      </children>
+      </VBox>
    </center>
    <bottom>
       <JFXDatePicker BorderPane.alignment="CENTER" />

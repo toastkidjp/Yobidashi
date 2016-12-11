@@ -71,6 +71,7 @@
               <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
               <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
               <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" />
+              <MenuLabel onAction="#openTools" text="Open tools" />
               <MenuLabel onAction="#callLogViewer" text="LogViewer" />
             </JFXListView>
           </content>

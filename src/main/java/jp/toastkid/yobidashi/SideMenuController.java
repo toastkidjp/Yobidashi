@@ -130,8 +130,11 @@ public class SideMenuController {
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
-    /** Action of Open external file. */
+    /** Action of open external file. */
     private Consumer<String> openExternal;
+
+    /** Action of open drawer */
+    private Runnable switchRightDrawer;
 
     /**
      * バックアップ機能を呼び出す。
@@ -577,6 +580,14 @@ public class SideMenuController {
     }
 
     /**
+     * Open right Drawer.
+     */
+    @FXML
+    private void openTools() {
+        switchRightDrawer.run();
+    }
+
+    /**
      * TODO implementing
      */
     @FXML
@@ -784,6 +795,14 @@ public class SideMenuController {
      */
     private void showMessageDialog(final String title, final String message) {
         getParent().ifPresent(parent -> AlertDialog.showMessage(parent, title, message));
+    }
+
+    /**
+     * Set on OpenTools action.
+     * @param switchRightDrawer
+     */
+    public void setOnOpenTools(final Runnable switchRightDrawer) {
+        this.switchRightDrawer = switchRightDrawer;
     }
 
 }

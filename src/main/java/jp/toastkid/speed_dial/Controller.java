@@ -35,7 +35,7 @@ public class Controller {
     private ComboBox<String> type;
 
     /** Search action. */
-    private BiConsumer<String, String> searchAction;
+    private BiConsumer<String, String> webSearchAction;
 
     /**
      * Return root pane.
@@ -60,8 +60,8 @@ public class Controller {
      * Set search action.
      * @param searchAction
      */
-    public void setOnSearch(final BiConsumer<String, String> searchAction) {
-        this.searchAction = searchAction;
+    public void setOnWebSearch(final BiConsumer<String, String> searchAction) {
+        this.webSearchAction = searchAction;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Controller {
         if (StringUtils.isBlank(query) || StringUtils.isBlank(t)) {
             return;
         }
-        searchAction.accept(query, t);
+        webSearchAction.accept(query, t);
     }
 
     /**
