@@ -19,10 +19,16 @@ import jp.toastkid.wiki.ArticleGenerator;
 
 /**
  * Article model.
- * @author Toast kid
  *
+ * @author Toast kid
  */
 public class Article implements Comparable<Article> {
+
+    /** Internal link's protocol. */
+    public static final String INTERNAL_PROTOCOL = "file:///internal/";
+
+    /** Internal link's format. */
+    private static final String INTERNAL_LINK_FORMAT = INTERNAL_PROTOCOL + "/%s/%s%s";
 
     /** article file. */
     public File file;
@@ -91,7 +97,7 @@ public class Article implements Comparable<Article> {
      * @return 記事ファイルへのパス
      */
     public String toInternalUrl() {
-        return String.format("/%s/%s%s", this.extention().substring(1),
+        return String.format(INTERNAL_LINK_FORMAT, this.extention().substring(1),
                 ArticleGenerator.titleToFileName(this.title), this.extention());
     }
 
@@ -198,7 +204,7 @@ public class Article implements Comparable<Article> {
      * @return Wiki 記事なら true
      */
     public static final boolean isWikiArticleUrl(final String url) {
-        return (url.contains("/txt/") || url.contains("/md/"));
+        return url.startsWith(INTERNAL_PROTOCOL);
     }
 
     /**
@@ -222,6 +228,15 @@ public class Article implements Comparable<Article> {
      */
     public static Article find(final String fileName) {
         return new Article(new File(Config.get("articleDir"), fileName));
+    }
+
+    /**
+     * URL から Article オブジェクトを生成.
+     * @param url URL
+     * @return Article オブジェクト
+     */
+    public static Article findFromUrl(final String url) {
+        return find(findFileNameFromUrl(url));
     }
 
     /**

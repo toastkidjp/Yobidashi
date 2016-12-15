@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
@@ -32,11 +30,10 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -70,6 +67,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
@@ -83,13 +81,15 @@ import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.utils.HtmlUtil;
-import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
-import jp.toastkid.rss.RssFeeder;
 import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.FullScreen;
 import jp.toastkid.wiki.control.ArticleListCell;
+import jp.toastkid.wiki.control.ArticleTab;
+import jp.toastkid.wiki.control.BaseWebTab;
+import jp.toastkid.wiki.control.ContentTab;
+import jp.toastkid.wiki.control.ReloadableTab;
+import jp.toastkid.wiki.control.WebTab;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Article.Extension;
 import jp.toastkid.wiki.models.Config;
@@ -103,10 +103,10 @@ import reactor.core.scheduler.Schedulers;
  * JavaFX WikiClient's Controller.
  *
  * @author Toast kid
- *
  */
 public final class Controller implements Initializable {
 
+    /** Speed dial's scene graph file. */
     private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** Logger. */
@@ -342,6 +342,7 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
+    /** Speed dial's controller. */
     private jp.toastkid.speed_dial.Controller speedDialController;
 
     @Override
@@ -372,7 +373,7 @@ public final class Controller implements Initializable {
                 public Integer call() {
                     // 長い時間のかかるタスク
                     try {
-                        setTitleOnToolbar();
+                        setTitleOnToolbar("");
                         if (Desktop.isDesktopSupported()) {
                             desktop = Desktop.getDesktop();
                         }
@@ -381,10 +382,7 @@ public final class Controller implements Initializable {
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
                             articleGenerator = new ArticleGenerator();
-                            Platform.runLater(() -> {
-                                //TODO delete openWebTab();
-                                callHome();
-                            });
+                            Platform.runLater(Controller.this::callHome);
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize ArticleGenerator. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -425,13 +423,7 @@ public final class Controller implements Initializable {
                             tabPane.getSelectionModel().selectedItemProperty().addListener(
                                     (a, prevTab, nextTab) -> {
                                         // (121224) タブ切り替え時の URL 表示の変更
-                                        final Optional<WebView> opt = getCurrentWebView();
-                                        if (!opt.isPresent()) {
-                                            return;
-                                        }
-                                        final WebView wv = opt.get();
-                                        final WebEngine engine = wv.getEngine();
-                                        final String tabUrl = engine.getLocation();
+                                        final String tabUrl = getCurrentTab().getUrl();
                                         if (!StringUtils.isEmpty(tabUrl)
                                                 && !tabUrl.startsWith("about")
                                                 && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
@@ -467,7 +459,7 @@ public final class Controller implements Initializable {
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
                             searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
-                            highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
+                            getCurrentTab().highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize tools. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -559,11 +551,12 @@ public final class Controller implements Initializable {
 
     /**
      * Set title.
+     * @param titleStr
      */
-    private void setTitleOnToolbar() {
-        final String text = Config.article == null || Config.article.title == null
+    private void setTitleOnToolbar(final String titleStr) {
+        final String text = titleStr == null
                 ? Config.get(Config.Key.APP_TITLE)
-                : Config.article.title + " - " + Config.get(Config.Key.APP_TITLE);
+                : titleStr + " - " + Config.get(Config.Key.APP_TITLE);
         title.setText(text);
         titleTooltip.setText(text);
     }
@@ -614,7 +607,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     protected void searchUp() {
-        highlight(Optional.ofNullable(searcherInput.getText()), WINDOW_FIND_UP);
+        getCurrentTab().highlight(Optional.ofNullable(searcherInput.getText()), WINDOW_FIND_UP);
     }
 
     /**
@@ -622,21 +615,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     protected void searchDown() {
-        highlight(Optional.ofNullable(searcherInput.getText()), WINDOW_FIND_DOWN);
-    }
-
-    /**
-     * Highlight keyword.
-     * @param word keyword which is wanted highlighting
-     * @see <a href="http://aoe-tk.hatenablog.com/entry/2015/06/15/001217">
-     * JavaFXのWebViewの検索を実現するのにもっと簡単な方法がありました</a>
-     */
-    private final void highlight(
-            final Optional<String> word, final String script) {
-        word.ifPresent(keyword ->
-            getCurrentWebView().ifPresent(wv ->
-                wv.getEngine().executeScript(MessageFormat.format(script, keyword)))
-        );
+        getCurrentTab().highlight(Optional.ofNullable(searcherInput.getText()), WINDOW_FIND_DOWN);
     }
 
     /**
@@ -683,20 +662,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void moveToTop() {
-        getCurrentWebView().ifPresent(wv ->
-            wv.getEngine().executeScript(findScrollTop(wv.getEngine().getLocation()))
-        );
-    }
-
-    /**
-     * find scroll script.
-     * @param url
-     * @return
-     */
-    private String findScrollTop(final String url) {
-        return url.endsWith(Defines.TEMP_FILE_NAME)
-                ? "$('html,body').animate({ scrollTop: 0 }, 'fast');"
-                : "window.scrollTo(0, 0);";
+        getCurrentTab().moveToTop();
     }
 
     /**
@@ -705,20 +671,7 @@ public final class Controller implements Initializable {
      * How to auto-scroll to the end in WebView?</a>
      */
     private final void moveToBottom() {
-        getCurrentWebView().ifPresent(wv ->
-            wv.getEngine().executeScript(findScrollBottom(wv.getEngine().getLocation()))
-        );
-    }
-
-    /**
-     * find scroll script.
-     * @param url
-     * @return
-     */
-    private String findScrollBottom(final String url) {
-        return url.endsWith(Defines.TEMP_FILE_NAME)
-                ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
-                : "window.scrollTo(0, document.body.scrollHeight);";
+        getCurrentTab().moveToBottom();
     }
 
     /**
@@ -748,7 +701,7 @@ public final class Controller implements Initializable {
                 new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
-            opt.ifPresent(article -> loadUrl(article.toInternalUrl()));
+            opt.ifPresent(article -> getCurrentTab().loadUrl(article.toInternalUrl()));
         } catch (final Exception e) {
             LOGGER.error("no such element", e);
         }
@@ -758,29 +711,16 @@ public final class Controller implements Initializable {
      * Show HTML source.
      */
     @FXML
-    public final void callHtmlSource() {
-        final Mono<String> source = Mono.<String>create(emitter -> {
-            getCurrentWebView().ifPresent(wv -> {
-                emitter.success(wv.getEngine()
-                        .executeScript(
-                                "document.getElementsByTagName('html')[0].innerHTML;"
-                                )
-                        .toString()
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;")
-                        );
-            });
-        });
+    private final void callHtmlSource() {
+        final ReloadableTab tab = getCurrentTab();
 
-        final Mono<WebView> browser = Mono.<WebView>create(emitter -> {
-            final String title = tabPane.getSelectionModel().getSelectedItem().getText();
-            openWebTab(title.concat("'s HTML Source"));
-            getCurrentWebView().ifPresent(wv -> emitter.success(wv));
-        });
+        if (!(tab instanceof BaseWebTab)) {
+            setStatus("This tab can't show source.");
+            return;
+        }
 
-        source.and(browser).subscribe(tuple ->
-            tuple.getT2().getEngine().loadContent(tuple.getT1().replace("\n", "<br/>"))
-        );
+        final String htmlSource = ((BaseWebTab) tab).htmlSource();
+        openWebTabWithContent(tab.getTitle().concat("'s HTML Source"), htmlSource, "text/plain");
     }
 
     /**
@@ -807,27 +747,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在のタブをリロードする.
-     * Wiki 記事の場合は再読み込み(というより一時HTMLの再生成)を実施する.
+     * Reload tab content.
      */
     @FXML
     private final void reload() {
-        final Node node = getCurrentTab().getContent();
-        if (node == null) {
-            return;
-        }
-
-        if (node instanceof WebView) {
-            final WebEngine engine = ((WebView) node).getEngine();
-            final String url = engine.getLocation();
-            if (!url.contains(Defines.TEMP_FILE_NAME)
-                    || StringUtils.isEmpty(Config.article.file.getName())) {
-                engine.reload();
-                return;
-            }
-            loadUrl(Config.article.toInternalUrl(), true);
-            return;
-        }
+        getCurrentTab().reload();
     }
 
     /**
@@ -847,31 +771,29 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(url)){
             return;
         }
-        openWebTab();
-        loadUrl(url);
+        openWebTab("Loading...", url);
     }
 
     /**
      * Open new tab having SpeedDial.
      */
+    @FXML
     private void openSpeedDialTab() {
         if (speedDialController == null) {
             speedDialController = readSpeedDial();
             speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
             speedDialController.setZero();
             speedDialController.setBackground(articleGenerator.getBackground());
-            speedDialController.setOnWebSearch((query, type) -> {
-                openWebTab("読み込み中……");
-                loadUrl(WebServiceHelper.buildRequestUrl(query, type));
-            });
+            speedDialController.setOnWebSearch((query, type) ->
+                openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
+            );
             speedDialController.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
         }
 
-        final Tab tab = makeClosableTab("Speed Dial");
         final Pane sdRoot = speedDialController.getRoot();
         sdRoot.setPrefWidth(width * 0.8);
-        tab.setContent(sdRoot);
-        openTab(tab);
+        openTab(new ContentTab.Builder().setTitle("Speed Dial")
+                .setContent(sdRoot).setOnClose(this::closeTab).build());
     }
 
     /**
@@ -901,83 +823,76 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Open new tab having SpeedDial.
-     */
-    @FXML
-    private void openWebTab() {
-        openWebTab("");
-    }
-
-    /**
      * Open new tab having WebView with title.
-     * @param title tab's title
+     * @param article tab's article
      */
-    private void openWebTab(final String title) {
-
-        // tab 切り替え→ URL 開くと変な位置にスクロールされるのを防止
-        if (Config.article != null) {
-            Config.article.yOffset = 0;
-        }
-
-        final Tab tab = makeClosableTab("new tab");
-        final WebView wv = new WebView();
-        wv.setOnContextMenuRequested(event -> showContextMenu());
-        tab.setContent(wv);
-        final WebEngine engine = wv.getEngine();
-        // 新規タブで開く場合
-        engine.setCreatePopupHandler(
-                popupFeature -> {
-                    openWebTab();
-                    tabPane.getSelectionModel().selectLast();
-                    return getCurrentWebView().get().getEngine();
-                }
-                );
-        //engine.setJavaScriptEnabled(true);
-        engine.setOnAlert(e -> LOGGER.info(e.getData()));
-        final Worker<Void> loadWorker = engine.getLoadWorker();
-        loadWorker.stateProperty().addListener(
-                (arg0, prev, next) -> {
-                    final String url = engine.getLocation();
-
-                    if (State.READY.equals(prev)) {
-                        tab.setText("loading...");
-                    }
-
-                    if (Article.isWikiArticleUrl(url)) {
-                        if (State.SCHEDULED.equals(arg0.getValue())) {
-                            loadWorker.cancel();
-                            Platform.runLater(() -> loadUrl(url));
-                        }
-                    }
-
-                    if (next == Worker.State.SUCCEEDED) {
-                        tab.setText(StringUtils.isNotBlank(engine.getTitle())
-                                ? engine.getTitle() : title);
-                        if (Config.article == null) {
-                            return;
-                        }
-                        final int j = Config.article.yOffset;
-                        if (j == 0) {
-                            return;
-                        }
-                        engine.executeScript(String.format("window.scrollTo(0, %d);", j));
-                    }
-                }
-                );
-        openTab(tab);
+    private void openArticleTab(final Article article) {
+        LOGGER.info("call open atab " + article.title);
+        openTab(makeArticleTab(article));
     }
 
     /**
-     * Make closable tab.
-     * @param title tab's title
-     * @return Tab
+     * Make article tab.
+     * @param article
+     * @return ArticleTab
      */
-    private Tab makeClosableTab(final String title) {
-        final Tab tab = new Tab(title);
-        final Button closeButton = new JFXButton("x");
-        closeButton.setOnAction(e -> closeTab(tab));
-        tab.setGraphic(closeButton);
-        return tab;
+    private ArticleTab makeArticleTab(final Article article) {
+        return new ArticleTab.Builder()
+                .setArticle(article)
+                .setOnClose(this::closeTab)
+                .setOnContextMenuRequested(event -> showContextMenu())
+                .setOnOpenNewArticle(this::openArticleTab)
+                .setOnOpenUrl(this::openWebTab)
+                .setOnLoad(() -> {
+                    // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
+                    urlText.setText(Config.article.toInternalUrl());
+                    Platform.runLater(() -> setTitleOnToolbar(article.title));
+                    // deep copy を渡す.
+                    addHistory(Config.article.clone());
+                    focusOn();
+                })
+                .setCreatePopupHandler(this::handleCreatePopup)//TODO WebViewのあたり出来上がってから実装
+                .build();
+    }
+
+    /**
+     *
+     * @param popupFeature
+     * @return
+     */
+    private WebEngine handleCreatePopup(final PopupFeatures popupFeature) {
+        final ArticleTab tab = makeArticleTab(new Article(new File("")));
+        tabPane.getSelectionModel().selectLast();
+        return tab.getWebView().getEngine();
+    }
+
+    /**
+     * Open new web tab.
+     * @param title
+     * @param url
+     */
+    private void openWebTab(final String title, final String url) {
+        openTab(new WebTab.Builder().setTitle(title).setUrl(url).setOnClose(this::closeTab).build());
+    }
+
+    /**
+     * Open new web tab for view html content.
+     * @param title
+     * @param content
+     * @param mimetype
+     */
+    private void openWebTabWithContent(
+            final String title,
+            final String content,
+            final String mimetype
+            ) {
+        final WebTab tab = new WebTab.Builder()
+                .setTitle(title)
+                .setContent(content)
+                .setMimetype(mimetype)
+                .setOnClose(this::closeTab)
+                .build();
+        openTab(tab);
     }
 
     /**
@@ -1027,7 +942,7 @@ public final class Controller implements Initializable {
                     makeContextMenuItemContainerWithAction(
                             cmc, "Slide show", event -> slideShow()),
                     makeContextMenuItemContainerWithAction(
-                            cmc, "Open new tab", event -> openWebTab()),
+                            cmc, "Open new tab", event -> openSpeedDialTab()),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Show HTML source", event -> callHtmlSource()),
                     makeContextMenuItemContainerWithAction(
@@ -1149,8 +1064,11 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void stop() {
-        Platform.runLater( () ->
-            getCurrentWebView().ifPresent(wv -> wv.getEngine().getLoadWorker().cancel()));
+        final ReloadableTab tab = getCurrentTab();
+        if (!(tab instanceof ArticleTab)) {
+            return;
+        }
+        Platform.runLater(tab::stop);
     }
 
     /**
@@ -1166,11 +1084,11 @@ public final class Controller implements Initializable {
      * @param f 記事名フィルタ文字列
      */
     protected void searchArticle(final String q, final String f) {
-        final CheckBox isAnd       = new JFXCheckBox("AND 検索"){{setSelected(true);}};
+        final CheckBox isAnd       = new JFXCheckBox("AND Search"){{setSelected(true);}};
         new AlertDialog.Builder(getParent())
-            .setTitle("全記事検索").setMessage("この操作の実行には時間がかかります。")
+            .setTitle("All article search").setMessage("この操作の実行には時間がかかります。")
             //"記事名のみを対象に検索"
-            .addControl(queryInput, new Label("記事名でフィルタ"), filterInput, isAnd)
+            .addControl(queryInput, new Label("Filter article name"), filterInput, isAnd)
             .setOnPositive("OK", () -> {
                 final String query = queryInput.getText().trim();
                 ((AutoCompleteTextField) queryInput).getEntries().add(query);
@@ -1204,21 +1122,15 @@ public final class Controller implements Initializable {
     @FXML
     private final void callRssFeeder() {
         final long start = System.currentTimeMillis();
-        openWebTab("RSS Feeder");
+       /* TODO impl
+        * openArticleTab("RSS Feeder");
         String content = RssFeeder.run();
         if (StringUtils.isEmpty(content)) {
             content = "コンテンツを取得できませんでした.";
         }
         articleGenerator.generateHtml(content, "RSS Feeder");
-        loadDefaultFile();
-        setStatus("取得完了：" + (System.currentTimeMillis() - start) + "[ms]");
-    }
-
-    /**
-     * Load temporary HTML.
-     */
-    private void loadDefaultFile() {
-        loadUrl(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
+        loadDefaultFile();*/
+        setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
     }
 
     /**
@@ -1321,7 +1233,20 @@ public final class Controller implements Initializable {
             if (property.getValue() == null) {
                 return;
             }
-            loadUrl(property.getValue().toInternalUrl());
+
+            if (newVal == null) {
+                return;
+            }
+
+            final Optional<Tab> first = tabPane.getTabs().stream()
+                    .filter(tab -> (tab instanceof ArticleTab)
+                            && ((ArticleTab) tab).getArticle().equals(newVal))
+                    .findFirst();
+            if (first.isPresent()) {
+                first.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
+                return;
+            }
+            openArticleTab(newVal);
         });
     }
 
@@ -1360,10 +1285,8 @@ public final class Controller implements Initializable {
 
     /**
      * 現在選択中のファイルに ListView をフォーカスする.
-     * @param items ObservableList
      */
     private void focusOn() {
-
         Platform.runLater(() -> {
             final int indexOf = articleList.getItems().indexOf(Config.article);
             if (indexOf != -1){
@@ -1379,93 +1302,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Load passed url.
-     * @param url URL
-     * @return yOffset.
-     */
-    private void loadUrl(final String url) {
-        loadUrl(url, false);
-    }
-
-    /**
-     * Load passed url.
-     * @param url URL
-     * @param isReload リロードの場合、yOffsetを保持.
-     * @return yOffset.
-     */
-    private void loadUrl(final String url, final boolean isReload) {
-        final Optional<WebView> currentWebView = getCurrentWebView();
-        if (!currentWebView.isPresent()) {
-            if (StringUtils.isNotBlank(url)) {
-                openWebTab();
-                loadUrl(url, isReload);
-            }
-            return;
-        }
-
-        // Web ページならそのまま表示.
-        if (!StringUtils.isEmpty(url) && url.startsWith("http")) {
-            urlText.setText(url);
-            currentWebView.ifPresent(wv -> wv.getEngine().load(url));
-            return;
-        }
-
-        // HTMLならそのまま表示.
-        if (!StringUtils.isEmpty(url) && url.endsWith(".html")) {
-            urlText.setText(url);
-            currentWebView.ifPresent(wv -> wv.getEngine().load(url));
-            return;
-        }
-
-        // (121229) ファイルパスを取得するための処理
-        String fileName  = Article.findFileNameFromUrl(url);
-        final int lastIndexOf = fileName.lastIndexOf("#");
-        final String innerLink = lastIndexOf != -1
-                ? HtmlUtil.tagEscape(fileName.substring(lastIndexOf)) : "";
-        // (140112) 内部リンク追加
-        if (lastIndexOf != -1) {
-            fileName  = fileName.substring(0, lastIndexOf);
-        }
-        final File file = new File(Config.get(Config.Key.ARTICLE_DIR), fileName);
-        if (!fileName.endsWith(".html")
-                && !FileUtil.isImageFile(fileName)
-                //&& (url.startsWith("file://") || url.startsWith(Defines.ARTICLE_URL_PREFIX) )
-                ){
-            if (Config.article == null) {
-                Config.article = new Article(file);
-            } else {
-                Config.article.replace(file);
-            }
-
-            if (!file.exists()){
-                // 存在しないファイルの場合はエディタを呼び出す。
-                callEditor();
-            }
-
-            if (articleGenerator == null) {
-                return;
-            }
-            // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
-            articleGenerator.generateArticleFile();
-            urlText.setText(Config.article.toInternalUrl());
-            // タブが入れ替わった可能性があるので、もう1回取得.
-            final WebEngine engine = getCurrentWebView().get().getEngine();
-            Platform.runLater(() -> {
-                final Object script = engine.executeScript("window.pageYOffset;");
-                final int yOffset
-                    = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
-                engine.load(Defines.findInstallDir() + Defines.TEMP_FILE_NAME + innerLink);
-                urlText.setText(url);
-                setTitleOnToolbar();
-                Config.article.yOffset = isReload ? yOffset : 0;
-            });
-            // deep copy を渡す.
-            addHistory(Config.article.clone());
-            focusOn();
-        }
-    }
-
-    /**
      * 記事名をリストの先頭に追加する。
      * @param article Article Object
      */
@@ -1475,7 +1311,6 @@ public final class Controller implements Initializable {
             items.add(0, article);
         }
         FILE_WATCHER.add(article.file);
-        historyList.requestLayout();
     }
 
     /**
@@ -1490,16 +1325,6 @@ public final class Controller implements Initializable {
                 FILE_WATCHER.clear();
             })
             .build().show();
-    }
-
-    /**
-     * Make new article.
-     * <HR>
-     * (130304) 作成<BR>
-     */
-    @FXML
-    private final void makeArticle() {
-        makeContent(Article.Extension.WIKI);
     }
 
     /**
@@ -1520,7 +1345,7 @@ public final class Controller implements Initializable {
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
         input.setPromptText(newArticleMessage);
         new AlertDialog.Builder(getParent())
-                .setTitle("新記事作成")
+                .setTitle("Make new article")
                 .setMessage(newArticleMessage)
                 .addControl(input)
                 .build().show();
@@ -1573,7 +1398,7 @@ public final class Controller implements Initializable {
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
         new AlertDialog.Builder(parent)
-            .setTitle("記事名変更").setMessage(renameMessage)
+            .setTitle("Rename article").setMessage(renameMessage)
             .addControl(input)
             .setOnPositive("OK", () ->{
                 final String newTitle = input.getText();
@@ -1608,16 +1433,16 @@ public final class Controller implements Initializable {
                     }
                     AlertDialog.showMessage(parent, title, message);
                     Config.article.replace(dest);
-                    loadUrl(Config.article.toInternalUrl());
+                    getCurrentTab().loadUrl(Config.article.toInternalUrl());
                     removeHistory(new Article(file));
                     loadArticleList();
                     return;
                 }
                 if (isCopy) {
-                    title   = "コピー失敗";
+                    title   = "Copy failed";
                     message = "ファイルのコピーに失敗しました。";
                 } else {
-                    title   = "変更失敗";
+                    title   = "Rename failed";
                     message = "ファイル名の変更に失敗しました。";
                 }
                 AlertDialog.showMessage(parent, title, message);
@@ -1644,7 +1469,7 @@ public final class Controller implements Initializable {
             return;
         }
         new AlertDialog.Builder(parent)
-            .setTitle("ファイルの削除")
+            .setTitle("Delete file")
             .setMessage(deleteTarget + " を削除しますか？")
             .setOnPositive("OK", () -> {
                 article.file.delete();
@@ -1652,7 +1477,7 @@ public final class Controller implements Initializable {
                 // (130317)
                 final String homePath = Config.get(Config.Key.HOME);
                 // 削除後はホーム画面に戻す
-                loadUrl(homePath);
+                getCurrentTab().loadUrl(homePath);
                 // (130309) そしてファイル一覧から削除
                 articleList.getItems().remove(deleteTarget);
                 removeHistory(article);
@@ -1712,24 +1537,13 @@ public final class Controller implements Initializable {
      * Return current tab.
      * @return current tab.
      */
-    private final Tab getCurrentTab() {
-        return tabPane.getTabs().get(tabPane.getSelectionModel().getSelectedIndex());
-    }
-
-    /**
-     * Return WebView object in current tab。
-     * @return WebView object(Optional)
-     */
-    protected final Optional<WebView> getCurrentWebView() {
-        final int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
-        if (selectedIndex == -1) {
-            return Optional.empty();
+    private final ReloadableTab getCurrentTab() {
+        final Tab tab = tabPane.getTabs().get(tabPane.getSelectionModel().getSelectedIndex());
+        if (!(tab instanceof ReloadableTab)) {
+            LOGGER.warn("Not instance Tab");
+            return null;
         }
-
-        final Node content = tabPane.getTabs().get(selectedIndex).getContent();
-        return content instanceof WebView
-                ? Optional.of((WebView) content)
-                : Optional.empty();
+        return (ReloadableTab) tab;
     }
 
     /**
@@ -1737,7 +1551,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void readUrlText(final ActionEvent event) {
-        loadUrl(urlText.getText());
+        getCurrentTab().loadUrl(urlText.getText());
     }
 
     /**
@@ -1751,12 +1565,12 @@ public final class Controller implements Initializable {
         new AlertDialog.Builder(getParent())
             .setTitle("PDF印刷").setMessage("PDFへの印刷を実行しますか？")
             .setOnPositive("OK", () -> {
-                final Optional<WebView> wv = getCurrentWebView();
-                if (!wv.isPresent()) {
+                final ReloadableTab tab = getCurrentTab();
+                if (!tab.canLoadUrl()) {
                     return;
                 }
                 final Printer printer = Printer.getDefaultPrinter();
-                if(printer == null) {
+                if (printer == null) {
                     LOGGER.warn("printe is null");
                     return;
                 } else {
@@ -1775,7 +1589,7 @@ public final class Controller implements Initializable {
                 }
                 job.getJobSettings().setJobName(Config.get(Config.Key.APP_TITLE));
                 LOGGER.info("jobName [{}]\n", job.getJobSettings().getJobName());
-                wv.get().getEngine().print(job);
+                tab.print(job);
                 job.endJob();
                 AlertDialog.showMessage(getParent(), "Complete print to PDF", "PDF印刷が正常に完了しました。");
             }).build().show();
@@ -1868,8 +1682,7 @@ public final class Controller implements Initializable {
                 FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
                 );
         articleGenerator.generateHtml(log, "LogViewer");
-        openWebTab();
-        loadDefaultFile();
+        openWebTab("LogViewer", Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1884,10 +1697,11 @@ public final class Controller implements Initializable {
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
-        sideMenuController.setOnWordCloud(this::openSpecifiedTab);
+        sideMenuController.setOnWordCloud(this::openContentTab);
         sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
-        sideMenuController.setOnConvertMd(this::openSpecifiedTab);
+        sideMenuController.setOnConvertMd(this::openContentTab);
         sideMenuController.setOnOpenLogViewer(this::openLogViewer);
+        sideMenuController.setOnMakeArticle(this::makeContent);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);
         sideMenuController.setOnDelete(this::callDelete);
@@ -1896,8 +1710,9 @@ public final class Controller implements Initializable {
             this.stage.close();
             System.exit(0);
         });
-        sideMenuController.setOnOpenScriptRunner(this::openSpecifiedTab);
+        sideMenuController.setOnOpenScriptRunner(this::openContentTab);
         sideMenuController.setOnOpenTools(this::switchRightDrawer);
+        sideMenuController.setOnPopup(this::setStatus);
     }
 
     /**
@@ -1905,15 +1720,16 @@ public final class Controller implements Initializable {
      */
     protected void setupToolMenu() {
         toolsController.init(this.stage);
-        toolsController.setOnDrawChart(this::openSpecifiedTab);
-        toolsController.setFlux(Flux.<WebView>create(emitter ->
+        toolsController.setOnDrawChart(this::openContentTab);
+        toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {
                     if (prevTab != null && prevTab.getContent() instanceof WebView) {
                         final WebView prev = (WebView) prevTab.getContent();
                         prev.zoomProperty().unbind();
                     }
-                    getCurrentWebView().ifPresent(emitter::next);;
+
+                    emitter.next(getCurrentTab().zoomProperty());
                 })
         ));
     }
@@ -1927,9 +1743,9 @@ public final class Controller implements Initializable {
             return;
         }
 
-        articleGenerator.generateHtml(articleGenerator.md2Html(PATH_ABOUT_APP), "About");
-        openWebTab();
-        loadDefaultFile();
+        final String title = "About";
+        articleGenerator.generateHtml(articleGenerator.md2Html(PATH_ABOUT_APP), title);
+        openWebTab(title, Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
@@ -1937,10 +1753,19 @@ public final class Controller implements Initializable {
      * @param title tab's title
      * @param content tab's content(Pane)
      */
-    private void openSpecifiedTab(final String title, final Pane content) {
-        final Tab tab = makeClosableTab(title);
-        tab.setContent(content);
-        openTab(tab);
+    private void openContentTab(final String title, final Pane content) {
+        openTab(makeContentTab(title, content));
+    }
+
+    /**
+     * Make ContentTab.
+     * @param title
+     * @param content
+     * @return ContentTab
+     */
+    private ContentTab makeContentTab(final String title, final Pane content) {
+        return new ContentTab.Builder()
+                .setTitle(title).setContent(content).setOnClose(this::closeTab).build();
     }
 
     /**
@@ -1948,8 +1773,7 @@ public final class Controller implements Initializable {
      * @param title tab's title
      */
     private void openExternalWebContent(final String title) {
-        openWebTab(title);
-        loadDefaultFile();
+        openWebTab(title, Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**

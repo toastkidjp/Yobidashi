@@ -14,13 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,6 @@ import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Config.Key;
 import jp.toastkid.wiki.models.Defines;
-import jp.toastkid.wiki.models.ViewTemplate;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -139,44 +135,54 @@ public final class ArticleGenerator {
             final String title,
             final boolean isTool
             ) {
-        final ViewTemplate template = ViewTemplate.parse(Config.get("viewTemplate"));
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
-        final String processed = post.process(content);
-        final String subheading = post.generateSubheadings(template);
+        final String processed   = post.process(content);
+        final String subheading  = post.generateSubheadings();
         FileUtil.outPutStr(
-            ArticleGenerator.bindArgs(
-                template.getPath(),
-                new HashMap<String, String>(){
-                    /** default uid. */
-                    private static final long serialVersionUID = 1L;
-                {
-                    put("installDir",  Defines.findInstallDir());
-                    put("title",       title);
-                    put("wikiIcon",    Config.get("wikiIcon"));
-                    put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
-                    put("subheadings", subheading);
-                    put("jarPath",     getClass().getClassLoader().getResource("assets/").toString());
-                    put("content",
-                        new StringBuilder()
-                            .append("<div class=\"content-area\">")
-                            .append(LINE_SEPARATOR)
-                            .append(processed)
-                            .toString()
-                            );
-                    if (new File(USER_BACKGROUND).exists()) {
-                        final String choose = chooser.choose();
-                        final String bodyAdditional = choose.isEmpty()
-                                ? ""
-                                : String.format("style=\"background-image: url('%s');\" ", choose);
-                        put("bodyAdditional", bodyAdditional);
-                    } else {
-                        put("bodyAdditional", "");
-                    }
-                }
-            }),
+            convertHtml(title, processed, subheading),
             Defines.TEMP_FILE_NAME,
             Defines.ARTICLE_ENCODE
         );
+    }
+
+    /**
+     *
+     * @param title
+     * @param processed
+     * @param subheading
+     * @return
+     */
+    public String convertHtml(final String title, final String processed, final String subheading) {
+        return ArticleGenerator.bindArgs(
+            Defines.TEMPLATE_DIR + "/main.html",
+            new HashMap<String, String>(){
+                /** default uid. */
+                private static final long serialVersionUID = 1L;
+            {
+                put("installDir",  Defines.findInstallDir());
+                put("title",       title);
+                put("wikiIcon",    Config.get("wikiIcon"));
+                put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
+                put("subheadings", subheading);
+                put("jarPath",     getClass().getClassLoader().getResource("assets/").toString());
+                put("content",
+                    new StringBuilder()
+                        .append("<div class=\"content-area\">")
+                        .append(LINE_SEPARATOR)
+                        .append(processed)
+                        .toString()
+                        );
+                if (new File(USER_BACKGROUND).exists()) {
+                    final String choose = chooser.choose();
+                    final String bodyAdditional = choose.isEmpty()
+                            ? ""
+                            : String.format("style=\"background-image: url('%s');\" ", choose);
+                    put("bodyAdditional", bodyAdditional);
+                } else {
+                    put("bodyAdditional", "");
+                }
+            }
+        });
     }
 
     /**
@@ -447,55 +453,6 @@ public final class ArticleGenerator {
             return wiki2Html(Config.article.file.getAbsolutePath());
         }
         return "";
-    }
-
-    /**
-     * Wiki 記事をスライドに変換する.
-     * @return
-     */
-    public String convertArticle2Slide() {
-        final MutableList<String> converted = Lists.mutable.empty();
-        final StringBuilder content = new StringBuilder();
-        final StringBuilder sectitonOption = new StringBuilder();
-        converter.convertToLines(Config.article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE)
-            .forEach(str -> {
-                if (str.startsWith("{background")) {
-                    final Matcher matcher = BG_PATTERN.matcher(str);
-                    if (matcher.find()) {
-                        ArrayIterate.forEach(
-                                matcher.group(1).split(BG_STATEMENT_DELIMITER),
-                                elemPair -> {
-                                    final String[] splited = elemPair.split(BG_ELEMPAIR_DELIMITER);
-                                    switch (splited[0]) {
-                                        case "src":
-                                            sectitonOption.append("data-background-image=")
-                                                .append(splited[1]);
-                                            break;
-                                        case "repeat":
-                                            sectitonOption.append("data-background-repeat=")
-                                                .append(splited[1]);
-                                            break;
-                                    }
-                                }
-                            );
-                    }
-                    return;
-                }
-                if ((str.contains("<hr/>") || str.matches("^<h[1-6r]>.*")) && content.length() != 0) {
-                    converted.add(String.format("<section %s>%s</section>",
-                            sectitonOption.toString(), content.toString()));
-                    content.setLength(0);
-                    sectitonOption.setLength(0);
-                }
-                final String trimmed = str.startsWith("<") ? str.replace("<hr/>", "") : str;
-                if (trimmed.length() != 0) {
-                    content.append(trimmed).append(LINE_SEPARATOR);
-                }
-            });
-        if (content.length() != 0) {
-            converted.add(String.format("<section>%s</section>", content.toString()));
-        }
-        return converted.makeString(LINE_SEPARATOR);
     }
 
     /**

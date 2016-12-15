@@ -49,6 +49,7 @@ import jp.toastkid.wiki.ArticleGenerator;
 import jp.toastkid.wiki.EpubGenerator;
 import jp.toastkid.wiki.dialog.ConfigDialog;
 import jp.toastkid.wiki.lib.Wiki2Markdown;
+import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
@@ -109,6 +110,9 @@ public class SideMenuController {
     /** Command of quit this app. */
     private Runnable onQuit;
 
+    /** Action of make new article. */
+    private Consumer<Article.Extension> onMakeArticle;
+
     /** Command of copy article. */
     private Runnable onCopy;
 
@@ -133,8 +137,10 @@ public class SideMenuController {
     /** Action of open external file. */
     private Consumer<String> openExternal;
 
-    /** Action of open drawer */
+    /** Action of open drawer. */
     private Runnable switchRightDrawer;
+
+    private Consumer<String> onPopup;
 
     /**
      * バックアップ機能を呼び出す。
@@ -207,6 +213,10 @@ public class SideMenuController {
      */
     @FXML
     protected final void callFileLength() {
+        if (Config.article == null) {
+            showMessagePopup("現在表示できません。");
+            return;
+        }
         showMessageDialog("文字数計測", Config.article.makeCharCountResult());
     }
 
@@ -564,6 +574,14 @@ public class SideMenuController {
     }
 
     /**
+     * Make new article.
+     */
+    @FXML
+    private final void makeArticle() {
+        onMakeArticle.accept(Article.Extension.WIKI);
+    }
+
+    /**
      * rename article.
      */
     @FXML
@@ -588,7 +606,7 @@ public class SideMenuController {
     }
 
     /**
-     * TODO implementing
+     * Open external file.
      */
     @FXML
     private void openExternalFile() {
@@ -749,6 +767,14 @@ public class SideMenuController {
     }
 
     /**
+     * Set on make article action.
+     * @param c
+     */
+    public void setOnMakeArticle(final Consumer<Article.Extension> onMakeArticle) {
+        this.onMakeArticle = onMakeArticle;
+    }
+
+    /**
      * Set on copy command.
      * @param onCopy
      */
@@ -798,11 +824,27 @@ public class SideMenuController {
     }
 
     /**
+     * Show simple message popup.
+     * @param message message
+     */
+    private void showMessagePopup(final String message) {
+        onPopup.accept(message);
+    }
+
+    /**
      * Set on OpenTools action.
      * @param switchRightDrawer
      */
     public void setOnOpenTools(final Runnable switchRightDrawer) {
         this.switchRightDrawer = switchRightDrawer;
+    }
+
+    /**
+     * Set on popup.
+     * @param onPopup
+     */
+    public void setOnPopup(final Consumer<String> onPopup) {
+        this.onPopup = onPopup;
     }
 
 }

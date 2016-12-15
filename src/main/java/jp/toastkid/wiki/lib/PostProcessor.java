@@ -12,7 +12,7 @@ import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.models.ViewTemplate;
+import jp.toastkid.wiki.models.Article;
 
 /**
  * make insternal links and subheadings.
@@ -146,7 +146,9 @@ public class PostProcessor {
             generatedLink.append("class='redLink' ");
         }
         generatedLink
-            .append("href=\"/").append(findExtension(isMd)).append("/")
+            .append("href=\"")
+            .append(Article.INTERNAL_PROTOCOL)
+            .append(findExtension(isMd)).append("/")
             .append(bytedStr)
             .append(".").append(findExtension(isMd));
         if (StringUtils.isNotEmpty(innerLink)) {
@@ -169,14 +171,14 @@ public class PostProcessor {
      * generate subheading html from subheadings.
      * @return subheading html.
      */
-    public String generateSubheadings(final ViewTemplate template) {
+    public String generateSubheadings() {
 
         if (subheadings == null) {
             throw new IllegalStateException("Please could you call this method after processed.");
         }
 
         final StringBuilder headingHtml = new StringBuilder();
-        final String tagName = getTag(template);
+        final String tagName = "ul";
 
         final boolean notEmpty = StringUtils.isNotEmpty(tagName);
         if (notEmpty) {
@@ -197,20 +199,6 @@ public class PostProcessor {
             headingHtml.append("</").append(tagName.substring(0, 2)).append(">");
         }
         return headingHtml.toString();
-    }
-
-    /**
-     * return list tag name.
-     * @param template
-     * @return
-     */
-    private String getTag(final ViewTemplate template) {
-        switch (template.toString()) {
-            case "MATERIAL":
-                return "ul";
-            default:
-                return "ol";
-        }
     }
 
 }

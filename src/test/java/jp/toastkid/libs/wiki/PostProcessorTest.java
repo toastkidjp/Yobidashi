@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import jp.toastkid.wiki.lib.PostProcessor;
-import jp.toastkid.wiki.models.ViewTemplate;
 
 /**
  * {@link PostProcessor}'s test cases.
@@ -56,7 +55,7 @@ public class PostProcessorTest {
                 + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></a><br/>"
                 + System.lineSeparator() + "</ul>";
 
-        assertEquals(extected, processor.generateSubheadings(ViewTemplate.SECOND));
+        assertEquals(extected, processor.generateSubheadings());
     }
 
 }
