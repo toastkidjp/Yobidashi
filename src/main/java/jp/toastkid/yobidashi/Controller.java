@@ -1500,7 +1500,15 @@ public final class Controller implements Initializable {
      */
     @FXML
     public final void callEditor() {
-        final File openTarget = Config.article.file;
+
+        final ReloadableTab tab = getCurrentTab();
+        if (!(tab instanceof ArticleTab)) {
+            setStatus("This tab's content can't edit.");
+            return;
+        }
+
+        final Article article = ((ArticleTab) tab).getArticle();
+        final File openTarget = article.file;
         if (openTarget.exists()){
             openFileByEditor(openTarget);
             return;
@@ -1509,7 +1517,7 @@ public final class Controller implements Initializable {
         // (130302) ファイルが存在しない場合は、ひな形を元に新規作成する。
         try {
             openTarget.createNewFile();
-            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent());
+            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
         } catch (final IOException e) {
             LOGGER.error("Error", e);;
         }

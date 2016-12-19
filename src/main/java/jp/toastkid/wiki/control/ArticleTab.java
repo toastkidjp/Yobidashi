@@ -1,5 +1,8 @@
 package jp.toastkid.wiki.control;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -27,6 +30,7 @@ import jp.toastkid.wiki.lib.PostProcessor;
 import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Config.Key;
+import jp.toastkid.yobidashi.Controller;
 
 /**
  * Article tab.
@@ -153,7 +157,7 @@ public class ArticleTab extends BaseWebTab {
         loadWorker.stateProperty().addListener(
                 (observable, prev, next) -> {
                     final String url = engine.getLocation();
-                    System.out.println(url + " " + observable.getValue() +" " + prev.name() + " " + next.name());
+                    //System.out.println(url + " " + observable.getValue() +" " + prev.name() + " " + next.name());
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
                         return;
@@ -241,7 +245,19 @@ public class ArticleTab extends BaseWebTab {
             final int yOffset
             ) {
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
-        final String processed   = post.process(GENERATOR.wiki2Html(this.article.file.getAbsolutePath()));
+
+        final File openTarget = this.article.file;
+        if (!openTarget.exists()) {
+            try {
+                openTarget.createNewFile();
+                Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(this.article));
+            } catch (final IOException e) {
+                LOGGER.error("Error", e);;
+            }
+            Controller.openFileByEditor(openTarget);
+        }
+
+        final String processed   = post.process(GENERATOR.wiki2Html(openTarget.getAbsolutePath()));
         final String subheading  = post.generateSubheadings();
         content = GENERATOR.convertHtml(this.article.title, processed, subheading);
 

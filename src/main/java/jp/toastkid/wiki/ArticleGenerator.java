@@ -220,24 +220,24 @@ public final class ArticleGenerator {
 
     /**
      * TODO write test.
-     * @param fileName file name
+     * @param article Article object
      * @return new file's content
      */
-    public static byte[] makeNewContent() {
-        final Optional<String> ext = FileUtil.findExtension(Config.article.file);
+    public static byte[] makeNewContent(final Article article) {
+        final Optional<String> ext = FileUtil.findExtension(article.file);
         if (!ext.isPresent()) {
             throw new IllegalArgumentException();
         }
         if (Article.Extension.WIKI.text().equals(ext.get())) {
             try {
-                return newArticle(Config.article.title).getBytes(Defines.ARTICLE_ENCODE);
+                return newArticle(article.title).getBytes(Defines.ARTICLE_ENCODE);
             } catch (final UnsupportedEncodingException e) {
                 LOGGER.error("Caught error.", e);
             }
         }
         if (Article.Extension.MD.text().equals(ext.get())) {
             try {
-                return newMarkdown(Config.article.title).getBytes(Defines.ARTICLE_ENCODE);
+                return newMarkdown(article.title).getBytes(Defines.ARTICLE_ENCODE);
             } catch (final UnsupportedEncodingException e) {
                 LOGGER.error("Caught error.", e);
             }

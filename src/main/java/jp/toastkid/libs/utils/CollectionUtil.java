@@ -12,10 +12,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import jp.toastkid.libs.comparator.NumberMapComparator;
-
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
+
+import jp.toastkid.libs.comparator.NumberMapComparator;
 
 
 /**
@@ -111,9 +111,8 @@ public abstract class CollectionUtil {
         }
         final StringBuilder resBuf = new StringBuilder(100);
         final Iterator<?> iter = pieces.iterator();
-        resBuf.append(iter.next().toString());
         while(iter.hasNext()){
-            resBuf.append(glue);
+            resBuf.append(resBuf.length() != 0 ? glue : "");
             resBuf.append(iter.next().toString());
         }
         return resBuf.toString();
