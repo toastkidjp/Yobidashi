@@ -174,7 +174,7 @@ public class ArticleTab extends BaseWebTab {
                         this.setText(StringUtils.isNotBlank(title)
                                 ? title : article.title);
                         onLoad.run();
-                        final int j = Config.article.yOffset;
+                        final int j = this.article.yOffset;
                         if (j == 0) {
                             return;
                         }

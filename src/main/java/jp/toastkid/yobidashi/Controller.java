@@ -443,8 +443,6 @@ public final class Controller implements Initializable {
                                                 ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.WIKI.text()
                                                 );
                                         if (selected.exists()){
-                                            Config.article = new Article(selected);
-                                            urlText.setText(Config.article.toInternalUrl());
                                             focusOn();
                                         }
                                     }
@@ -827,7 +825,6 @@ public final class Controller implements Initializable {
      * @param article tab's article
      */
     private void openArticleTab(final Article article) {
-        LOGGER.info("call open atab " + article.title);
         openTab(makeArticleTab(article));
     }
 
@@ -844,11 +841,10 @@ public final class Controller implements Initializable {
                 .setOnOpenNewArticle(this::openArticleTab)
                 .setOnOpenUrl(this::openWebTab)
                 .setOnLoad(() -> {
-                    // 読み込んだ内容を HTML 変換し、一時ファイルに書き出し、さらにそれを読み込んで表示
-                    urlText.setText(Config.article.toInternalUrl());
+                    urlText.setText(article.toInternalUrl());
                     Platform.runLater(() -> setTitleOnToolbar(article.title));
                     // deep copy を渡す.
-                    addHistory(Config.article.clone());
+                    addHistory(article.clone());
                     focusOn();
                 })
                 .setCreatePopupHandler(this::handleCreatePopup)//TODO WebViewのあたり出来上がってから実装
@@ -1142,12 +1138,19 @@ public final class Controller implements Initializable {
             fs = new FullScreen(this.width, this.height);
         }
 
-        if (!StringUtils.equals(fs.getTitle(), Config.article.title)) {
-            fs.setTitle(Config.article.title);
-            fs.show(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
+        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
+        if (!articleOr.isPresent()) {
+            setStatus("This tab can't use full screen mode.");
             return;
         }
-        fs.show();
+        articleOr.ifPresent(article -> {
+            if (!StringUtils.equals(fs.getTitle(), article.title)) {
+                fs.setTitle(article.title);
+                fs.show(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
+                return;
+            }
+            fs.show();
+        });
     }
 
     /**
@@ -1155,7 +1158,12 @@ public final class Controller implements Initializable {
      */
     @FXML
     private void slideShow() {
-        new jp.toastkid.slideshow.Main().show(this.stage, Config.article.file.getAbsolutePath());
+        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
+        if (!articleOr.isPresent()) {
+            setStatus("This tab can't use slide show.");
+            return;
+        }
+        new jp.toastkid.slideshow.Main().show(this.stage, articleOr.get().file.getAbsolutePath());
     }
 
     /**
@@ -1287,18 +1295,20 @@ public final class Controller implements Initializable {
      * 現在選択中のファイルに ListView をフォーカスする.
      */
     private void focusOn() {
-        Platform.runLater(() -> {
-            final int indexOf = articleList.getItems().indexOf(Config.article);
-            if (indexOf != -1){
-                articleList.getSelectionModel().select(indexOf);
-                articleList.scrollTo(indexOf - FOCUS_MARGIN);
-            }
-            final int indexOfHistory = historyList.getItems().indexOf(Config.article);
-            if (indexOfHistory != -1){
-                historyList.getSelectionModel().select(indexOfHistory);
-                historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
-            }
-        });
+        Platform.runLater(() ->
+            Optional.ofNullable(getCurrentArticle()).ifPresent(article -> {
+                final int indexOf = articleList.getItems().indexOf(article);
+                if (indexOf != -1){
+                    articleList.getSelectionModel().select(indexOf);
+                    articleList.scrollTo(indexOf - FOCUS_MARGIN);
+                }
+                final int indexOfHistory = historyList.getItems().indexOf(article);
+                if (indexOfHistory != -1){
+                    historyList.getSelectionModel().select(indexOfHistory);
+                    historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
+                }
+            })
+        );
     }
 
     /**
@@ -1351,7 +1361,6 @@ public final class Controller implements Initializable {
                 .build().show();
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
-            Config.article = Article.find(ArticleGenerator.titleToFileName(newFileName) + ext.text());
             callEditor();
         }
     }
@@ -1391,7 +1400,14 @@ public final class Controller implements Initializable {
             prefix = "Copy_";
         }
         final Window parent = getParent();
-        final String currentTitle = Config.article.title;
+        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
+        if (!articleOr.isPresent()) {
+            setStatus("This tab can't rename.");
+            return;
+        }
+
+        final Article article = articleOr.get();
+        final String currentTitle = article.title;
 
         final TextField input = new TextField(prefix.concat(currentTitle));
 
@@ -1407,12 +1423,12 @@ public final class Controller implements Initializable {
                 }
                 final File dest = new File(
                         Config.get(Config.Key.ARTICLE_DIR),
-                        ArticleGenerator.titleToFileName(newTitle) + Config.article.extention()
+                        ArticleGenerator.titleToFileName(newTitle) + article.extention()
                         );
                 if (dest.exists()){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
                 }
-                final File file = Config.article.file;
+                final File file = article.file;
                 boolean success = false;
                 try {
                     success = isCopy
@@ -1432,8 +1448,8 @@ public final class Controller implements Initializable {
                         message = "ファイル名を「" + newTitle  + "」に変更しました。";
                     }
                     AlertDialog.showMessage(parent, title, message);
-                    Config.article.replace(dest);
-                    getCurrentTab().loadUrl(Config.article.toInternalUrl());
+                    article.replace(dest);
+                    getCurrentTab().loadUrl(article.toInternalUrl());
                     removeHistory(new Article(file));
                     loadArticleList();
                     return;
@@ -1459,7 +1475,12 @@ public final class Controller implements Initializable {
      */
     private final void callDelete() {
         // 削除対象のファイルオブジェクト
-        final Article article = Config.article;
+        final Optional<Article> ofNullable = getCurrentArticleOfNullable();
+        if (!ofNullable.isPresent()) {
+            setStatus("This tab's content can't delete.");
+            return;
+        }
+        final Article article = ofNullable.get();
         final String deleteTarget = article.title;
         final Window parent = getParent();
         // (130317) ファイルが存在しない場合はダイアログを出して戻る。
@@ -1552,6 +1573,28 @@ public final class Controller implements Initializable {
             return null;
         }
         return (ReloadableTab) tab;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private final Optional<Article> getCurrentArticleOfNullable() {
+        return Optional.ofNullable(getCurrentArticle());
+    }
+
+    /**
+     * Get current tab's article.
+     * @return
+     */
+    private final Article getCurrentArticle() {
+        final ReloadableTab tab = getCurrentTab();
+        if (!(tab instanceof ArticleTab)) {
+            setStatus("This tab's content can't edit.");
+            return null;
+        }
+
+        return ((ArticleTab) tab).getArticle();
     }
 
     /**
@@ -1721,6 +1764,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnOpenScriptRunner(this::openContentTab);
         sideMenuController.setOnOpenTools(this::switchRightDrawer);
         sideMenuController.setOnPopup(this::setStatus);
+        sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
     }
 
     /**

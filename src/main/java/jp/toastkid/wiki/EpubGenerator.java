@@ -8,6 +8,7 @@ import jp.toastkid.libs.epub.DocToEpub;
 import jp.toastkid.libs.epub.EpubMetaData;
 import jp.toastkid.libs.epub.PageLayout;
 import jp.toastkid.libs.epub.PageProgressDirection;
+import jp.toastkid.wiki.models.Article;
 import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wiki.models.Defines;
 
@@ -24,10 +25,10 @@ public class EpubGenerator {
      * @param isVertival
      * @param fileName
      */
-    public final void toEpub(final boolean isVertival) {
+    public final void toEpub(final Article article, final boolean isVertival) {
         final EpubMetaData meta = new EpubMetaData();
         meta.recursive = true;
-        final String convertTitle = Config.article.title;
+        final String convertTitle = article.title;
         final String author       = Config.get(Config.Key.AUTHOR);
         meta.title        = convertTitle;
         meta.subtitle     = convertTitle;

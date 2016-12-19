@@ -74,9 +74,6 @@ public final class Config {
     /** path/to/editor. contains option. */
     private static String editorPath;
 
-    /** 現在選択中の記事. */
-    public static Article article;
-
     /**
      * get property value by key.
      * @param key string

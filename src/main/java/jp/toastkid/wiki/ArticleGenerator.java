@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.impl.factory.Lists;
@@ -51,16 +50,6 @@ public final class ArticleGenerator {
 
     /** background directory. */
     private static final String USER_BACKGROUND   = Defines.USER_DIR + "/res/images/background/";
-
-    /** for use background graphic in slide. */
-    private static final String BG_STATEMENT_DELIMITER = "\\|";
-
-    /** for use background graphic in slide. */
-    private static final String BG_ELEMPAIR_DELIMITER = "=";
-
-    /** for use background graphic in slide. */
-    private static final Pattern BG_PATTERN
-        = Pattern.compile("\\{background:(.+?)\\}", Pattern.DOTALL);
 
     /** Markdown Converter. */
     private static final Marked MARKED = new MarkedBuilder().gfm(true).build();
@@ -435,22 +424,24 @@ public final class ArticleGenerator {
 
     /**
      * generate article file.
+     * @param article
      */
-    public void generateArticleFile() {
-        generateHtml(convertArticle(Config.article.extention()), Config.article.title);
+    public void generateArticleFile(final Article article) {
+        generateHtml(convertArticle(article), article.title);
     }
 
     /**
      * convert article to html content.
-     * @param ext file's extension.
+     * @param article
      * @return html content.
      */
-    public String convertArticle(final String ext) {
+    public String convertArticle(final Article article) {
+        final String ext = article.extention();
         if (Article.Extension.MD.text().equals(ext)) {
-            return md2Html(Config.article.file.getAbsolutePath());
+            return md2Html(article.file.getAbsolutePath());
         }
         if (Article.Extension.WIKI.text().equals(ext)) {
-            return wiki2Html(Config.article.file.getAbsolutePath());
+            return wiki2Html(article.file.getAbsolutePath());
         }
         return "";
     }

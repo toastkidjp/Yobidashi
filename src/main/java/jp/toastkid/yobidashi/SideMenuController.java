@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -142,6 +143,8 @@ public class SideMenuController {
 
     private Consumer<String> onPopup;
 
+    private Supplier<Optional<Article>> articleGetter;
+
     /**
      * バックアップ機能を呼び出す。
      */
@@ -213,11 +216,12 @@ public class SideMenuController {
      */
     @FXML
     protected final void callFileLength() {
-        if (Config.article == null) {
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
             showMessagePopup("現在表示できません。");
             return;
         }
-        showMessageDialog("文字数計測", Config.article.makeCharCountResult());
+        showMessageDialog("文字数計測", optional.get().makeCharCountResult());
     }
 
     /**
@@ -266,7 +270,12 @@ public class SideMenuController {
      */
     @FXML
     public final void callConvertAobun() {
-        final String absolutePath = Config.article.file.getAbsolutePath();
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("This tab's content can't convert Aozora bunko file.");
+            return;
+        }
+        final String absolutePath = optional.get().file.getAbsolutePath();
         AobunUtils.docToTxt(absolutePath);
         showMessageDialog(
                 "Complete Converting",
@@ -284,10 +293,17 @@ public class SideMenuController {
         value.setFitToHeight(true);
         value.setFitToWidth(true);
 
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("This tab's content can't generate word cloud.");
+            return;
+        }
+
         wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
                         .setMinFontSize(8.0).build();
-        wordCloud.draw(pane, Config.article.file);
-        tabAction.open(Config.article.title + "のワードクラウド", pane);
+        final Article article = optional.get();
+        wordCloud.draw(pane, article.file);
+        tabAction.open(article.title + "のワードクラウド", pane);
     }
     /**
      * call About.
@@ -452,6 +468,13 @@ public class SideMenuController {
      */
     @FXML
     private void callConvertMd() {
+
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("This tab's content can't convert to Markdown.");
+            return;
+        }
+
         final CodeArea pane = new CodeArea();
         pane.setParagraphGraphicFactory(LineNumberFactory.get(pane));
 
@@ -459,16 +482,17 @@ public class SideMenuController {
         pane.setPrefWidth(prefWidth);
         pane.setPrefHeight(stage.getHeight());
 
+        final Article article = optional.get();
         try {
             pane.replaceText(CollectionUtil.implode(
-                    Wiki2Markdown.convert(Files.readAllLines(Config.article.file.toPath()))
+                    Wiki2Markdown.convert(Files.readAllLines(article.file.toPath()))
                     ));
         } catch (final IOException e) {
             LOGGER.error("Error", e);
             showMessageDialog("IOException", e.getMessage());
             return;
         }
-        convert2Md.open("[MD] " + Config.article.title, new AnchorPane(pane));
+        convert2Md.open("[MD] " + article.title, new AnchorPane(pane));
     }
 
     /**
@@ -547,14 +571,15 @@ public class SideMenuController {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    new EpubGenerator().toEpub(vertically.isSelected());
+                                    articleGetter.get().ifPresent(article ->
+                                        new EpubGenerator().toEpub(article, vertically.isSelected()));
                                     return 100;
                                 }
                             })
                             .build();
                     pd.start(stage);
                 }).build().show()
-                );
+            );
     }
 
     /**
@@ -845,6 +870,14 @@ public class SideMenuController {
      */
     public void setOnPopup(final Consumer<String> onPopup) {
         this.onPopup = onPopup;
+    }
+
+    /**
+     * Set current article getter.
+     * @param articleGetter
+     */
+    public void setCurrentArticleGetter(final Supplier<Optional<Article>> articleGetter) {
+        this.articleGetter = articleGetter;
     }
 
 }
