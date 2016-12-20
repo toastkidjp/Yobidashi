@@ -100,7 +100,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * JavaFX WikiClient's Controller.
+ * Yobidashi's primary Controller.
  *
  * @author Toast kid
  */
@@ -1520,7 +1520,7 @@ public final class Controller implements Initializable {
      * エディタを呼び出す.
      */
     @FXML
-    public final void callEditor() {
+    private final void callEditor() {
 
         final ReloadableTab tab = getCurrentTab();
         if (!(tab instanceof ArticleTab)) {
@@ -1585,16 +1585,11 @@ public final class Controller implements Initializable {
 
     /**
      * Get current tab's article.
-     * @return
+     * @return If tab contains article, its article. else null.
      */
     private final Article getCurrentArticle() {
         final ReloadableTab tab = getCurrentTab();
-        if (!(tab instanceof ArticleTab)) {
-            setStatus("This tab's content can't edit.");
-            return null;
-        }
-
-        return ((ArticleTab) tab).getArticle();
+        return tab instanceof ArticleTab ? ((ArticleTab) tab).getArticle() : null;
     }
 
     /**

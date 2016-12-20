@@ -677,7 +677,7 @@ public class SideMenuController {
 
     /**
      * Set open tab command.
-     * @param edit Command
+     * @param open tab Command
      */
     protected void setOnNewTab(final Runnable command) {
         this.open = command;
@@ -685,7 +685,7 @@ public class SideMenuController {
 
     /**
      * Set close tab command.
-     * @param edit Command
+     * @param close tab Command
      */
     protected void setOnCloseTab(final Runnable command) {
         this.close = command;
