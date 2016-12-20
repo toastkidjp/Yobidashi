@@ -20,6 +20,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXListView;
 
@@ -51,6 +53,9 @@ import jp.toastkid.wiki.models.Article;
  *
  */
 public final class ArticleSearcher {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArticleSearcher.class);
 
     /** Header pane's style. */
     private static final String HEADER_BACKGROUND_STYLE = "-fx-background-color: rgba(244, 244, 245, 0.88);";
@@ -191,24 +196,31 @@ public final class ArticleSearcher {
         final ProgressDialog pd = new ProgressDialog.Builder().setCommand(new Task<Integer>(){
 
             @Override
-            protected Integer call() throws Exception {
-                final long start = System.currentTimeMillis();
-                lastFilenum      = 0;
-                searchResultMap  = Maps.mutable.empty();
-                max = 0;
-                progress = new SimpleDoubleProperty();
-                progress.addListener((prev, next, v) -> {
-                    updateProgress(v.doubleValue(), max);
-                    updateMessage(String.format("Search in progress... %d / %d", v.intValue(), max));
-                });
-                dirSearch(dirPath, pQuery);
-                // 検索にかかった時間
-                lastSearchTime   = System.currentTimeMillis() - start;
-                makeResultTab(pQuery);
-                final String message = "Done：" + lastSearchTime + "[ms]";
-                updateMessage(message);
-                successAction.accept(message);
-                updateProgress(100, 100);
+            protected Integer call() {
+                try {
+                    final long start = System.currentTimeMillis();
+                    lastFilenum      = 0;
+                    searchResultMap  = Maps.mutable.empty();
+                    max = 0;
+                    progress = new SimpleDoubleProperty();
+                    progress.addListener((prev, next, v) -> {
+                        updateProgress(v.doubleValue(), max);
+                        updateMessage(String.format("Search in progress... %d / %d", v.intValue(), max));
+                    });
+                    dirSearch(dirPath, pQuery);
+                    // 検索にかかった時間
+                    lastSearchTime   = System.currentTimeMillis() - start;
+                    makeResultTab(pQuery);
+                    final String message = "Done：" + lastSearchTime + "[ms]";
+                    updateMessage(message);
+                    successAction.accept(message);
+                    updateProgress(100, 100);
+                    done();
+                } catch (final Exception e) {
+                    LOGGER.error("Caught exception.", e);
+                    updateProgress(100, 100);
+                    failed();
+                }
                 return 100;
             }
 
@@ -276,7 +288,7 @@ public final class ArticleSearcher {
             .reject(invalidElement(size))
             .each(  elem -> searchResultMap.put(elem.getFilePath(), elem.getResult()));
         if (searchResultMap.isEmpty()) {
-            emptyAction.run();
+            Platform.runLater(emptyAction::run);
             return;
         }
     }
