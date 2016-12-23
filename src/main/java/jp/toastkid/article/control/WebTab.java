@@ -98,15 +98,16 @@ public class WebTab extends BaseWebTab {
         this.setContent(wv);
         final WebEngine engine = wv.getEngine();
         engine.getLoadWorker().stateProperty().addListener((value, prev, next) -> {
+
+            if (State.CANCELLED.equals(value.getValue())) {
+                hideSpinner();
+            }
+
             if (State.SUCCEEDED.equals(value.getValue())) {
                 setText(engine.getTitle());
                 hideSpinner();
             }
         });
-
-        if (State.CANCELLED.equals(observable.getValue())) {
-            hideSpinner();
-        }
 
         if (StringUtils.isNotBlank(b.content)) {
             wv.getEngine().loadContent(b.content, b.contentType.getText());
