@@ -104,6 +104,10 @@ public class WebTab extends BaseWebTab {
             }
         });
 
+        if (State.CANCELLED.equals(observable.getValue())) {
+            hideSpinner();
+        }
+
         if (StringUtils.isNotBlank(b.content)) {
             wv.getEngine().loadContent(b.content, b.contentType.getText());
             return;

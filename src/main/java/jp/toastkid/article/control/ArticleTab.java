@@ -185,6 +185,10 @@ public class ArticleTab extends BaseWebTab {
                         return;
                     }
 
+                    if (State.CANCELLED.equals(observable.getValue())) {
+                        hideSpinner();
+                    }
+
                     if (State.SUCCEEDED.equals(observable.getValue())) {
                         final String title = engine.getTitle();
                         this.setText(StringUtils.isNotBlank(title) ? title : article.title);
