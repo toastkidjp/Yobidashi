@@ -4,10 +4,13 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.jfoenix.controls.JFXSpinner;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -25,6 +28,9 @@ public abstract class BaseWebTab extends ReloadableTab {
     /** WebView. */
     private final WebView wv;
 
+    /** Loading indicator. */
+    private final JFXSpinner spinner;
+
     /**
      *
      * @param title
@@ -35,6 +41,8 @@ public abstract class BaseWebTab extends ReloadableTab {
         super(title, content, closeAction);
         wv = new WebView();
         Optional.ofNullable(getHandler()).ifPresent(wv.getEngine()::setCreatePopupHandler);
+        spinner = new JFXSpinner();
+        this.setGraphic(new HBox(this.getGraphic(), spinner));
     }
 
     /**
@@ -141,6 +149,14 @@ public abstract class BaseWebTab extends ReloadableTab {
      */
     public WebView getWebView() {
         return wv;
+    }
+
+    /**
+     * Hide spinner.
+     */
+    protected void hideSpinner() {
+        spinner.setVisible(false);
+        spinner.setManaged(false);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javafx.concurrent.Worker.State;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
@@ -95,6 +96,14 @@ public class WebTab extends BaseWebTab {
         this.handler = b.handler;
         wv = getWebView();
         this.setContent(wv);
+        final WebEngine engine = wv.getEngine();
+        engine.getLoadWorker().stateProperty().addListener((value, prev, next) -> {
+            if (State.SUCCEEDED.equals(value.getValue())) {
+                setText(engine.getTitle());
+                hideSpinner();
+            }
+        });
+
         if (StringUtils.isNotBlank(b.content)) {
             wv.getEngine().loadContent(b.content, b.contentType.getText());
             return;

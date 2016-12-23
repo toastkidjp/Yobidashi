@@ -194,6 +194,7 @@ public class ArticleTab extends BaseWebTab {
                             return;
                         }
                         engine.executeScript(String.format("window.scrollTo(0, %d);", j));
+                        hideSpinner();
                     }
                 });
 
