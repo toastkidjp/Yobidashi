@@ -74,6 +74,20 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.FullScreen;
+import jp.toastkid.article.control.ArticleListCell;
+import jp.toastkid.article.control.ArticleTab;
+import jp.toastkid.article.control.BaseWebTab;
+import jp.toastkid.article.control.ContentTab;
+import jp.toastkid.article.control.ReloadableTab;
+import jp.toastkid.article.control.WebTab;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Article.Extension;
+import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.ContentType;
+import jp.toastkid.article.models.Defines;
+import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.Style;
@@ -82,19 +96,6 @@ import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.FullScreen;
-import jp.toastkid.wiki.control.ArticleListCell;
-import jp.toastkid.wiki.control.ArticleTab;
-import jp.toastkid.wiki.control.BaseWebTab;
-import jp.toastkid.wiki.control.ContentTab;
-import jp.toastkid.wiki.control.ReloadableTab;
-import jp.toastkid.wiki.control.WebTab;
-import jp.toastkid.wiki.models.Article;
-import jp.toastkid.wiki.models.Article.Extension;
-import jp.toastkid.wiki.models.Config;
-import jp.toastkid.wiki.models.Defines;
-import jp.toastkid.wiki.search.ArticleSearcher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -114,9 +115,6 @@ public final class Controller implements Initializable {
 
     /** /path/to/log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
-
-    /** /path/to/path to about file. */
-    private static final String PATH_ABOUT_APP   = "README.md";
 
     /** /path/to/path to bookmark file. */
     private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
@@ -440,7 +438,7 @@ public final class Controller implements Initializable {
                                         // (130317) 「現在選択中のファイル名」にセット
                                         final File selected = new File(
                                                 Config.get(Config.Key.ARTICLE_DIR),
-                                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.WIKI.text()
+                                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
                                                 );
                                         if (selected.exists()){
                                             focusOn();
@@ -718,7 +716,7 @@ public final class Controller implements Initializable {
         }
 
         final String htmlSource = ((BaseWebTab) tab).htmlSource();
-        openWebTabWithContent(tab.getTitle().concat("'s HTML Source"), htmlSource, "text/plain");
+        openWebTabWithContent(tab.getTitle().concat("'s HTML Source"), htmlSource, ContentType.TEXT);
     }
 
     /**
@@ -790,6 +788,7 @@ public final class Controller implements Initializable {
 
         final Pane sdRoot = speedDialController.getRoot();
         sdRoot.setPrefWidth(width * 0.8);
+        sdRoot.setPrefHeight(tabPane.getHeight());
         openTab(new ContentTab.Builder().setTitle("Speed Dial")
                 .setContent(sdRoot).setOnClose(this::closeTab).build());
     }
@@ -857,7 +856,8 @@ public final class Controller implements Initializable {
      * @return
      */
     private WebEngine handleCreatePopup(final PopupFeatures popupFeature) {
-        final ArticleTab tab = makeArticleTab(new Article(new File("")));
+        System.out.println("Open new tab from popup");
+        final WebTab tab = new WebTab.Builder().setTitle("").build();
         tabPane.getSelectionModel().selectLast();
         return tab.getWebView().getEngine();
     }
@@ -875,17 +875,17 @@ public final class Controller implements Initializable {
      * Open new web tab for view html content.
      * @param title
      * @param content
-     * @param mimetype
+     * @param contentType
      */
     private void openWebTabWithContent(
             final String title,
             final String content,
-            final String mimetype
+            final ContentType contentType
             ) {
         final WebTab tab = new WebTab.Builder()
                 .setTitle(title)
                 .setContent(content)
-                .setMimetype(mimetype)
+                .setContentType(contentType)
                 .setOnClose(this::closeTab)
                 .build();
         openTab(tab);
@@ -1285,7 +1285,7 @@ public final class Controller implements Initializable {
             .subscribe(
                 empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
                     .collect(ArticleGenerator::titleToFileName)
-                    .collect(fileName -> fileName + ".txt")
+                    .collect(fileName -> fileName + Article.Extension.MD.text())
                     .collect(Article::find)
                     .each(bookmarks::add)
                     );
@@ -1745,13 +1745,11 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openContentTab);
         sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
-        sideMenuController.setOnConvertMd(this::openContentTab);
         sideMenuController.setOnOpenLogViewer(this::openLogViewer);
         sideMenuController.setOnMakeArticle(this::makeContent);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);
         sideMenuController.setOnDelete(this::callDelete);
-        sideMenuController.setOnAbout(this::about);
         sideMenuController.setOnQuit(() -> {
             this.stage.close();
             System.exit(0);
@@ -1760,6 +1758,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnOpenTools(this::switchRightDrawer);
         sideMenuController.setOnPopup(this::setStatus);
         sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
+        sideMenuController.setOpenTabWithHtmlContent(this::openWebTabWithContent);
     }
 
     /**
@@ -1779,20 +1778,6 @@ public final class Controller implements Initializable {
                     emitter.next(getCurrentTab().zoomProperty());
                 })
         ));
-    }
-
-    /**
-     * Show about this app.
-     */
-    private void about() {
-        if (!new File(PATH_ABOUT_APP).exists()) {
-            LOGGER.warn(new File(PATH_ABOUT_APP).getAbsolutePath() + " is not exists.");
-            return;
-        }
-
-        final String title = "About";
-        articleGenerator.generateHtml(articleGenerator.md2Html(PATH_ABOUT_APP), title);
-        openWebTab(title, Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**

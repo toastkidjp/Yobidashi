@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
-import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.article.models.Defines;
 
 /**
  * JavaFX stylesheet definition.

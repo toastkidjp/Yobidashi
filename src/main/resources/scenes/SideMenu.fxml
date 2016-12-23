@@ -66,7 +66,6 @@
               <MenuLabel onAction="#openNoodleTimer" text="Noodle Timer" />
               <MenuLabel onAction="#openNameGenerator" text="Name Generator" />
               <MenuLabel onAction="#openCssGenerator" text="CSS Generator" />
-              <MenuLabel onAction="#callConvertMd" text="Convert to Markdown" />
               <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
               <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
               <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
@@ -92,7 +91,8 @@
           <content>
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" fx:id="help">
               <MenuLabel onAction="#callApplicationState" text="Application state" />
-              <MenuLabel onAction="#callAbout" text="About" />
+              <MenuLabel onAction="#about" text="About" />
+              <MenuLabel onAction="#license" text="License" />
             </JFXListView>
           </content>
         </Tab>

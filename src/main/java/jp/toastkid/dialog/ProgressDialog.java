@@ -15,8 +15,8 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import jp.toastkid.wiki.ImageChooser;
-import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.article.ImageChooser;
+import jp.toastkid.article.models.Defines;
 
 /**
  * Progress dialog.

@@ -13,10 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.models.Article;
-import jp.toastkid.wiki.models.Defines;
 
 /**
  * 日記から家計簿の部分を取り出し、計算する。

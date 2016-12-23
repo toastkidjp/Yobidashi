@@ -209,7 +209,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.wiki.ArticleGenerator#titleToFileName(java.lang.String)} 's test method.
+     * {@link jp.toastkid.article.ArticleGenerator#titleToFileName(java.lang.String)} 's test method.
      */
     @Ignore
     public final void testToBytedString_EUC_JP() {
@@ -217,7 +217,7 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.wiki.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} 's test method.
+     * {@link jp.toastkid.article.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} 's test method.
      */
     @Ignore
     public final void testDecodeBytedStr() {

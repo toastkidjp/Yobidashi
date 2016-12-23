@@ -3,17 +3,18 @@ package jp.toastkid.yobidashi;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
+import org.reactfx.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,46 +25,54 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import jp.toastkid.article.ApplicationState;
+import jp.toastkid.article.Archiver;
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.EpubGenerator;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.ContentType;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
-import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.wiki.ApplicationState;
-import jp.toastkid.wiki.Archiver;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.EpubGenerator;
-import jp.toastkid.wiki.dialog.ConfigDialog;
-import jp.toastkid.wiki.lib.Wiki2Markdown;
-import jp.toastkid.wiki.models.Article;
-import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
+import jp.toastkid.yobidashi.dialog.ConfigDialog;
 
 /**
  * Side menu's controller.
  *
  * @author Toast kid
  */
-public class SideMenuController {
+public class SideMenuController implements Initializable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SideMenuController.class);
+
+    /** /path/to/about_file. */
+    private static final String PATH_ABOUT_APP = "README.md";
+
+    /** /path/to/license */
+    private static final String PATH_LICENSE   = "LICENSE";
+
+    /** Article Generator. */
+    private ArticleGenerator articleGenerator;
 
     /** menu tabs. */
     @FXML
@@ -99,12 +108,6 @@ public class SideMenuController {
     /** Command of preview. */
     private Runnable preview;
 
-    /** Command of converting to Markdown. */
-    private OpenTabAction convert2Md;
-
-    /** Command of showing about page. */
-    private Runnable about;
-
     /** Command of showing log viewer. */
     private Runnable log;
 
@@ -132,27 +135,29 @@ public class SideMenuController {
     /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
 
-    /** Article Generator. */
-    private ArticleGenerator articleGenerator;
-
     /** Action of open external file. */
     private Consumer<String> openExternal;
 
     /** Action of open drawer. */
     private Runnable switchRightDrawer;
 
+    /** Action of popup text. */
     private Consumer<String> onPopup;
 
+    /** Article's getter. */
     private Supplier<Optional<Article>> articleGetter;
 
+    /** Action open tab with html content. */
+    private TriConsumer<String, String, ContentType> openTabWithHtmlContent;
+
     /**
-     * バックアップ機能を呼び出す。
+     * Call back up method.
      */
     @FXML
     private final void callBackUp(final ActionEvent event) {
         final Window parent = getParent().get();
         new AlertDialog.Builder(parent)
-            .setTitle("バックアップ")
+            .setTitle("Backup")
             .setMessage("この処理には時間がかかります。")
             .setOnPositive("OK", () -> {
                 new ProgressDialog.Builder()
@@ -305,12 +310,43 @@ public class SideMenuController {
         wordCloud.draw(pane, article.file);
         tabAction.open(article.title + "のワードクラウド", pane);
     }
+
     /**
-     * call About.
+     * Call About.
      */
     @FXML
-    private final void callAbout() {
-        about.run();
+    private final void about() {
+        openStaticFileWithConverting(PATH_ABOUT_APP, "About");
+    }
+
+    /**
+     * Call License.
+     */
+    @FXML
+    private final void license() {
+        openTabWithHtmlContent.accept(
+                "License",
+                FileUtil.readLines(PATH_LICENSE, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                ContentType.TEXT
+                );
+    }
+
+    /**
+     * Open static file with convert to html.
+     * @param pathToFile
+     * @param title
+     */
+    private void openStaticFileWithConverting(final String pathToFile, final String title) {
+        final File file = new File(pathToFile);
+        if (!file.exists()) {
+            LOGGER.warn(file.getAbsolutePath() + " is not exists.");
+            return;
+        }
+        this.openTabWithHtmlContent.accept(
+                title,
+                articleGenerator.decorate(title, file),
+                ContentType.HTML
+                );
     }
 
     /**
@@ -464,38 +500,6 @@ public class SideMenuController {
     }
 
     /**
-     * Convert current article to Markdown.
-     */
-    @FXML
-    private void callConvertMd() {
-
-        final Optional<Article> optional = articleGetter.get();
-        if (!optional.isPresent()) {
-            showMessagePopup("This tab's content can't convert to Markdown.");
-            return;
-        }
-
-        final CodeArea pane = new CodeArea();
-        pane.setParagraphGraphicFactory(LineNumberFactory.get(pane));
-
-        final double prefWidth = stage.getWidth() * 0.8;
-        pane.setPrefWidth(prefWidth);
-        pane.setPrefHeight(stage.getHeight());
-
-        final Article article = optional.get();
-        try {
-            pane.replaceText(CollectionUtil.implode(
-                    Wiki2Markdown.convert(Files.readAllLines(article.file.toPath()))
-                    ));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            showMessageDialog("IOException", e.getMessage());
-            return;
-        }
-        convert2Md.open("[MD] " + article.title, new AnchorPane(pane));
-    }
-
-    /**
      * Show log viewer.
      */
     @FXML
@@ -603,7 +607,7 @@ public class SideMenuController {
      */
     @FXML
     private final void makeArticle() {
-        onMakeArticle.accept(Article.Extension.WIKI);
+        onMakeArticle.accept(Article.Extension.MD);
     }
 
     /**
@@ -635,11 +639,6 @@ public class SideMenuController {
      */
     @FXML
     private void openExternalFile() {
-
-        if (articleGenerator == null) {
-            articleGenerator = new ArticleGenerator();
-        }
-
         final FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File("."));
         final File result = fc.showOpenDialog(stage.getScene().getWindow());
@@ -650,21 +649,24 @@ public class SideMenuController {
         final StringBuilder content = new StringBuilder();
         FileUtil.findExtension(result).ifPresent(ext -> {
             switch (ext) {
+                // TODO 実装を考え直す. 多分そのまま開いた方がよい
                 case ".txt":
-                case ".wiki":
-                    content.append(articleGenerator.wiki2Html(result.getAbsolutePath()));
+                    openTabWithHtmlContent.accept(
+                            result.getAbsolutePath(),
+                            FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                            ContentType.TEXT
+                            );
                     break;
                 case ".md":
-                    content.append(articleGenerator.md2Html(result.getAbsolutePath()));
+                    content.append(articleGenerator.convertToHtml(result));
+                    if (content.length() == 0) {
+                        return;
+                    }
+                    articleGenerator.generateHtml(content.toString(), result.getAbsolutePath());
+                    openExternal.accept(result.getAbsolutePath());
                     break;
             }
         });
-
-        if (content.length() == 0) {
-            return;
-        }
-        articleGenerator.generateHtml(content.toString(), result.getAbsolutePath());
-        openExternal.accept(result.getAbsolutePath());
     }
 
     /**
@@ -732,14 +734,6 @@ public class SideMenuController {
     }
 
     /**
-     * Set convert command.
-     * @param convert2Md command.
-     */
-    protected void setOnConvertMd(final OpenTabAction convert2Md) {
-        this.convert2Md = convert2Md;
-    }
-
-    /**
      * for use shortcut when start-up.
      */
     private void putAccerelator() {
@@ -765,14 +759,6 @@ public class SideMenuController {
     protected void setStage(final Stage stage) {
         this.stage  = stage;
         putAccerelator();
-    }
-
-    /**
-     * Set "About" command.
-     * @param about command
-     */
-    protected void setOnAbout(final Runnable about) {
-        this.about = about;
     }
 
     /**
@@ -878,6 +864,20 @@ public class SideMenuController {
      */
     public void setCurrentArticleGetter(final Supplier<Optional<Article>> articleGetter) {
         this.articleGetter = articleGetter;
+    }
+
+    /**
+     * Set openTabWithHtmlContent.
+     * @param openTabWithHtmlContent
+     */
+    public void setOpenTabWithHtmlContent(
+            final TriConsumer<String, String, ContentType> openTabWithHtmlContent) {
+        this.openTabWithHtmlContent = openTabWithHtmlContent;
+    }
+
+    @Override
+    public void initialize(final URL location, final ResourceBundle resources) {
+        articleGenerator = new ArticleGenerator();
     }
 
 }

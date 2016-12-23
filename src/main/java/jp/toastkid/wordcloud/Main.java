@@ -13,7 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.article.models.Defines;
 
 /**
  * Word cloud.
