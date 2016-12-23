@@ -92,7 +92,7 @@ public class WebServiceHelper {
             case REALTIME_SEARCH:
                 return "http://realtime.search.yahoo.co.jp/search?fr=top_ga1_sa&ei=utf-8&p=" + targetQuery;
             case WIKIPEDIA:
-                return "http://ja.wikipedia.org/wiki/Special:Search?search="
+                return "https://ja.wikipedia.org/wiki/Special:Search?search="
                         + targetQuery + "&sourceid=Mozilla-search";
             case TABELOG:
                 return "http://tabelog.com/japan/0/0/lst/?vs=1&sk="
@@ -103,7 +103,7 @@ public class WebServiceHelper {
                 return "http://dic.search.yahoo.co.jp/search?ei=UTF-8&fr=top_ga1_sa&p=" + targetQuery;
             case WEB_SEARCH:
             default:
-                return "http://search.yahoo.co.jp/search?p=" + targetQuery
+                return "https://search.yahoo.co.jp/search?p=" + targetQuery
                         + "&search.x=1&fr=top_ga1_sa&tid=top_ga1_sa&ei=UTF-8&aq=&oq=";
         }
     }
