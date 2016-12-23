@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -107,14 +106,11 @@ import reactor.core.scheduler.Schedulers;
  */
 public final class Controller implements Initializable {
 
-    /** Speed dial's scene graph file. */
-    private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
-
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
-    /** /path/to/log file. */
-    private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
+    /** Speed dial's scene graph file. */
+    private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** /path/to/path to bookmark file. */
     private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
@@ -1716,22 +1712,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Call LogViewer.
-     */
-    private final void openLogViewer() {
-        if (!new File(PATH_APP_LOG).exists()) {
-            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
-            return;
-        }
-        final String log = String.format(
-                "<pre>%s</pre>",
-                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
-                );
-        articleGenerator.generateHtml(log, "LogViewer");
-        openWebTab("LogViewer", Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
-    }
-
-    /**
      * Set stage to SideMenuController.
      */
     protected void setupSideMenu() {
@@ -1745,7 +1725,6 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openContentTab);
         sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
-        sideMenuController.setOnOpenLogViewer(this::openLogViewer);
         sideMenuController.setOnMakeArticle(this::makeContent);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);

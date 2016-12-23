@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ import jp.toastkid.article.EpubGenerator;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Config;
 import jp.toastkid.article.models.ContentType;
+import jp.toastkid.article.models.Defines;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
@@ -70,6 +72,9 @@ public class SideMenuController implements Initializable {
 
     /** /path/to/license */
     private static final String PATH_LICENSE   = "LICENSE";
+
+    /** /path/to/log file. */
+    private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
@@ -107,9 +112,6 @@ public class SideMenuController implements Initializable {
 
     /** Command of preview. */
     private Runnable preview;
-
-    /** Command of showing log viewer. */
-    private Runnable log;
 
     /** Command of quit this app. */
     private Runnable onQuit;
@@ -504,7 +506,18 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void callLogViewer() {
-        log.run();
+        if (!new File(PATH_APP_LOG).exists()) {
+            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
+            return;
+        }
+        final String log = String.format(
+                "<pre>%s</pre>",
+                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
+                );
+
+        final String title = "LogViewer";
+        openTabWithHtmlContent.accept(
+                title, articleGenerator.decorate(title, log, ""), ContentType.HTML);
     }
 
     /**
@@ -649,7 +662,6 @@ public class SideMenuController implements Initializable {
         final StringBuilder content = new StringBuilder();
         FileUtil.findExtension(result).ifPresent(ext -> {
             switch (ext) {
-                // TODO 実装を考え直す. 多分そのまま開いた方がよい
                 case ".txt":
                     openTabWithHtmlContent.accept(
                             result.getAbsolutePath(),
@@ -759,14 +771,6 @@ public class SideMenuController implements Initializable {
     protected void setStage(final Stage stage) {
         this.stage  = stage;
         putAccerelator();
-    }
-
-    /**
-     * Set "LogViewer" command.
-     * @param log command
-     */
-    protected void setOnOpenLogViewer(final Runnable log) {
-        this.log = log;
     }
 
     /**
