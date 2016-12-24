@@ -18,9 +18,9 @@ public class WebServiceHelperTest {
      */
     @Test
     public final void testTypeGetText() {
-        assertEquals("Y!辞書", Type.Y_DICTIONARY.getText());
-        assertEquals("Y!RTS", Type.REALTIME_SEARCH.getText());
-        assertEquals("食べログ", Type.TABELOG.getText());
+        assertEquals("Dictionary", Type.Y_DICTIONARY.getText());
+        assertEquals("Realtime", Type.REALTIME_SEARCH.getText());
+        assertEquals("Restaurant", Type.TABELOG.getText());
         assertEquals("Weblio", Type.WEBLIO.getText());
         assertEquals("Wikipedia", Type.WIKIPEDIA.getText());
         assertEquals("Y!", Type.WEB_SEARCH.getText());
@@ -31,9 +31,9 @@ public class WebServiceHelperTest {
      */
     @Test
     public final void testTypeFind() {
-        assertEquals(Type.Y_DICTIONARY, Type.find("Y!辞書"));
-        assertEquals(Type.REALTIME_SEARCH, Type.find("Y!RTS"));
-        assertEquals(Type.TABELOG, Type.find("食べログ"));
+        assertEquals(Type.Y_DICTIONARY, Type.find("Dictionary"));
+        assertEquals(Type.REALTIME_SEARCH, Type.find("Realtime"));
+        assertEquals(Type.TABELOG, Type.find("Restaurant"));
         assertEquals(Type.WEBLIO, Type.find("Weblio"));
         assertEquals(Type.WIKIPEDIA, Type.find("Wikipedia"));
         assertEquals(Type.WEB_SEARCH, Type.find("Y!"));
@@ -48,7 +48,7 @@ public class WebServiceHelperTest {
     @Test
     public final void testBuildRequestUrl() {
         final String expected = "https://search.yahoo.co.jp/search?p=%E3%83%88%E3%83%9E%E3%83%88"
-                + "&search.x=1&fr=top_ga1_sa&tid=top_ga1_sa&ei=UTF-8&aq=&oq=";
+                + "&search.x=1&ei=UTF-8&aq=&oq=";
         assertEquals(expected, WebServiceHelper.buildRequestUrl("トマト", Type.WEB_SEARCH));
         assertEquals(expected, WebServiceHelper.buildRequestUrl("トマト", "Y!"));
         assertEquals(expected, WebServiceHelper.buildRequestUrl("トマト", (String) null));
