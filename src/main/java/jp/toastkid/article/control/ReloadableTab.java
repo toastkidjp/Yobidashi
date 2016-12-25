@@ -94,4 +94,11 @@ public abstract class ReloadableTab extends Tab {
     protected void setCloseAction(Consumer<Tab> closeAction) {
         this.closeAction = closeAction;
     }
+
+    /**
+     * Edit current content.
+     */
+    public String edit() {
+        return "This tab's content can't edit.";
+    }
 }

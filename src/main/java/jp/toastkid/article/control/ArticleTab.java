@@ -1,5 +1,6 @@
 package jp.toastkid.article.control;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +31,6 @@ import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Config;
 import jp.toastkid.article.models.Config.Key;
 import jp.toastkid.libs.utils.MathUtil;
-import jp.toastkid.yobidashi.Controller;
 
 /**
  * Article tab.
@@ -44,6 +44,9 @@ public class ArticleTab extends BaseWebTab {
 
     /** Article HTML generator. */
     private static final ArticleGenerator GENERATOR = new ArticleGenerator();
+
+    /** for desktop control. */
+    private static Desktop desktop;
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
@@ -271,7 +274,7 @@ public class ArticleTab extends BaseWebTab {
             } catch (final IOException e) {
                 LOGGER.error("Error", e);;
             }
-            Controller.openFileByEditor(openTarget);
+            openFileByEditor(openTarget);
         }
 
         final String processed  = post.process(GENERATOR.convertToHtml(this.article));
@@ -324,6 +327,48 @@ public class ArticleTab extends BaseWebTab {
     @Override
     protected Callback<PopupFeatures, WebEngine> getHandler() {
         return this.handler;
+    }
+
+    @Override
+    public String edit() {
+        final File openTarget = article.file;
+        if (openTarget.exists()){
+            openFileByEditor(openTarget);
+            return "";
+        }
+
+        // ファイルが存在しない場合は、ひな形を元に新規作成する。
+        try {
+            openTarget.createNewFile();
+            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);;
+        }
+        //loadArticleList();
+        openFileByEditor(openTarget);
+        return "";
+    }
+
+    /**
+     * Open file by editor.
+     *
+     * @param openTarget
+     */
+    private static void openFileByEditor(final File openTarget) {
+
+        if (Desktop.isDesktopSupported()) {
+            desktop = Desktop.getDesktop();
+        }
+
+        if (!openTarget.exists() || desktop == null){
+            return;
+        }
+
+        try {
+            desktop.open(openTarget);
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);;
+        }
     }
 
 }

@@ -1,10 +1,8 @@
 package jp.toastkid.yobidashi;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Optional;
@@ -262,9 +260,6 @@ public final class Controller implements Initializable {
     @FXML
     private DatePicker calendar;
 
-    /** for desktop control. */
-    private static Desktop desktop;
-
     /** functions class. */
     private ArticleGenerator articleGenerator;
 
@@ -368,9 +363,6 @@ public final class Controller implements Initializable {
                     // 長い時間のかかるタスク
                     try {
                         setTitleOnToolbar("");
-                        if (Desktop.isDesktopSupported()) {
-                            desktop = Desktop.getDesktop();
-                        }
                         setProgress("availableProcessors = " + availableProcessors);
 
                         es.execute(() -> {
@@ -785,8 +777,7 @@ public final class Controller implements Initializable {
         final Pane sdRoot = speedDialController.getRoot();
         sdRoot.setPrefWidth(width * 0.8);
         sdRoot.setPrefHeight(tabPane.getHeight());
-        openTab(new ContentTab.Builder().setTitle("Speed Dial")
-                .setContent(sdRoot).setOnClose(this::closeTab).build());
+        openTab(makeContentTab("Speed Dial", sdRoot));
     }
 
     /**
@@ -844,6 +835,17 @@ public final class Controller implements Initializable {
                 })
                 .setCreatePopupHandler(this::handleCreatePopup)//TODO WebViewのあたり出来上がってから実装
                 .build();
+    }
+
+    /**
+     * Make ContentTab.
+     * @param title
+     * @param content
+     * @return ContentTab
+     */
+    private ContentTab makeContentTab(final String title, final Pane content) {
+        return new ContentTab.Builder()
+                .setTitle(title).setContent(content).setOnClose(this::closeTab).build();
     }
 
     /**
@@ -1518,43 +1520,10 @@ public final class Controller implements Initializable {
     @FXML
     private final void callEditor() {
 
-        final ReloadableTab tab = getCurrentTab();
-        if (!(tab instanceof ArticleTab)) {
-            setStatus("This tab's content can't edit.");
-            return;
-        }
+        final String edit = getCurrentTab().edit();
 
-        final Article article = ((ArticleTab) tab).getArticle();
-        final File openTarget = article.file;
-        if (openTarget.exists()){
-            openFileByEditor(openTarget);
-            return;
-        }
-
-        // (130302) ファイルが存在しない場合は、ひな形を元に新規作成する。
-        try {
-            openTarget.createNewFile();
-            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);;
-        }
-        loadArticleList();
-        openFileByEditor(openTarget);
-    }
-
-    /**
-     * Open file by editor.
-     *
-     * @param openTarget
-     */
-    public static void openFileByEditor(final File openTarget) {
-        if (!openTarget.exists() || desktop == null){
-            return;
-        }
-        try {
-            desktop.open(openTarget);
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);;
+        if (StringUtils.isNotEmpty(edit)) {
+            setStatus(edit);
         }
     }
 
@@ -1766,17 +1735,6 @@ public final class Controller implements Initializable {
      */
     private void openContentTab(final String title, final Pane content) {
         openTab(makeContentTab(title, content));
-    }
-
-    /**
-     * Make ContentTab.
-     * @param title
-     * @param content
-     * @return ContentTab
-     */
-    private ContentTab makeContentTab(final String title, final Pane content) {
-        return new ContentTab.Builder()
-                .setTitle(title).setContent(content).setOnClose(this::closeTab).build();
     }
 
     /**
