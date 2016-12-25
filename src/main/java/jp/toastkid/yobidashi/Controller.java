@@ -409,7 +409,11 @@ public final class Controller implements Initializable {
                             tabPane.getSelectionModel().selectedItemProperty().addListener(
                                     (a, prevTab, nextTab) -> {
                                         // (121224) タブ切り替え時の URL 表示の変更
-                                        final String tabUrl = getCurrentTab().getUrl();
+                                        final ReloadableTab tab = getCurrentTab();
+                                        if (tab == null) {
+                                            return;
+                                        }
+                                        final String tabUrl = tab.getUrl();
                                         if (!StringUtils.isEmpty(tabUrl)
                                                 && !tabUrl.startsWith("about")
                                                 && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
@@ -1052,6 +1056,16 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Close all tabs.
+     */
+    @FXML
+    private final void closeAllTabs() {
+        tabPane.getTabs().removeAll(tabPane.getTabs());
+        setStatus("Close all tabs.");
+        openSpeedDialTab();
+    }
+
+    /**
      * Stop loading.
      * TODO 動作未検証
      * @param event
@@ -1532,7 +1546,11 @@ public final class Controller implements Initializable {
      * @return current tab.
      */
     private final ReloadableTab getCurrentTab() {
-        final Tab tab = tabPane.getTabs().get(tabPane.getSelectionModel().getSelectedIndex());
+        final int currentIndex = tabPane.getSelectionModel().getSelectedIndex();
+        if (currentIndex == -1) {
+            return null;
+        }
+        final Tab tab = tabPane.getTabs().get(currentIndex);
         if (!(tab instanceof ReloadableTab)) {
             LOGGER.warn("Not instance Tab");
             return null;
@@ -1689,6 +1707,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnEdit(this::callEditor);
         sideMenuController.setOnNewTab(this::openSpeedDialTab);
         sideMenuController.setOnCloseTab(this::closeTab);
+        sideMenuController.setOnCloseAllTabs(this::closeAllTabs);
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
@@ -1722,8 +1741,8 @@ public final class Controller implements Initializable {
                         final WebView prev = (WebView) prevTab.getContent();
                         prev.zoomProperty().unbind();
                     }
-
-                    emitter.next(getCurrentTab().zoomProperty());
+                    Optional.ofNullable(getCurrentTab())
+                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
                 })
         ));
     }

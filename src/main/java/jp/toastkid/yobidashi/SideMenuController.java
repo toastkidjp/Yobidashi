@@ -152,6 +152,8 @@ public class SideMenuController implements Initializable {
     /** Action open tab with html content. */
     private TriConsumer<String, String, ContentType> openTabWithHtmlContent;
 
+    private Runnable closeAll;
+
     /**
      * Call back up method.
      */
@@ -470,11 +472,19 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Close new tab.
+     * Close current tab.
      */
     @FXML
     private final void closeTab() {
         close.run();
+    }
+
+    /**
+     * Close all tabs.
+     */
+    @FXML
+    private final void closeAllTabs() {
+        closeAll.run();
     }
 
     /**
@@ -703,6 +713,14 @@ public class SideMenuController implements Initializable {
      */
     protected void setOnCloseTab(final Runnable command) {
         this.close = command;
+    }
+
+    /**
+     * Set action of close all tabs.
+     * @param object
+     */
+    protected void setOnCloseAllTabs(final Runnable command) {
+        this.closeAll = command;
     }
 
     /**

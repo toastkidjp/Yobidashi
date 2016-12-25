@@ -27,6 +27,7 @@
               <MenuLabel onAction="#openExternalFile" text="Open external file" />
               <MenuLabel accelerator="Ctrl+T" mnemonicParsing="true" onAction="#openSpeedDialTab" text="Open new tab" />
               <MenuLabel accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="Close tab" />
+              <MenuLabel accelerator="Alt+W" mnemonicParsing="true" onAction="#closeAllTabs" text="Close tab" />
               <MenuLabel accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="Slide show"/>
               <!--MenuLabel accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" /-->
               <MenuLabel onAction="#quit" text="Quit"/>
