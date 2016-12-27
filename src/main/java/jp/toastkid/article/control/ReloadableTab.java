@@ -19,6 +19,9 @@ import javafx.scene.control.Tab;
  */
 public abstract class ReloadableTab extends Tab {
 
+    /** Default loading tab title. */
+    protected static final String LOADING = "Now Loading...";
+
     /** Default tab title. */
     protected static final String DEFAULT_TAB_TITLE = "New tab";
 

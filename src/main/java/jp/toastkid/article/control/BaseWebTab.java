@@ -152,6 +152,14 @@ public abstract class BaseWebTab extends ReloadableTab {
     }
 
     /**
+     * Show spinner.
+     */
+    protected void showSpinner() {
+        spinner.setVisible(true);
+        spinner.setManaged(true);
+    }
+
+    /**
      * Hide spinner.
      */
     protected void hideSpinner() {

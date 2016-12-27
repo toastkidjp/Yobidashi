@@ -39,9 +39,6 @@ import jp.toastkid.libs.utils.MathUtil;
  */
 public class ArticleTab extends BaseWebTab {
 
-    /** Default loading tab title. */
-    private static final String LOADING = "Now Loading...";
-
     /** Article HTML generator. */
     private static final ArticleGenerator GENERATOR = new ArticleGenerator();
 
