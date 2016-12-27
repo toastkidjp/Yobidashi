@@ -658,6 +658,41 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Open current folder.
+     */
+    @FXML
+    private void openCurrentFolder() {
+        openFolder(Defines.findInstallDir());
+    }
+
+    /**
+     * Open current folder.
+     */
+    @FXML
+    private void openArticleFolder() {
+        openFolder(Config.get(Config.Key.ARTICLE_DIR));
+    }
+
+    /**
+     * Open current folder.
+     */
+    @FXML
+    private void openImageFolder() {
+        openFolder(Config.get(Config.Key.IMAGE_DIR));
+    }
+
+    /**
+     * Open specified folder.
+     * @param dir
+     */
+    private void openFolder(final String dir) {
+        final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
+                ? dir
+                : FileUtil.FILE_PROTOCOL + dir;
+        RuntimeUtil.callExplorer(openPath);
+    }
+
+    /**
      * Open external file.
      */
     @FXML

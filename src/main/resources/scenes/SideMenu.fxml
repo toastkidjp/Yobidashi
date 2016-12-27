@@ -2,6 +2,7 @@
 
 <?import java.lang.String?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.StackPane?>
@@ -9,6 +10,7 @@
 
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXTabPane?>
+<?import com.jfoenix.controls.JFXPopup?>
 
 <?import jp.toastkid.jfx.common.control.MenuLabel?>
 
@@ -25,9 +27,17 @@
               <MenuLabel onAction="#clearBackup" text="Delete backup" />
               <MenuLabel accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="Backup article" />
               <MenuLabel onAction="#openExternalFile" text="Open external file" />
+              <JFXListView fx:id="folders" styleClass="popup-list-view">
+                <groupnode>
+                  <Label>Folders</Label>
+                </groupnode>
+                <MenuLabel onAction="#openCurrentFolder" text="Current Folder" />
+                <MenuLabel onAction="#openArticleFolder" text="Article Folder" />
+                <MenuLabel onAction="#openImageFolder" text="Image Folder" />
+              </JFXListView>
               <MenuLabel accelerator="Ctrl+T" mnemonicParsing="true" onAction="#openSpeedDialTab" text="Open new tab" />
               <MenuLabel accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="Close tab" />
-              <MenuLabel accelerator="Alt+W" mnemonicParsing="true" onAction="#closeAllTabs" text="Close tab" />
+              <MenuLabel accelerator="Alt+W" mnemonicParsing="true" onAction="#closeAllTabs" text="Close all tabs" />
               <MenuLabel accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="Slide show"/>
               <!--MenuLabel accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" /-->
               <MenuLabel onAction="#quit" text="Quit"/>
