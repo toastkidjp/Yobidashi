@@ -698,7 +698,6 @@ public final class Controller implements Initializable {
     /**
      * Show HTML source.
      */
-    @FXML
     private final void callHtmlSource() {
         final ReloadableTab tab = getCurrentTab();
 
@@ -714,7 +713,6 @@ public final class Controller implements Initializable {
     /**
      * Set "home"(it means appearing when start-up) article.
      */
-    @FXML
     private final void setHome() {
         final String currentURL = urlText.getText();
         final Window parent = getParent();
@@ -746,7 +744,6 @@ public final class Controller implements Initializable {
      * Search Web with query.
      * @param event ActionEvent
      */
-    @FXML
     private final void webSearch() {
         final String kind  = searchCategory.getItems()
                 .get(searchCategory.getSelectionModel().getSelectedIndex())
@@ -765,7 +762,6 @@ public final class Controller implements Initializable {
     /**
      * Open new tab having SpeedDial.
      */
-    @FXML
     private void openSpeedDialTab() {
         if (speedDialController == null) {
             speedDialController = readSpeedDial();

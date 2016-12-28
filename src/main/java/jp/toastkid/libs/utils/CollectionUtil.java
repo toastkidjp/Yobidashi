@@ -2,7 +2,6 @@ package jp.toastkid.libs.utils;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -65,23 +63,7 @@ public abstract class CollectionUtil {
     public static Set<String> arrayToSet(final String[] pStrArray){
         return Sets.mutable.of(pStrArray);
     }
-    /**
-     * 正規表現のString型配列からPatternのArrayList <b>(変更不可)</b>を生成し返す
-     * @param regexArray 正規表現のString型配列
-     * @return returnPatternsList regexArrayの値をコンパイルしたパターンを格納したArrayList<Pattern>
-     */
-    public static ArrayList<Pattern> createArrayListPFromStringArray(final String[] regexArray){
-           final ArrayList<Pattern> returnPatternsList = new ArrayList<Pattern>();
-           for(int j = 0 ;j < regexArray.length;j++){
-               returnPatternsList.add(
-                       Pattern.compile(
-                               regexArray[j],
-                               Pattern.DOTALL
-                               )
-                    );
-           }
-           return new ArrayList<Pattern>(Collections.unmodifiableList(returnPatternsList));
-    }
+
     /**
      * pieces に格納された文字列を取り出して,
      * 改行記号(System.getProperty("line.separator")で取得)で連結して返却する

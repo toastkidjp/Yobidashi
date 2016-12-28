@@ -109,7 +109,8 @@ public class WebTab extends BaseWebTab {
                     hideSpinner();
                     break;
                 case SUCCEEDED:
-                    setText(engine.getTitle());
+                    final String newTitle = engine.getTitle();
+                    setText(StringUtils.isNotEmpty(newTitle) ? newTitle : b.title);
                     hideSpinner();
                     break;
             }

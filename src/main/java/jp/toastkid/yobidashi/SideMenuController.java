@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.reactfx.util.TriConsumer;
 import org.slf4j.Logger;
@@ -25,9 +26,12 @@ import com.jfoenix.controls.JFXListView;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
@@ -48,6 +52,7 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
+import jp.toastkid.libs.lambda.Filters;
 import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -56,6 +61,8 @@ import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * Side menu's controller.
@@ -806,15 +813,43 @@ public class SideMenuController implements Initializable {
             = this.stage.getScene().getAccelerators();
         menuTabs.getTabs().forEach(tab -> {
             @SuppressWarnings("unchecked")
-            final JFXListView<MenuLabel> labels = (JFXListView<MenuLabel>) tab.getContent();
-            labels.getItems().forEach(l -> {
-                if (l.getAccelerator() == null) {
-                    return;
-                }
-                accelerators.put(
-                        l.getAccelerator(), () -> l.getOnAction().handle(new ActionEvent()));
-            });
+            final JFXListView<Node> items = (JFXListView<Node>) tab.getContent();
+            items.getItems().stream()
+                 .flatMap(this::flattenListToLabel)
+                 .map(this::extractAcceleratorPair)
+                 .filter(Filters::isNotNull)
+                 .forEach(item -> accelerators.put(
+                         item.getT1(), () -> item.getT2().handle(new ActionEvent())));
         });
+    }
+
+    /**
+     * Flatten list to Label.
+     * @param item Node
+     * @return new Node's Stream.
+     */
+    @SuppressWarnings("unchecked")
+    private Stream<Node> flattenListToLabel(final Node item) {
+        if (item instanceof ListView) {
+            return ((ListView<Node>) item).getItems().stream();
+        }
+        return Stream.of(item);
+    }
+
+    /**
+     * Extract accelerator and action from node.
+     * @param node
+     * @return accelerator and action
+     */
+    private Tuple2<KeyCombination, EventHandler<ActionEvent>> extractAcceleratorPair(final Node node) {
+        if (!(node instanceof MenuLabel)) {
+            return null;
+        }
+        final MenuLabel label = (MenuLabel) node;
+        if (label.getAccelerator() == null) {
+            return null;
+        }
+        return Tuples.of(label.getAccelerator(), label.getOnAction());
     }
 
     /**
