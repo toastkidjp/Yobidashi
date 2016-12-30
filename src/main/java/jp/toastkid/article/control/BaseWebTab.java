@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.jfoenix.controls.JFXSpinner;
 
 import javafx.beans.property.DoubleProperty;
@@ -15,7 +17,7 @@ import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
-import jp.toastkid.article.models.Defines;
+import jp.toastkid.article.models.Article;
 
 /**
  * Base of Web tab.
@@ -81,19 +83,17 @@ public abstract class BaseWebTab extends ReloadableTab {
 
     @Override
     public String getUrl() {
-        return wv.getEngine().getLocation();
+        return getWebView().getEngine().getLocation();
     }
 
     @Override
     public void moveToTop() {
-        wv.getEngine()
-            .executeScript(findScrollTop(getWebView().getEngine().getLocation()));
+        getWebView().getEngine().executeScript(findScrollTop(getUrl()));
     }
 
     @Override
     public void moveToBottom() {
-        wv.getEngine()
-            .executeScript(findScrollBottom(getWebView().getEngine().getLocation()));
+        getWebView().getEngine().executeScript(findScrollBottom(getUrl()));
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class BaseWebTab extends ReloadableTab {
      * @return
      */
     private String findScrollTop(final String url) {
-        return url.endsWith(Defines.TEMP_FILE_NAME)
+        return StringUtils.isEmpty(url) || Article.isInternalLink(url)
                 ? "$('html,body').animate({ scrollTop: 0 }, 'fast');"
                 : "window.scrollTo(0, 0);";
     }
@@ -113,7 +113,7 @@ public abstract class BaseWebTab extends ReloadableTab {
      * @return
      */
     private String findScrollBottom(final String url) {
-        return url.endsWith(Defines.TEMP_FILE_NAME)
+        return StringUtils.isEmpty(url) || Article.isInternalLink(url)
                 ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
                 : "window.scrollTo(0, document.body.scrollHeight);";
     }
@@ -135,12 +135,12 @@ public abstract class BaseWebTab extends ReloadableTab {
 
     @Override
     public void reload() {
-        wv.getEngine().reload();
+        getWebView().getEngine().reload();
     }
 
     @Override
     public void loadUrl(final String url) {
-        wv.getEngine().load(url);
+        getWebView().getEngine().load(url);
     }
 
     /**

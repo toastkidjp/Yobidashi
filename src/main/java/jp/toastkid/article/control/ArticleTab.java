@@ -73,8 +73,6 @@ public class ArticleTab extends BaseWebTab {
 
         private EventHandler<ContextMenuEvent> onContextMenuRequested;
 
-        private Callback<PopupFeatures, WebEngine> createPopupHandler;
-
         private Consumer<Tab> closeAction;
 
         private Runnable onLoad;
@@ -101,12 +99,6 @@ public class ArticleTab extends BaseWebTab {
 
         public Builder setOnContextMenuRequested(final EventHandler<ContextMenuEvent> e) {
             this.onContextMenuRequested = e;
-            return this;
-        }
-
-        public Builder setCreatePopupHandler(
-                final Callback<PopupFeatures, WebEngine> createPopupHandler) {
-            this.createPopupHandler = createPopupHandler;
             return this;
         }
 
@@ -166,7 +158,6 @@ public class ArticleTab extends BaseWebTab {
                         return;
                     }
 
-                    //TODO
                     if (url.startsWith("http")) {
                         if (State.SCHEDULED.equals(observable.getValue())) {
                             System.out.println("loader stop ");
@@ -193,12 +184,13 @@ public class ArticleTab extends BaseWebTab {
                         final String title = engine.getTitle();
                         this.setText(StringUtils.isNotBlank(title) ? title : article.title);
                         onLoad.run();
-                        final int j = this.article.yOffset;
+                        hideSpinner();
+
+                        final int j = this.yOffset;
                         if (j == 0) {
                             return;
                         }
                         engine.executeScript(String.format("window.scrollTo(0, %d);", j));
-                        hideSpinner();
                     }
                 });
 
@@ -226,7 +218,7 @@ public class ArticleTab extends BaseWebTab {
             return;
         }
 
-        if (Article.isWikiArticleUrl(url)) {
+        if (Article.isInternalLink(url)) {
             onOpenNewArticle.accept(Article.findFromUrl(url));
             return;
         }
@@ -249,18 +241,13 @@ public class ArticleTab extends BaseWebTab {
             final Object script = engine.executeScript("window.pageYOffset;");
             yOffset = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
         }
-        loadArticle(isReload, yOffset);
+        loadArticle();
     }
 
     /**
      * Load specified article with options.
-     * @param isReload
-     * @param yOffset
      */
-    private void loadArticle(
-            final boolean isReload,
-            final int yOffset
-            ) {
+    private void loadArticle() {
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
 
         final File openTarget = this.article.file;
@@ -280,9 +267,6 @@ public class ArticleTab extends BaseWebTab {
 
         final WebEngine engine = getWebView().getEngine();
         engine.loadContent(content);
-        if (isReload) {
-            engine.executeScript(String.format("window.scrollTo(0, %d);", yOffset));
-        }
     }
 
     @Override

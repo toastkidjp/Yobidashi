@@ -203,7 +203,7 @@ public class Article implements Comparable<Article> {
      * @param url URL
      * @return Wiki 記事なら true
      */
-    public static final boolean isWikiArticleUrl(final String url) {
+    public static final boolean isInternalLink(final String url) {
         return url.startsWith(INTERNAL_PROTOCOL);
     }
 

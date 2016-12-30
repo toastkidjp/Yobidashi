@@ -37,10 +37,11 @@ public class ArticleListCell extends JFXListCell<Article> {
             setGraphic(null);
             return;
         }
-        ((Label) cellContent).setText(new StringBuilder()
+        final String text = new StringBuilder()
                 .append(article.extention().substring(1) ).append(" | ")
-                .append(article.title).append("\n最終更新：")
-                .append(article.lastModifiedText()).toString());
+                .append(article.title).append(System.lineSeparator()).append("最終更新：")
+                .append(article.lastModifiedText()).toString();
+        ((Label) cellContent).setText(text);
     }
 
 }

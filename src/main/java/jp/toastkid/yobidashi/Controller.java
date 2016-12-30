@@ -64,8 +64,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.PopupFeatures;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
@@ -80,7 +78,6 @@ import jp.toastkid.article.control.ContentTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Article.Extension;
 import jp.toastkid.article.models.Config;
 import jp.toastkid.article.models.ContentType;
 import jp.toastkid.article.models.Defines;
@@ -833,7 +830,6 @@ public final class Controller implements Initializable {
                     addHistory(article.clone());
                     focusOn();
                 })
-                .setCreatePopupHandler(this::handleCreatePopup)//TODO WebViewのあたり出来上がってから実装
                 .build();
     }
 
@@ -846,18 +842,6 @@ public final class Controller implements Initializable {
     private ContentTab makeContentTab(final String title, final Pane content) {
         return new ContentTab.Builder()
                 .setTitle(title).setContent(content).setOnClose(this::closeTab).build();
-    }
-
-    /**
-     *
-     * @param popupFeature
-     * @return
-     */
-    private WebEngine handleCreatePopup(final PopupFeatures popupFeature) {
-        System.out.println("Open new tab from popup");
-        final WebTab tab = new WebTab.Builder().setTitle("").build();
-        tabPane.getSelectionModel().selectLast();
-        return tab.getWebView().getEngine();
     }
 
     /**
@@ -1351,14 +1335,6 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void makeMarkdown() {
-        makeContent(Article.Extension.MD);
-    }
-
-    /**
-     * make content file.
-     * @param ext.
-     */
-    private final void makeContent(final Extension ext) {
         final TextField input = new TextField();
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
         input.setPromptText(newArticleMessage);
@@ -1575,8 +1551,8 @@ public final class Controller implements Initializable {
      * Open urlText's value.
      */
     @FXML
-    public final void readUrlText(final ActionEvent event) {
-        getCurrentTab().loadUrl(urlText.getText());
+    public final void readUrlText() {
+        openWebTab("", urlText.getText());
     }
 
     /**
@@ -1598,9 +1574,9 @@ public final class Controller implements Initializable {
                 if (printer == null) {
                     LOGGER.warn("printe is null");
                     return;
-                } else {
-                    LOGGER.info("print name:" + printer.getName());
                 }
+
+                LOGGER.info("print name:" + printer.getName());
 
                 printer.createPageLayout(
                         Paper.A4,
@@ -1709,7 +1685,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openContentTab);
         sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
-        sideMenuController.setOnMakeArticle(this::makeContent);
+        sideMenuController.setOnMakeArticle(this::makeMarkdown);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);
         sideMenuController.setOnDelete(this::callDelete);

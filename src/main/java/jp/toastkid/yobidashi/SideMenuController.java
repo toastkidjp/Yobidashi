@@ -124,7 +124,7 @@ public class SideMenuController implements Initializable {
     private Runnable onQuit;
 
     /** Action of make new article. */
-    private Consumer<Article.Extension> onMakeArticle;
+    private Runnable onMakeArticle;
 
     /** Command of copy article. */
     private Runnable onCopy;
@@ -165,7 +165,7 @@ public class SideMenuController implements Initializable {
      * Call back up method.
      */
     @FXML
-    private final void callBackUp(final ActionEvent event) {
+    private final void callBackUp() {
         final Window parent = getParent().get();
         new AlertDialog.Builder(parent)
             .setTitle("Backup")
@@ -637,7 +637,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void makeArticle() {
-        onMakeArticle.accept(Article.Extension.MD);
+        onMakeArticle.run();
     }
 
     /**
@@ -873,7 +873,7 @@ public class SideMenuController implements Initializable {
      * Set on make article action.
      * @param c
      */
-    public void setOnMakeArticle(final Consumer<Article.Extension> onMakeArticle) {
+    public void setOnMakeArticle(final Runnable onMakeArticle) {
         this.onMakeArticle = onMakeArticle;
     }
 
