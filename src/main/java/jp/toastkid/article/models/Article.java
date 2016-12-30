@@ -42,9 +42,6 @@ public class Article implements Comparable<Article> {
     /** number of article characters. */
     public long byteLength;
 
-    /** current yOffset. */
-    public int  yOffset = 0;
-
     /**
      * Article's extension.
      * @author Toast kid

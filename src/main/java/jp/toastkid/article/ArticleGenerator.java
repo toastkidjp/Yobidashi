@@ -78,36 +78,13 @@ public final class ArticleGenerator {
     /**
      * 引数として渡した HTML 文字列を一時ファイルに出力する.
      * 主に HTML ツールの呼び出しで使用
-     * @param content 表示したい HTML 文字列(StringBuilder)
-     * @param title HTML の タイトル
-     */
-    public final void generateHtml(final StringBuilder content, final String title) {
-        generateHtml(content.toString(), title);
-    }
-
-    /**
-     * 引数として渡した HTML 文字列を一時ファイルに出力する.
-     * 主に HTML ツールの呼び出しで使用
      * <HR>
      * (130414) 引数 title 追加<BR>
      * (130302) 作成<BR>
      * @param content 表示したい HTML 文字列
      * @param title HTML の タイトル
      */
-    public final void generateHtml(final String content, final String title) {
-        generateHtml(content, title, false);
-    }
-
-    /**
-     * 引数として渡した HTML 文字列を一時ファイルに出力する.
-     * 主に HTML ツールの呼び出しで使用
-     * <HR>
-     * (130414) 引数 title 追加<BR>
-     * (130302) 作成<BR>
-     * @param content 表示したい HTML 文字列
-     * @param title HTML の タイトル
-     */
-    public final void generateHtml(
+    /*TODO けすpublic final void generateHtml(
             final String content,
             final String title,
             final boolean isTool
@@ -120,7 +97,7 @@ public final class ArticleGenerator {
             Defines.TEMP_FILE_NAME,
             Defines.ARTICLE_ENCODE
         );
-    }
+    }*/
 
     /**
      * Decorate HTML content with template and CSS.
@@ -382,7 +359,7 @@ public final class ArticleGenerator {
      */
     public static String decodeBytedStr(final String bytestr, final String encode) {
         final Charset charset = Charset.forName(encode);
-        final List<String> strl = new ArrayList<String>();
+        final List<String> strl = new ArrayList<>();
         final byte[] b = new byte[(bytestr.length() / 2)];
         final StringBuilder temp = new StringBuilder(5);
         for (int i = 0; i < bytestr.length(); i++) {
@@ -402,14 +379,6 @@ public final class ArticleGenerator {
         }
         final ByteBuffer bybuf = ByteBuffer.wrap(b);
         return charset.decode(bybuf).toString();
-    }
-
-    /**
-     * generate article file.
-     * @param article
-     */
-    public void generateArticleFile(final Article article) {
-        generateHtml(convertToHtml(article), article.title);
     }
 
     /**

@@ -144,9 +144,6 @@ public class SideMenuController implements Initializable {
     /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
 
-    /** Action of open external file. */
-    private Consumer<String> openExternal;
-
     /** Action of open drawer. */
     private Runnable switchRightDrawer;
 
@@ -159,6 +156,7 @@ public class SideMenuController implements Initializable {
     /** Action open tab with html content. */
     private TriConsumer<String, String, ContentType> openTabWithHtmlContent;
 
+    /** Action of close all tabs. */
     private Runnable closeAll;
 
     /**
@@ -726,8 +724,11 @@ public class SideMenuController implements Initializable {
                     if (content.length() == 0) {
                         return;
                     }
-                    articleGenerator.generateHtml(content.toString(), result.getAbsolutePath());
-                    openExternal.accept(result.getAbsolutePath());
+                    openTabWithHtmlContent.accept(
+                            result.getAbsolutePath(),
+                            content.toString(),
+                            ContentType.HTML
+                            );
                     break;
             }
         });
@@ -907,14 +908,6 @@ public class SideMenuController implements Initializable {
      */
     protected void setOnOpenScriptRunner(final OpenTabAction scriptOpener) {
         this.scriptOpener = scriptOpener;
-    }
-
-    /**
-     * Set on opening external content action.
-     * @param openExternal
-     */
-    protected void setOnOpenExternalFile(final Consumer<String> openExternal) {
-        this.openExternal = openExternal;
     }
 
     /**

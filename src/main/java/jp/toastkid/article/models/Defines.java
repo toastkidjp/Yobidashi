@@ -56,9 +56,6 @@ public final class Defines {
     /** 記事ファイルの文字コード. */
     public static final String ARTICLE_ENCODE     = "UTF-8";
 
-    /** 一時ファイルの名前. */
-    public static final String TEMP_FILE_NAME     = "temp.html";
-
     /** Windows デフォルトのエディタ. */
     public static final String NOTEPAD_EXE        = "notepad.exe";
 

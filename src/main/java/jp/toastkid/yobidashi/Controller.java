@@ -70,7 +70,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import jp.toastkid.article.ArticleGenerator;
-import jp.toastkid.article.FullScreen;
 import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
 import jp.toastkid.article.control.BaseWebTab;
@@ -287,9 +286,6 @@ public final class Controller implements Initializable {
     /** file watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
-    /** use for full screen. */
-    private FullScreen fs;
-
     /** splitter closing transition. */
     private TranslateTransition splitterClose;
 
@@ -411,10 +407,7 @@ public final class Controller implements Initializable {
                                             return;
                                         }
                                         final String tabUrl = tab.getUrl();
-                                        if (!StringUtils.isEmpty(tabUrl)
-                                                && !tabUrl.startsWith("about")
-                                                && !tabUrl.endsWith(Defines.TEMP_FILE_NAME)
-                                                ){
+                                        if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
                                             urlText.setText(tabUrl);
                                             return;
                                         }
@@ -708,52 +701,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Set "home"(it means appearing when start-up) article.
-     */
-    private final void setHome() {
-        final String currentURL = urlText.getText();
-        final Window parent = getParent();
-        if (currentURL.startsWith("/")
-                || currentURL.startsWith("http://")
-                || currentURL.startsWith("https://")
-                ){
-            final String homeTitle = tabPane.getSelectionModel().getSelectedItem().getText();
-            new AlertDialog.Builder(parent).setTitle("ホーム設定")
-                .setMessage(homeTitle + "をホームに設定しますか？")
-                .setOnPositive("YES", () -> {
-                    Config.store(Config.Key.HOME, currentURL);
-                    Config.reload();
-                }).build().show();
-            return ;
-        }
-        AlertDialog.showMessage(parent, "設定不可", "現在のページはホームに設定できません。");
-    }
-
-    /**
      * Reload tab content.
      */
     @FXML
     private final void reload() {
         getCurrentTab().reload();
-    }
-
-    /**
-     * Search Web with query.
-     * @param event ActionEvent
-     */
-    private final void webSearch() {
-        final String kind  = searchCategory.getItems()
-                .get(searchCategory.getSelectionModel().getSelectedIndex())
-                .toString();
-        final String query = webQuery.getText();
-        if (StringUtils.isEmpty(query)){
-            return ;
-        }
-        final String url = WebServiceHelper.buildRequestUrl(query, kind);
-        if (StringUtils.isEmpty(url)){
-            return;
-        }
-        openWebTab("Loading...", url);
     }
 
     /**
@@ -916,7 +868,7 @@ public final class Controller implements Initializable {
                     makeContextMenuItemContainerWithAction(
                             cmc, "文字数計測", event -> sideMenuController.callFileLength()),
                     makeContextMenuItemContainerWithAction(
-                            cmc, "Full Screen", event -> callTabFullScreen()),
+                            cmc, "Full Screen", event -> stage.setFullScreen(true)),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Slide show", event -> slideShow()),
                     makeContextMenuItemContainerWithAction(
@@ -1122,30 +1074,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Show current tab to full screen.
-     */
-    @FXML
-    private void callTabFullScreen() {
-        if (fs == null) {
-            fs = new FullScreen(this.width, this.height);
-        }
-
-        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
-        if (!articleOr.isPresent()) {
-            setStatus("This tab can't use full screen mode.");
-            return;
-        }
-        articleOr.ifPresent(article -> {
-            if (!StringUtils.equals(fs.getTitle(), article.title)) {
-                fs.setTitle(article.title);
-                fs.show(Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
-                return;
-            }
-            fs.show();
-        });
-    }
-
-    /**
      * Show slide show.
      */
     @FXML
@@ -1200,7 +1128,6 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void callHome() {
-        //loadUrl(Config.get(Config.Key.HOME));
         openSpeedDialTab();
     }
 
@@ -1684,7 +1611,6 @@ public final class Controller implements Initializable {
         sideMenuController.setOnReload(this::reload);
         sideMenuController.setOnPreviewSource(this::callHtmlSource);
         sideMenuController.setOnWordCloud(this::openContentTab);
-        sideMenuController.setOnOpenExternalFile(this::openExternalWebContent);
         sideMenuController.setOnMakeArticle(this::makeMarkdown);
         sideMenuController.setOnCopy(this::callCopy);
         sideMenuController.setOnRename(this::callRename);
@@ -1726,14 +1652,6 @@ public final class Controller implements Initializable {
      */
     private void openContentTab(final String title, final Pane content) {
         openTab(makeContentTab(title, content));
-    }
-
-    /**
-     * Open external content on tab with title.
-     * @param title tab's title
-     */
-    private void openExternalWebContent(final String title) {
-        openWebTab(title, Defines.findInstallDir() + Defines.TEMP_FILE_NAME);
     }
 
     /**
