@@ -3,6 +3,7 @@ package jp.toastkid.yobidashi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
@@ -13,7 +14,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
 import reactor.core.publisher.Flux;
@@ -132,13 +132,13 @@ public class ToolsController {
 
     /**
      * Set current WebView publisher.
-     * @param wvPublisher
+     * @param zoomPublisher
      */
-    public void setFlux(final Flux<WebView> wvPublisher) {
-        wvPublisher.subscribeOn(Schedulers.elastic())
-            .subscribe(wv -> {
-                zoom.setValue(wv.getZoom());
-                zoom.valueProperty().bindBidirectional(wv.zoomProperty());
+    public void setFlux(final Flux<DoubleProperty> zoomPublisher) {
+        zoomPublisher.subscribeOn(Schedulers.elastic())
+            .subscribe(z -> {
+                zoom.setValue(z.get());
+                zoom.valueProperty().bindBidirectional(z);
             });
     }
 

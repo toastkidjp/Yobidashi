@@ -3,7 +3,7 @@ package jp.toastkid.libs.fileFilter;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import jp.toastkid.wiki.models.Article;
+import jp.toastkid.article.models.Article;
 /**
  *
  * @see <a href="http://qingdao.jugem.jp/?eid=103">【Java】Fileクラスのlist(FilenameFilter filter)メソッド</a>

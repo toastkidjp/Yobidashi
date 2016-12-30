@@ -3,16 +3,20 @@ package jp.toastkid.yobidashi;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
+import org.reactfx.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,46 +26,65 @@ import com.jfoenix.controls.JFXListView;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import jp.toastkid.article.ApplicationState;
+import jp.toastkid.article.Archiver;
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.EpubGenerator;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.ContentType;
+import jp.toastkid.article.models.Defines;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
+import jp.toastkid.libs.lambda.Filters;
 import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
-import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.wiki.ApplicationState;
-import jp.toastkid.wiki.Archiver;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.EpubGenerator;
-import jp.toastkid.wiki.dialog.ConfigDialog;
-import jp.toastkid.wiki.lib.Wiki2Markdown;
-import jp.toastkid.wiki.models.Config;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
+import jp.toastkid.yobidashi.dialog.ConfigDialog;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * Side menu's controller.
  *
  * @author Toast kid
  */
-public class SideMenuController {
+public class SideMenuController implements Initializable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SideMenuController.class);
+
+    /** /path/to/about_file. */
+    private static final String PATH_ABOUT_APP = "README.md";
+
+    /** /path/to/license */
+    private static final String PATH_LICENSE   = "LICENSE";
+
+    /** /path/to/log file. */
+    private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
+
+    /** Article Generator. */
+    private ArticleGenerator articleGenerator;
 
     /** menu tabs. */
     @FXML
@@ -97,17 +120,11 @@ public class SideMenuController {
     /** Command of preview. */
     private Runnable preview;
 
-    /** Command of converting to Markdown. */
-    private OpenTabAction convert2Md;
-
-    /** Command of showing about page. */
-    private Runnable about;
-
-    /** Command of showing log viewer. */
-    private Runnable log;
-
     /** Command of quit this app. */
     private Runnable onQuit;
+
+    /** Action of make new article. */
+    private Runnable onMakeArticle;
 
     /** Command of copy article. */
     private Runnable onCopy;
@@ -127,23 +144,29 @@ public class SideMenuController {
     /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
 
-    /** Article Generator. */
-    private ArticleGenerator articleGenerator;
-
-    /** Action of open external file. */
-    private Consumer<String> openExternal;
-
-    /** Action of open drawer */
+    /** Action of open drawer. */
     private Runnable switchRightDrawer;
 
+    /** Action of popup text. */
+    private Consumer<String> onPopup;
+
+    /** Article's getter. */
+    private Supplier<Optional<Article>> articleGetter;
+
+    /** Action open tab with html content. */
+    private TriConsumer<String, String, ContentType> openTabWithHtmlContent;
+
+    /** Action of close all tabs. */
+    private Runnable closeAll;
+
     /**
-     * バックアップ機能を呼び出す。
+     * Call back up method.
      */
     @FXML
-    private final void callBackUp(final ActionEvent event) {
+    private final void callBackUp() {
         final Window parent = getParent().get();
         new AlertDialog.Builder(parent)
-            .setTitle("バックアップ")
+            .setTitle("Backup")
             .setMessage("この処理には時間がかかります。")
             .setOnPositive("OK", () -> {
                 new ProgressDialog.Builder()
@@ -207,7 +230,12 @@ public class SideMenuController {
      */
     @FXML
     protected final void callFileLength() {
-        showMessageDialog("文字数計測", Config.article.makeCharCountResult());
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("現在表示できません。");
+            return;
+        }
+        showMessageDialog("文字数計測", optional.get().makeCharCountResult());
     }
 
     /**
@@ -256,7 +284,12 @@ public class SideMenuController {
      */
     @FXML
     public final void callConvertAobun() {
-        final String absolutePath = Config.article.file.getAbsolutePath();
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("This tab's content can't convert Aozora bunko file.");
+            return;
+        }
+        final String absolutePath = optional.get().file.getAbsolutePath();
         AobunUtils.docToTxt(absolutePath);
         showMessageDialog(
                 "Complete Converting",
@@ -274,17 +307,55 @@ public class SideMenuController {
         value.setFitToHeight(true);
         value.setFitToWidth(true);
 
+        final Optional<Article> optional = articleGetter.get();
+        if (!optional.isPresent()) {
+            showMessagePopup("This tab's content can't generate word cloud.");
+            return;
+        }
+
         wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
                         .setMinFontSize(8.0).build();
-        wordCloud.draw(pane, Config.article.file);
-        tabAction.open(Config.article.title + "のワードクラウド", pane);
+        final Article article = optional.get();
+        wordCloud.draw(pane, article.file);
+        tabAction.open(article.title + "のワードクラウド", pane);
     }
+
     /**
-     * call About.
+     * Call About.
      */
     @FXML
-    private final void callAbout() {
-        about.run();
+    private final void about() {
+        openStaticFileWithConverting(PATH_ABOUT_APP, "About");
+    }
+
+    /**
+     * Call License.
+     */
+    @FXML
+    private final void license() {
+        openTabWithHtmlContent.accept(
+                "License",
+                FileUtil.readLines(PATH_LICENSE, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                ContentType.TEXT
+                );
+    }
+
+    /**
+     * Open static file with convert to html.
+     * @param pathToFile
+     * @param title
+     */
+    private void openStaticFileWithConverting(final String pathToFile, final String title) {
+        final File file = new File(pathToFile);
+        if (!file.exists()) {
+            LOGGER.warn(file.getAbsolutePath() + " is not exists.");
+            return;
+        }
+        this.openTabWithHtmlContent.accept(
+                title,
+                articleGenerator.decorate(title, file),
+                ContentType.HTML
+                );
     }
 
     /**
@@ -406,11 +477,19 @@ public class SideMenuController {
     }
 
     /**
-     * Close new tab.
+     * Close current tab.
      */
     @FXML
     private final void closeTab() {
         close.run();
+    }
+
+    /**
+     * Close all tabs.
+     */
+    @FXML
+    private final void closeAllTabs() {
+        closeAll.run();
     }
 
     /**
@@ -438,35 +517,22 @@ public class SideMenuController {
     }
 
     /**
-     * Convert current article to Markdown.
-     */
-    @FXML
-    private void callConvertMd() {
-        final CodeArea pane = new CodeArea();
-        pane.setParagraphGraphicFactory(LineNumberFactory.get(pane));
-
-        final double prefWidth = stage.getWidth() * 0.8;
-        pane.setPrefWidth(prefWidth);
-        pane.setPrefHeight(stage.getHeight());
-
-        try {
-            pane.replaceText(CollectionUtil.implode(
-                    Wiki2Markdown.convert(Files.readAllLines(Config.article.file.toPath()))
-                    ));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            showMessageDialog("IOException", e.getMessage());
-            return;
-        }
-        convert2Md.open("[MD] " + Config.article.title, new AnchorPane(pane));
-    }
-
-    /**
      * Show log viewer.
      */
     @FXML
     private void callLogViewer() {
-        log.run();
+        if (!new File(PATH_APP_LOG).exists()) {
+            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
+            return;
+        }
+        final String log = String.format(
+                "<pre>%s</pre>",
+                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
+                );
+
+        final String title = "LogViewer";
+        openTabWithHtmlContent.accept(
+                title, articleGenerator.decorate(title, log, ""), ContentType.HTML);
     }
 
     /**
@@ -537,14 +603,15 @@ public class SideMenuController {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    new EpubGenerator().toEpub(vertically.isSelected());
+                                    articleGetter.get().ifPresent(article ->
+                                        new EpubGenerator().toEpub(article, vertically.isSelected()));
                                     return 100;
                                 }
                             })
                             .build();
                     pd.start(stage);
                 }).build().show()
-                );
+            );
     }
 
     /**
@@ -561,6 +628,14 @@ public class SideMenuController {
     @FXML
     private void callCopy() {
         onCopy.run();
+    }
+
+    /**
+     * Make new article.
+     */
+    @FXML
+    private final void makeArticle() {
+        onMakeArticle.run();
     }
 
     /**
@@ -588,15 +663,45 @@ public class SideMenuController {
     }
 
     /**
-     * TODO implementing
+     * Open current folder.
+     */
+    @FXML
+    private void openCurrentFolder() {
+        openFolder(Defines.findInstallDir());
+    }
+
+    /**
+     * Open current folder.
+     */
+    @FXML
+    private void openArticleFolder() {
+        openFolder(Config.get(Config.Key.ARTICLE_DIR));
+    }
+
+    /**
+     * Open current folder.
+     */
+    @FXML
+    private void openImageFolder() {
+        openFolder(Config.get(Config.Key.IMAGE_DIR));
+    }
+
+    /**
+     * Open specified folder.
+     * @param dir
+     */
+    private void openFolder(final String dir) {
+        final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
+                ? dir
+                : FileUtil.FILE_PROTOCOL + dir;
+        RuntimeUtil.callExplorer(openPath);
+    }
+
+    /**
+     * Open external file.
      */
     @FXML
     private void openExternalFile() {
-
-        if (articleGenerator == null) {
-            articleGenerator = new ArticleGenerator();
-        }
-
         final FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File("."));
         final File result = fc.showOpenDialog(stage.getScene().getWindow());
@@ -608,20 +713,25 @@ public class SideMenuController {
         FileUtil.findExtension(result).ifPresent(ext -> {
             switch (ext) {
                 case ".txt":
-                case ".wiki":
-                    content.append(articleGenerator.wiki2Html(result.getAbsolutePath()));
+                    openTabWithHtmlContent.accept(
+                            result.getAbsolutePath(),
+                            FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                            ContentType.TEXT
+                            );
                     break;
                 case ".md":
-                    content.append(articleGenerator.md2Html(result.getAbsolutePath()));
+                    content.append(articleGenerator.convertToHtml(result));
+                    if (content.length() == 0) {
+                        return;
+                    }
+                    openTabWithHtmlContent.accept(
+                            result.getAbsolutePath(),
+                            content.toString(),
+                            ContentType.HTML
+                            );
                     break;
             }
         });
-
-        if (content.length() == 0) {
-            return;
-        }
-        articleGenerator.generateHtml(content.toString(), result.getAbsolutePath());
-        openExternal.accept(result.getAbsolutePath());
     }
 
     /**
@@ -634,7 +744,7 @@ public class SideMenuController {
 
     /**
      * Set open tab command.
-     * @param edit Command
+     * @param open tab Command
      */
     protected void setOnNewTab(final Runnable command) {
         this.open = command;
@@ -642,10 +752,18 @@ public class SideMenuController {
 
     /**
      * Set close tab command.
-     * @param edit Command
+     * @param close tab Command
      */
     protected void setOnCloseTab(final Runnable command) {
         this.close = command;
+    }
+
+    /**
+     * Set action of close all tabs.
+     * @param object
+     */
+    protected void setOnCloseAllTabs(final Runnable command) {
+        this.closeAll = command;
     }
 
     /**
@@ -689,14 +807,6 @@ public class SideMenuController {
     }
 
     /**
-     * Set convert command.
-     * @param convert2Md command.
-     */
-    protected void setOnConvertMd(final OpenTabAction convert2Md) {
-        this.convert2Md = convert2Md;
-    }
-
-    /**
      * for use shortcut when start-up.
      */
     private void putAccerelator() {
@@ -704,15 +814,43 @@ public class SideMenuController {
             = this.stage.getScene().getAccelerators();
         menuTabs.getTabs().forEach(tab -> {
             @SuppressWarnings("unchecked")
-            final JFXListView<MenuLabel> labels = (JFXListView<MenuLabel>) tab.getContent();
-            labels.getItems().forEach(l -> {
-                if (l.getAccelerator() == null) {
-                    return;
-                }
-                accelerators.put(
-                        l.getAccelerator(), () -> l.getOnAction().handle(new ActionEvent()));
-            });
+            final JFXListView<Node> items = (JFXListView<Node>) tab.getContent();
+            items.getItems().stream()
+                 .flatMap(this::flattenListToLabel)
+                 .map(this::extractAcceleratorPair)
+                 .filter(Filters::isNotNull)
+                 .forEach(item -> accelerators.put(
+                         item.getT1(), () -> item.getT2().handle(new ActionEvent())));
         });
+    }
+
+    /**
+     * Flatten list to Label.
+     * @param item Node
+     * @return new Node's Stream.
+     */
+    @SuppressWarnings("unchecked")
+    private Stream<Node> flattenListToLabel(final Node item) {
+        if (item instanceof ListView) {
+            return ((ListView<Node>) item).getItems().stream();
+        }
+        return Stream.of(item);
+    }
+
+    /**
+     * Extract accelerator and action from node.
+     * @param node
+     * @return accelerator and action
+     */
+    private Tuple2<KeyCombination, EventHandler<ActionEvent>> extractAcceleratorPair(final Node node) {
+        if (!(node instanceof MenuLabel)) {
+            return null;
+        }
+        final MenuLabel label = (MenuLabel) node;
+        if (label.getAccelerator() == null) {
+            return null;
+        }
+        return Tuples.of(label.getAccelerator(), label.getOnAction());
     }
 
     /**
@@ -725,27 +863,19 @@ public class SideMenuController {
     }
 
     /**
-     * Set "About" command.
-     * @param about command
-     */
-    protected void setOnAbout(final Runnable about) {
-        this.about = about;
-    }
-
-    /**
-     * Set "LogViewer" command.
-     * @param log command
-     */
-    protected void setOnOpenLogViewer(final Runnable log) {
-        this.log = log;
-    }
-
-    /**
      * Set on quit command.
      * @param onQuit
      */
     protected void setOnQuit(final Runnable onQuit) {
         this.onQuit = onQuit;
+    }
+
+    /**
+     * Set on make article action.
+     * @param c
+     */
+    public void setOnMakeArticle(final Runnable onMakeArticle) {
+        this.onMakeArticle = onMakeArticle;
     }
 
     /**
@@ -781,14 +911,6 @@ public class SideMenuController {
     }
 
     /**
-     * Set on opening external content action.
-     * @param openExternal
-     */
-    protected void setOnOpenExternalFile(final Consumer<String> openExternal) {
-        this.openExternal = openExternal;
-    }
-
-    /**
      * Show simple message dialog.
      * @param title title
      * @param message message
@@ -798,11 +920,49 @@ public class SideMenuController {
     }
 
     /**
+     * Show simple message popup.
+     * @param message message
+     */
+    private void showMessagePopup(final String message) {
+        onPopup.accept(message);
+    }
+
+    /**
      * Set on OpenTools action.
      * @param switchRightDrawer
      */
     public void setOnOpenTools(final Runnable switchRightDrawer) {
         this.switchRightDrawer = switchRightDrawer;
+    }
+
+    /**
+     * Set on popup.
+     * @param onPopup
+     */
+    public void setOnPopup(final Consumer<String> onPopup) {
+        this.onPopup = onPopup;
+    }
+
+    /**
+     * Set current article getter.
+     * @param articleGetter
+     */
+    public void setCurrentArticleGetter(final Supplier<Optional<Article>> articleGetter) {
+        this.articleGetter = articleGetter;
+    }
+
+    /**
+     * Set openTabWithHtmlContent.
+     * @param openTabWithHtmlContent
+     */
+    public void setOpenTabWithHtmlContent(
+            final TriConsumer<String, String, ContentType> openTabWithHtmlContent) {
+        this.openTabWithHtmlContent = openTabWithHtmlContent;
+    }
+
+    @Override
+    public void initialize(final URL location, final ResourceBundle resources) {
+        articleGenerator = new ArticleGenerator();
     }
 
 }

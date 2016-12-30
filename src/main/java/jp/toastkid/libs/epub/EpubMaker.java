@@ -24,12 +24,12 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.models.Defines;
 
 /**
  * epub を生成する.

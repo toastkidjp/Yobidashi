@@ -19,8 +19,9 @@ public class WebServiceHelper {
      *
      */
     public enum Type {
-        Y_DICTIONARY("Y!辞書"), WEBLIO("Weblio"), TABELOG("食べログ"), WIKIPEDIA("Wikipedia"),
-        REALTIME_SEARCH("Y!RTS"), WEB_SEARCH("Y!");
+        Y_DICTIONARY("Dictionary"), WEBLIO("Weblio"), TABELOG("Restaurant"), WIKIPEDIA("Wikipedia"),
+        Y_IMAGE("Image"), REALTIME_SEARCH("Realtime"), WEB_SEARCH("Y!"), Y_VIDEO("Video"),
+        Y_MAP("Map"), Y_LOCO("Location");
 
         /** 検索種別の日本語名. */
         private final String text;
@@ -90,21 +91,29 @@ public class WebServiceHelper {
 
         switch (type) {
             case REALTIME_SEARCH:
-                return "http://realtime.search.yahoo.co.jp/search?fr=top_ga1_sa&ei=utf-8&p=" + targetQuery;
+                return "http://realtime.search.yahoo.co.jp/search?ei=utf-8&p=" + targetQuery;
             case WIKIPEDIA:
-                return "http://ja.wikipedia.org/wiki/Special:Search?search="
+                return "https://ja.wikipedia.org/wiki/Special:Search?search="
                         + targetQuery + "&sourceid=Mozilla-search";
             case TABELOG:
-                return "http://tabelog.com/japan/0/0/lst/?vs=1&sk="
+                return "https://tabelog.com/japan/0/0/lst/?vs=1&sk="
                         + targetQuery + "&SrtT=trend&LstCosT=0&sa=&cid=top_navi1&sw=" + targetQuery;
             case WEBLIO:
                 return "http://ejje.weblio.jp/content/" + targetQuery;
+            case Y_IMAGE:
+                return "http://image.search.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
             case Y_DICTIONARY:
-                return "http://dic.search.yahoo.co.jp/search?ei=UTF-8&fr=top_ga1_sa&p=" + targetQuery;
+                return "http://dic.search.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
+            case Y_VIDEO:
+                return "http://video.search.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
+            case Y_MAP:
+                return "http://map.search.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
+            case Y_LOCO:
+                return "http://search.loco.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
             case WEB_SEARCH:
             default:
-                return "http://search.yahoo.co.jp/search?p=" + targetQuery
-                        + "&search.x=1&fr=top_ga1_sa&tid=top_ga1_sa&ei=UTF-8&aq=&oq=";
+                return "https://search.yahoo.co.jp/search?p=" + targetQuery
+                        + "&search.x=1&ei=UTF-8&aq=&oq=";
         }
     }
 }

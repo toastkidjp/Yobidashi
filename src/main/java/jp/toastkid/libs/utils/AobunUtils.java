@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.wiki.models.Article;
-import jp.toastkid.wiki.models.Config;
-import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.Defines;
 
 /**
  * 青空文庫に関する便利クラス

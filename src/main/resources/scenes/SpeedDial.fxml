@@ -44,16 +44,20 @@
               <children>
                 <JFXComboBox fx:id="type" minWidth="180.0">
                   <tooltip>
-                    <Tooltip text="Style を選択します。" />
+                    <Tooltip text="Select search category." />
                   </tooltip>
                   <items>
                     <FXCollections fx:factory="observableArrayList">
                       <String fx:value="Y!" />
-                      <String fx:value="Y!辞書" />
+                      <String fx:value="Dictionary" />
+                      <String fx:value="Image" />
                       <String fx:value="Weblio" />
-                      <String fx:value="食べログ" />
+                      <String fx:value="Restaurant" />
                       <String fx:value="Wikipedia" />
-                      <String fx:value="Y!RTS" />
+                      <String fx:value="Realtime" />
+                      <String fx:value="Video" />
+                      <String fx:value="Map" />
+                      <String fx:value="Location" />
                     </FXCollections>
                   </items>
                 </JFXComboBox>

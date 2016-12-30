@@ -1,6 +1,6 @@
 package jp.toastkid.libs.epub;
 
-import jp.toastkid.wiki.models.Defines;
+import jp.toastkid.article.models.Defines;
 
 /**
  * Holding path to Resources.
