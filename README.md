@@ -44,7 +44,6 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | [commons-lang3](https://commons.apache.org/proper/commons-lang/) | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 | [PDFBox](https://pdfbox.apache.org/) | Apache License 2.0 | Converting slides to PDF
 | [commons-io](http://commons.apache.org/proper/commons-io/) | Apache License 2.0 | PDF-Box's dependency lib.
-| [Marked4J](https://github.com/making/marked4j) |  [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Markdown parser for Java |
 | [jackson-databind](https://github.com/FasterXML/jackson-databind) | Apache License Version 2.0 | convert string to POJO.
 | [slf4j-api](http://www.slf4j.org/) | [MIT license](http://www.slf4j.org/license.html) | Logging
 | [Groovy](http://www.groovy-lang.org/) | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.

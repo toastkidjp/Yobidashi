@@ -8,6 +8,7 @@ user/
 .git/
 .gradle/
 .settings/
+bin/
 build/
 backup/
 gradle/

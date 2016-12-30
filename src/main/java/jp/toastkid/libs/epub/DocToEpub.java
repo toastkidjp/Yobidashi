@@ -15,12 +15,12 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.converter.MarkdownConverter;
+import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.wiki.ArticleGenerator;
-import jp.toastkid.wiki.lib.WikiConverter;
-import jp.toastkid.wiki.models.Article;
-import jp.toastkid.wiki.models.Config;
-import jp.toastkid.wiki.models.Defines;
 
 /**
  * 記事を epub に変換して出力する.
@@ -177,7 +177,7 @@ public final class DocToEpub {
             final PageLayout layout
             ) {
         final List<ContentMetaData> targetPaths = new ArrayList<ContentMetaData>();
-        final WikiConverter converter = new WikiConverter("");
+        final MarkdownConverter converter = new MarkdownConverter("");
         final String imageDir = Config.get("imageDir").replace("\\", "/");
         converter.containsMenubar = false;
         targets.forEach((file) -> {

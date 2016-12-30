@@ -1,6 +1,6 @@
-** [[日記2016-02-26(金)]] [[日記2016-02-25(木)]]
+## [[日記2016-02-26(金)]] [[日記2016-02-25(木)]]
 
-** [【東京】Kotlin Birthday Party|https://kotlin.doorkeeper.jp/events/38987] {twitter:#jjug} {twitter:ngsw_taro}
+## [【東京】Kotlin Birthday Party|https://kotlin.doorkeeper.jp/events/38987] {twitter:#jjug} {twitter:ngsw_taro}
 
 {github:JoelSutherland/GitHub-jQuery-Repo-Widget}
 
@@ -9,18 +9,15 @@
 
 h6.[[tomato]]
 
-* タイトル
+# タイトル
 
-** サブタイトル
+## サブタイトル
 {expand:トマト大王}
 
 今日は家に引きこもっていても大丈夫だ。
 
 最高傑作　次回作
 
-#
-##
-#
 {expand}
 
 > 引用
