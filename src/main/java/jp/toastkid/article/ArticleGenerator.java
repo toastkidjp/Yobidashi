@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.impl.factory.Lists;
@@ -24,13 +24,13 @@ import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Defines;
 import jp.toastkid.yobidashi.Config.Key;
+import jp.toastkid.yobidashi.Defines;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Wiki article generator.
+ * Article generator.
  *
  * @author Toast kid
  */
@@ -47,9 +47,6 @@ public final class ArticleGenerator {
 
     /** txt -> Wiki 変換器. */
     private final MarkdownConverter converter;
-
-    /** リンクのプレフィクス. */
-    public String prefix;
 
     /** Image file chooser. */
     private final ImageChooser chooser;
@@ -74,30 +71,6 @@ public final class ArticleGenerator {
         chooser = new ImageChooser(USER_BACKGROUND);
         LOGGER.info("ended init ImageChooser. {}[ms]", System.currentTimeMillis() - start);
     }
-
-    /**
-     * 引数として渡した HTML 文字列を一時ファイルに出力する.
-     * 主に HTML ツールの呼び出しで使用
-     * <HR>
-     * (130414) 引数 title 追加<BR>
-     * (130302) 作成<BR>
-     * @param content 表示したい HTML 文字列
-     * @param title HTML の タイトル
-     */
-    /*TODO けすpublic final void generateHtml(
-            final String content,
-            final String title,
-            final boolean isTool
-            ) {
-        final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
-        final String processed   = post.process(content);
-        final String subheading  = post.generateSubheadings();
-        FileUtil.outPutStr(
-            decorate(title, processed, subheading),
-            Defines.TEMP_FILE_NAME,
-            Defines.ARTICLE_ENCODE
-        );
-    }*/
 
     /**
      * Decorate HTML content with template and CSS.
@@ -175,67 +148,29 @@ public final class ArticleGenerator {
     }
 
     /**
+     * Generate new article file.
+     * @param newArticle
+     */
+    public static void generateNewArticle(final Article newArticle) {
+        try {
+            Files.write(newArticle.file.toPath(), ArticleGenerator.makeNewContent(newArticle));
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);;
+        }
+    }
+
+    /**
      * Make new file's content.
      * @param article Article object
      * @return new file's content
      */
-    public static byte[] makeNewContent(final Article article) {
-        final Optional<String> ext = FileUtil.findExtension(article.file);
-        if (!ext.isPresent()) {
-            throw new IllegalArgumentException();
-        }
-
-        if (Article.Extension.MD.text().equals(ext.get())) {
-            try {
-                return newMarkdown(article.title).getBytes(Defines.ARTICLE_ENCODE);
-            } catch (final UnsupportedEncodingException e) {
-                LOGGER.error("Caught error.", e);
-            }
+    private static byte[] makeNewContent(final Article article) {
+        try {
+            return newMarkdown(article.title).getBytes(Defines.ARTICLE_ENCODE);
+        } catch (final UnsupportedEncodingException e) {
+            LOGGER.error("Caught error.", e);
         }
         return new byte[0];
-    }
-
-    /**
-     * 記事新規作成時のひな型を生成して返す.
-     * <HR>
-     * (130324) ひな型を一部修正<BR>
-     * (130112) 無駄に長い処理だったのでメソッドに分離<BR>
-     * @param convertedName 自然言語に戻したファイル名
-     * @return 記事のひな型
-     */
-    private static final String newArticle(final String convertedName){
-        final StringBuilder newContent = new StringBuilder(2000);
-        newContent.append("* ");
-        // (130112) 修正
-        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
-            newContent.append(convertedName.substring(2,convertedName.length()));
-        } else {
-            newContent.append(convertedName);
-        }
-
-        newContent.append(LINE_SEPARATOR);
-        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
-            newContent.append("未記入").append(LINE_SEPARATOR);
-            newContent.append(LINE_SEPARATOR);
-            newContent.append("** 消灯").append(LINE_SEPARATOR);
-            newContent.append("時分に消灯し、寝る。").append(LINE_SEPARATOR);
-            newContent.append(LINE_SEPARATOR);
-            // 土日祝分でなければ日経平均記入欄を追加
-            if (!convertedName.endsWith("(土)")
-                && !convertedName.endsWith("(日)")
-                && !convertedName.endsWith("祝)")
-                ){
-                newContent.append("** 今日の日経平均株価終値").append(LINE_SEPARATOR);
-                newContent.append("円(円高安)").append(LINE_SEPARATOR);
-                newContent.append(LINE_SEPARATOR);
-            }
-            // 家計簿欄を追加
-            newContent.append("** 家計簿").append(LINE_SEPARATOR);
-            newContent.append("| | 円").append(LINE_SEPARATOR);
-            newContent.append("| | 円").append(LINE_SEPARATOR);
-            newContent.append(LINE_SEPARATOR);
-        }
-        return newContent.toString();
     }
 
     /**
@@ -289,18 +224,17 @@ public final class ArticleGenerator {
      * @param params パラメータ
      * @return パラメータをセットしたテンプレートの文字列表現
      */
-    public static final String bindArgs(
-            final String pathToTemplate,
-            final Map<String, String> params
-            ) {
-        return bindArgsInternal(
-                FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE), params);
+    public static final String bindArgs(final String pathToTemplate, final Map<String, String> params) {
+        return bindArgsInternal(FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE), params);
     }
 
-    private static final String bindArgsInternal(
-            final List<String> strs,
-            final Map<String, String> params
-            ) {
+    /**
+     * Internal method.
+     * @param strs
+     * @param params
+     * @return
+     */
+    private static final String bindArgsInternal(final List<String> strs, final Map<String, String> params) {
         try {
             return TEMPLATE_ENGINE.createTemplate(
                     Lists.immutable.ofAll(strs).makeString(LINE_SEPARATOR)).make(params).toString();

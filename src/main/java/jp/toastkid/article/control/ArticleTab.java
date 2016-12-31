@@ -1,6 +1,5 @@
 package jp.toastkid.article.control;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,9 +46,6 @@ public class ArticleTab extends BaseWebTab {
     /** Article HTML generator. */
     private static final ArticleGenerator GENERATOR = new ArticleGenerator();
 
-    /** for desktop control. */
-    private static Desktop desktop;
-
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
 
@@ -65,12 +61,16 @@ public class ArticleTab extends BaseWebTab {
     /** HTML content. */
     private String content;
 
+    /** Content's yOffset. */
     private int yOffset;
 
+    /** Content editor. */
     private CodeArea editor;
 
+    /** Splitter. */
     private SplitPane split;
 
+    /** Editor's scroll bar. */
     private VirtualizedScrollPane<CodeArea> vsp;
 
     /**
@@ -296,13 +296,7 @@ public class ArticleTab extends BaseWebTab {
 
         final File openTarget = this.article.file;
         if (!openTarget.exists()) {
-            try {
-                openTarget.createNewFile();
-                Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(this.article));
-            } catch (final IOException e) {
-                LOGGER.error("Error", e);;
-            }
-            openFileByEditor(openTarget);
+            ArticleGenerator.generateNewArticle(article);
         }
 
         final String processed  = post.process(GENERATOR.convertToHtml(this.article));
@@ -358,21 +352,13 @@ public class ArticleTab extends BaseWebTab {
     public String edit() {
         final File openTarget = article.file;
         if (openTarget.exists()){
-            //openFileByEditor(openTarget);
             switchEditorVisible();
             editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
-        try {
-            openTarget.createNewFile();
-            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            return e.getMessage();
-        }
-        //openFileByEditor(openTarget);
+        ArticleGenerator.generateNewArticle(article);
         switchEditorVisible();
         editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
         return "";
@@ -388,28 +374,6 @@ public class ArticleTab extends BaseWebTab {
         }
         reload();
         return String.format("Save to file 「%s」", article.title);
-    }
-
-    /**
-     * Open file by editor.
-     *
-     * @param openTarget
-     */
-    private static void openFileByEditor(final File openTarget) {
-
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-        }
-
-        if (!openTarget.exists() || desktop == null){
-            return;
-        }
-
-        try {
-            desktop.open(openTarget);
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);;
-        }
     }
 
 }

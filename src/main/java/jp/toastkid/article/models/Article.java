@@ -230,6 +230,16 @@ public class Article implements Comparable<Article> {
     }
 
     /**
+     * TODO write test.
+     * 記事名から Article オブジェクトを生成.
+     * @param newFileName ファイル名(パスではない)
+     * @return Article オブジェクト
+     */
+    public static Article findFromTitle(final String newFileName) {
+        return Article.find(ArticleGenerator.titleToFileName(newFileName) + ".md");
+    }
+
+    /**
      * URL から Article オブジェクトを生成.
      * @param url URL
      * @return Article オブジェクト

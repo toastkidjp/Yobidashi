@@ -1,15 +1,12 @@
 package jp.toastkid.article;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.HashMap;
 
 import org.junit.Test;
 
-import jp.toastkid.article.models.Article;
 import jp.toastkid.yobidashi.Defines;
 
 /**
@@ -41,18 +38,6 @@ public final class ArticleGeneratorTest {
             htmlContent.contains("<title>タイトルでござい</title>")
             && htmlContent.contains("こんてんと")
         );
-    }
-
-    /**
-     * Check {@link ArticleGenerator#makeNewContent(Article)}.
-     */
-    @Test
-    public void testMakeNewContent() {
-        final byte[] newContent = ArticleGenerator.makeNewContent(
-                new Article(new File("C6FCB5AD323031332D30382D333128C5DA29.md")));
-        assertNotNull(newContent);
-        System.out.println(new String(newContent));
-        assertTrue(new String(newContent).startsWith("# 2013-08-31(土)"));
     }
 
     /**

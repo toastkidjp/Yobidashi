@@ -20,6 +20,7 @@ import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
+import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
@@ -1209,7 +1210,8 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearHistory() {
         new AlertDialog.Builder(stage)
-            .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
+            .setTitle("Clear History")
+            .setMessage("Does it delete all histories?")
             .setOnPositive("OK", () -> {
                 historyList.getItems().clear();
                 FILE_WATCHER.clear();
@@ -1218,11 +1220,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Make new Markdown.
+     * Make new Markdown file.
      */
     private final void makeMarkdown() {
-        final TextField input = new TextField();
-        final String newArticleMessage = "新しい記事の名前を入力して下さい。";
+        final TextField input = new JFXTextField();
+        final String newArticleMessage = "Please could you input new article's title?";
         input.setPromptText(newArticleMessage);
         new AlertDialog.Builder(getParent())
                 .setTitle("Make new article")
@@ -1230,9 +1232,10 @@ public final class Controller implements Initializable {
                 .addControl(input)
                 .build().show();
         final String newFileName = input.getText();
-        if (!StringUtils.isEmpty(newFileName)){
-            callEditor();
+        if (StringUtils.isEmpty(newFileName)){
+            return;
         }
+        openArticleTab(Article.findFromTitle(newFileName));
     }
 
     /**
