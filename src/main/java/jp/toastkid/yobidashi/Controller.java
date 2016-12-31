@@ -679,7 +679,7 @@ public final class Controller implements Initializable {
                 new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
-            opt.ifPresent(article -> getCurrentTab().loadUrl(article.toInternalUrl()));
+            opt.ifPresent(this::openArticleTab);
         } catch (final Exception e) {
             LOGGER.error("no such element", e);
         }
