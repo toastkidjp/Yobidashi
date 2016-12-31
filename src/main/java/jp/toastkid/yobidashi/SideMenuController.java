@@ -157,6 +157,9 @@ public class SideMenuController implements Initializable {
     /** Action of close all tabs. */
     private Runnable closeAll;
 
+    /** Action of save article. */
+    private Runnable onSaveArticle;
+
     /**
      * Call back up method.
      */
@@ -637,6 +640,14 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Make new article.
+     */
+    @FXML
+    private final void saveArticle() {
+        onSaveArticle.run();
+    }
+
+    /**
      * rename article.
      */
     @FXML
@@ -956,6 +967,14 @@ public class SideMenuController implements Initializable {
     public void setOpenTabWithHtmlContent(
             final TriConsumer<String, String, ContentType> openTabWithHtmlContent) {
         this.openTabWithHtmlContent = openTabWithHtmlContent;
+    }
+
+    /**
+     * Set on save article.
+     * @param command command
+     */
+    protected void setOnSaveArticle(final Runnable command) {
+        this.onSaveArticle = command;
     }
 
     @Override

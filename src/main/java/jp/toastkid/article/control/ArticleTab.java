@@ -9,6 +9,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +22,7 @@ import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.web.PopupFeatures;
@@ -28,6 +32,7 @@ import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Config.Key;
@@ -61,6 +66,12 @@ public class ArticleTab extends BaseWebTab {
     private String content;
 
     private int yOffset;
+
+    private CodeArea editor;
+
+    private SplitPane split;
+
+    private VirtualizedScrollPane<CodeArea> vsp;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -194,12 +205,45 @@ public class ArticleTab extends BaseWebTab {
                     }
                 });
 
-        this.setContent(webView);
+        this.editor = new CodeArea();
+        editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
+
+        vsp = new VirtualizedScrollPane<>(editor);
+        split = new SplitPane(webView, vsp);
+        this.setContent(split);
+        split.setDividerPositions(0.5);
+        switchEditorVisible();
+
         Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
 
         // 新規タブで開く場合
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
         this.loadUrl(article.toInternalUrl());
+    }
+
+    /**
+     * Switch editor's visibility.
+     */
+    private void switchEditorVisible() {
+        if (isNotEditorVisible()) {
+            split.setDividerPositions(0.5);
+            vsp.setVisible(true);
+            vsp.setManaged(true);
+            return;
+        }
+
+        split.setDividerPositions(1.0);
+        editor.setEstimatedScrollY(0.0);
+        vsp.setVisible(false);
+        vsp.setManaged(false);
+    }
+
+    /**
+     * Return isn't visible of editor.
+     * @return
+     */
+    private boolean isNotEditorVisible() {
+        return 0.9 < split.getDividerPositions()[0];
     }
 
     /**
@@ -314,7 +358,9 @@ public class ArticleTab extends BaseWebTab {
     public String edit() {
         final File openTarget = article.file;
         if (openTarget.exists()){
-            openFileByEditor(openTarget);
+            //openFileByEditor(openTarget);
+            switchEditorVisible();
+            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
             return "";
         }
 
@@ -323,11 +369,25 @@ public class ArticleTab extends BaseWebTab {
             openTarget.createNewFile();
             Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
         } catch (final IOException e) {
-            LOGGER.error("Error", e);;
+            LOGGER.error("Error", e);
+            return e.getMessage();
         }
-        //loadArticleList();
-        openFileByEditor(openTarget);
+        //openFileByEditor(openTarget);
+        switchEditorVisible();
+        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
         return "";
+    }
+
+    @Override
+    public String saveContent() {
+        try {
+            Files.write(article.file.toPath(), editor.getText().getBytes());
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);
+            return e.getMessage();
+        }
+        reload();
+        return String.format("Save to file 「%s」", article.title);
     }
 
     /**

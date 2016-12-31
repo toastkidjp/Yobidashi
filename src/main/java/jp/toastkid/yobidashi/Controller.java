@@ -1219,9 +1219,7 @@ public final class Controller implements Initializable {
 
     /**
      * Make new Markdown.
-     * .
      */
-    @FXML
     private final void makeMarkdown() {
         final TextField input = new TextField();
         final String newArticleMessage = "新しい記事の名前を入力して下さい。";
@@ -1234,6 +1232,16 @@ public final class Controller implements Initializable {
         final String newFileName = input.getText();
         if (!StringUtils.isEmpty(newFileName)){
             callEditor();
+        }
+    }
+
+    /**
+     * Save current tab's content.
+     */
+    private void saveCurrentTab() {
+        final String message = getCurrentTab().saveContent();
+        if (StringUtils.isNotBlank(message)) {
+            setStatus(message);
         }
     }
 
@@ -1582,6 +1590,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPopup(this::setStatus);
         sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
         sideMenuController.setOpenTabWithHtmlContent(this::openWebTabWithContent);
+        sideMenuController.setOnSaveArticle(this::saveCurrentTab);
     }
 
     /**
