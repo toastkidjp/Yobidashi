@@ -28,9 +28,9 @@ import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Config.Key;
 import jp.toastkid.libs.utils.MathUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Config.Key;
 
 /**
  * Article tab.

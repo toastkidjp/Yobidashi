@@ -32,8 +32,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Config.Key;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Config.Key;
 
 /**
  * Chart controller.

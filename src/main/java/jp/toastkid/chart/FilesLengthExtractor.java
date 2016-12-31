@@ -7,9 +7,9 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import jp.toastkid.article.ArticleGenerator;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.fileFilter.ArticleFileFilter;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * ファイルの文字数を計算する。

@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * RSS リーダ.

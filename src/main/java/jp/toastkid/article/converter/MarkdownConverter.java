@@ -12,12 +12,12 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.article.models.Config;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.yobidashi.Config;
 
 /**
  * This class convert Markdown file to HTML.

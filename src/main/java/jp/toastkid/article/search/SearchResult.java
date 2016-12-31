@@ -9,9 +9,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.impl.factory.Maps;
 
 import jp.toastkid.article.ArticleGenerator;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * 記事1件の検索結果.

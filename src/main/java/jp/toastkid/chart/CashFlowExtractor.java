@@ -15,8 +15,8 @@ import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * 日記から家計簿の部分を取り出し、計算する。

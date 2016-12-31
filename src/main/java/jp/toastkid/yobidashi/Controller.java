@@ -77,9 +77,7 @@ import jp.toastkid.article.control.ContentTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
 import jp.toastkid.article.models.ContentType;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
@@ -1087,43 +1085,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Open folder.
-     * @param event 開くフォルダを決めるのに使う.
-     */
-    @FXML
-    private final void openFolder(final ActionEvent event) {
-        final MenuItem source = (MenuItem) event.getSource();
-        final String text = source.getText();
-        String[] dirs;
-        switch (text) {
-            case "現在のフォルダ":
-                dirs = new String[]{ Defines.findInstallDir() };
-                break;
-            case "記事":
-                dirs = new String[]{ Config.get(Config.Key.ARTICLE_DIR) };
-                break;
-            case "画像":
-                dirs = new String[]{ Config.get(Config.Key.IMAGE_DIR) };
-                break;
-            case "音楽":
-                dirs = Config.get(Config.Key.MUSIC_DIR).split(",");
-                break;
-            default:
-                dirs = new String[]{ Defines.findInstallDir() };
-                break;
-        }
-        for (final String dir : dirs) {
-            if (StringUtils.isBlank(dir)) {
-                continue;
-            }
-            final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
-                    ? dir
-                    : FileUtil.FILE_PROTOCOL + dir;
-            RuntimeUtil.callExplorer(openPath);
-        }
-    }
-
-    /**
      * Open home.
      */
     @FXML
@@ -1406,10 +1367,7 @@ public final class Controller implements Initializable {
             .setOnPositive("OK", () -> {
                 article.file.delete();
                 AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                // (130317)
-                final String homePath = Config.get(Config.Key.HOME);
-                // 削除後はホーム画面に戻す
-                getCurrentTab().loadUrl(homePath);
+                openSpeedDialTab();
                 // (130309) そしてファイル一覧から削除
                 articleList.getItems().remove(deleteTarget);
                 removeHistory(article);

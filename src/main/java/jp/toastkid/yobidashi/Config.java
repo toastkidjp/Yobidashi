@@ -1,4 +1,4 @@
-package jp.toastkid.article.models;
+package jp.toastkid.yobidashi;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,11 +6,9 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,7 @@ public final class Config {
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     /**
-     * keys of Config.
+     * Keys of Config.
      * @author Toast kid
      *
      */
@@ -46,15 +44,13 @@ public final class Config {
         EDITOR_PATH("editorPath"),
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
-        HOME("home"),
-        MUSIC_DIR("musicDir"),
         IMAGE_DIR("imageDir");
 
-        /** key of Config. */
+        /** Key of Config. */
         private final String text;
 
         /**
-         * set text.
+         * Set text.
          * @param text
          */
         private Key(final String text) {
@@ -62,10 +58,10 @@ public final class Config {
         }
     }
 
-    /** message in properties file. */
+    /** Message in properties file. */
     private static final String MESSAGE = "Tool's Property.";
 
-    /** configrations. */
+    /** Configrations. */
     private static final Properties CONFIG = new Properties();
     static {
         reload();
@@ -75,7 +71,7 @@ public final class Config {
     private static String editorPath;
 
     /**
-     * get property value by key.
+     * Get property value by key.
      * @param key string
      * @return property value object
      */
@@ -84,7 +80,7 @@ public final class Config {
     }
 
     /**
-     * get property value by key.
+     * Get property value by key.
      * @param key string
      * @return property value object
      */
@@ -93,7 +89,7 @@ public final class Config {
     }
 
     /**
-     * get property value by key.
+     * Get property value by key.
      * @param key key
      * @return property value object
      */
@@ -102,7 +98,7 @@ public final class Config {
     }
 
     /**
-     * get property value by key.
+     * Get property value by key.
      * @param key key
      * @return property value object
      */
@@ -120,32 +116,6 @@ public final class Config {
         return CONFIG.getProperty(key, substitute).toString();
     }
 
-    /** リロードボタンの画像へのパス. */
-    //private static final String IMAGE_RELOAD = "reload.png";
-
-
-    /**
-     * 設定をファイルに保存する.
-     * @param key   設定のキー
-     * @param value 設定値
-     */
-    public final void storeConfig(
-            final String key,
-            final String value
-            ) {
-        final Map<String,String> confMap = FileUtil.isExistFile(Defines.CONF_DIR)
-                ? FileUtil.createMapFromFile(Defines.CONF_DIR, Defines.CONF_ENCODE, "=")
-                : new HashMap<String,String>(10);
-        if (StringUtils.isNotEmpty(key)){
-            confMap.put(key, value);
-        }
-        FileUtil.outPutMap(
-                confMap,
-                Defines.CONF_DIR,
-                Defines.CONF_ENCODE,
-                "="
-        );
-    }
     /**
      * 設定を再読み込みする.
      */

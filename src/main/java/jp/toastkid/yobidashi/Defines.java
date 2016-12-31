@@ -1,4 +1,4 @@
-package jp.toastkid.article.models;
+package jp.toastkid.yobidashi;
 
 import java.io.File;
 

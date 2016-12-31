@@ -21,11 +21,11 @@ import groovy.text.TemplateEngine;
 import jp.toastkid.article.converter.MarkdownConverter;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Config.Key;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.Config.Key;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 

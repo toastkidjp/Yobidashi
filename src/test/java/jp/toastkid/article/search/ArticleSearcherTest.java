@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 
-import jp.toastkid.article.models.Config;
 import jp.toastkid.article.search.ArticleSearcher;
+import jp.toastkid.yobidashi.Config;
 
 /**
  * ファイル検索クラスのテスト.

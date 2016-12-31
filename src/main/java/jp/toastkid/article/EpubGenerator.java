@@ -5,12 +5,12 @@ import java.io.File;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.epub.DocToEpub;
 import jp.toastkid.libs.epub.EpubMetaData;
 import jp.toastkid.libs.epub.PageLayout;
 import jp.toastkid.libs.epub.PageProgressDirection;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * ePub generator.

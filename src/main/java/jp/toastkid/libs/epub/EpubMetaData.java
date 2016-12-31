@@ -5,8 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * Epub's meta data.

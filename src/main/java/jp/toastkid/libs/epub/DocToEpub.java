@@ -18,9 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.MarkdownConverter;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * 記事を epub に変換して出力する.

@@ -16,6 +16,8 @@ import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * Article model.

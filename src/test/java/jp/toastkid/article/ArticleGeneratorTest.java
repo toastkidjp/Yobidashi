@@ -10,7 +10,7 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Defines;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * {@link ArticleGenerator}'s test case.
