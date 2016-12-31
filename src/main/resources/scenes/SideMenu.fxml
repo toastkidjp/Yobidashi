@@ -39,6 +39,7 @@
               <MenuLabel accelerator="Ctrl+W" mnemonicParsing="true" onAction="#closeTab" text="Close tab" />
               <MenuLabel accelerator="Alt+W" mnemonicParsing="true" onAction="#closeAllTabs" text="Close all tabs" />
               <MenuLabel accelerator="Shift+F5" mnemonicParsing="true" onAction="#slideShow" text="Slide show"/>
+              <MenuLabel onAction="#editBookmark" text="Edit bookmark"/>
               <!--MenuLabel accelerator="Ctrl+P" mnemonicParsing="true" onAction="#callPrinterJob" text="Print" /-->
               <MenuLabel onAction="#quit" text="Quit"/>
             </JFXListView>

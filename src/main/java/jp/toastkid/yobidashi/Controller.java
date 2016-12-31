@@ -106,9 +106,6 @@ public final class Controller implements Initializable {
     /** Speed dial's scene graph file. */
     private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
-    /** /path/to/path to bookmark file. */
-    private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
-
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
 
@@ -1176,10 +1173,8 @@ public final class Controller implements Initializable {
             .publishOn(Schedulers.elastic())
             .subscribeOn(Schedulers.elastic())
             .subscribe(
-                empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
-                    .collect(Articles::titleToFileName)
-                    .collect(fileName -> fileName + Article.Extension.MD.text())
-                    .collect(Articles::find)
+                empty -> new BookmarkManager().readLines()
+                    .collect(Articles::findFromTitle)
                     .each(bookmarks::add)
                     );
     }

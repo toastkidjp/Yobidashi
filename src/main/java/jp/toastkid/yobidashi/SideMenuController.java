@@ -322,6 +322,14 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Call BookmarkManager.
+     */
+    @FXML
+    private final void editBookmark() {
+        new BookmarkManager().edit(stage);
+    }
+
+    /**
      * Call About.
      */
     @FXML
