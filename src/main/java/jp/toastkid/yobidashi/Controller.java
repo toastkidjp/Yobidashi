@@ -717,6 +717,7 @@ public final class Controller implements Initializable {
             speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
             speedDialController.setZero();
             speedDialController.setBackground(articleGenerator.getBackground());
+            speedDialController.setOnArticleSearch(this::doSearch);
             speedDialController.setOnWebSearch((query, type) ->
                 openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
             );
@@ -1039,21 +1040,31 @@ public final class Controller implements Initializable {
                     ((AutoCompleteTextField) filterInput).getEntries().add(filter);
                 }
 
-                final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
-                        .setHomeDirPath(Config.get("articleDir"))
-                        .setAnd(isAnd.isSelected())
-                        .setSelectName(filter)
-                        .setEmptyAction(() -> {
-                            showSnackbar(String.format("Not found article with '%s'.", query));
-                            searchArticle(queryInput.getText(), filterInput.getText());
-                        })
-                        .setSuccessAction(this::setStatus)
-                        .setTabPane(leftTabs)
-                        .setListViewInitializer(this::initArticleList)
-                        .setHeight(articleList.getHeight())
-                        .build();
-                fileSearcher.search(query);
+                doSearch(isAnd.isSelected(), query, filter);
             }).build().show();
+    }
+
+    /**
+     * Do search article.
+     * @param isAnd
+     * @param query
+     * @param filter
+     */
+    private void doSearch(final boolean isAnd, final String query, final String filter) {
+        final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
+                .setHomeDirPath(Config.get("articleDir"))
+                .setAnd(isAnd)
+                .setSelectName(filter)
+                .setEmptyAction(() -> {
+                    showSnackbar(String.format("Not found article with '%s'.", query));
+                    searchArticle(queryInput.getText(), filterInput.getText());
+                })
+                .setSuccessAction(this::setStatus)
+                .setTabPane(leftTabs)
+                .setListViewInitializer(this::initArticleList)
+                .setHeight(articleList.getHeight())
+                .build();
+        fileSearcher.search(query);
     }
 
     /**

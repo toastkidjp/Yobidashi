@@ -48,6 +48,7 @@
                   </tooltip>
                   <items>
                     <FXCollections fx:factory="observableArrayList">
+                      <String fx:value="Article" />
                       <String fx:value="Y!" />
                       <String fx:value="Dictionary" />
                       <String fx:value="Image" />
