@@ -1,6 +1,6 @@
 package jp.toastkid.libs.epub;
 
-import jp.toastkid.article.models.Defines;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * Holding path to Resources.

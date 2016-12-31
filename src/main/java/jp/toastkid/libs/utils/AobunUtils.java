@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Defines;
+import jp.toastkid.article.models.Articles;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * 青空文庫に関する便利クラス
@@ -43,7 +43,7 @@ public final class AobunUtils {
         final int length = files.length;
         for (int i = 0; i < length; i++){
             if (!files[i].isDirectory()) {
-                final String title = Article.convertTitle(files[i].getName());
+                final String title = Articles.convertTitle(files[i].getName());
                 if (title.startsWith(prefix)) {
                     docToTxt(files[i].getAbsolutePath(), prefix);
                     System.out.println("Now processing (" + (i + 1) + " / " + length + ") ... " + title);
@@ -104,7 +104,7 @@ public final class AobunUtils {
      * @return 文書タイトル
      */
     public static String getTitleFromPath(final String filePath) {
-        return Article.convertTitle(new File(filePath).getName()).replace("_", " ");
+        return Articles.convertTitle(new File(filePath).getName()).replace("_", " ");
     }
 
     /**
@@ -117,7 +117,7 @@ public final class AobunUtils {
             final String       bookTitle,
             final List<String> list
             ) {
-        final List<String>  output    = new ArrayList<String>(list.size());
+        final List<String>  output    = new ArrayList<>(list.size());
         final StringBuilder paragraph = new StringBuilder();
         for (String str : list) {
             if (str.contains("&ruby")) {

@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.Interval;
 
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * ファイル単位での検索をする.

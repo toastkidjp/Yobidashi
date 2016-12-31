@@ -9,7 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import jp.toastkid.article.models.Config;
+import jp.toastkid.yobidashi.Config;
 
 /**
  * 設定ダイアログのコントローラ.

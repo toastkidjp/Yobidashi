@@ -15,12 +15,11 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.MarkdownConverter;
-import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Defines;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * 記事を epub に変換して出力する.
@@ -49,7 +48,7 @@ public final class DocToEpub {
             );
 
     /** 削除対象ファイルのパス一覧. */
-    private static List<String> cleanTargets = new ArrayList<String>();
+    private static List<String> cleanTargets = new ArrayList<>();
 
     /**
      * run generator.
@@ -94,7 +93,7 @@ public final class DocToEpub {
              * 指定静的コンテンツ回収
              */
             final EpubMaker eMaker = new EpubMaker(meta);
-            final List<ContentMetaData> targetContents = new ArrayList<ContentMetaData>();
+            final List<ContentMetaData> targetContents = new ArrayList<>();
             if (StringUtils.isNotEmpty(meta.targetPrefix)) {
                 targetContents.addAll(
                         getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
@@ -122,10 +121,10 @@ public final class DocToEpub {
             final boolean recursive
         ) {
         final List<File> targets = ARTICLES.asParallel(Executors.newFixedThreadPool(20), 20)
-                .select(file -> file.getName().startsWith(ArticleGenerator.titleToFileName(prefix)))
+                .select(file -> file.getName().startsWith(Articles.titleToFileName(prefix)))
                 .toList();
         if (recursive) {
-            final List<File> recursiveFiles = new ArrayList<File>();
+            final List<File> recursiveFiles = new ArrayList<>();
             targets.forEach(file ->{
                 recursiveFiles.add(file);
                 final List<String> contents = FileUtil.readLines(
@@ -139,7 +138,7 @@ public final class DocToEpub {
                         while (matcher.find()) {
                             final File f = new File(
                                     ARTICLE_PATH,
-                                    ArticleGenerator.titleToFileName(matcher.group(1)).concat(".txt")
+                                    Articles.titleToFileName(matcher.group(1)).concat(".txt")
                                 );
                             if (f.exists() && !recursiveFiles.contains(f)) {
                                 recursiveFiles.add(f);
@@ -158,10 +157,10 @@ public final class DocToEpub {
      * @return 記事ファイルオブジェクトの一覧
      */
     private static final List<File> getTargets(final List<String> targets) {
-        final List<File> files = new ArrayList<File>(targets.size());
+        final List<File> files = new ArrayList<>(targets.size());
         targets.parallelStream()
             .map(prefix -> new File(ARTICLE_PATH,
-                    ArticleGenerator.titleToFileName(prefix).concat(".txt")))
+                    Articles.titleToFileName(prefix).concat(".txt")))
             .filter(ARTICLES::contains)
             .forEach(f -> files.add(f));
         return files;
@@ -176,7 +175,7 @@ public final class DocToEpub {
             final List<File> targets,
             final PageLayout layout
             ) {
-        final List<ContentMetaData> targetPaths = new ArrayList<ContentMetaData>();
+        final List<ContentMetaData> targetPaths = new ArrayList<>();
         final MarkdownConverter converter = new MarkdownConverter("");
         final String imageDir = Config.get("imageDir").replace("\\", "/");
         converter.containsMenubar = false;
@@ -186,7 +185,7 @@ public final class DocToEpub {
                         file.getAbsolutePath(),
                         Defines.ARTICLE_ENCODE
                     );
-            final String title = Article.convertTitle(file.getName());
+            final String title = Articles.convertTitle(file.getName());
             String baseName = file.getName();
             baseName = baseName.substring(0, baseName.length() - 4);
             baseName = (FILE_NAME_LENGTH < baseName.length())
@@ -197,7 +196,7 @@ public final class DocToEpub {
             final String style = layout.equals(PageLayout.VERTICAL)
                     ? EpubDefine.STYLESHEET_VERTICAL
                     : EpubDefine.STYLESHEET_HORIZONTAL;
-            final String convertedSource = ArticleGenerator.bindArgs(
+            final String convertedSource = Articles.bindArgs(
                     Resource.TEMPLATE,
                     Maps.mutable.of(
                             "title", title,

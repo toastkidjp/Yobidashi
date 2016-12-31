@@ -20,6 +20,7 @@ import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
+import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
@@ -77,9 +78,8 @@ import jp.toastkid.article.control.ContentTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.article.models.ContentType;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
@@ -363,7 +363,7 @@ public final class Controller implements Initializable {
                             articleGenerator = new ArticleGenerator();
                             Platform.runLater(Controller.this::callHome);
                             final String message = Thread.currentThread().getName()
-                                    + " Ended initialize ArticleGenerator. "
+                                    + " Ended initialize Articles. "
                                     + (System.currentTimeMillis() - start) + "ms";
                             setProgress(message);
                             LOGGER.info(message);
@@ -420,7 +420,7 @@ public final class Controller implements Initializable {
                                         // (130317) 「現在選択中のファイル名」にセット
                                         final File selected = new File(
                                                 Config.get(Config.Key.ARTICLE_DIR),
-                                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
+                                                Articles.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
                                                 );
                                         if (selected.exists()){
                                             focusOn();
@@ -1087,43 +1087,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Open folder.
-     * @param event 開くフォルダを決めるのに使う.
-     */
-    @FXML
-    private final void openFolder(final ActionEvent event) {
-        final MenuItem source = (MenuItem) event.getSource();
-        final String text = source.getText();
-        String[] dirs;
-        switch (text) {
-            case "現在のフォルダ":
-                dirs = new String[]{ Defines.findInstallDir() };
-                break;
-            case "記事":
-                dirs = new String[]{ Config.get(Config.Key.ARTICLE_DIR) };
-                break;
-            case "画像":
-                dirs = new String[]{ Config.get(Config.Key.IMAGE_DIR) };
-                break;
-            case "音楽":
-                dirs = Config.get(Config.Key.MUSIC_DIR).split(",");
-                break;
-            default:
-                dirs = new String[]{ Defines.findInstallDir() };
-                break;
-        }
-        for (final String dir : dirs) {
-            if (StringUtils.isBlank(dir)) {
-                continue;
-            }
-            final String openPath = dir.startsWith(FileUtil.FILE_PROTOCOL)
-                    ? dir
-                    : FileUtil.FILE_PROTOCOL + dir;
-            RuntimeUtil.callExplorer(openPath);
-        }
-    }
-
-    /**
      * Open home.
      */
     @FXML
@@ -1184,7 +1147,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Article.readAllArticleNames(Config.get("articleDir")))
+        Flux.fromIterable(Articles.readAllArticleNames(Config.get("articleDir")))
             .subscribeOn(Schedulers.newSingle("I/O"))
             .doOnTerminate(this::focusOn)
             .subscribe(items::add);
@@ -1203,9 +1166,9 @@ public final class Controller implements Initializable {
             .subscribeOn(Schedulers.elastic())
             .subscribe(
                 empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
-                    .collect(ArticleGenerator::titleToFileName)
+                    .collect(Articles::titleToFileName)
                     .collect(fileName -> fileName + Article.Extension.MD.text())
-                    .collect(Article::find)
+                    .collect(Articles::find)
                     .each(bookmarks::add)
                     );
     }
@@ -1248,7 +1211,8 @@ public final class Controller implements Initializable {
     @FXML
     private final void clearHistory() {
         new AlertDialog.Builder(stage)
-            .setTitle("Clear History").setMessage("閲覧履歴を削除します。")
+            .setTitle("Clear History")
+            .setMessage("Does it delete all histories?")
             .setOnPositive("OK", () -> {
                 historyList.getItems().clear();
                 FILE_WATCHER.clear();
@@ -1257,13 +1221,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Make new Markdown.
-     * .
+     * Make new Markdown file.
      */
-    @FXML
     private final void makeMarkdown() {
-        final TextField input = new TextField();
-        final String newArticleMessage = "新しい記事の名前を入力して下さい。";
+        final TextField input = new JFXTextField();
+        final String newArticleMessage = "Please could you input new article's title?";
         input.setPromptText(newArticleMessage);
         new AlertDialog.Builder(getParent())
                 .setTitle("Make new article")
@@ -1271,8 +1233,19 @@ public final class Controller implements Initializable {
                 .addControl(input)
                 .build().show();
         final String newFileName = input.getText();
-        if (!StringUtils.isEmpty(newFileName)){
-            callEditor();
+        if (StringUtils.isEmpty(newFileName)){
+            return;
+        }
+        openArticleTab(Articles.findFromTitle(newFileName));
+    }
+
+    /**
+     * Save current tab's content.
+     */
+    private void saveCurrentTab() {
+        final String message = getCurrentTab().saveContent();
+        if (StringUtils.isNotBlank(message)) {
+            setStatus(message);
         }
     }
 
@@ -1334,7 +1307,7 @@ public final class Controller implements Initializable {
                 }
                 final File dest = new File(
                         Config.get(Config.Key.ARTICLE_DIR),
-                        ArticleGenerator.titleToFileName(newTitle) + article.extention()
+                        Articles.titleToFileName(newTitle) + article.extention()
                         );
                 if (dest.exists()){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
@@ -1406,10 +1379,7 @@ public final class Controller implements Initializable {
             .setOnPositive("OK", () -> {
                 article.file.delete();
                 AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                // (130317)
-                final String homePath = Config.get(Config.Key.HOME);
-                // 削除後はホーム画面に戻す
-                getCurrentTab().loadUrl(homePath);
+                openSpeedDialTab();
                 // (130309) そしてファイル一覧から削除
                 articleList.getItems().remove(deleteTarget);
                 removeHistory(article);
@@ -1624,6 +1594,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnPopup(this::setStatus);
         sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
         sideMenuController.setOpenTabWithHtmlContent(this::openWebTabWithContent);
+        sideMenuController.setOnSaveArticle(this::saveCurrentTab);
     }
 
     /**

@@ -17,7 +17,7 @@ import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
-import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 
 /**
  * Base of Web tab.
@@ -102,7 +102,7 @@ public abstract class BaseWebTab extends ReloadableTab {
      * @return
      */
     private String findScrollTop(final String url) {
-        return StringUtils.isEmpty(url) || Article.isInternalLink(url)
+        return StringUtils.isEmpty(url) || Articles.isInternalLink(url)
                 ? "$('html,body').animate({ scrollTop: 0 }, 'fast');"
                 : "window.scrollTo(0, 0);";
     }
@@ -113,7 +113,7 @@ public abstract class BaseWebTab extends ReloadableTab {
      * @return
      */
     private String findScrollBottom(final String url) {
-        return StringUtils.isEmpty(url) || Article.isInternalLink(url)
+        return StringUtils.isEmpty(url) || Articles.isInternalLink(url)
                 ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
                 : "window.scrollTo(0, document.body.scrollHeight);";
     }

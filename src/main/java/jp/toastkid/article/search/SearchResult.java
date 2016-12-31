@@ -1,6 +1,5 @@
 package jp.toastkid.article.search;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,15 +7,12 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.impl.factory.Maps;
 
-import jp.toastkid.article.ArticleGenerator;
-import jp.toastkid.article.models.Defines;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.utils.Strings;
 
 /**
  * 記事1件の検索結果.
- * @author Toast kid
  *
+ * @author Toast kid
  */
 public final class SearchResult {
 
@@ -36,7 +32,7 @@ public final class SearchResult {
     public Map<String, List<String>> df;
 
     /**
-     * constructor.
+     * Constructor.
      * @param pFilePath /path/to/file
      */
     public SearchResult(final String pFilePath) {
@@ -53,21 +49,6 @@ public final class SearchResult {
         final SearchResult result = new SearchResult(pFilePath);
         result.df.put("simple", new ArrayList<String>());
         return result;
-    }
-
-    /**
-     * ファイルパスから記事名を生成し、内部リンクを返す.
-     * @param filePath ファイルパス
-     * @return 内部リンク
-     */
-    public final String getLink() {
-        final String fileName = new File(this.filePath).getName();
-        final String title = ArticleGenerator.decodeBytedStr(
-                FileUtil.removeExtension(fileName),
-                Defines.TITLE_ENCODE
-        );
-        return Strings.join(
-                "<a href=\"/wiki/", fileName, "\" ", "target=\"_blank\">", title, "</a>");
     }
 
     @Override

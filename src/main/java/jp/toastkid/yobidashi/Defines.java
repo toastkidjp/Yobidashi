@@ -1,9 +1,6 @@
-package jp.toastkid.article.models;
+package jp.toastkid.yobidashi;
 
 import java.io.File;
-
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.impl.factory.Sets;
 
 import jp.toastkid.libs.utils.FileUtil;
 
@@ -47,7 +44,7 @@ public final class Defines {
     /** 設定ファイル名. */
     public static final String CONF_NAME          = "config.properties";
 
-    /** WikiClient の設定ファイルのパス. */
+    /** 設定ファイルの文字コード. */
     public static final String CONF_ENCODE        = "UTF-8";
 
     /** タイトルの文字コード. */
@@ -56,33 +53,14 @@ public final class Defines {
     /** 記事ファイルの文字コード. */
     public static final String ARTICLE_ENCODE     = "UTF-8";
 
-    /** Windows デフォルトのエディタ. */
-    public static final String NOTEPAD_EXE        = "notepad.exe";
-
-    /** Terapad のオプション. */
-    public static final String TERAPAD_OPTIONS    = " /cu8n";
-
-    /** デフォルトの URL. */
-    public static final String DEFAULT_HOME       = "http://www.yahoo.co.jp";
-
-    /** 個人的な使用か否か. */
-    public static final boolean isMyUse           = true;
-
     /** ePub生成レシピの置き場所. */
     public static final String EPUB_RECIPE_DIR    = USER_DIR + "/res/epub/";
-
-    /** このプログラムで扱う音楽ファイルの拡張子. */
-    public static final ImmutableSet<String> MUSIC_FILES
-        = Sets.immutable.of(".mid", ".mp3", ".wav");
 
     /** Groovy Script Dialog title. */
     public static final String SCRIPT_RUNNER      = "Script Runner";
 
-    /** line separator. */
-    public static final String LINE_SEPARATOR = System.lineSeparator();
-
     /** path/to/template. */
-    public static final String PATH_TO_TEMPLATE = Defines.TEMPLATE_DIR + "/main.html";
+    public static final String PATH_TO_TEMPLATE   = Defines.TEMPLATE_DIR + "/main.html";
 
     /**
      * インスタンス生成を禁止する.

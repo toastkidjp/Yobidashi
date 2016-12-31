@@ -100,8 +100,17 @@ public abstract class ReloadableTab extends Tab {
 
     /**
      * Edit current content.
+     * @return error message.
      */
     public String edit() {
         return "This tab's content can't edit.";
+    }
+
+    /**
+     * Save current content.
+     * @return error message.
+     */
+    public String saveContent() {
+        return "This tab's content can't save.";
     }
 }

@@ -1,6 +1,5 @@
 package jp.toastkid.article.control;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +8,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.web.PopupFeatures;
@@ -28,9 +31,11 @@ import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
-import jp.toastkid.article.models.Config;
-import jp.toastkid.article.models.Config.Key;
+import jp.toastkid.article.models.Articles;
+import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
+import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.Config.Key;
 
 /**
  * Article tab.
@@ -41,9 +46,6 @@ public class ArticleTab extends BaseWebTab {
 
     /** Article HTML generator. */
     private static final ArticleGenerator GENERATOR = new ArticleGenerator();
-
-    /** for desktop control. */
-    private static Desktop desktop;
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
@@ -60,7 +62,17 @@ public class ArticleTab extends BaseWebTab {
     /** HTML content. */
     private String content;
 
+    /** Content's yOffset. */
     private int yOffset;
+
+    /** Content editor. */
+    private CodeArea editor;
+
+    /** Splitter. */
+    private SplitPane split;
+
+    /** Editor's scroll bar. */
+    private VirtualizedScrollPane<CodeArea> vsp;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -194,12 +206,45 @@ public class ArticleTab extends BaseWebTab {
                     }
                 });
 
-        this.setContent(webView);
+        this.editor = new CodeArea();
+        editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
+
+        vsp = new VirtualizedScrollPane<>(editor);
+        split = new SplitPane(webView, vsp);
+        this.setContent(split);
+        split.setDividerPositions(0.5);
+        switchEditorVisible();
+
         Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
 
         // 新規タブで開く場合
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
         this.loadUrl(article.toInternalUrl());
+    }
+
+    /**
+     * Switch editor's visibility.
+     */
+    private void switchEditorVisible() {
+        if (isNotEditorVisible()) {
+            split.setDividerPositions(0.5);
+            vsp.setVisible(true);
+            vsp.setManaged(true);
+            return;
+        }
+
+        split.setDividerPositions(1.0);
+        editor.setEstimatedScrollY(0.0);
+        vsp.setVisible(false);
+        vsp.setManaged(false);
+    }
+
+    /**
+     * Return isn't visible of editor.
+     * @return
+     */
+    private boolean isNotEditorVisible() {
+        return 0.9 < split.getDividerPositions()[0];
     }
 
     /**
@@ -218,8 +263,8 @@ public class ArticleTab extends BaseWebTab {
             return;
         }
 
-        if (Article.isInternalLink(url)) {
-            onOpenNewArticle.accept(Article.findFromUrl(url));
+        if (Articles.isInternalLink(url)) {
+            onOpenNewArticle.accept(Articles.findFromUrl(url));
             return;
         }
         onOpenUrl.accept(LOADING, url);
@@ -252,13 +297,7 @@ public class ArticleTab extends BaseWebTab {
 
         final File openTarget = this.article.file;
         if (!openTarget.exists()) {
-            try {
-                openTarget.createNewFile();
-                Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(this.article));
-            } catch (final IOException e) {
-                LOGGER.error("Error", e);;
-            }
-            openFileByEditor(openTarget);
+            Articles.generateNewArticle(article);
         }
 
         final String processed  = post.process(GENERATOR.convertToHtml(this.article));
@@ -314,42 +353,28 @@ public class ArticleTab extends BaseWebTab {
     public String edit() {
         final File openTarget = article.file;
         if (openTarget.exists()){
-            openFileByEditor(openTarget);
+            switchEditorVisible();
+            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
-        try {
-            openTarget.createNewFile();
-            Files.write(openTarget.toPath(), ArticleGenerator.makeNewContent(article));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);;
-        }
-        //loadArticleList();
-        openFileByEditor(openTarget);
+        Articles.generateNewArticle(article);
+        switchEditorVisible();
+        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
         return "";
     }
 
-    /**
-     * Open file by editor.
-     *
-     * @param openTarget
-     */
-    private static void openFileByEditor(final File openTarget) {
-
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-        }
-
-        if (!openTarget.exists() || desktop == null){
-            return;
-        }
-
+    @Override
+    public String saveContent() {
         try {
-            desktop.open(openTarget);
+            Files.write(article.file.toPath(), editor.getText().getBytes());
         } catch (final IOException e) {
-            LOGGER.error("Error", e);;
+            LOGGER.error("Error", e);
+            return e.getMessage();
         }
+        reload();
+        return String.format("Save to file 「%s」", article.title);
     }
 
 }
