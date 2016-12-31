@@ -174,14 +174,14 @@ public class Articles {
         final StringBuilder newContent = new StringBuilder(2000);
         newContent.append("# ");
         // (130112) 修正
-        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
+        if (convertedName.startsWith("日記20") ){
             newContent.append(convertedName.substring(2,convertedName.length()));
         } else {
             newContent.append(convertedName);
         }
 
         newContent.append(LINE_SEPARATOR);
-        if (Defines.isMyUse && convertedName.startsWith("日記20") ){
+        if (convertedName.startsWith("日記20") ){
             newContent.append("未記入").append(LINE_SEPARATOR);
             newContent.append(LINE_SEPARATOR);
             newContent.append("## 消灯").append(LINE_SEPARATOR);

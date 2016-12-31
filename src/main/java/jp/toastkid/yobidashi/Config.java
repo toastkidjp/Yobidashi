@@ -41,7 +41,6 @@ public final class Config {
     public enum Key {
         AUTHOR("author"),
         APP_TITLE("appTitle"),
-        EDITOR_PATH("editorPath"),
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
         IMAGE_DIR("imageDir");
@@ -130,10 +129,6 @@ public final class Config {
 
         CONFIG.clear();
         CONFIG.putAll(Props.readDir(Defines.CONF_DIR).get());
-        editorPath = get(Key.EDITOR_PATH);
-        if (editorPath.toLowerCase().indexOf("terapad") != -1) {
-            editorPath = editorPath + Defines.TERAPAD_OPTIONS;
-        }
     }
 
     /**

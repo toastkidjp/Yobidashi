@@ -168,7 +168,7 @@ public class Article implements Comparable<Article> {
         return new StringBuilder()
             .append(title).append(" は ")
             .append(FileUtil.countCharacters(file.getAbsolutePath(), Defines.ARTICLE_ENCODE))
-            .append(" 字です。").append(Defines.LINE_SEPARATOR)
+            .append(" 字です。").append(System.lineSeparator())
             .append(file.length() / 1024L).append("[KB]").toString();
     }
 
