@@ -36,6 +36,7 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Config.Key;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * Article tab.
@@ -354,21 +355,21 @@ public class ArticleTab extends BaseWebTab {
         final File openTarget = article.file;
         if (openTarget.exists()){
             switchEditorVisible();
-            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
+            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
         Articles.generateNewArticle(article);
         switchEditorVisible();
-        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
+        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
         return "";
     }
 
     @Override
     public String saveContent() {
         try {
-            Files.write(article.file.toPath(), editor.getText().getBytes());
+            Files.write(article.file.toPath(), editor.getText().getBytes(Defines.ARTICLE_ENCODE));
         } catch (final IOException e) {
             LOGGER.error("Error", e);
             return e.getMessage();
