@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.fileFilter.ArticleFileFilter;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
@@ -38,37 +38,32 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
 
         this.prefix = pPrefix;
 
-        final Map<String, Number> resultMap = new TreeMap<String, Number>();
+        final Map<String, Number> resultMap = new TreeMap<>();
         if(list == null){
             list = new File(pathToDir).list(new ArticleFileFilter(false));
         }
 
         final int length = list.length;
         for (int i = 0; i < length; i++) {
-            final String name
-                = ArticleGenerator.decodeBytedStr(FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
-            if(name.startsWith(pPrefix)){
-                final BufferedReader fileReader
-                    = FileUtil.makeFileReader(pathToDir + "/" + list[i], Defines.ARTICLE_ENCODE);
-                String str ="";
-                try {
+            final String name = Articles.decodeBytedStr(FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
+            if (name.startsWith(pPrefix)) {
+                try (final BufferedReader fileReader
+                        = FileUtil.makeFileReader(pathToDir + "/" + list[i], Defines.ARTICLE_ENCODE);) {
+                    String str ="";
                     out:
-                    while (str != null) {
-                        if (str.endsWith("今日の日経平均株価終値")){
-                            str = fileReader.readLine();
-                            final String target = str.split("円")[0];
-                            if (StringUtils.isNotEmpty(target)){
-                                final String input = target.replace(",", "");
-                                resultMap.put(
-                                        name.replace("日記", ""),
-                                        (int)Math.floor(Double.parseDouble(input))
-                                        );
-                                break out;
+                        while (str != null) {
+                            if (str.endsWith("今日の日経平均株価終値")){
+                                str = fileReader.readLine();
+                                final String target = str.split("円")[0];
+                                if (StringUtils.isNotEmpty(target)){
+                                    final String input = target.replace(",", "");
+                                    resultMap.put(name.replace("日記", ""), (int)Math.floor(Double.parseDouble(input)));
+                                    break out;
+                                }
                             }
+                            str = fileReader.readLine();
                         }
-                        str = fileReader.readLine();
-                    }
-                    fileReader.close();
+                        fileReader.close();
                 } catch ( final IOException e) {
                     e.printStackTrace();
                 }

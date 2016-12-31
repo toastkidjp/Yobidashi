@@ -13,8 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
-import jp.toastkid.article.ArticleGenerator;
-import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
 
@@ -65,7 +64,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
             return Collections.emptyMap();
         }
 
-        final String prefix = ArticleGenerator.titleToFileName(pPrefix);
+        final String prefix = Articles.titleToFileName(pPrefix);
         final List<String> articleTitles = ArrayIterate.select(
                 new File(pathToDir).list(), item -> item.startsWith(prefix)).asUnmodifiable();
 
@@ -80,7 +79,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
             final String readTarget = pathToDir + "/" + item;
 
             boolean isCashFlowArea = false;
-            final String date = Article.convertTitle(item).replace("日記", "");
+            final String date = Articles.convertTitle(item).replace("日記", "");
             String str = "";
             try (final BufferedReader fileReader
                    = FileUtil.makeFileReader(readTarget, Defines.ARTICLE_ENCODE); ) {

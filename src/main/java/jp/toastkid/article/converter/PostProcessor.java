@@ -9,8 +9,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
-import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
 
@@ -138,7 +138,7 @@ public class PostProcessor {
             input = input.substring("md:".length());
         }
 
-        final String bytedStr = ArticleGenerator.titleToFileName(input);
+        final String bytedStr = Articles.titleToFileName(input);
         final boolean isExist
             = new File(articleDir, bytedStr.concat(MD)).exists();
         final StringBuilder generatedLink = new StringBuilder(180);

@@ -31,6 +31,7 @@ import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.Config;
@@ -262,8 +263,8 @@ public class ArticleTab extends BaseWebTab {
             return;
         }
 
-        if (Article.isInternalLink(url)) {
-            onOpenNewArticle.accept(Article.findFromUrl(url));
+        if (Articles.isInternalLink(url)) {
+            onOpenNewArticle.accept(Articles.findFromUrl(url));
             return;
         }
         onOpenUrl.accept(LOADING, url);
@@ -296,7 +297,7 @@ public class ArticleTab extends BaseWebTab {
 
         final File openTarget = this.article.file;
         if (!openTarget.exists()) {
-            ArticleGenerator.generateNewArticle(article);
+            Articles.generateNewArticle(article);
         }
 
         final String processed  = post.process(GENERATOR.convertToHtml(this.article));
@@ -358,7 +359,7 @@ public class ArticleTab extends BaseWebTab {
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
-        ArticleGenerator.generateNewArticle(article);
+        Articles.generateNewArticle(article);
         switchEditorVisible();
         editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
         return "";

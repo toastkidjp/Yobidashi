@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.fileFilter.ArticleFileFilter;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
@@ -38,15 +38,14 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
     @Override
     public Map<String, Number> extract(final String pathToDir, final String pPrefix) {
         this.prefix = pPrefix;
-        final Map<String, Number> resultMap = new TreeMap<String, Number>();
+        final Map<String, Number> resultMap = new TreeMap<>();
         if (list == null) {
             list = new File(pathToDir).list(new ArticleFileFilter(false));
         }
         int overall = 0;
         final int length = list.length;
         for (int i = 0; i < length; i++) {
-            final String name = ArticleGenerator.decodeBytedStr(
-                    FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
+            final String name = Articles.decodeBytedStr(FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
             if (name.startsWith(pPrefix)){
                 String putKey = name;
                 // (130503) 修正

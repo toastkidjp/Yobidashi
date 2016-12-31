@@ -1,22 +1,15 @@
 package jp.toastkid.article.models;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
-import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Defines;
 
 /**
@@ -53,6 +46,7 @@ public class Article implements Comparable<Article> {
         MD(".md");
 
         private String text;
+
         private Extension(final String n) {
             this.text = n;
         }
@@ -63,8 +57,7 @@ public class Article implements Comparable<Article> {
     }
 
     /** usable extensions. */
-    private static final FixedSizeSet<String> EXTENSIONS
-        = Sets.fixedSize.of(Extension.MD.text);
+    public static final FixedSizeSet<String> EXTENSIONS = Sets.fixedSize.of(Extension.MD.text);
 
     /**
      * initialize Article model.
@@ -76,7 +69,7 @@ public class Article implements Comparable<Article> {
         }
 
         this.file      = file;
-        this.title     = convertTitle(file.getName());
+        this.title     = Articles.convertTitle(file.getName());
         this.extension = FileUtil.findExtension(file).orElse("");
     }
 
@@ -97,7 +90,7 @@ public class Article implements Comparable<Article> {
      */
     public String toInternalUrl() {
         return String.format(INTERNAL_LINK_FORMAT, this.extention().substring(1),
-                ArticleGenerator.titleToFileName(this.title), this.extention());
+                Articles.titleToFileName(this.title), this.extention());
     }
 
     /**
@@ -106,7 +99,7 @@ public class Article implements Comparable<Article> {
      */
     public void replace(final File dest) {
         this.file      = dest;
-        this.title     = Article.convertTitle(dest.getName());
+        this.title     = Articles.convertTitle(dest.getName());
         this.extension = FileUtil.findExtension(file).get();
     }
 
@@ -161,100 +154,6 @@ public class Article implements Comparable<Article> {
      */
     public boolean isValid() {
         final Optional<String> ext = FileUtil.findExtension(this.file);
-        if (!ext.isPresent()) {
-            return false;
-        }
-        return EXTENSIONS.contains(ext.get());
-    }
-
-    /**
-     * 記事名一覧を返す.
-     * @param articleDir dir of articles
-     * @return 記事名一覧の Set (ソート済み)
-     */
-    public static final List<Article> readAllArticleNames(final String articleDir) {
-        final File dir = new File(articleDir);
-        if (dir == null || !dir.canRead()){
-            return Collections.emptyList();
-        }
-        return ArrayAdapter
-                .newArrayWith(dir.listFiles(Article::isValidContentFile))
-                .collect(Article::new)
-                .select( a -> a.isValid())
-                .asParallel(Executors.newFixedThreadPool(12), 12)
-                .toList();
-    }
-
-    /**
-     * URL から記事ファイル名を取り出す.
-     * <HR>
-     * (130707) 作成<BR>
-     * @param url URL
-     * @return 記事ファイル名
-     */
-    public static final String findFileNameFromUrl(final String url) {
-        final String[] split = url.split("/");
-        return split[split.length - 1];
-    }
-
-    /**
-     * URL が Wiki 記事であるかを判定する.
-     * @param url URL
-     * @return Wiki 記事なら true
-     */
-    public static final boolean isInternalLink(final String url) {
-        return url.startsWith(INTERNAL_PROTOCOL);
-    }
-
-    /**
-     * ファイル名(<b>path は不可</b>)を人間の読める形式にして返す.
-     * 「.txt」 が入っていても可
-     * <HR>
-     * (121014) 作成<BR>
-     * @param filePath
-     * @return ファイル名
-     */
-    public static final String convertTitle(final String filePath) {
-        return (StringUtils.isNotEmpty(filePath))
-                   ? ArticleGenerator.decodeBytedStr(FileUtil.removeExtension(filePath), "EUC-JP")
-                   : null;
-    }
-
-    /**
-     * fileName から Article オブジェクトを生成.
-     * @param fileName ファイル名(パスではない)
-     * @return Article オブジェクト
-     */
-    public static Article find(final String fileName) {
-        return new Article(new File(Config.get("articleDir"), fileName));
-    }
-
-    /**
-     * TODO write test.
-     * 記事名から Article オブジェクトを生成.
-     * @param newFileName ファイル名(パスではない)
-     * @return Article オブジェクト
-     */
-    public static Article findFromTitle(final String newFileName) {
-        return Article.find(ArticleGenerator.titleToFileName(newFileName) + ".md");
-    }
-
-    /**
-     * URL から Article オブジェクトを生成.
-     * @param url URL
-     * @return Article オブジェクト
-     */
-    public static Article findFromUrl(final String url) {
-        return find(findFileNameFromUrl(url));
-    }
-
-    /**
-     * distinguish usable file extension.
-     * @param f File Object
-     * @return f is valid file?
-     */
-    public static boolean isValidContentFile(final File f) {
-        final Optional<String> ext = FileUtil.findExtension(f);
         if (!ext.isPresent()) {
             return false;
         }

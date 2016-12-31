@@ -78,6 +78,7 @@ import jp.toastkid.article.control.ContentTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.article.models.ContentType;
 import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.dialog.AlertDialog;
@@ -362,7 +363,7 @@ public final class Controller implements Initializable {
                             articleGenerator = new ArticleGenerator();
                             Platform.runLater(Controller.this::callHome);
                             final String message = Thread.currentThread().getName()
-                                    + " Ended initialize ArticleGenerator. "
+                                    + " Ended initialize Articles. "
                                     + (System.currentTimeMillis() - start) + "ms";
                             setProgress(message);
                             LOGGER.info(message);
@@ -419,7 +420,7 @@ public final class Controller implements Initializable {
                                         // (130317) 「現在選択中のファイル名」にセット
                                         final File selected = new File(
                                                 Config.get(Config.Key.ARTICLE_DIR),
-                                                ArticleGenerator.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
+                                                Articles.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
                                                 );
                                         if (selected.exists()){
                                             focusOn();
@@ -1146,7 +1147,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Article.readAllArticleNames(Config.get("articleDir")))
+        Flux.fromIterable(Articles.readAllArticleNames(Config.get("articleDir")))
             .subscribeOn(Schedulers.newSingle("I/O"))
             .doOnTerminate(this::focusOn)
             .subscribe(items::add);
@@ -1165,9 +1166,9 @@ public final class Controller implements Initializable {
             .subscribeOn(Schedulers.elastic())
             .subscribe(
                 empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
-                    .collect(ArticleGenerator::titleToFileName)
+                    .collect(Articles::titleToFileName)
                     .collect(fileName -> fileName + Article.Extension.MD.text())
-                    .collect(Article::find)
+                    .collect(Articles::find)
                     .each(bookmarks::add)
                     );
     }
@@ -1235,7 +1236,7 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(newFileName)){
             return;
         }
-        openArticleTab(Article.findFromTitle(newFileName));
+        openArticleTab(Articles.findFromTitle(newFileName));
     }
 
     /**
@@ -1306,7 +1307,7 @@ public final class Controller implements Initializable {
                 }
                 final File dest = new File(
                         Config.get(Config.Key.ARTICLE_DIR),
-                        ArticleGenerator.titleToFileName(newTitle) + article.extention()
+                        Articles.titleToFileName(newTitle) + article.extention()
                         );
                 if (dest.exists()){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");

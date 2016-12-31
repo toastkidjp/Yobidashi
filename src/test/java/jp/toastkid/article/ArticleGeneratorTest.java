@@ -1,13 +1,10 @@
 package jp.toastkid.article;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
+import java.io.File;
 
 import org.junit.Test;
-
-import jp.toastkid.yobidashi.Defines;
 
 /**
  * {@link ArticleGenerator}'s test case.
@@ -16,46 +13,28 @@ import jp.toastkid.yobidashi.Defines;
  */
 public final class ArticleGeneratorTest {
 
+    /** test resource path. */
+    private static final String PATH = "src/test/resources/article/C6FCB5AD323031332D30382D333128C5DA29.md";
+
     /**
-     * テンプレートのパラメータ置換が正しくできることを確認する.
+     * Test {@link ArticleGenerator#convertToHtml(File)}.
      */
     @Test
-    public final void testGetHTMLContent() {
-
-        final String htmlContent = ArticleGenerator.bindArgs(
-            Defines.PATH_TO_TEMPLATE,
-            new HashMap<String, String>() {
-                private static final long serialVersionUID = 1L;
-            {
-                put("title", "タイトルでござい");
-                put("content", "こんてんと");
-                put("jarPath", "jar:");
-                put("bodyAdditional", "");
-                put("subheadings", "");
-            }}
-        );
-        assertTrue(
-            htmlContent.contains("<title>タイトルでござい</title>")
-            && htmlContent.contains("こんてんと")
-        );
+    public void test_convertToHtml() {
+        final ArticleGenerator gen = new ArticleGenerator();
+        final String convertToHtml = gen.convertToHtml(new File(PATH));
+        assertTrue(convertToHtml.startsWith("<h2> [[日記2016-02-26(金)]] [[日記2016-02-25(木)]]</h2>"));
     }
 
     /**
-     * Check {@link ArticleGenerator#titleToFileName(String)}.
+     * Test {@link ArticleGenerator#decorate(String, File)}.
      */
     @Test
-    public void test_titleToFileName() {
-        final String titleToFileName = ArticleGenerator.titleToFileName("トマト");
-        assertEquals("A5C8A5DEA5C8", titleToFileName);
-    }
-
-    /**
-     * Check {@link ArticleGenerator#decodeBytedStr(String, String)}.
-     */
-    @Test
-    public void test_decodeBytedStr() {
-        final String decodeBytedStr = ArticleGenerator.decodeBytedStr("A5C8A5DEA5C8", "EUC-JP");
-        assertEquals("トマト", decodeBytedStr);
+    public void test_decorate() {
+        final ArticleGenerator gen = new ArticleGenerator();
+        final String decorated = gen.decorate("test", new File(PATH));
+        assertTrue(decorated.startsWith("<!DOCTYPE html>"));
+        assertTrue(decorated.endsWith("</html>"));
     }
 
 }

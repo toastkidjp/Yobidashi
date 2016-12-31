@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -24,7 +23,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -32,9 +31,9 @@ import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.Defines;
 
 /**
- * epub を生成する.
- * @author Toast kid
+ * ePub を生成する.
  *
+ * @author Toast kid
  */
 public final class EpubMaker {
 
@@ -57,9 +56,8 @@ public final class EpubMaker {
     private final EpubMetaData meta;
 
     /** 必ず削除対象とするファイル. */
-    private static final List<String> DEFAULT_REMOVE_TARGETS = Collections.unmodifiableList(
-        Arrays.asList(new String[]{"content.opf", "navdoc.html", "title_page.xhtml", "toc.ncx"})
-    );
+    private static final List<String> DEFAULT_REMOVE_TARGETS
+        = Arrays.asList("content.opf", "navdoc.html", "title_page.xhtml", "toc.ncx");
 
     /** epub に必ず含めるメタファイル名とその参照元の組一覧. */
     private static final ImmutableList<Pair<String, String>> REQUIRED_METAFILE_PAIRS
@@ -86,12 +84,12 @@ public final class EpubMaker {
      * ePubを生成する.
      */
     public final void generateEpub() {
-        final List<String> cleanTargets = new ArrayList<String>(DEFAULT_REMOVE_TARGETS);
+        final List<String> cleanTargets = new ArrayList<>(DEFAULT_REMOVE_TARGETS);
         final List<Pair<String, String>> pairs = new ArrayList<>(REQUIRED_METAFILE_PAIRS.toList());
         pairs.addAll(prepareContents());
         // titlePage
         FileUtil.outPutStr(
-                ArticleGenerator.bindArgs(
+                Articles.bindArgs(
                         Resource.TITLE_PAGE,
                         new HashMap<String, String>(){
                             /** default. */
@@ -116,7 +114,7 @@ public final class EpubMaker {
      * @return コンテンツ関連のファイルパスのペア
      */
     private final Collection<Pair<String, String>> prepareContents() {
-        final Collection<Pair<String, String>> pairs = new ArrayList<Pair<String, String>>();
+        final Collection<Pair<String, String>> pairs = new ArrayList<>();
         if (contentPaths == null) {
             return null;
         }
@@ -125,7 +123,7 @@ public final class EpubMaker {
             if (StringUtils.isNotEmpty(path.dest.toString())) {
                 parent = parent.concat(path.dest.toString());
             }
-            pairs.add(new Pair<String, String>(path.source.toString(), parent));
+            pairs.add(new Pair<>(path.source.toString(), parent));
         });
         // navdoc.html
         generateNavdoc(contentPaths);
@@ -152,7 +150,7 @@ public final class EpubMaker {
             }
         }
         FileUtil.outPutStr(
-            ArticleGenerator.bindArgs(
+            Articles.bindArgs(
                 Resource.NAVDOC,
                 Maps.mutable.with("title", meta.title, "content", sb.toString())
             ),
@@ -186,7 +184,7 @@ public final class EpubMaker {
             }
         }
         FileUtil.outPutStr(
-            ArticleGenerator.bindArgs(
+            Articles.bindArgs(
                 Resource.TOC_NCX,
                 Maps.mutable.of(
                         "title",   meta.title,
@@ -216,25 +214,25 @@ public final class EpubMaker {
                     .append("\" media-type=\"image/jpeg\" />")
                     .append(LINE_SEPARATOR);
                 idrefCount++;
-            } else {
-                content
-                    .append("  <item id=\"")
-                    .append("chapter" + Strings.addZero(contentCount))
-                    .append("\" href=\"")
-                    .append(cMeta.entry)
-                    .append("\" media-type=\"text/html\" />")
-                    //.append("\" media-type=\"application/xhtml+xml\" />")
-                    .append(LINE_SEPARATOR);
-                idref
-                    .append("<itemref idref=\"")
-                    .append("chapter" + Strings.addZero(contentCount))
-                    .append("\" />")
-                    .append(LINE_SEPARATOR);
-                contentCount++;
+                continue;
             }
+            content
+                .append("  <item id=\"")
+                .append("chapter" + Strings.addZero(contentCount))
+                .append("\" href=\"")
+                .append(cMeta.entry)
+                .append("\" media-type=\"text/html\" />")
+                //.append("\" media-type=\"application/xhtml+xml\" />")
+                .append(LINE_SEPARATOR);
+            idref
+                .append("<itemref idref=\"")
+                .append("chapter" + Strings.addZero(contentCount))
+                .append("\" />")
+                .append(LINE_SEPARATOR);
+            contentCount++;
         }
         FileUtil.outPutStr(
-            ArticleGenerator.bindArgs(
+            Articles.bindArgs(
                     Resource.CONTENT_OPF,
                     new HashMap<String, String>(){
                         /** default. */

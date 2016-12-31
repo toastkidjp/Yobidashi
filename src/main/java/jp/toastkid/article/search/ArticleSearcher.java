@@ -39,6 +39,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.article.models.Articles;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.libs.utils.Strings;
 
@@ -245,7 +246,7 @@ public final class ArticleSearcher {
         final MutableList<ArticleSearchTask> runnables = ArrayIterate
                 .reject(files, file ->
                     StringUtils.isNotEmpty(this.selectName)
-                    && !Article.convertTitle(file.getName()).contains(this.selectName)
+                    && !Articles.convertTitle(file.getName()).contains(this.selectName)
                 )
                 .collect(file -> new ArticleSearchTask(file.getAbsolutePath(), patterns));
         max = max + runnables.size();
@@ -263,7 +264,7 @@ public final class ArticleSearcher {
                 continue;
             }
             // 記事名検索の場合、ここで結果を入れる.
-            if (Article.convertTitle(readingFile.getName()).contains(this.selectName)) {
+            if (Articles.convertTitle(readingFile.getName()).contains(this.selectName)) {
                 searchResultMap.put(
                         readingFile.getName(),
                         SearchResult.makeSimple(readingFile.getAbsolutePath())
