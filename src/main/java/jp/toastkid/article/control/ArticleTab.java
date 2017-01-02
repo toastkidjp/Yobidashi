@@ -363,4 +363,9 @@ public class ArticleTab extends BaseWebTab {
         return String.format("Save to file 「%s」", article.title);
     }
 
+    @Override
+    public String getUrl() {
+        return article.toInternalUrl();
+    }
+
 }

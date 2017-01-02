@@ -395,24 +395,10 @@ public final class Controller implements Initializable {
                                         final String tabUrl = tab.getUrl();
                                         if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
                                             urlText.setText(tabUrl);
-                                            return;
-                                        }
-
-                                        final String text = nextTab.getText();
-                                        if (StringUtils.isEmpty(text)) {
-                                            return;
-                                        }
-
-                                        // (130317) 「現在選択中のファイル名」にセット
-                                        final File selected = new File(
-                                                Config.get(Config.Key.ARTICLE_DIR),
-                                                Articles.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
-                                                );
-                                        if (selected.exists()){
                                             focusOn();
                                         }
                                     }
-                                    );
+                                );
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize right tabs. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -940,7 +926,6 @@ public final class Controller implements Initializable {
     /**
      * 現在選択しているタブを閉じる. 1つしか開いていない時は閉じない.
      */
-    @FXML
     private final void closeTab() {
         closeTab(tabPane.getSelectionModel().getSelectedItem());
     }
@@ -961,7 +946,6 @@ public final class Controller implements Initializable {
     /**
      * Close all tabs.
      */
-    @FXML
     private final void closeAllTabs() {
         tabPane.getTabs().removeAll(tabPane.getTabs());
         setStatus("Close all tabs.");
@@ -973,7 +957,6 @@ public final class Controller implements Initializable {
      * TODO 動作未検証
      * @param event
      */
-    @FXML
     private final void stop() {
         final ReloadableTab tab = getCurrentTab();
         if (!(tab instanceof ArticleTab)) {
@@ -1105,19 +1088,15 @@ public final class Controller implements Initializable {
                 return;
             }
 
-            if (newVal == null) {
-                return;
-            }
-
             final Optional<Tab> first = tabPane.getTabs().stream()
                     .filter(tab -> (tab instanceof ArticleTab)
-                            && ((ArticleTab) tab).getArticle().equals(newVal))
+                            && ((ArticleTab) tab).getArticle().equals(property.getValue()))
                     .findFirst();
             if (first.isPresent()) {
                 first.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
                 return;
             }
-            openArticleTab(newVal);
+            openArticleTab(property.getValue());
         });
     }
 
@@ -1163,10 +1142,17 @@ public final class Controller implements Initializable {
                     articleList.getSelectionModel().select(indexOf);
                     articleList.scrollTo(indexOf - FOCUS_MARGIN);
                 }
+
                 final int indexOfHistory = historyList.getItems().indexOf(article);
                 if (indexOfHistory != -1){
                     historyList.getSelectionModel().select(indexOfHistory);
                     historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
+                }
+
+                final int indexOfBookmark = bookmarkList.getItems().indexOf(article);
+                if (indexOfBookmark != -1){
+                    bookmarkList.getSelectionModel().select(indexOfBookmark);
+                    bookmarkList.scrollTo(indexOfBookmark - FOCUS_MARGIN);
                 }
             })
         );
