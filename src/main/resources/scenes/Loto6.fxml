@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
@@ -9,22 +10,29 @@
 <?import com.jfoenix.controls.JFXButton?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="160.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+    prefHeight="160.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.loto6.Loto6Controller"
     >
    <children>
-      <HBox prefHeight="120.0" prefWidth="400.0">
+      <HBox prefHeight="120.0" prefWidth="-Infinity">
          <children>
-            <Label fx:id="result" alignment="CENTER" contentDisplay="CENTER" prefHeight="99.0" prefWidth="300.0" text="ここに生成結果が表示されます。" textAlignment="CENTER">
-               <font><Font size="60.0" /></font>
+         
+            <Label fx:id="result" alignment="CENTER" contentDisplay="CENTER" prefHeight="99.0" prefWidth="400.0" text="ここに生成結果が表示されます。" textAlignment="CENTER">
+               <font><Font size="25.0" /></font>
+               <HBox.margin>
+                 <Insets left="20.0" />
+               </HBox.margin>
             </Label>
          </children>
       </HBox>
-      <HBox prefHeight="40.0" prefWidth="400.0">
-         <children>
-            <JFXTextField fx:id="inputWord" prefHeight="30.0" prefWidth="260.0" onAction="#generate"/>
-            <JFXButton buttonType="RAISED" prefWidth="140.0" text="Generate" onAction="#generate"/>
-         </children>
+      <HBox prefHeight="40.0" prefWidth="-Infinity">
+        <HBox.margin>
+          <Insets left="20.0" />
+        </HBox.margin>
+        <children>
+          <JFXTextField fx:id="inputWord" prefHeight="30.0" prefWidth="260.0" onAction="#generate"/>
+          <JFXButton buttonType="RAISED" prefWidth="140.0" text="Generate" onAction="#generate"/>
+        </children>
       </HBox>
    </children>
 </VBox>
