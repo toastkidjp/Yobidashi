@@ -9,6 +9,7 @@ plugins {
     id 'application'
     id 'eclipse'
     id 'jacoco'
+    id 'pmd'
 }
 
 sourceCompatibility = 1.8
@@ -106,4 +107,15 @@ def String revHash() {
   ext.revision = 'git rev-list --count HEAD'.execute().text.trim()
   ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
   return "r${revision}.${hash}"
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSets = [
+        'java-basic',
+        'java-braces',
+        'java-clone',
+        'java-codesize',
+        'java-design'
+    ]
 }
