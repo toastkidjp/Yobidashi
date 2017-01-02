@@ -313,9 +313,6 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
-    /** Speed dial's controller. */
-    private jp.toastkid.speed_dial.Controller speedDialController;
-
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -701,38 +698,36 @@ public final class Controller implements Initializable {
      * Open new tab having SpeedDial.
      */
     private void openSpeedDialTab() {
-        if (speedDialController == null) {
-            speedDialController = readSpeedDial();
-            speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
-            speedDialController.setZero();
-            speedDialController.setBackground(articleGenerator.getBackground());
-            speedDialController.setOnArticleSearch(this::doSearch);
-            speedDialController.setOnWebSearch((query, type) ->
+        try {
+            final jp.toastkid.speed_dial.Controller controller = readSpeedDial();
+            controller.setTitle(Config.get(Config.Key.APP_TITLE));
+            controller.setZero();
+            controller.setBackground(articleGenerator.getBackground());
+            controller.setOnArticleSearch(this::doSearch);
+            controller.setOnWebSearch((query, type) ->
                 openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
             );
-            speedDialController.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
-        }
+            controller.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
 
-        final Pane sdRoot = speedDialController.getRoot();
-        sdRoot.setPrefWidth(width * 0.8);
-        sdRoot.setPrefHeight(tabPane.getHeight());
-        openTab(makeContentTab("Speed Dial", sdRoot));
+            final Pane sdRoot = controller.getRoot();
+            sdRoot.setPrefWidth(width * 0.8);
+            sdRoot.setPrefHeight(tabPane.getHeight());
+            openTab(makeContentTab("Speed Dial", sdRoot));
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Init speed dial's controller.
      * @return Controller
+     * @throws IOException
      */
-    private final jp.toastkid.speed_dial.Controller readSpeedDial() {
-        try {
-            final FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
-            loader.load();
-            return (jp.toastkid.speed_dial.Controller) loader.getController();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private final jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
+        final FXMLLoader loader = new FXMLLoader(
+                getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
+        loader.load();
+        return (jp.toastkid.speed_dial.Controller) loader.getController();
     }
 
 
