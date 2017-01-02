@@ -24,14 +24,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
+import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.Config;
@@ -87,8 +86,6 @@ public class ArticleTab extends BaseWebTab {
 
         private Runnable onLoad;
 
-        private Callback<PopupFeatures, WebEngine> handler;
-
         private Consumer<Article> onOpenNewArticle;
 
         private BiConsumer<String, String> onOpenUrl;
@@ -114,11 +111,6 @@ public class ArticleTab extends BaseWebTab {
 
         public Builder setOnLoad(final Runnable onLoad) {
             this.onLoad = onLoad;
-            return this;
-        }
-
-        public Builder setHandler(final Callback<PopupFeatures, WebEngine> handler) {
-            this.handler = handler;
             return this;
         }
 
@@ -205,10 +197,10 @@ public class ArticleTab extends BaseWebTab {
 
         this.editor = new CodeArea();
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-
         vsp = new VirtualizedScrollPane<>(editor);
         split = new SplitPane(webView, vsp);
         this.setContent(split);
+
         split.setDividerPositions(0.5);
         switchEditorVisible();
 
@@ -224,16 +216,18 @@ public class ArticleTab extends BaseWebTab {
      */
     private void switchEditorVisible() {
         if (isNotEditorVisible()) {
+            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
             split.setDividerPositions(0.5);
             vsp.setVisible(true);
             vsp.setManaged(true);
+            editor.setEstimatedScrollY(0.0);
             return;
         }
 
-        split.setDividerPositions(1.0);
-        editor.setEstimatedScrollY(0.0);
+        SplitterTransitionFactory.makeHorizontalSlide(split, 1.0d, 1.0d).play();
         vsp.setVisible(false);
         vsp.setManaged(false);
+        split.setDividerPositions(1.0);
     }
 
     /**

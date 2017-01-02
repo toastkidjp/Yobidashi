@@ -24,8 +24,6 @@ import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
-import javafx.animation.Interpolator;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -69,7 +67,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Duration;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
@@ -85,6 +82,7 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.Style;
 import jp.toastkid.jfx.common.control.AutoCompleteTextField;
+import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.utils.FileUtil;
@@ -282,12 +280,6 @@ public final class Controller implements Initializable {
 
     /** file watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
-
-    /** splitter closing transition. */
-    private TranslateTransition splitterClose;
-
-    /** splitter opening transition. */
-    private TranslateTransition splitterOpen;
 
     /** Snackbar. */
     @FXML
@@ -930,14 +922,7 @@ public final class Controller implements Initializable {
      * Show left panel.
      */
     private void showLeftPane() {
-        if (splitterOpen == null) {
-            splitterOpen = new TranslateTransition(Duration.seconds(0.25d), tabPane);
-            splitterOpen.setFromX(-200);
-            splitterOpen.setToX(0);
-            splitterOpen.setInterpolator(Interpolator.LINEAR);
-            splitterOpen.setCycleCount(1);
-        }
-        splitterOpen.play();
+        SplitterTransitionFactory.makeHorizontalSlide(splitter, DEFAULT_DIVIDER_POSITION, DEFAULT_DIVIDER_POSITION).play();
         splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
     }
 
@@ -945,14 +930,7 @@ public final class Controller implements Initializable {
      * 左側を隠す.
      */
     private void hideLeftPane() {
-        if (splitterClose == null) {
-            splitterClose = new TranslateTransition(Duration.seconds(0.25d), tabPane);
-            splitterClose.setFromX(200);
-            splitterClose.setToX(0);
-            splitterClose.setInterpolator(Interpolator.LINEAR);
-            splitterClose.setCycleCount(1);
-        }
-        splitterClose.play();
+        SplitterTransitionFactory.makeHorizontalSlide(splitter, 0.0d, DEFAULT_DIVIDER_POSITION).play();
         splitter.setDividerPosition(0, 0.0d);
     }
 
