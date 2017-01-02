@@ -3,9 +3,16 @@ package jp.toastkid.libs.utils;
  * バイト配列を一般的な 16 進表記文字列にするためのユーティリティクラス
  * @see <a href="http://www.atmarkit.co.jp/fjava/rensai4/programer06/programer06_2.html">
  * ‘愛’で学ぶ文字コードと文字化けの常識</a>
+ * @author Toast kid
  */
-
 public final class HexStringUtil {
+
+    /**
+     * Private constructor.
+     */
+    private HexStringUtil() {
+        // NOP.
+    }
 
     /**
     * 与えられたバイト配列を16進表記の文字列に変換します.

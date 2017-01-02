@@ -13,10 +13,7 @@ import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
-import javafx.scene.web.PopupFeatures;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 import jp.toastkid.article.models.Articles;
 
 /**
@@ -42,16 +39,9 @@ public abstract class BaseWebTab extends ReloadableTab {
     public BaseWebTab(final String title, final Node content, final Consumer<Tab> closeAction) {
         super(title, content, closeAction);
         wv = new WebView();
-        Optional.ofNullable(getHandler()).ifPresent(wv.getEngine()::setCreatePopupHandler);
         spinner = new JFXSpinner();
         this.setGraphic(new HBox(this.getGraphic(), spinner));
     }
-
-    /**
-     * Return CreatePopupHandler.
-     * @return CreatePopupHandler
-     */
-    protected abstract Callback<PopupFeatures, WebEngine> getHandler();
 
     @Override
     public boolean canLoadUrl() {

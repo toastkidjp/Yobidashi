@@ -24,18 +24,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
+import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Config.Key;
+import jp.toastkid.yobidashi.Defines;
 
 /**
  * Article tab.
@@ -56,23 +56,20 @@ public class ArticleTab extends BaseWebTab {
     /** Load action. */
     private final Runnable onLoad;
 
-    /** CreatePopupHandler. */
-    private final Callback<PopupFeatures, WebEngine> handler;
+    /** Content editor. */
+    private final CodeArea editor;
+
+    /** Splitter. */
+    private final SplitPane split;
+
+    /** Editor's scroll bar. */
+    private final VirtualizedScrollPane<CodeArea> vsp;
 
     /** HTML content. */
     private String content;
 
     /** Content's yOffset. */
     private int yOffset;
-
-    /** Content editor. */
-    private CodeArea editor;
-
-    /** Splitter. */
-    private SplitPane split;
-
-    /** Editor's scroll bar. */
-    private VirtualizedScrollPane<CodeArea> vsp;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -88,8 +85,6 @@ public class ArticleTab extends BaseWebTab {
         private Consumer<Tab> closeAction;
 
         private Runnable onLoad;
-
-        private Callback<PopupFeatures, WebEngine> handler;
 
         private Consumer<Article> onOpenNewArticle;
 
@@ -119,11 +114,6 @@ public class ArticleTab extends BaseWebTab {
             return this;
         }
 
-        public Builder setHandler(final Callback<PopupFeatures, WebEngine> handler) {
-            this.handler = handler;
-            return this;
-        }
-
         public ArticleTab build() {
             return new ArticleTab(this);
         }
@@ -147,7 +137,6 @@ public class ArticleTab extends BaseWebTab {
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
         this.article = b.article;
-        this.handler = b.handler;
 
         Optional.ofNullable(b.closeAction).ifPresent(action -> {
             final Button closeButton = new JFXButton("x");
@@ -208,10 +197,10 @@ public class ArticleTab extends BaseWebTab {
 
         this.editor = new CodeArea();
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-
         vsp = new VirtualizedScrollPane<>(editor);
         split = new SplitPane(webView, vsp);
         this.setContent(split);
+
         split.setDividerPositions(0.5);
         switchEditorVisible();
 
@@ -227,16 +216,18 @@ public class ArticleTab extends BaseWebTab {
      */
     private void switchEditorVisible() {
         if (isNotEditorVisible()) {
+            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
             split.setDividerPositions(0.5);
             vsp.setVisible(true);
             vsp.setManaged(true);
+            editor.setEstimatedScrollY(0.0);
             return;
         }
 
-        split.setDividerPositions(1.0);
-        editor.setEstimatedScrollY(0.0);
+        SplitterTransitionFactory.makeHorizontalSlide(split, 1.0d, 1.0d).play();
         vsp.setVisible(false);
         vsp.setManaged(false);
+        split.setDividerPositions(1.0);
     }
 
     /**
@@ -345,36 +336,36 @@ public class ArticleTab extends BaseWebTab {
     }
 
     @Override
-    protected Callback<PopupFeatures, WebEngine> getHandler() {
-        return this.handler;
-    }
-
-    @Override
     public String edit() {
         final File openTarget = article.file;
         if (openTarget.exists()){
             switchEditorVisible();
-            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
+            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
         Articles.generateNewArticle(article);
         switchEditorVisible();
-        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), "UTF-8"));
+        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
         return "";
     }
 
     @Override
     public String saveContent() {
         try {
-            Files.write(article.file.toPath(), editor.getText().getBytes());
+            Files.write(article.file.toPath(), editor.getText().getBytes(Defines.ARTICLE_ENCODE));
         } catch (final IOException e) {
             LOGGER.error("Error", e);
             return e.getMessage();
         }
         reload();
         return String.format("Save to file 「%s」", article.title);
+    }
+
+    @Override
+    public String getUrl() {
+        return article.toInternalUrl();
     }
 
 }

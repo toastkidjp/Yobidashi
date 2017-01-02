@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.util.TriConsumer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -39,6 +40,9 @@ public class Controller {
 
     /** Empty action. */
     private Runnable emptyAction;
+
+    /** Action of search article. */
+    private TriConsumer<Boolean, String, String> articleSearchAction;
 
     /**
      * Return root pane.
@@ -85,6 +89,10 @@ public class Controller {
             emptyAction.run();
             return;
         }
+        if ("Article".equals(t)) {
+            articleSearchAction.accept(true, query, "");
+            return;
+        }
         webSearchAction.accept(query, t);
     }
 
@@ -113,6 +121,14 @@ public class Controller {
      */
     public void setOnEmptyAction(final Runnable emptyAction) {
         this.emptyAction = emptyAction;
+    }
+
+    /**
+     * Set on article search action.
+     * @param command
+     */
+    public void setOnArticleSearch(TriConsumer<Boolean, String, String> command) {
+        this.articleSearchAction = command;
     }
 
 }

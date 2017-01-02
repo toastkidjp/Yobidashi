@@ -14,23 +14,37 @@ import java.util.regex.Pattern;
 
 
 /**
- * Web 上の文書を取得する。
+ * TODO 解体する.
+ *
+ * Web 上の文書を取得する.
  *
  * @author Toast kid
- *
+ * @deprecated
  */
+@Deprecated
 public final class WebDocumentUtil {
+
     /** Y!ファイナンスの日経平均株価のページ. */
     private static final String STOCKS_FINANCE_YAHOO = "http://stocks.finance.yahoo.co.jp/stocks/detail/?code=998407.O";
+
     /** 日経平均株価を抜き出す正規表現. */
     private static final Pattern NIKKEI_PATTERN
         = Pattern.compile("<td class=\"stoksPrice\">(.+?)</td>", Pattern.DOTALL);
+
     /** 値動きを抜き出す正規表現. */
     private static final Pattern CHANGE_PATTERN
         = Pattern.compile("<span class=\".*yjMSt\">(.+?)</span>", Pattern.DOTALL);
 
     /** エンコード */
     public static String encode = "utf-8";
+
+    /**
+     * Private constructor.
+     */
+    private WebDocumentUtil() {
+        // TODO
+    }
+
     /**
      * 指定した URL の Web 文書から特定部分を正規表現で取得する.
      * @param urlStr 取得したい文書の URL 文字列

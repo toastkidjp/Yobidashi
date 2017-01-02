@@ -31,6 +31,13 @@ public final class HtmlUtil {
         = Pattern.compile("<title>(.+?)</title>",      Pattern.DOTALL);
 
     /**
+     * Private constructor.
+     */
+    private HtmlUtil() {
+        // NOP.
+    }
+
+    /**
      * 表の HTML 表現を生成し返す。
      * <HR>
      * (130414) 作成<BR>
@@ -214,7 +221,7 @@ public final class HtmlUtil {
      * @param str
      */
     public static HashMap<String,String> getRssUrlsMap( final String str ) {
-        final HashMap<String,String> resSet = new HashMap<String,String>(100);
+        final HashMap<String,String> resSet = new HashMap<>(100);
         final Matcher matcher = RDF_PATTERN.matcher(str);
         while (matcher.find()) {
             final String matched = "http://" + matcher.group(1) + ".rdf";
@@ -272,9 +279,8 @@ public final class HtmlUtil {
     public static String tabRemove(final String str) {
         if (str.indexOf("\t") != -1) {
             return str.replaceAll("\t", "");
-        } else {
-            return str;
         }
+        return str;
     }
 
     /**

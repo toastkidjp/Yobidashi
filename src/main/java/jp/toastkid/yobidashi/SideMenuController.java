@@ -40,7 +40,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import jp.toastkid.article.ApplicationState;
 import jp.toastkid.article.Archiver;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.EpubGenerator;
@@ -319,6 +318,14 @@ public class SideMenuController implements Initializable {
         final Article article = optional.get();
         wordCloud.draw(pane, article.file);
         tabAction.open(article.title + "のワードクラウド", pane);
+    }
+
+    /**
+     * Call BookmarkManager.
+     */
+    @FXML
+    private final void editBookmark() {
+        new BookmarkManager().edit(stage);
     }
 
     /**

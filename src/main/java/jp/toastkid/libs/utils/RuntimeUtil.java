@@ -16,6 +16,9 @@ import java.io.InputStreamReader;
  */
 public final class RuntimeUtil {
 
+    /**
+     * Private constructor.
+     */
     private RuntimeUtil() {
         // NOP.
     }

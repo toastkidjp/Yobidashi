@@ -24,8 +24,6 @@ import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
-import javafx.animation.Interpolator;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -69,7 +67,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Duration;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
@@ -85,6 +82,7 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.Style;
 import jp.toastkid.jfx.common.control.AutoCompleteTextField;
+import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.utils.FileUtil;
@@ -105,9 +103,6 @@ public final class Controller implements Initializable {
 
     /** Speed dial's scene graph file. */
     private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
-
-    /** /path/to/path to bookmark file. */
-    private static final String PATH_BOOKMARK    = Defines.USER_DIR + "/bookmark.txt";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -286,12 +281,6 @@ public final class Controller implements Initializable {
     /** file watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
-    /** splitter closing transition. */
-    private TranslateTransition splitterClose;
-
-    /** splitter opening transition. */
-    private TranslateTransition splitterOpen;
-
     /** Snackbar. */
     @FXML
     private JFXSnackbar snackbar;
@@ -323,9 +312,6 @@ public final class Controller implements Initializable {
     /** Tools pane controller. */
     @FXML
     private ToolsController toolsController;
-
-    /** Speed dial's controller. */
-    private jp.toastkid.speed_dial.Controller speedDialController;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -409,24 +395,10 @@ public final class Controller implements Initializable {
                                         final String tabUrl = tab.getUrl();
                                         if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
                                             urlText.setText(tabUrl);
-                                            return;
-                                        }
-
-                                        final String text = nextTab.getText();
-                                        if (StringUtils.isEmpty(text)) {
-                                            return;
-                                        }
-
-                                        // (130317) 「現在選択中のファイル名」にセット
-                                        final File selected = new File(
-                                                Config.get(Config.Key.ARTICLE_DIR),
-                                                Articles.titleToFileName(nextTab.getText()) + Article.Extension.MD.text()
-                                                );
-                                        if (selected.exists()){
                                             focusOn();
                                         }
                                     }
-                                    );
+                                );
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize right tabs. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -679,7 +651,7 @@ public final class Controller implements Initializable {
                 new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
                 return;
             }
-            opt.ifPresent(article -> getCurrentTab().loadUrl(article.toInternalUrl()));
+            opt.ifPresent(this::openArticleTab);
         } catch (final Exception e) {
             LOGGER.error("no such element", e);
         }
@@ -712,37 +684,36 @@ public final class Controller implements Initializable {
      * Open new tab having SpeedDial.
      */
     private void openSpeedDialTab() {
-        if (speedDialController == null) {
-            speedDialController = readSpeedDial();
-            speedDialController.setTitle(Config.get(Config.Key.APP_TITLE));
-            speedDialController.setZero();
-            speedDialController.setBackground(articleGenerator.getBackground());
-            speedDialController.setOnWebSearch((query, type) ->
+        try {
+            final jp.toastkid.speed_dial.Controller controller = readSpeedDial();
+            controller.setTitle(Config.get(Config.Key.APP_TITLE));
+            controller.setZero();
+            controller.setBackground(articleGenerator.getBackground());
+            controller.setOnArticleSearch(this::doSearch);
+            controller.setOnWebSearch((query, type) ->
                 openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
             );
-            speedDialController.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
-        }
+            controller.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
 
-        final Pane sdRoot = speedDialController.getRoot();
-        sdRoot.setPrefWidth(width * 0.8);
-        sdRoot.setPrefHeight(tabPane.getHeight());
-        openTab(makeContentTab("Speed Dial", sdRoot));
+            final Pane sdRoot = controller.getRoot();
+            sdRoot.setPrefWidth(width * 0.8);
+            sdRoot.setPrefHeight(tabPane.getHeight());
+            openTab(makeContentTab("Speed Dial", sdRoot));
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Init speed dial's controller.
      * @return Controller
+     * @throws IOException
      */
-    private final jp.toastkid.speed_dial.Controller readSpeedDial() {
-        try {
-            final FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
-            loader.load();
-            return (jp.toastkid.speed_dial.Controller) loader.getController();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private final jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
+        final FXMLLoader loader = new FXMLLoader(
+                getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
+        loader.load();
+        return (jp.toastkid.speed_dial.Controller) loader.getController();
     }
 
 
@@ -932,14 +903,7 @@ public final class Controller implements Initializable {
      * Show left panel.
      */
     private void showLeftPane() {
-        if (splitterOpen == null) {
-            splitterOpen = new TranslateTransition(Duration.seconds(0.25d), tabPane);
-            splitterOpen.setFromX(-200);
-            splitterOpen.setToX(0);
-            splitterOpen.setInterpolator(Interpolator.LINEAR);
-            splitterOpen.setCycleCount(1);
-        }
-        splitterOpen.play();
+        SplitterTransitionFactory.makeHorizontalSlide(splitter, DEFAULT_DIVIDER_POSITION, DEFAULT_DIVIDER_POSITION).play();
         splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
     }
 
@@ -947,14 +911,7 @@ public final class Controller implements Initializable {
      * 左側を隠す.
      */
     private void hideLeftPane() {
-        if (splitterClose == null) {
-            splitterClose = new TranslateTransition(Duration.seconds(0.25d), tabPane);
-            splitterClose.setFromX(200);
-            splitterClose.setToX(0);
-            splitterClose.setInterpolator(Interpolator.LINEAR);
-            splitterClose.setCycleCount(1);
-        }
-        splitterClose.play();
+        SplitterTransitionFactory.makeHorizontalSlide(splitter, 0.0d, DEFAULT_DIVIDER_POSITION).play();
         splitter.setDividerPosition(0, 0.0d);
     }
 
@@ -969,7 +926,6 @@ public final class Controller implements Initializable {
     /**
      * 現在選択しているタブを閉じる. 1つしか開いていない時は閉じない.
      */
-    @FXML
     private final void closeTab() {
         closeTab(tabPane.getSelectionModel().getSelectedItem());
     }
@@ -990,7 +946,6 @@ public final class Controller implements Initializable {
     /**
      * Close all tabs.
      */
-    @FXML
     private final void closeAllTabs() {
         tabPane.getTabs().removeAll(tabPane.getTabs());
         setStatus("Close all tabs.");
@@ -1002,7 +957,6 @@ public final class Controller implements Initializable {
      * TODO 動作未検証
      * @param event
      */
-    @FXML
     private final void stop() {
         final ReloadableTab tab = getCurrentTab();
         if (!(tab instanceof ArticleTab)) {
@@ -1039,21 +993,31 @@ public final class Controller implements Initializable {
                     ((AutoCompleteTextField) filterInput).getEntries().add(filter);
                 }
 
-                final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
-                        .setHomeDirPath(Config.get("articleDir"))
-                        .setAnd(isAnd.isSelected())
-                        .setSelectName(filter)
-                        .setEmptyAction(() -> {
-                            showSnackbar(String.format("Not found article with '%s'.", query));
-                            searchArticle(queryInput.getText(), filterInput.getText());
-                        })
-                        .setSuccessAction(this::setStatus)
-                        .setTabPane(leftTabs)
-                        .setListViewInitializer(this::initArticleList)
-                        .setHeight(articleList.getHeight())
-                        .build();
-                fileSearcher.search(query);
+                doSearch(isAnd.isSelected(), query, filter);
             }).build().show();
+    }
+
+    /**
+     * Do search article.
+     * @param isAnd
+     * @param query
+     * @param filter
+     */
+    private void doSearch(final boolean isAnd, final String query, final String filter) {
+        final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
+                .setHomeDirPath(Config.get("articleDir"))
+                .setAnd(isAnd)
+                .setSelectName(filter)
+                .setEmptyAction(() -> {
+                    showSnackbar(String.format("Not found article with '%s'.", query));
+                    searchArticle(queryInput.getText(), filterInput.getText());
+                })
+                .setSuccessAction(this::setStatus)
+                .setTabPane(leftTabs)
+                .setListViewInitializer(this::initArticleList)
+                .setHeight(articleList.getHeight())
+                .build();
+        fileSearcher.search(query);
     }
 
     /**
@@ -1124,19 +1088,15 @@ public final class Controller implements Initializable {
                 return;
             }
 
-            if (newVal == null) {
-                return;
-            }
-
             final Optional<Tab> first = tabPane.getTabs().stream()
                     .filter(tab -> (tab instanceof ArticleTab)
-                            && ((ArticleTab) tab).getArticle().equals(newVal))
+                            && ((ArticleTab) tab).getArticle().equals(property.getValue()))
                     .findFirst();
             if (first.isPresent()) {
                 first.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
                 return;
             }
-            openArticleTab(newVal);
+            openArticleTab(property.getValue());
         });
     }
 
@@ -1165,10 +1125,8 @@ public final class Controller implements Initializable {
             .publishOn(Schedulers.elastic())
             .subscribeOn(Schedulers.elastic())
             .subscribe(
-                empty -> FileUtil.readLines(PATH_BOOKMARK, "UTF-8")
-                    .collect(Articles::titleToFileName)
-                    .collect(fileName -> fileName + Article.Extension.MD.text())
-                    .collect(Articles::find)
+                empty -> new BookmarkManager().readLines()
+                    .collect(Articles::findFromTitle)
                     .each(bookmarks::add)
                     );
     }
@@ -1184,10 +1142,17 @@ public final class Controller implements Initializable {
                     articleList.getSelectionModel().select(indexOf);
                     articleList.scrollTo(indexOf - FOCUS_MARGIN);
                 }
+
                 final int indexOfHistory = historyList.getItems().indexOf(article);
                 if (indexOfHistory != -1){
                     historyList.getSelectionModel().select(indexOfHistory);
                     historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
+                }
+
+                final int indexOfBookmark = bookmarkList.getItems().indexOf(article);
+                if (indexOfBookmark != -1){
+                    bookmarkList.getSelectionModel().select(indexOfBookmark);
+                    bookmarkList.scrollTo(indexOfBookmark - FOCUS_MARGIN);
                 }
             })
         );

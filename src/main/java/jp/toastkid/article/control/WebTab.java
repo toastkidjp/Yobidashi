@@ -8,10 +8,8 @@ import javafx.concurrent.Worker.State;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
-import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 import jp.toastkid.article.models.ContentType;
 
 /**
@@ -24,9 +22,6 @@ public class WebTab extends BaseWebTab {
 
     /** WebView. */
     private final WebView wv;
-
-    /** CreatePopupHandler. */
-    private Callback<PopupFeatures, WebEngine> handler;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -42,8 +37,6 @@ public class WebTab extends BaseWebTab {
         private Consumer<Tab> closeAction;
 
         private String content;
-
-        private Callback<PopupFeatures, WebEngine> handler;
 
         private ContentType contentType;
 
@@ -71,11 +64,6 @@ public class WebTab extends BaseWebTab {
             return this;
         }
 
-        public Builder setHandler(final Callback<PopupFeatures, WebEngine> handler) {
-            this.handler = handler;
-            return this;
-        }
-
         public Builder setContentType(final ContentType contentType) {
             this.contentType = contentType;
             return this;
@@ -93,7 +81,6 @@ public class WebTab extends BaseWebTab {
      */
     private WebTab(final Builder b) {
         super(b.title, null, b.closeAction);
-        this.handler = b.handler;
         wv = getWebView();
         this.setContent(wv);
         final WebEngine engine = wv.getEngine();
@@ -146,11 +133,6 @@ public class WebTab extends BaseWebTab {
     @Override
     public String getTitle() {
         return wv.getEngine().getTitle();
-    }
-
-    @Override
-    protected Callback<PopupFeatures, WebEngine> getHandler() {
-        return this.handler;
     }
 
 }
