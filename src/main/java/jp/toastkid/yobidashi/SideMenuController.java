@@ -40,7 +40,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import jp.toastkid.article.ApplicationState;
 import jp.toastkid.article.Archiver;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.EpubGenerator;

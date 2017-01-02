@@ -33,6 +33,13 @@ public final class CalendarUtil {
         = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     /**
+     * Private constructor.
+     */
+    private CalendarUtil() {
+        // NOP.
+    }
+
+    /**
      * 引数として渡された UNIX 時間(long型、ミリ秒)から、
      * 「2012-05-11(金)」のような形式をした年月日表現(年/月/日/曜日)を取得する.
      * <HR>

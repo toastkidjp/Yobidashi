@@ -18,20 +18,32 @@ import org.eclipse.collections.impl.factory.primitive.IntSets;
  *
  */
 public final class MathUtil {
+
     /**
      * @return xor で生成した乱数
      */
     public static long xor() {
         return (xor128());
     }
+
     /** メソッド xor128() で使用 (120325 追加) */
     private static long xor_x = 123456789;
+
     /** メソッド xor128() で使用 (120325 追加) */
     private static long xor_y = 362436069;
+
     /** メソッド xor128() で使用 (120325 追加) */
     private static long xor_z = 521288629;
+
     /** メソッド xor128() で使用 (120325 追加) */
     private static long xor_w = 88675123;
+
+    /**
+     * Private constructor.
+     */
+    private MathUtil() {
+        // NOP.
+    }
 
     /**
      * 以下、<a href="http://www001.upp.so-net.ne.jp/isaku/rand.html">良い乱数・悪い乱数</a>より
@@ -82,27 +94,26 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         xor_z = xor_w;
         return xor_w = ( xor_w ^ ( xor_w >> 19 ) ) ^ ( t ^ ( t >> 8 ) ) ;
     }
+
     /**
      * pNumberを最大の数とする  pSize 個のユニークな要素を持つ int 集合を生成し返す
      * @param pNumber : 集合に含まれる最大の数
      * @param pSize : 集合の要素数
      * @return randamNumberSet Set<Integer>
      */
-    public static MutableIntSet createRandamNumberSet(
-            int pNumber,
-            final int pSize
-            ){
-        pNumber++;
+    public static MutableIntSet createRandamNumberSet(final int pNumber, final int pSize){
+        final int max = pNumber + 1;
         MutableIntSet randamNumberSet = null;
         randamNumberSet = IntSets.mutable.empty();
         while(randamNumberSet.size() < pSize){
-            randamNumberSet.add((int)(Math.random() * pNumber));
-            if (pNumber == randamNumberSet.size()) {
+            randamNumberSet.add((int)(Math.random() * max));
+            if (max == randamNumberSet.size()) {
                 break;
             }
         }
         return randamNumberSet;
     }
+
     /**
      * pNumberを最大の数とする,pSize個のユニークな要素を持つint型配列を生成し返す.
      * @param pNumber : 集合に含まれる最大の数
@@ -116,6 +127,7 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         final MutableIntSet randamNumberSet = createRandamNumberSet(pNumber, pSize);
         return randamNumberSet.toArray();
     }
+
     /**
      * 引数として渡された２数の最大公約数をユークリッドの互除法で求める
      * @param num1 引数１
@@ -123,10 +135,7 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
      * @return num1 : ２数の最大公約数
      * @see <a href = "http://www11.atwiki.jp/darui_program/">せっかくだから俺はプログラマの道を選ぶぜ@wiki</a>
      */
-    public static int calcEucridian(
-            int num1,
-            int num2
-            ){
+    public static int calcEucridian(int num1, int num2){
         while( num1 != num2 ) {
             if( num1 > num2 ) {
                 num1 = num1 - num2;
@@ -136,16 +145,14 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         }
         return num1;
     }
+
     /**
      * 引数として渡された２数の最大公約数をユークリッドの互除法で求める
      * @param a 引数１
      * @param b 引数２
      * @return a : ２数の最大公約数
      */
-    public static int calcEucridian2(
-            int a,
-            int b
-            ){
+    public static int calcEucridian2(int a, int b){
         int p = 0;
         //int res = 0;
         while(a != 0 && b != 0){
@@ -216,12 +223,10 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         if(n < 0){
             if(Math.abs(n) % 2 == 1){
                 return fibCalculate(n);
-            }else{
-                return (-1) * fibCalculate(n);
             }
-        }else{
-            return (fibCalculate(n));
+            return (-1) * fibCalculate(n);
         }
+        return (fibCalculate(n));
     }
      /**
       * fibonacci()メソッドから呼び出され、計算を行う。
@@ -229,37 +234,39 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
       * @return フィボナッチ数列の解
       */
     private static int fibCalculate(final int n){
-         if(n < 0){/*F(－n) = (－1)^(n+1)*Fn */
-             return fibCalculate(Math.abs(n));
-         }else if(n == 0){
-             return 0;
-         }else if(n == 1){
-             return 1;
-         }else{/*F(n)=F(n-1)+F(n-2)*/
-             return fibCalculate(n - 1) + fibCalculate(n - 2);
-         }
+
+        if (n < 0) {/*F(－n) = (－1)^(n+1)*Fn */
+            return fibCalculate(Math.abs(n));
+        } else if (n == 0) {
+            return 0;
+        } else if (n == 1) {
+            return 1;
+        }
+
+        /*F(n)=F(n-1)+F(n-2)*/
+        return fibCalculate(n - 1) + fibCalculate(n - 2);
     }
+
     /**
      * nCr の値を返す
      * @param n
      * @param r
      * @return res : nCr の値
      */
-    public static int nCr(
-            final int n,
-            final int r
-            ){
-            int res = 1;
-            for(int i = 0; i < r; i++){
-                if(i != r){
-                    res = res * (n - i);
-                } else {
-                    res = res * (n - i + 1);
-                }
+    public static int nCr(final int n, final int r){
+        int res = 1;
+        for(int i = 0; i < r; i++){
+            if(i != r){
+                res = res * (n - i);
+                continue;
             }
-            res = res / factorial(r);
-            return res;
+
+            res = res * (n - i + 1);
+        }
+        res = res / factorial(r);
+        return res;
     }
+
     /**
      * a の階乗を返す。
      * @param a
@@ -267,7 +274,7 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
      */
     public static int factorial(final int a){
         int factorialVal = 1;
-        for(int i = 2; i <= a; i++){
+        for (int i = 2; i <= a; i++) {
             factorialVal = factorialVal * i;
         }
         return factorialVal;
@@ -374,7 +381,7 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         if (size < 1) {
             throw new IllegalArgumentException();
         }
-        final Set<Integer> set = new TreeSet<Integer>();
+        final Set<Integer> set = new TreeSet<>();
         if (max < size) {
             for (int i = 1; i <= max; i++) {
                 set.add(i);

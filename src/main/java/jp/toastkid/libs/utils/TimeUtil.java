@@ -26,10 +26,17 @@ public final class TimeUtil {
     private static ThreadLocal<AtomicLong> simulatedCurrTimeMs
         = ThreadLocal.withInitial(() -> new AtomicLong(0));
 
+    /**
+     * Private constructor.
+     */
+    private TimeUtil() {
+        // NOP.
+    }
+
     public static void startSimulating() {
         synchronized(sleepTimesLock) {
             simulating.set(true);
-            threadSleepTimes = new ConcurrentHashMap<Thread, AtomicLong>();
+            threadSleepTimes = new ConcurrentHashMap<>();
         }
     }
 

@@ -23,7 +23,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class GzipUtils {
 
+    /** Object mapper. */
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /**
+     * Private constructor.
+     */
+    private GzipUtils() {
+        // NOP.
+    }
 
     /**
      * passed object convert to gziped byte array.

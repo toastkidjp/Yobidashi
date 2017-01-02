@@ -82,6 +82,13 @@ public final class FileUtil {
     };
 
     /**
+     * Private constructor.
+     */
+    private FileUtil() {
+        // NOP.
+    }
+
+    /**
      * 出力先pOutPutFileNameと文字コードutf-8で初期化したPrintWriterを生成して返す
      * @param pOutPutFileName 出力先
      * @return resWriter
@@ -257,7 +264,7 @@ public final class FileUtil {
             final String filePath,
             final String pEncode
             ) {
-        final List<String> lines = new ArrayList<String>(5000);
+        final List<String> lines = new ArrayList<>(5000);
         try (final BufferedReader fileReader = makeReader(filePath, pEncode)) {
 
             if (fileReader == null) {
@@ -307,7 +314,7 @@ public final class FileUtil {
             final String pSeparator,
             final String pEncode
             ) {
-        final Map<String, Integer> resMap = new HashMap<String, Integer>();
+        final Map<String, Integer> resMap = new HashMap<>();
         try (final BufferedReader fileReader = makeFileReader(pTablePath, pEncode);) {
             String str = new String();
             String[] temp;
@@ -409,7 +416,7 @@ public final class FileUtil {
             final String pSeparator,
             final String pEncode
             ) {
-        final Map<String, String> resMap = new HashMap<String, String>();
+        final Map<String, String> resMap = new HashMap<>();
         try{
             final BufferedReader fileReader
             = makeFileReader(
@@ -682,7 +689,7 @@ public final class FileUtil {
      */
     public static TreeMap<String, Integer> getSortedMapWithIntValue(final Map<String, Integer> passedMap) {
         final TreeMap<String,Integer> tempMap =
-            new TreeMap<String,Integer>(new NumberMapComparator(passedMap));
+            new TreeMap<>(new NumberMapComparator(passedMap));
         // TreeMap に全部の組をコピー(このときにソートされる)
         tempMap.putAll(passedMap);
         return tempMap;
@@ -697,7 +704,7 @@ public final class FileUtil {
      */
     public static Map<String, Double> getSortedMapWithDoubleValue(final Map<String, Double> passedMap) {
         final TreeMap<String,Double> tempMap =
-            new TreeMap<String,Double>(new NumberMapComparator(passedMap));
+            new TreeMap<>(new NumberMapComparator(passedMap));
         // TreeMap に全部の組をコピー(このときにソートされる)
         tempMap.putAll(passedMap);
         return tempMap;
@@ -722,7 +729,7 @@ public final class FileUtil {
         }
 
         final TreeMap<String,Double> tempMap =
-            new TreeMap<String,Double>();
+            new TreeMap<>();
         // TreeMap に全部の組をコピー(このときにソートされる)
         tempMap.putAll(passedMap);
         // TreeMap の表示
@@ -838,7 +845,7 @@ public final class FileUtil {
             ) {
         final String delimiter = "\t";
         final TreeMap<String,String> tempMap =
-            new TreeMap<String,String>(passedMap);
+            new TreeMap<>(passedMap);
         // TreeMap に全部の組をコピー(このときにソートされる)
         tempMap.putAll(passedMap);
         // TreeMap の表示
@@ -893,7 +900,7 @@ public final class FileUtil {
             final String pEncode,
             final String header
             ) {
-        final TreeSet<String>  useSet = new TreeSet<String>(passedSet);
+        final TreeSet<String>  useSet = new TreeSet<>(passedSet);
         final Iterator<String> iterator = useSet.iterator();
         try (final PrintWriter nameWriter = makeFileWriter(pOutputName, pEncode);) {
             if (StringUtils.isNotEmpty(header)) {
@@ -984,7 +991,7 @@ public final class FileUtil {
      */
     public static void uniqueDataFile(final String pFileName) {
 
-        final TreeSet<String> uniqueDataSet = new TreeSet<String>();
+        final TreeSet<String> uniqueDataSet = new TreeSet<>();
         try (final BufferedReader  fileReader = makeFileReader(pFileName,"shift-jis");
              final PrintWriter     fileWriter = makeFileWriter(pFileName,"shift-jis");
                 ) {
@@ -1134,7 +1141,7 @@ public final class FileUtil {
             ) {
         String dSepar;
         String[] tempStrA;
-        final Map<String, Integer> resMap = new HashMap<String, Integer>();
+        final Map<String, Integer> resMap = new HashMap<>();
         try{
             for (int i = 0; i < fileNames.length; i++) {
                 final BufferedReader fileReader = makeFileReader(fileNames[i], "shift-jis");
@@ -1203,7 +1210,7 @@ public final class FileUtil {
             final String targetFileEncode,
             final String delimiter
             ) {
-        final Map<String,Set<String>> resMap = new HashMap<String, Set<String>>(1000);
+        final Map<String,Set<String>> resMap = new HashMap<>(1000);
         final BufferedReader fileReader = makeFileReader(targetFilePath, targetFileEncode);
         try {
             String str = fileReader.readLine();
@@ -1234,7 +1241,7 @@ public final class FileUtil {
             final String targetFileEncode,
             final String delimiter
             ) {
-        final Map<String,List<String>> resMap = new HashMap<String, List<String>>(1000);
+        final Map<String,List<String>> resMap = new HashMap<>(1000);
         final BufferedReader fileReader = makeFileReader(targetFilePath, targetFileEncode);
         try {
             String str = fileReader.readLine();
@@ -1294,7 +1301,7 @@ public final class FileUtil {
             final String fileEncode,
             final String delimiter
             ) {
-        final List<List<String>> resList = new ArrayList<List<String>>(8000);
+        final List<List<String>> resList = new ArrayList<>(8000);
         final BufferedReader fileReader = makeFileReader(filePath, fileEncode);
         String str = "";
         try {

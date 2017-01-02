@@ -99,12 +99,15 @@ public class ChartPane extends VBox {
     @SuppressWarnings("unchecked")
     private static TableView<KeyValue> makeTable(final Collection<KeyValue> tableValues) {
         final TableView<KeyValue> table = new TableView<>();
+
         final TableColumn<KeyValue, String> keys = new TableColumn<>("Date");
         keys.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("key"));
         keys.setPrefWidth(300.0);
+
         final TableColumn<KeyValue, String> items = new TableColumn<>("Item");
         items.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("middle"));
         items.setPrefWidth(500.0);
+
         final TableColumn<KeyValue, String> costs = new TableColumn<>("Cost");
         costs.setCellValueFactory(new PropertyValueFactory<KeyValue, String>("value"));
         costs.setPrefWidth(100.0);
@@ -137,7 +140,7 @@ public class ChartPane extends VBox {
         dataMap.entrySet().stream()
             .filter( entry -> {return !entry.getKey().equals(FilesLengthExtractor.TOTAL_KEY);})
             .forEach(entry -> {
-                final Data<String, Number> d = new Data<String, Number>(entry.getKey(), entry.getValue());
+                final Data<String, Number> d = new Data<>(entry.getKey(), entry.getValue());
                 final String text = entry.getKey() + ": " + entry.getValue().intValue();
                 d.setNode(new HoveredThresholdNode(threshold, entry.getValue().intValue(), text));
                 series.getData().add(d);
@@ -239,7 +242,7 @@ public class ChartPane extends VBox {
      * @return 月の文字列表現を要素に持つ List
      */
     public static final List<String> getMonthsList() {
-        final List<String> monthSelector = new ArrayList<String>();
+        final List<String> monthSelector = new ArrayList<>();
         final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM");
         final String now = LocalDateTime.now().format(pattern);
         LocalDateTime ldt = LocalDateTime.of(2011, 1, 1, 0, 0);

@@ -48,19 +48,26 @@ public class Style {
     public static final String DEFAULT = "MODENA";
 
     /**
-     * get path to css.
-     * @param s Style name.
+     * Private constructor.
+     */
+    private Style() {
+        // NOP.
+    }
+
+    /**
+     * Get path to css.
+     * @param styleName Style name.
      * @return path to css.
      */
-    public static String getPath(final String s) {
-        if (StringUtils.isEmpty(s)) {
+    public static String getPath(final String styleName) {
+        if (StringUtils.isEmpty(styleName)) {
             return DEFAULT;
         }
-        final URL resource = Style.class.getResource("/css/" + s.toLowerCase() + CSS);
+        final URL resource = Style.class.getResource("/css/" + styleName.toLowerCase() + CSS);
         if (resource == null) {
-            final File userDefined = new File(USER_DEFINED_PATH, s.toLowerCase() + CSS);
+            final File userDefined = new File(USER_DEFINED_PATH, styleName.toLowerCase() + CSS);
             if (!userDefined.exists()) {
-                return (resource != null) ? resource.toString() : s.toString();
+                return (resource != null) ? resource.toString() : styleName.toString();
             }
             try {
                 return userDefined.toURI().toURL().toString();
@@ -68,13 +75,12 @@ public class Style {
                 LOGGER.error("Caught error.", e);
             }
         }
-        return (resource != null) ? resource.toString() : s.toString();
+        return (resource != null) ? resource.toString() : styleName.toString();
     }
 
     /**
-     * get path to css.
-     * @param s Style name.
-     * @return path to css.
+     * Find file name from css dir.
+     * @return list of css names.
      */
     public static List<String> findFileNamesFromDir() {
         final MutableSet<String> styles = Sets.mutable.empty();

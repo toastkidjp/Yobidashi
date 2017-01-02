@@ -289,7 +289,7 @@ public final class MarkdownConverter {
             final List<String> sources,
             final boolean isCount
             ) {
-        final List<String> contents = new ArrayList<String>(sources.size());
+        final List<String> contents = new ArrayList<>(sources.size());
         boolean isInBlockQuote = false;
         boolean isInQuote      = false;
         boolean isInPre        = false;
@@ -304,7 +304,7 @@ public final class MarkdownConverter {
         YolpMapBuilder map = null;
 
         int formation = -1;
-        List<Footballer> team = new ArrayList<Footballer>(11);
+        List<Footballer> team = new ArrayList<>(11);
         int uLTagDepth  = 0;
         int oLTagDepth  = 0;
         /** 何番目の expand か */
@@ -463,12 +463,9 @@ public final class MarkdownConverter {
                     isInP = false;
                 } else {
                     // (121118) 追加
-                    if (isInP) {
-                        if (!allowP(str)
-                                ) {
-                            contents.add("</p>");
-                            isInP = false;
-                        }
+                    if (isInP && !allowP(str)) {
+                        contents.add("</p>");
+                        isInP = false;
                     }
                     if (!isInP && allowP(str)) {
                         contents.add("<p>");
@@ -716,7 +713,7 @@ public final class MarkdownConverter {
                     contents.add(Formation.getPitch(team, formation));
                     isInFormation = false;
                     formation   = -1;
-                    team = new ArrayList<Footballer>(11);
+                    team = new ArrayList<>(11);
                 }
                 str = "";
             }
@@ -747,6 +744,7 @@ public final class MarkdownConverter {
         }
         return contents;
     }
+
     /**
      * return table tag.
      * @return table tag
@@ -754,6 +752,7 @@ public final class MarkdownConverter {
     private String getTableTag() {
         return "<table class=\"table table-hover table-stripe\">";
     }
+
     /**
      * p タグを許容するか否かを判定する.
      * @param str
@@ -771,6 +770,7 @@ public final class MarkdownConverter {
         }
         return false;
     }
+
     /**
      * 行単位の変換をする.
      * <HR>
@@ -1046,6 +1046,7 @@ public final class MarkdownConverter {
     public final String getTitle() {
         return title;
     }
+
     /**
      * タイトルをセットする.
      * @param title 設定する title
@@ -1053,6 +1054,7 @@ public final class MarkdownConverter {
     public void setTitle(final String title) {
         this.title = title;
     }
+
     /**
      * txtFilePath が示すファイルが存在する時のみ、 file を セットする.
      * @param txtFilePath ファイルのパス

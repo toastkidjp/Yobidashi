@@ -1,4 +1,4 @@
-package jp.toastkid.article;
+package jp.toastkid.yobidashi;
 
 import java.text.NumberFormat;
 import java.util.Map;
@@ -15,6 +15,13 @@ import org.eclipse.collections.impl.factory.Maps;
  *
  */
 public final class ApplicationState {
+
+    /**
+     * Private constructor.
+     */
+    private ApplicationState() {
+        // NOP.
+    }
 
     /** 1MB に等しい数値を返す.すなわち 1024  の 2 乗 */
     private static final long MEGA_BYTE = Math.round(Math.pow(1024, 2));

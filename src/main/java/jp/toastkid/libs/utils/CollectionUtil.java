@@ -31,6 +31,13 @@ public abstract class CollectionUtil {
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
     /**
+     * Private constructor.
+     */
+    private CollectionUtil() {
+        // NOP.
+    }
+
+    /**
      * String 型配列の中身を "\t" で指定した文字列で繋いで返す.
      * @param pStrArray 中身を取り出したい String 型配列
      * @return 文字列
@@ -38,6 +45,7 @@ public abstract class CollectionUtil {
     public static String implode(final String[] pStrArray){
         return implode(pStrArray, "\t");
     }
+
     /**
      * String 型配列の中身を glue で指定した文字列で繋いで返す.
      * @param pieces 中身を取り出したい String 型配列
@@ -108,7 +116,7 @@ public abstract class CollectionUtil {
           final String lineS = System.getProperty("line.separator");
           final StringBuilder takeBuilder = new StringBuilder();
           final TreeMap<String,Integer> tempMap =
-              new TreeMap<String,Integer>(new NumberMapComparator(pTMap));
+              new TreeMap<>(new NumberMapComparator(pTMap));
             // TreeMap に全部の組をコピー(このときにソートされる)
           tempMap.putAll(pTMap);
             // TreeMap の表示
@@ -130,7 +138,7 @@ public abstract class CollectionUtil {
             /** gramCount-グラムに分割 */
             final int gramCount = 2;
 
-            final Map<String, int[]> resMap = new HashMap<String, int[]>();
+            final Map<String, int[]> resMap = new HashMap<>();
             final Set<String> appear = Sets.mutable.empty();
             //boolean isValidKind = kindOfClassify.equals(str.split("\t")[1]);
 
@@ -245,7 +253,7 @@ public abstract class CollectionUtil {
             final Map<String , Set<String>> pMap,
             final String glue
             ) {
-        final Map<String,String> resMap = new HashMap<String,String>(100);
+        final Map<String,String> resMap = new HashMap<>(100);
         final Iterator<String> iter = pMap.keySet().iterator();
         String key;
         while(iter.hasNext()){
@@ -264,7 +272,7 @@ public abstract class CollectionUtil {
             final Map<String , List<String>> pMap,
             final String dataSeparator
             ){
-        final Map<String,String> resMap = new HashMap<String,String>(100);
+        final Map<String,String> resMap = new HashMap<>(100);
         final Set<String> kSet = pMap.keySet();
         final Iterator<String> iter = kSet.iterator();
         List<String> pMapValSet;
@@ -337,7 +345,7 @@ public abstract class CollectionUtil {
                 );
         final Iterator<String> iter = catMap.keySet().iterator();
         String tempKey;
-        final Set<String> catSet = new TreeSet<String>();
+        final Set<String> catSet = new TreeSet<>();
         while(iter.hasNext()){
             tempKey = iter.next();
             //System.out.println(tempKey + " : " + catMap.get(tempKey).size());
@@ -351,7 +359,7 @@ public abstract class CollectionUtil {
      * @return List&lt;String>
      */
     public static List<String> takeStrListFromList_List(final List<List<String>> pList){
-        final List<String> resList = new ArrayList<String>(pList.size());
+        final List<String> resList = new ArrayList<>(pList.size());
         for (int i = 0; i < pList.size(); i++) {
             resList.add(implode(pList.get(i)));
         }
@@ -412,7 +420,7 @@ public abstract class CollectionUtil {
     public static Map<String, String> takeFromMap_STR_INTLST(
             final Map<String, List<Integer>> pathLengthMap
             ) {
-        final Map<String,String> resMap = new HashMap<String, String>(pathLengthMap.size());
+        final Map<String,String> resMap = new HashMap<>(pathLengthMap.size());
         final Iterator<String> iter = pathLengthMap.keySet().iterator();
         while(iter.hasNext()){
             final String key = iter.next();
@@ -432,7 +440,7 @@ public abstract class CollectionUtil {
             ) {
         final Set<List<String>> resLList = Sets.mutable.empty();
 
-        List<String> first = new ArrayList<String>(10);
+        List<String> first = new ArrayList<>(10);
         first.add(target);
 
         resLList.add(first);
@@ -457,7 +465,7 @@ public abstract class CollectionUtil {
      * @return 指定したサイズの分だけ 0 を入れた List&lt;String>
      */
     public static List<String> getZeroList(final int size){
-        final ArrayList<String> resList = new ArrayList<String>(size);
+        final ArrayList<String> resList = new ArrayList<>(size);
         for(int i = 0; i < size; i++){
             resList.add("0");
         }
@@ -526,7 +534,7 @@ public abstract class CollectionUtil {
         while(iterator.hasNext()){
             nowFileAbsolutePath = iterator.next().toString();
 
-            tempMap = new TreeMap<String, String>(filesTMap.get(nowFileAbsolutePath));
+            tempMap = new TreeMap<>(filesTMap.get(nowFileAbsolutePath));
             //System.out.println(nowFileAbsolutePath + " : " + filesTMap.size()/*+ tempMap */);
             if(isOver){
                 writer.print(nowFileAbsolutePath);

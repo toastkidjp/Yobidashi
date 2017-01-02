@@ -31,7 +31,7 @@ import jp.toastkid.yobidashi.Defines;
  *
  * @author Toast kid
  */
-public class Articles {
+public final class Articles {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Articles.class);
@@ -41,6 +41,13 @@ public class Articles {
 
     /** line separator. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
+
+    /**
+     * Private constructor.
+     */
+    private Articles() {
+        // NOP.
+    }
 
     /**
      * 記事名一覧を返す.

@@ -94,21 +94,29 @@ public final class AlertDialogController implements Initializable {
             b.setText(text);
         }
 
-        EventHandler<ActionEvent> eventHandler = null;
-        if (action != null) {
-            eventHandler = eve -> {
-                try {
-                    action.run();
-                    this.close();
-                } catch (final RuntimeException e) {
-                    AlertDialog.showMessage(message.getScene().getWindow(), "Error!!!", e.getMessage());
-                    LOGGER.error("Caught error.", e);
-                }
-            };
-        } else {
-            eventHandler = eve -> this.close();
+        b.setOnAction(initEventHandler(action));
+    }
+
+    /**
+     * Initialize event handler.
+     * @param action
+     * @return
+     */
+    private EventHandler<ActionEvent> initEventHandler(final Runnable action) {
+
+        if (action == null) {
+            return eve -> this.close();
         }
-        b.setOnAction(eventHandler);
+
+        return eve -> {
+            try {
+                action.run();
+                this.close();
+            } catch (final RuntimeException e) {
+                AlertDialog.showMessage(message.getScene().getWindow(), "Error!!!", e.getMessage());
+                LOGGER.error("Caught error.", e);
+            }
+        };
     }
 
     /**

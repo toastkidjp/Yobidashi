@@ -57,23 +57,20 @@ public class ArticleTab extends BaseWebTab {
     /** Load action. */
     private final Runnable onLoad;
 
-    /** CreatePopupHandler. */
-    private final Callback<PopupFeatures, WebEngine> handler;
+    /** Content editor. */
+    private final CodeArea editor;
+
+    /** Splitter. */
+    private final SplitPane split;
+
+    /** Editor's scroll bar. */
+    private final VirtualizedScrollPane<CodeArea> vsp;
 
     /** HTML content. */
     private String content;
 
     /** Content's yOffset. */
     private int yOffset;
-
-    /** Content editor. */
-    private CodeArea editor;
-
-    /** Splitter. */
-    private SplitPane split;
-
-    /** Editor's scroll bar. */
-    private VirtualizedScrollPane<CodeArea> vsp;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -148,7 +145,6 @@ public class ArticleTab extends BaseWebTab {
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
         this.article = b.article;
-        this.handler = b.handler;
 
         Optional.ofNullable(b.closeAction).ifPresent(action -> {
             final Button closeButton = new JFXButton("x");
@@ -343,11 +339,6 @@ public class ArticleTab extends BaseWebTab {
     @Override
     public String htmlSource() {
         return content != null ? content : super.htmlSource();
-    }
-
-    @Override
-    protected Callback<PopupFeatures, WebEngine> getHandler() {
-        return this.handler;
     }
 
     @Override

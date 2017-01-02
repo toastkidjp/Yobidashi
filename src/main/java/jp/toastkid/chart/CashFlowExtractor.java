@@ -93,10 +93,9 @@ public final class CashFlowExtractor implements ChartDataExtractor {
                         final String target = line[2];
                         int price = 0;
                         if (target.endsWith("円")) {
-                            final String priceStr
-                                = target.substring(0, target.indexOf("円")).trim();
+                            final String priceStr = target.substring(0, target.indexOf("円")).trim();
                             // 120701 修正
-                            if (!"".equals(priceStr)) {
+                            if (StringUtils.isNotBlank(priceStr)) {
                                 price = Integer.parseInt(priceStr);
                             }
                             map.put(date +  line[1].trim(), price);

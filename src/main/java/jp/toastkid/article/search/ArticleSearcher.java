@@ -68,7 +68,7 @@ public final class ArticleSearcher {
     private int parallel = 12;
 
     /** AND 検索を使用するか否か. */
-    private boolean isAnd = false;
+    private final boolean isAnd;
 
     /** Path string of article dir. */
     private final String dirPath;
