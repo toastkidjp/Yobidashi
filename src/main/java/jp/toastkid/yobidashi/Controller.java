@@ -946,6 +946,13 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Close current tab.
+     */
+    private final void closeCurrentTab() {
+        Optional.ofNullable(getCurrentTab()).ifPresent(tab -> tab.close(this::closeTab));
+    }
+
+    /**
      * Close all tabs.
      */
     private final void closeAllTabs() {
@@ -1519,7 +1526,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnSearch(this::searchArticle);
         sideMenuController.setOnEdit(this::callEditor);
         sideMenuController.setOnNewTab(this::openSpeedDialTab);
-        sideMenuController.setOnCloseTab(this::closeTab);
+        sideMenuController.setOnCloseTab(this::closeCurrentTab);
         sideMenuController.setOnCloseAllTabs(this::closeAllTabs);
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);
