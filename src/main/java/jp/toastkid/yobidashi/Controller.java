@@ -955,19 +955,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Stop loading.
-     * TODO 動作未検証
-     * @param event
-     */
-    private final void stop() {
-        final ReloadableTab tab = getCurrentTab();
-        if (!(tab instanceof ArticleTab)) {
-            return;
-        }
-        Platform.runLater(tab::stop);
-    }
-
-    /**
      * Alias for using method reference.
      */
     private void searchArticle() {
