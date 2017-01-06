@@ -112,10 +112,16 @@ public final class MarkdownConverter {
     private static final Pattern RUBY_PAT = Pattern.compile("&ruby\\((.+?)\\)", Pattern.DOTALL);
 
     /**
-     * Confluence の リンク を再現するための検出用正規表現.
+     * RegEx of hyper link.
      */
     private static final Pattern HYPER_LINK_PATTERN
         = Pattern.compile("\\[(.+?)\\]\\((.+?)\\)", Pattern.DOTALL);
+
+    /**
+     * RegEx of Image.
+     */
+    private static final Pattern IMAGE_LINK_PATTERN
+        = Pattern.compile("\\!\\[(.+?)\\]\\((.+?)\\)", Pattern.DOTALL);
 
     /** Github widget 記述を検出する正規表現. */
     private static final Pattern GITHUB_PATTERN  = Pattern.compile("\\{[g|G]it[h|H]ub:(.+?)\\}", Pattern.DOTALL);
@@ -792,10 +798,12 @@ public final class MarkdownConverter {
         if (str.indexOf("---") != -1) {
             str = str.replaceFirst("---*-", "<hr/>");
         }
+
         // ひとりWiki用プラグイン変換
         if (str.indexOf("&br()") != -1) {
             str = str.replaceAll("&br\\(\\)", "<br/>");
         }
+
         if (str.toLowerCase().indexOf("{lastmodify}") != -1) {
             str = str.replace(
                     "{lastmodify}",
@@ -925,13 +933,21 @@ public final class MarkdownConverter {
             }
         }
 
+        if (str.indexOf("![") != -1 && str.indexOf("](") != -1) {
+            matcher = IMAGE_LINK_PATTERN.matcher(str);
+            while (matcher.find()) {
+                final String alt  = matcher.group(1);
+                final String link = matcher.group(2);
+                str = str.replaceFirst(IMAGE_LINK_PATTERN.pattern(), makeImageTag(alt, link));
+            }
+        }
+
         if (str.indexOf("[") != -1 && str.indexOf("](") != -1) {
             matcher = HYPER_LINK_PATTERN.matcher(str);
             while (matcher.find()) {
                 final String alt  = matcher.group(1);
                 final String link = matcher.group(2);
                 final StringBuilder generatedLink = new StringBuilder(180);
-                // (121010) ソースフォルダをリンクパスに追加
                 generatedLink.append("<a href=\"");
                 generatedLink.append(link);
                 generatedLink.append("\"");
@@ -944,6 +960,7 @@ public final class MarkdownConverter {
                 str = str.replaceFirst(HYPER_LINK_PATTERN.pattern(), generatedLink.toString());
             }
         }
+
         if (str.indexOf("{hide:") != -1) {
             matcher = OVERFLOW_HIDDEN_PATTERN.matcher(str);
             while (matcher.find()) {
@@ -1037,6 +1054,16 @@ public final class MarkdownConverter {
             str = str.replace("$", "\\$");
         }
         return str;
+    }
+
+    /**
+     * Make image tag.
+     * @param alt
+     * @param link
+     * @return
+     */
+    private String makeImageTag(final String alt, final String link) {
+        return "<img src=\"" + link + "\" alt=\"" + alt + "\" />";
     }
 
     /**
