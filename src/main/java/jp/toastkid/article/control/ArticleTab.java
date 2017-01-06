@@ -14,13 +14,10 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jfoenix.controls.JFXButton;
-
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
@@ -137,13 +134,6 @@ public class ArticleTab extends BaseWebTab {
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
         this.article = b.article;
-
-        Optional.ofNullable(b.closeAction).ifPresent(action -> {
-            final Button closeButton = new JFXButton("x");
-            closeButton.setOnAction(e -> action.accept(this));
-            this.setGraphic(closeButton);
-        });
-
         this.onLoad = b.onLoad;
 
         final WebView webView = getWebView();
@@ -197,6 +187,12 @@ public class ArticleTab extends BaseWebTab {
 
         this.editor = new CodeArea();
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
+        editor.setOnKeyTyped(event -> {
+            if (getText().startsWith("* ")) {
+                return;
+            }
+            setText("* " + getText());
+        });
         vsp = new VirtualizedScrollPane<>(editor);
         split = new SplitPane(webView, vsp);
         this.setContent(split);

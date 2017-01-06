@@ -115,9 +115,6 @@ public final class Controller implements Initializable {
     private static final String WINDOW_FIND_UP
         = "window.find(\"{0}\", false, true, true, false, true, false)";
 
-    /** 左のリストで中心をいくつずらすか. */
-    private static final int FOCUS_MARGIN = 10;
-
     /** searcher appear keyboard shortcut. */
     private static final KeyCodeCombination APPEAR_SEARCHER
         = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
@@ -396,7 +393,12 @@ public final class Controller implements Initializable {
                                         if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
                                             urlText.setText(tabUrl);
                                             focusOn();
+                                            return;
                                         }
+
+                                        articleList.getSelectionModel().clearSelection();
+                                        historyList.getSelectionModel().clearSelection();
+                                        bookmarkList.getSelectionModel().clearSelection();
                                     }
                                 );
                             final String message = Thread.currentThread().getName()
@@ -944,25 +946,19 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Close current tab.
+     */
+    private final void closeCurrentTab() {
+        Optional.ofNullable(getCurrentTab()).ifPresent(tab -> tab.close(this::closeTab));
+    }
+
+    /**
      * Close all tabs.
      */
     private final void closeAllTabs() {
         tabPane.getTabs().removeAll(tabPane.getTabs());
         setStatus("Close all tabs.");
         openSpeedDialTab();
-    }
-
-    /**
-     * Stop loading.
-     * TODO 動作未検証
-     * @param event
-     */
-    private final void stop() {
-        final ReloadableTab tab = getCurrentTab();
-        if (!(tab instanceof ArticleTab)) {
-            return;
-        }
-        Platform.runLater(tab::stop);
     }
 
     /**
@@ -1135,27 +1131,17 @@ public final class Controller implements Initializable {
      * 現在選択中のファイルに ListView をフォーカスする.
      */
     private void focusOn() {
-        Platform.runLater(() ->
-            Optional.ofNullable(getCurrentArticle()).ifPresent(article -> {
-                final int indexOf = articleList.getItems().indexOf(article);
-                if (indexOf != -1){
-                    articleList.getSelectionModel().select(indexOf);
-                    articleList.scrollTo(indexOf - FOCUS_MARGIN);
-                }
+        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
+        if (!articleOr.isPresent()) {
+            return;
+        }
 
-                final int indexOfHistory = historyList.getItems().indexOf(article);
-                if (indexOfHistory != -1){
-                    historyList.getSelectionModel().select(indexOfHistory);
-                    historyList.scrollTo(indexOfHistory - FOCUS_MARGIN);
-                }
+        articleOr.ifPresent(article -> Platform.runLater(() -> {
+            article.focus(articleList);
+            article.focus(historyList);
+            article.focus(bookmarkList);
+        }));
 
-                final int indexOfBookmark = bookmarkList.getItems().indexOf(article);
-                if (indexOfBookmark != -1){
-                    bookmarkList.getSelectionModel().select(indexOfBookmark);
-                    bookmarkList.scrollTo(indexOfBookmark - FOCUS_MARGIN);
-                }
-            })
-        );
     }
 
     /**
@@ -1540,7 +1526,7 @@ public final class Controller implements Initializable {
         sideMenuController.setOnSearch(this::searchArticle);
         sideMenuController.setOnEdit(this::callEditor);
         sideMenuController.setOnNewTab(this::openSpeedDialTab);
-        sideMenuController.setOnCloseTab(this::closeTab);
+        sideMenuController.setOnCloseTab(this::closeCurrentTab);
         sideMenuController.setOnCloseAllTabs(this::closeAllTabs);
         sideMenuController.setOnSlideShow(this::slideShow);
         sideMenuController.setOnReload(this::reload);

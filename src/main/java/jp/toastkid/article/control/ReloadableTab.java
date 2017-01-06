@@ -3,6 +3,9 @@ package jp.toastkid.article.control;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jfoenix.controls.JFXButton;
 
 import javafx.beans.property.DoubleProperty;
@@ -18,6 +21,9 @@ import javafx.scene.control.Tab;
  *
  */
 public abstract class ReloadableTab extends Tab {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReloadableTab.class);
 
     /** Default loading tab title. */
     protected static final String LOADING = "Now Loading...";
@@ -38,9 +44,24 @@ public abstract class ReloadableTab extends Tab {
         super(title, content);
         Optional.ofNullable(closeAction).ifPresent(action -> {
             final Button closeButton = new JFXButton("x");
-            closeButton.setOnAction(e -> action.accept(this));
+            closeButton.setOnAction(e -> close(action));
             this.setGraphic(closeButton);
         });
+    }
+
+    /**
+     * Close this tab.
+     * @param action
+     */
+    public void close(final Consumer<Tab> action) {
+        LOGGER.info("attempt to close");
+        if (this.getText().startsWith("* ")) {
+            // TODO snackbar 通知
+            LOGGER.info("can't close");
+            return;
+        }
+        LOGGER.info("close");
+        action.accept(this);
     }
 
     /** Reload tab. */

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
 
+import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
@@ -18,6 +19,9 @@ import jp.toastkid.yobidashi.Defines;
  * @author Toast kid
  */
 public class Article implements Comparable<Article> {
+
+    /** 左のリストで中心をいくつずらすか. */
+    private static final int FOCUS_MARGIN = 10;
 
     /** Internal link's protocol. */
     public static final String INTERNAL_PROTOCOL = "file:///internal/";
@@ -170,6 +174,20 @@ public class Article implements Comparable<Article> {
             .append(FileUtil.countCharacters(file.getAbsolutePath(), Defines.ARTICLE_ENCODE))
             .append(" 字です。").append(System.lineSeparator())
             .append(file.length() / 1024L).append("[KB]").toString();
+    }
+
+    /**
+     * Focus ListView on this item.
+     * @param listView
+     */
+    public final void focus(final ListView<Article> listView) {
+        final int indexOf = listView.getItems().indexOf(this);
+        if (indexOf != -1){
+            listView.getSelectionModel().select(indexOf);
+            listView.scrollTo(indexOf - FOCUS_MARGIN);
+            return;
+        }
+        listView.getSelectionModel().clearSelection();
     }
 
 }
