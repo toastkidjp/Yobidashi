@@ -1,8 +1,11 @@
 package jp.toastkid.chart;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
@@ -29,6 +33,9 @@ import jp.toastkid.yobidashi.Defines;
  *
  */
 public final class CashFlowExtractor implements ChartDataExtractor {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(CashFlowExtractor.class);
 
     /** key value pair's list. */
     private final List<KeyValue> values;
@@ -65,8 +72,16 @@ public final class CashFlowExtractor implements ChartDataExtractor {
         }
 
         final String prefix = Articles.titleToFileName(pPrefix);
-        final List<String> articleTitles = ArrayIterate.select(
-                new File(pathToDir).list(), item -> item.startsWith(prefix)).asUnmodifiable();
+
+        final List<String> articleTitles = new ArrayList<>();
+        try {
+            Files.find(Paths.get(pathToDir), 1, (p, attr) -> p.getFileName().toString().startsWith(prefix))
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .forEach(articleTitles::add);
+        } catch (final IOException e1) {
+            LOGGER.info("Error!", e1);
+        }
 
         if (articleTitles.size() < 1) {
             return Collections.emptyMap();

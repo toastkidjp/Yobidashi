@@ -1,13 +1,17 @@
 package jp.toastkid.libs;
 
-import java.io.File;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.eclipse.collections.impl.collector.Collectors2;
 
 /**
  * 特定パッケージ配下のクラスを検索する.
@@ -97,7 +101,7 @@ public final class ClassFinder {
 
         final String protocol = url.getProtocol();
         if ("file".equals(protocol)) {
-            return findClassesWithFile(rootPackageName, new File(url.getFile()));
+            return findClassesWithFile(rootPackageName, Paths.get(url.getFile()));
         } else if ("jar".equals(protocol)) {
             return findClassesWithJarFile(rootPackageName, url);
         }
@@ -113,16 +117,21 @@ public final class ClassFinder {
      */
     private List<Class<?>> findClassesWithFile(
             final String packageName,
-            final File dir
+            final Path dir
             ) throws Exception {
         final List<Class<?>> classes = new ArrayList<Class<?>>();
 
-        for (final String path : dir.list()) {
-            final File entry = new File(dir, path);
-            if (entry.isFile() && isClassFile(entry.getName())) {
-                classes.add(classLoader.loadClass(packageName + "." + fileNameToClassName(entry.getName())));
-            } else if (entry.isDirectory()) {
-                classes.addAll(findClassesWithFile(packageName + "." + entry.getName(), entry));
+        for (final Path path : Files.list(dir).collect(Collectors2.toImmutableList())) {
+            final Path entry = dir.resolve(path);
+            final String fileName = entry.getFileName().toString();
+
+            if (Files.isReadable(entry) && isClassFile(fileName)) {
+                classes.add(classLoader.loadClass(packageName + "." + fileNameToClassName(fileName)));
+                continue;
+            }
+
+            if (Files.isDirectory(entry)) {
+                classes.addAll(findClassesWithFile(packageName + "." + fileName, entry));
             }
         }
 

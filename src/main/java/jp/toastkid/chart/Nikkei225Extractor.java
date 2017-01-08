@@ -1,30 +1,35 @@
 package jp.toastkid.chart;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.libs.fileFilter.ArticleFileFilter;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
 
 /**
- * ファイルの文字数を計算する。
- * <HR>
- * (121113) 作成<BR>
+ * Extract Nikkei 225 from article.
+ *
  * @author Toast kid
  *
  */
 public final class Nikkei225Extractor implements ChartDataExtractor {
 
-    /** file list. */
-    private static String[] list;
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Nikkei225Extractor.class);
 
+    /** Prefix of target article. */
     private String prefix;
 
     /**
@@ -39,34 +44,37 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
         this.prefix = pPrefix;
 
         final Map<String, Number> resultMap = new TreeMap<>();
-        if(list == null){
-            list = new File(pathToDir).list(new ArticleFileFilter(false));
+        final List<Path> list = new ArrayList<>();
+        try {
+            Files.find(Paths.get(pathToDir), 1, (p, attr) -> p.getFileName().toString().endsWith(".md"))
+                    .forEach(list::add);
+        } catch (final IOException e) {
+            LOGGER.info("Error!", e);
         }
 
-        final int length = list.length;
-        for (int i = 0; i < length; i++) {
-            final String name = Articles.decodeBytedStr(FileUtil.removeExtension(list[i]), Defines.TITLE_ENCODE);
-            if (name.startsWith(pPrefix)) {
-                try (final BufferedReader fileReader
-                        = FileUtil.makeFileReader(pathToDir + "/" + list[i], Defines.ARTICLE_ENCODE);) {
-                    String str ="";
-                    out:
-                        while (str != null) {
-                            if (str.endsWith("今日の日経平均株価終値")){
-                                str = fileReader.readLine();
-                                final String target = str.split("円")[0];
-                                if (StringUtils.isNotEmpty(target)){
-                                    final String input = target.replace(",", "");
-                                    resultMap.put(name.replace("日記", ""), (int)Math.floor(Double.parseDouble(input)));
-                                    break out;
-                                }
-                            }
+        for (final Path path : list) {
+            final String name = Articles.decodeBytedStr(FileUtil.removeExtension(path.getFileName().toString()), Defines.TITLE_ENCODE);
+            if (!name.startsWith(pPrefix)) {
+                continue;
+            }
+            try (final BufferedReader fileReader = Files.newBufferedReader(path)) {
+                String str ="";
+                out:
+                    while (str != null) {
+                        if (str.endsWith("今日の日経平均株価終値")){
                             str = fileReader.readLine();
+                            final String target = str.split("円")[0];
+                            if (StringUtils.isNotEmpty(target)){
+                                final String input = target.replace(",", "");
+                                resultMap.put(name.replace("日記", ""), (int)Math.floor(Double.parseDouble(input)));
+                                break out;
+                            }
                         }
-                        fileReader.close();
-                } catch ( final IOException e) {
-                    e.printStackTrace();
-                }
+                        str = fileReader.readLine();
+                    }
+                    fileReader.close();
+            } catch ( final IOException e) {
+                LOGGER.info("Error!", e);
             }
             if (200 < resultMap.size()){
                 break;

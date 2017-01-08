@@ -1,6 +1,7 @@
 package jp.toastkid.wordcloud;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -93,21 +94,21 @@ public final class FxWordCloud {
      * @param pathToFile path/to/file
      */
     public void draw(final Pane canvas, final String pathToFile) {
-        draw(canvas, new File(pathToFile));
+        draw(canvas, Paths.get(pathToFile));
     }
 
     /**
      * draw Word Cloud on passed Pane.
      * @param canvas
-     * @param file file
+     * @param path Path
      */
-    public void draw(final Pane canvas, final File file) {
+    public void draw(final Pane canvas, final Path path) {
         final TinySegmenter ts = TinySegmenter.getInstance();
         ts.isAllowChar     = false;
         ts.isAllowHiragana = false;
         ts.isAllowNum      = false;
         final MutableMap<String, Integer> map = Maps.mutable.empty();
-        FileUtil.readLines(file, Defines.ARTICLE_ENCODE)
+        FileUtil.readLines(path, Defines.ARTICLE_ENCODE)
             .stream()
             .filter(StringUtils::isNotEmpty)
             .forEach(str -> {
@@ -122,7 +123,7 @@ public final class FxWordCloud {
     /**
      * draw Word Cloud on passed Pane.
      * @param canvas
-     * @param file file
+     * @param path file
      */
     public void draw(final Pane canvas, final Map<String, Integer> map) {
         final MutableMap<String, Integer> m = Maps.mutable.empty();

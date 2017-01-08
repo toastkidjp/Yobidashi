@@ -5,7 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.mockito.Mockito.mock;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,12 +20,9 @@ import org.junit.Test;
  */
 public class ArticleTest {
 
-    /** test resource path. */
-    private static final String PATH
-        = "src/test/resources/article/C6FCB5AD323031332D30382D333128C5DA29.md";
-
-    /** test resource file. */
-    private static final File FILE = new File(PATH);
+    /** test resource Path. */
+    private static final Path PATH
+        = Paths.get("src/test/resources/article/C6FCB5AD323031332D30382D333128C5DA29.md");
 
     /** testing object. */
     private Article a;
@@ -32,7 +32,7 @@ public class ArticleTest {
      */
     @Before
     public void setUp() {
-        a = new Article(FILE);
+        a = new Article(PATH);
     }
 
     /**
@@ -74,9 +74,9 @@ public class ArticleTest {
      */
     @Test
     public final void testReplace() {
-        final File dest = new File("C6FCB5AD323031332D30382D333128C5DA.slide");
+        final Path dest = Paths.get("C6FCB5AD323031332D30382D333128C5DA.slide");
         a.replace(dest);
-        assertEquals(dest, a.file);
+        assertEquals(dest, a.path);
         assertEquals("日記2013-08-31(土", a.title);
         assertEquals("file:///internal//slide/C6FCB5AD323031332D30382D333128C5DA.slide", a.toInternalUrl());
         assertEquals(".slide", a.extention());
@@ -84,10 +84,11 @@ public class ArticleTest {
 
     /**
      * check {@link Article#lastModified()}.
+     * @throws IOException
      */
     @Test
-    public final void testLastModified() {
-        assertEquals(FILE.lastModified(), a.lastModified());
+    public final void testLastModified() throws IOException {
+        assertEquals(Files.getLastModifiedTime(PATH).toMillis(), a.lastModified());
     }
 
     /**

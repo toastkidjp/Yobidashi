@@ -1,8 +1,8 @@
 package jp.toastkid.article.control;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -251,7 +251,7 @@ public class ArticleTab extends BaseWebTab {
         }
 
         if (Articles.isInternalLink(url)) {
-            onOpenNewArticle.accept(Articles.findFromUrl(url));
+            onOpenNewArticle.accept(Articles.findByUrl(url));
             return;
         }
         onOpenUrl.accept(LOADING, url);
@@ -282,8 +282,8 @@ public class ArticleTab extends BaseWebTab {
     private void loadArticle() {
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
 
-        final File openTarget = this.article.file;
-        if (!openTarget.exists()) {
+        final Path openTarget = this.article.path;
+        if (!Files.exists(openTarget)) {
             Articles.generateNewArticle(article);
         }
 
@@ -333,24 +333,25 @@ public class ArticleTab extends BaseWebTab {
 
     @Override
     public String edit() {
-        final File openTarget = article.file;
-        if (openTarget.exists()){
+        final Path openTarget = article.path;
+        final String absPath = article.path.toAbsolutePath().toString();
+        if (Files.exists(openTarget)){
             switchEditorVisible();
-            editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
+            editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
         Articles.generateNewArticle(article);
         switchEditorVisible();
-        editor.replaceText(FileUtil.getStrFromFile(article.file.getAbsolutePath(), Defines.ARTICLE_ENCODE));
+        editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
         return "";
     }
 
     @Override
     public String saveContent() {
         try {
-            Files.write(article.file.toPath(), editor.getText().getBytes(Defines.ARTICLE_ENCODE));
+            Files.write(article.path, editor.getText().getBytes(Defines.ARTICLE_ENCODE));
         } catch (final IOException e) {
             LOGGER.error("Error", e);
             return e.getMessage();

@@ -1,6 +1,9 @@
 package jp.toastkid.article;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -63,7 +66,7 @@ public final class ArticleGenerator {
      * @param processed
      * @return decorated HTML content
      */
-    public String decorate(final String title, final File file) {
+    public String decorate(final String title, final Path file) {
 
         final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
         final String processed   = post.process(convertToHtml(file));
@@ -98,7 +101,7 @@ public final class ArticleGenerator {
                         .append(processed)
                         .toString()
                         );
-                if (new File(USER_BACKGROUND).exists()) {
+                if (Files.exists(Paths.get(USER_BACKGROUND))) {
                     final String choose = chooser.choose();
                     final String bodyAdditional = choose.isEmpty()
                             ? ""
@@ -113,23 +116,30 @@ public final class ArticleGenerator {
 
     /**
      * {@link MarkdownConverter} で変換した結果を返す.
+     *
      * @param article Article object
      * @return 変換後の HTML 文字列
      */
     public String convertToHtml(final Article article) {
-        return convertToHtml(article.file);
+        return convertToHtml(article.path);
     }
 
     /**
      * {@link MarkdownConverter} で変換した結果を返す.
-     * @param file Article file
+     * @param path Article's path
      * @return 変換後の HTML 文字列
      */
-    public String convertToHtml(final File file) {
-        final String absolutePath = file.getAbsolutePath();
-        return converter.convert(absolutePath , Defines.ARTICLE_ENCODE) + "<hr/>Last Modified： "
-                + CalendarUtil.longToStr(
-                        new File(absolutePath).lastModified(), MarkdownConverter.STANDARD_DATE_FORMAT);
+    public String convertToHtml(final Path path) {
+        final String absolutePath = path.toAbsolutePath().toString();
+        try {
+            final long ms = Files.getLastModifiedTime(path).toMillis();
+            return converter.convert(absolutePath , Defines.ARTICLE_ENCODE) + "<hr/>Last Modified： "
+                    + CalendarUtil.longToStr(ms, MarkdownConverter.STANDARD_DATE_FORMAT);
+        } catch (final IOException e) {
+            e.printStackTrace();
+            LOGGER.error("Error!", e);
+        }
+        return converter.convert(absolutePath , Defines.ARTICLE_ENCODE);
     }
 
     /**

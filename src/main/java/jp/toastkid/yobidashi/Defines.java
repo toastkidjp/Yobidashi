@@ -1,12 +1,12 @@
 package jp.toastkid.yobidashi;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 import jp.toastkid.libs.utils.FileUtil;
 
 
 /**
- * WikiClient の各種定義を保存する.
+ * This constants hold defines of Yobidashi.
  * <ol>
  * <li>Config……可変値
  * <li>Define……固定値
@@ -63,20 +63,19 @@ public final class Defines {
     public static final String PATH_TO_TEMPLATE   = Defines.TEMPLATE_DIR + "/main.html";
 
     /**
-     * インスタンス生成を禁止する.
+     * Deny make this instance.
      */
     private Defines() {
         //do nothing.
     }
 
     /**
-     * インストールフォルダを取得して返す.
-     * <HR>
-     * (130803) 作成<BR>
-     * @return インストールフォルダのパス
+     * Find path to install folder.
+     *
+     * @return Path of install folder
      */
     public static String findInstallDir() {
         return FileUtil.FILE_PROTOCOL
-                + new File(".").getAbsoluteFile().getParent().replace("\\", "/") + "/";
+                + Paths.get(".").toAbsolutePath().getParent().toString().replace("\\", "/") + "/";
     }
 }

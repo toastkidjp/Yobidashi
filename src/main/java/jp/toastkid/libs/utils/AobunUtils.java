@@ -1,12 +1,18 @@
 package jp.toastkid.libs.utils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.factory.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.yobidashi.Config;
@@ -18,13 +24,19 @@ import jp.toastkid.yobidashi.Defines;
  * @version 0.0.1
  */
 public final class AobunUtils {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AobunUtils.class);
+
     /** 改ページ記号 */
     public static final String REPAGE = "［＃改ページ］";
 
     /** 処理対象フォルダ */
     private static final String targetDirPath = "D:/MyWiki/MyWikiData";
+
     /** ルビの正規表現 */
     private static final Pattern RUBY_PATTERN = Pattern.compile("&ruby\\((.+?)\\)", Pattern.DOTALL);
+
     /** matcher */
     private static Matcher matcher;
 
@@ -39,15 +51,23 @@ public final class AobunUtils {
      * 複数ファイルの変換処理を実施する。
      */
     private static void process(final String prefix) {
-        final File[] files = new File(targetDirPath).listFiles();
-        final int length = files.length;
+        final List<Path> files = Lists.mutable.empty();
+        try {
+            Files.list(Paths.get(targetDirPath)).forEach(files::add);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        final int length = files.size();
         for (int i = 0; i < length; i++){
-            if (!files[i].isDirectory()) {
-                final String title = Articles.convertTitle(files[i].getName());
-                if (title.startsWith(prefix)) {
-                    docToTxt(files[i].getAbsolutePath(), prefix);
-                    System.out.println("Now processing (" + (i + 1) + " / " + length + ") ... " + title);
-                }
+            final Path path = files.get(i);
+            if (Files.isDirectory(path)) {
+                continue;
+            }
+
+            final String title = Articles.convertTitle(path.getFileName().toString());
+            if (title.startsWith(prefix)) {
+                docToTxt(path.toAbsolutePath().toString(), prefix);
+                System.out.println("Now processing (" + (i + 1) + " / " + length + ") ... " + title);
             }
         }
         System.out.println("done.");
@@ -89,7 +109,11 @@ public final class AobunUtils {
             ) {
         boolean isMkdir = false;
         if (StringUtils.isNotEmpty(outputDir)) {
-            isMkdir = FileUtil.mkdir(outputDir);
+            try {
+                isMkdir = Files.createDirectories(Paths.get(outputDir)) != null;
+            } catch (final IOException e) {
+                LOGGER.error("Error!", e);
+            }
         }
         String outputPath = bookTitle.replace("?", "").replace(" ", "_") + ".txt";
         if (isMkdir) {
@@ -104,7 +128,7 @@ public final class AobunUtils {
      * @return 文書タイトル
      */
     public static String getTitleFromPath(final String filePath) {
-        return Articles.convertTitle(new File(filePath).getName()).replace("_", " ");
+        return Articles.convertTitle(Paths.get(filePath).getFileName().toString()).replace("_", " ");
     }
 
     /**
@@ -175,13 +199,15 @@ public final class AobunUtils {
      */
     private static String reform(final String str) {
         String result = str;
-        if (str.contains("&ruby")) {
-            matcher = RUBY_PATTERN.matcher(str);
-            while (matcher.find()) {
-                final String[] split = matcher.group(1).split(",");
-                final String replacement = split[0] + "《" + split[1] + "》";
-                result = str.replaceFirst(RUBY_PATTERN.pattern(), replacement);
-            }
+        if (!str.contains("&ruby")) {
+            return result;
+        }
+
+        matcher = RUBY_PATTERN.matcher(str);
+        while (matcher.find()) {
+            final String[] split = matcher.group(1).split(",");
+            final String replacement = split[0] + "《" + split[1] + "》";
+            result = str.replaceFirst(RUBY_PATTERN.pattern(), replacement);
         }
         return result;
     }

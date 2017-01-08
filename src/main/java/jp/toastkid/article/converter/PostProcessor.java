@@ -1,6 +1,7 @@
 package jp.toastkid.article.converter;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -139,8 +140,7 @@ public class PostProcessor {
         }
 
         final String bytedStr = Articles.titleToFileName(input);
-        final boolean isExist
-            = new File(articleDir, bytedStr.concat(MD)).exists();
+        final boolean isExist = Files.exists(Paths.get(articleDir, bytedStr.concat(MD)));
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
         generatedLink.append("<a ");

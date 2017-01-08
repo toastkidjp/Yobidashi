@@ -1,11 +1,13 @@
 package jp.toastkid.article.models;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +18,6 @@ import java.util.concurrent.Executors;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,16 +56,24 @@ public final class Articles {
      * @return 記事名一覧の Set (ソート済み)
      */
     public static final List<Article> readAllArticleNames(final String articleDir) {
-        final File dir = new File(articleDir);
-        if (dir == null || !dir.canRead()){
+        final Path dir = Paths.get(articleDir);
+
+        if (dir == null || !Files.isReadable(dir)){
             return Collections.emptyList();
         }
-        return ArrayAdapter
-                .newArrayWith(dir.listFiles(Articles::isValidContentFile))
-                .collect(Article::new)
-                .select( a -> a.isValid())
-                .asParallel(Executors.newFixedThreadPool(12), 12)
-                .toList();
+
+        try (DirectoryStream<Path> directoryStream
+                = Files.newDirectoryStream(dir, Articles::isValidContentPath)){
+            return Lists.mutable.ofAll(directoryStream)
+                    .collect(Article::new)
+                    .select( a -> a.isValid())
+                    .asParallel(Executors.newFixedThreadPool(12), 12)
+                    .toList();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -74,7 +83,7 @@ public final class Articles {
      * @param url URL
      * @return 記事ファイル名
      */
-    public static final String findFileNameFromUrl(final String url) {
+    public static final String findFileNameByUrl(final String url) {
         final String[] split = url.split("/");
         return split[split.length - 1];
     }
@@ -86,6 +95,15 @@ public final class Articles {
      */
     public static final boolean isInternalLink(final String url) {
         return url.startsWith(Article.INTERNAL_PROTOCOL);
+    }
+
+    /**
+     * Return converted title.
+     * @param path Path object
+     * @return title
+     */
+    public static final String convertTitle(final Path path) {
+        return convertTitle(path.getFileName().toString());
     }
 
     /**
@@ -103,21 +121,11 @@ public final class Articles {
     }
 
     /**
-     * fileName から Article オブジェクトを生成.
-     * @param fileName ファイル名(パスではない)
-     * @return Article オブジェクト
-     */
-    public static Article find(final String fileName) {
-        return new Article(new File(Config.get("articleDir"), fileName));
-    }
-
-    /**
-     * TODO write test.
      * 記事名から Article オブジェクトを生成.
      * @param newFileName ファイル名(パスではない)
      * @return Article オブジェクト
      */
-    public static Article findFromTitle(final String newFileName) {
+    public static Article findByTitle(final String newFileName) {
         return find(titleToFileName(newFileName) + ".md");
     }
 
@@ -126,17 +134,27 @@ public final class Articles {
      * @param url URL
      * @return Article オブジェクト
      */
-    public static Article findFromUrl(final String url) {
-        return find(findFileNameFromUrl(url));
+    public static Article findByUrl(final String url) {
+        return find(findFileNameByUrl(url));
+    }
+
+    /**
+     * fileName から Article オブジェクトを生成.
+     * @param fileName ファイル名(パスではない)
+     * @return Article オブジェクト
+     */
+    private static Article find(final String fileName) {
+        return new Article(Paths.get(Config.get("articleDir"), fileName));
     }
 
     /**
      * distinguish usable file extension.
-     * @param f File Object
+     *
+     * @param p {@link Path} Object
      * @return f is valid file?
      */
-    public static boolean isValidContentFile(final File f) {
-        final Optional<String> ext = FileUtil.findExtension(f);
+    public static boolean isValidContentPath(final Path p) {
+        final Optional<String> ext = FileUtil.findExtension(p);
         if (!ext.isPresent()) {
             return false;
         }
@@ -149,7 +167,7 @@ public final class Articles {
      */
     public static void generateNewArticle(final Article newArticle) {
         try {
-            Files.write(newArticle.file.toPath(), makeNewContent(newArticle));
+            Files.write(newArticle.path, makeNewContent(newArticle));
         } catch (final IOException e) {
             LOGGER.error("Error", e);;
         }

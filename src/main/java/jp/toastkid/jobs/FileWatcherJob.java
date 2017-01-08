@@ -1,9 +1,9 @@
 package jp.toastkid.jobs;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
@@ -16,69 +16,92 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * watch file for auto backup.
- * @author Toast kid
+ * Watch file for auto backup.
  *
+ * @author Toast kid
  */
 public class FileWatcherJob implements Runnable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(FileWatcherJob.class);
 
-    /** backup interval. */
+    /** Backup interval. */
     private static final long BACKUP_INTERVAL = TimeUnit.SECONDS.toMillis(30L);
 
-    /** file watcher task list. */
-    private final MutableMap<File, Long> targets = Maps.mutable.empty();
+    /** File watcher task list. */
+    private final MutableMap<Path, Long> targets = Maps.mutable.empty();
 
     @Override
     public void run() {
-        final File backup = new File("backup");
-        if (!backup.exists() || !backup.isDirectory()) {
+        final Path backup = Paths.get("backup");
+        if (!Files.exists(backup) || !Files.isDirectory(backup)) {
             LOGGER.info("make backup dir.");
-            backup.mkdir();
+            try {
+                Files.createDirectory(backup);
+            } catch (final IOException e) {
+                LOGGER.error("Error", e);
+            }
         }
-        Flux.<File>create(emitter -> {
+        Flux.<Path>create(emitter -> {
             targets
-                .select((file, ms) -> ms < file.lastModified())
+                .select(FileWatcherJob::isTarget)
                 .forEachKeyValue((file, ms) -> emitter.next(file));
             emitter.complete();
         })
         .delaySubscriptionMillis(BACKUP_INTERVAL)
         .repeat()
         .subscribeOn(Schedulers.newElastic("FileWatcher"))
-        .subscribe(file -> {
+        .subscribe(path -> {
             try {
                 final Path copy = Files.copy(
-                        file.toPath(), new File(backup, file.getName()).toPath(),
+                        path, backup.resolve(path.getFileName().toString()),
                         StandardCopyOption.REPLACE_EXISTING
                         );
                 LOGGER.info("Backup to " + copy);
-                targets.put(file, file.lastModified());
+                add(path);
             } catch (final IOException e) {
-                LOGGER.error("Error", e);;
+                LOGGER.error("Error", e);
             }
         });
     }
 
     /**
-     * add file to watch list.
-     * @param file article file.
+     * Is passed path job's target?
+     * @param path
+     * @param ms
+     * @return
      */
-    public void add(final File file) {
-        targets.put(file, file.lastModified());
+    private static boolean isTarget(final Path path, final long ms) {
+        try {
+            return ms < Files.getLastModifiedTime(path).toMillis();
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);
+        }
+        return false;
     }
 
     /**
-     * remove file to list.
-     * @param file
+     * Add file to watch list.
+     * @param path article file.
      */
-    public void remove(final File file) {
-        targets.remove(file);
+    public void add(final Path path) {
+        try {
+            targets.put(path, Files.getLastModifiedTime(path).toMillis());
+        } catch (final IOException e) {
+            LOGGER.error("Error", e);
+        }
     }
 
     /**
-     * clear watch list.
+     * Remove Path to list.
+     * @param path
+     */
+    public void remove(final Path path) {
+        targets.remove(path);
+    }
+
+    /**
+     * Clear watch list.
      */
     public void clear() {
         targets.clear();

@@ -1,10 +1,10 @@
 package jp.toastkid.libs.epub;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -142,7 +142,7 @@ public final class EpubMaker {
         final StringBuilder sb = new StringBuilder();
         for (final ContentMetaData cMeta : fileNames) {
             if (!FileUtil.isImageFile(cMeta.source)) {
-                sb.append("<li><a href=\"").append(new File(cMeta.source).getName())
+                sb.append("<li><a href=\"").append(Paths.get(cMeta.source).getFileName().toString())
                 .append("\">")
                 .append(cMeta.title)
                 .append("</a></li>")
@@ -177,7 +177,7 @@ public final class EpubMaker {
                 );
                 sb.append(cMeta.title);
                 sb.append("</text></navLabel><content src=\"");
-                sb.append(new File(cMeta.source).getName());
+                sb.append(Paths.get(cMeta.source).getFileName().toString());
                 sb.append("\"/></navPoint>");
                 sb.append(LINE_SEPARATOR);
                 order++;
@@ -261,13 +261,13 @@ public final class EpubMaker {
         try {
             final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(meta.zipFilePath));
             // ファイル圧縮処理
-            for (final Pair<String, String> p : files) {
-                final String path  = p.right;
-                final File f = new File(p.left);
-                if (f.isDirectory()) {
-                    putEntryDirectory(out, f);
+            for (final Pair<String, String> pair : files) {
+                final String path  = pair.right;
+                final Path p = Paths.get(pair.left);
+                if (Files.isDirectory(p)) {
+                    putEntryDirectory(out, p);
                 } else {
-                    putEntryFile(out, p.left, path);
+                    putEntryFile(out, pair.left, path);
                 }
             }
             // 出力ストリームを閉じる
@@ -318,12 +318,12 @@ public final class EpubMaker {
     /**
      * ZipOutputStream に対しディレクトリを登録する.
      * @param out
-     * @param file
+     * @param path
      * @throws IOException
      */
-    private static void putEntryDirectory(final ZipOutputStream out, final File file)
+    private static void putEntryDirectory(final ZipOutputStream out, final Path path)
             throws IOException {
-        final ZipEntry entry = new ZipEntry(file.getPath() + "/");
+        final ZipEntry entry = new ZipEntry(path.toString() + "/");
         entry.setSize(0);
         out.putNextEntry(entry);
     }
@@ -334,9 +334,15 @@ public final class EpubMaker {
      */
     private static final void clean(final List<String> pathList) {
         pathList.parallelStream()
-            .map(pathStr -> {return new File(pathStr);})
-            .filter(file -> {return file.exists();})
-            .forEach(file -> {file.delete();});
+            .map(Paths::get)
+            .filter(Files::exists)
+            .forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (final Exception e) {
+                    LOGGER.error("Error!", e);
+                }
+            });
     }
 
     /**

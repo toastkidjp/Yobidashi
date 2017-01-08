@@ -2,8 +2,9 @@ package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -12,10 +13,11 @@ import jp.toastkid.libs.Pair;
 
 /**
  * check {@link GzipUtils} behavior.
- * @author Toast kid
  *
+ * @author Toast kid
  */
 public class GzipUtilsTest {
+
     /** resources dir. */
     private static final String RESOURCES_DIR = "./src/test/resources/utils/";
 
@@ -68,7 +70,7 @@ public class GzipUtilsTest {
     public final void testWrite() throws IOException {
         GzipUtils.write(PAIR, FILE_NAME);
         assertEquals(PAIR.toString(), GzipUtils.read(FILE_NAME).get(0));
-        new File(FILE_NAME).delete();
+        Files.delete(Paths.get(FILE_NAME));
     }
 
 }

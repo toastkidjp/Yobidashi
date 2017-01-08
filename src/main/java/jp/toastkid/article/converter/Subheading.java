@@ -8,16 +8,20 @@ import java.io.Serializable;
  *
  */
 public class Subheading implements Serializable {
+
     /** serialVersionUID. */
     private static final long serialVersionUID = 6144685566158773878L;
 
     /** title. */
     public final String title;
+
     /** subheading id. */
     public final String id;
+
     /** html depth. */
     public final int    depth;
-    
+
+
     /**
      * initialize object.
      * @param str

@@ -31,7 +31,7 @@ public final class Controller implements Initializable {
 
     @Override
     public void initialize(final URL arg0, final ResourceBundle arg1) {
-        canvas.setOnMouseClicked(eve -> {Controller.this.close();});
+        canvas.setOnMouseClicked(eve -> Controller.this.close());
     }
 
 }

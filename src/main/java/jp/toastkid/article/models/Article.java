@@ -1,6 +1,8 @@
 package jp.toastkid.article.models;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -30,7 +32,7 @@ public class Article implements Comparable<Article> {
     private static final String INTERNAL_LINK_FORMAT = INTERNAL_PROTOCOL + "/%s/%s%s";
 
     /** article file. */
-    public File file;
+    public Path path;
 
     /** article's extension. */
     private String extension;
@@ -65,16 +67,16 @@ public class Article implements Comparable<Article> {
 
     /**
      * initialize Article model.
-     * @param file
+     * @param path
      */
-    public Article(final File file) {
-        if (file == null) {
+    public Article(final Path path) {
+        if (path == null) {
             throw new IllegalArgumentException("file is not allow null.");
         }
 
-        this.file      = file;
-        this.title     = Articles.convertTitle(file.getName());
-        this.extension = FileUtil.findExtension(file).orElse("");
+        this.path      = path;
+        this.title     = Articles.convertTitle(path.getFileName().toString());
+        this.extension = FileUtil.findExtension(path).orElse("");
     }
 
     /**
@@ -98,13 +100,13 @@ public class Article implements Comparable<Article> {
     }
 
     /**
-     * replace file.
+     * Replace file.
      * @param dest new file.
      */
-    public void replace(final File dest) {
-        this.file      = dest;
-        this.title     = Articles.convertTitle(dest.getName());
-        this.extension = FileUtil.findExtension(file).get();
+    public void replace(final Path dest) {
+        this.path      = dest;
+        this.title     = Articles.convertTitle(dest);
+        this.extension = FileUtil.findExtension(path).get();
     }
 
     /**
@@ -112,7 +114,12 @@ public class Article implements Comparable<Article> {
      * @return last modified ms.
      */
     public long lastModified() {
-        return file.lastModified();
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return -1L;
     }
 
     /**
@@ -120,7 +127,12 @@ public class Article implements Comparable<Article> {
      * @return last modified string.
      */
     public String lastModifiedText() {
-        return CalendarUtil.toUniTypeDate(file.lastModified());
+        try {
+            return CalendarUtil.toUniTypeDate(Files.getLastModifiedTime(path).toMillis());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return "-1L";
     }
 
     @Override
@@ -128,7 +140,7 @@ public class Article implements Comparable<Article> {
         if (!(obj instanceof Article)) {
             return false;
         }
-        return this.file.equals(((Article) obj).file);
+        return this.path.equals(((Article) obj).path);
     }
 
     @Override
@@ -148,7 +160,7 @@ public class Article implements Comparable<Article> {
 
     @Override
     public Article clone() {
-        return new Article(this.file);
+        return new Article(this.path);
     }
 
     /**
@@ -157,7 +169,7 @@ public class Article implements Comparable<Article> {
      * @return f is valid file?
      */
     public boolean isValid() {
-        final Optional<String> ext = FileUtil.findExtension(this.file);
+        final Optional<String> ext = FileUtil.findExtension(this.path);
         if (!ext.isPresent()) {
             return false;
         }
@@ -169,11 +181,16 @@ public class Article implements Comparable<Article> {
      * @return ファイルの字数計測結果(文字列)
      */
     public final String makeCharCountResult() {
-        return new StringBuilder()
-            .append(title).append(" は ")
-            .append(FileUtil.countCharacters(file.getAbsolutePath(), Defines.ARTICLE_ENCODE))
-            .append(" 字です。").append(System.lineSeparator())
-            .append(file.length() / 1024L).append("[KB]").toString();
+        try {
+            return new StringBuilder()
+                .append(title).append(" は ")
+                .append(FileUtil.countCharacters(path, Defines.ARTICLE_ENCODE))
+                .append(" 字です。").append(System.lineSeparator())
+                .append(Files.size(path) / 1024L).append("[KB]").toString();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

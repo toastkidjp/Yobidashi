@@ -1,18 +1,14 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  * FileUtil's test.
@@ -20,6 +16,7 @@ import org.mockito.Mockito;
  *
  */
 public class FileUtilTest {
+
     /**
      * test uriToPath().
      */
@@ -33,6 +30,7 @@ public class FileUtilTest {
         assertEquals("  ", FileUtil.uriToPath("  "));
         assertEquals(null, FileUtil.uriToPath(null));
     }
+
     /**
      * test findExtension().
      */
@@ -40,7 +38,6 @@ public class FileUtilTest {
     public void testFindExtension() {
         assertEquals(Optional.empty(), FileUtil.findExtension(""));
         assertEquals(Optional.empty(), FileUtil.findExtension((String) null));
-        assertEquals(Optional.empty(), FileUtil.findExtension((File) null));
         assertEquals(Optional.empty(), FileUtil.findExtension(" "));
         assertEquals(Optional.empty(), FileUtil.findExtension(" "));
         assertEquals(Optional.empty(), FileUtil.findExtension("　"));
@@ -48,7 +45,6 @@ public class FileUtilTest {
         assertEquals(".js", FileUtil.findExtension("tomato.js").get());
         assertEquals(".pyc", FileUtil.findExtension("tomato.orange.pyc").get());
         assertEquals(".pyc", FileUtil.findExtension("...pyc").get());
-        assertEquals(".txt", FileUtil.findExtension(new File("dummy.txt")).get());
     }
 
     /**
@@ -63,25 +59,22 @@ public class FileUtilTest {
     }
 
     /**
-     * check {@link FileUtil#isLastModifiedNdays(java.io.File, long)}.
-     */
-    @Test
-    public void testIsLastModifiedNdays() {
-        final File mock = Mockito.mock(File.class);
-        when(mock.lastModified())
-            .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(71L));
-        assertTrue(FileUtil.isLastModifiedNdays(mock, 3));
-        when(mock.lastModified())
-            .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(73L));
-        assertFalse(FileUtil.isLastModifiedNdays(mock, 3));
-    }
-
-    /**
      * {@link FileUtil#countCharacters(String, String)}.
      */
     @Test
     public void testCountCharacters() {
         assertEquals(6, FileUtil.countCharacters("src/test/resources/utils/file/a.txt", "UTF-8"));
+    }
+
+    /**
+     * {@link FileUtil#countCharacters(Path, String)}.
+     */
+    @Test
+    public void testCountCharacters_Path_String() {
+        assertEquals(
+                6,
+                FileUtil.countCharacters(Paths.get("src/test/resources/utils/file/a.txt"), "UTF-8")
+                );
     }
 
     /**
@@ -93,7 +86,7 @@ public class FileUtilTest {
     }
 
     /**
-     * test {@link FileUtil#readLines(File, String)}.
+     * test {@link FileUtil#readLines(String, String)}.
      */
     @Test
     public void testReadLines() {

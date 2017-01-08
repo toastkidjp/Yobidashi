@@ -1,8 +1,10 @@
 package jp.toastkid.yobidashi;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Optional;
@@ -926,13 +928,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在選択しているタブを閉じる. 1つしか開いていない時は閉じない.
-     */
-    private final void closeTab() {
-        closeTab(tabPane.getSelectionModel().getSelectedItem());
-    }
-
-    /**
      * 引数で渡されたタブを閉じる.
      * @param tab
      */
@@ -1043,7 +1038,7 @@ public final class Controller implements Initializable {
             setStatus("This tab can't use slide show.");
             return;
         }
-        new jp.toastkid.slideshow.Main().show(this.stage, articleOr.get().file.getAbsolutePath());
+        new jp.toastkid.slideshow.Main().show(this.stage, articleOr.get().path.toAbsolutePath().toString());
     }
 
     /**
@@ -1118,11 +1113,9 @@ public final class Controller implements Initializable {
             initArticleList(bookmarkList);
             emitter.success("");
             })
-            .publishOn(Schedulers.elastic())
-            .subscribeOn(Schedulers.elastic())
             .subscribe(
                 empty -> new BookmarkManager().readLines()
-                    .collect(Articles::findFromTitle)
+                    .collect(Articles::findByTitle)
                     .each(bookmarks::add)
                     );
     }
@@ -1153,7 +1146,7 @@ public final class Controller implements Initializable {
         if (!items.contains(article)) {
             items.add(0, article);
         }
-        FILE_WATCHER.add(article.file);
+        FILE_WATCHER.add(article.path);
     }
 
     /**
@@ -1187,7 +1180,7 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(newFileName)){
             return;
         }
-        openArticleTab(Articles.findFromTitle(newFileName));
+        openArticleTab(Articles.findByTitle(newFileName));
     }
 
     /**
@@ -1256,19 +1249,19 @@ public final class Controller implements Initializable {
                 if (StringUtils.isBlank(newTitle)) {
                     return;
                 }
-                final File dest = new File(
+                final Path dest = Paths.get(
                         Config.get(Config.Key.ARTICLE_DIR),
                         Articles.titleToFileName(newTitle) + article.extention()
                         );
-                if (dest.exists()){
+                if (Files.exists(dest)){
                     AlertDialog.showMessage(parent, "変更失敗", "そのファイル名はすでに存在します。");
                 }
-                final File file = article.file;
+                final Path path = article.path;
                 boolean success = false;
                 try {
                     success = isCopy
-                            ? FileUtil.copyTransfer(file.getAbsolutePath(), dest.getAbsolutePath())
-                            : file.renameTo(dest);
+                            ? FileUtil.copyTransfer(path.toAbsolutePath().toString(), dest.toAbsolutePath().toString())
+                            : Files.move(path, dest) != null;
                 } catch (final IOException e) {
                     LOGGER.error("Error", e);;
                 }
@@ -1285,7 +1278,7 @@ public final class Controller implements Initializable {
                     AlertDialog.showMessage(parent, title, message);
                     article.replace(dest);
                     getCurrentTab().loadUrl(article.toInternalUrl());
-                    removeHistory(new Article(file));
+                    removeHistory(new Article(path));
                     loadArticleList();
                     return;
                 }
@@ -1319,7 +1312,7 @@ public final class Controller implements Initializable {
         final String deleteTarget = article.title;
         final Window parent = getParent();
         // (130317) ファイルが存在しない場合はダイアログを出して戻る。
-        if (!article.file.exists()){
+        if (!Files.exists(article.path)){
             AlertDialog.showMessage(parent,
                     "ファイルがありません", deleteTarget + " というファイルは存在しません。");
             return;
@@ -1328,12 +1321,17 @@ public final class Controller implements Initializable {
             .setTitle("Delete file")
             .setMessage(deleteTarget + " を削除しますか？")
             .setOnPositive("OK", () -> {
-                article.file.delete();
-                AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                openSpeedDialTab();
-                // (130309) そしてファイル一覧から削除
-                articleList.getItems().remove(deleteTarget);
-                removeHistory(article);
+                try {
+                    Files.delete(article.path);
+                    AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
+                    openSpeedDialTab();
+                    // (130309) そしてファイル一覧から削除
+                    articleList.getItems().remove(deleteTarget);
+                    removeHistory(article);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                    AlertDialog.showMessage(parent, "Failed!", deleteTarget + " を削除できませんでした。");
+                }
             }).build().show();
     }
 

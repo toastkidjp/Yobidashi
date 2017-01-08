@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -108,7 +108,7 @@ public class GzipUtils {
     private static BufferedReader setUpReader(final String filename) throws IOException {
         return new BufferedReader(
                 new InputStreamReader(new GZIPInputStream(
-                                Files.newInputStream(new File(filename).toPath()))));
+                                Files.newInputStream(Paths.get(filename)))));
     }
 
     /**
@@ -120,7 +120,7 @@ public class GzipUtils {
     private static BufferedWriter setUpWriter(final String filename) throws IOException {
         return new BufferedWriter(
                 new OutputStreamWriter(
-                        new GZIPOutputStream(Files.newOutputStream(new File(filename).toPath()))));
+                        new GZIPOutputStream(Files.newOutputStream(Paths.get(filename)))));
     }
 
 }
