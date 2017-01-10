@@ -12,7 +12,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 
 <VBox prefHeight="411.0" prefWidth="591.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="jp.toastkid.wiki.dialog.ConfigDialogController">
+  fx:controller="jp.toastkid.yobidashi.dialog.ConfigDialogController">
   <children>
     <Label text="Author" />
     <JFXTextField fx:id="author" onAction="#storeConfig" />
