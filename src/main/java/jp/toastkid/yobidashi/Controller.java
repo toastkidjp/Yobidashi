@@ -849,6 +849,10 @@ public final class Controller implements Initializable {
                     makeContextMenuItemContainerWithAction(
                             cmc, "Open new tab", event -> openSpeedDialTab()),
                     makeContextMenuItemContainerWithAction(
+                            cmc, "Close current tab", event -> closeCurrentTab()),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Close all tabs", event -> closeAllTabs()),
+                    makeContextMenuItemContainerWithAction(
                             cmc, "Show HTML source", event -> callHtmlSource()),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Find in page", event -> openSearcher()),
@@ -863,10 +867,17 @@ public final class Controller implements Initializable {
                             isRightDrawerClosing() ? "Open tools" : "Close tools",
                             event -> switchRightDrawer()
                             ),
+                    makeContextMenuItemContainerWithAction(
+                            cmc, "Save article", event -> saveCurrentTab()),
                     cmc.new MenuItemContainer(
                             isHideLeftPane()
                             ? makeMenuItemWithAction("記事一覧を開く",   event -> showLeftPane())
                             : makeMenuItemWithAction("記事一覧を閉じる", event -> hideLeftPane())
+                            ),
+                    cmc.new MenuItemContainer(
+                            getCurrentTab().isEditing()
+                            ? makeMenuItemWithAction("Close editor",   event -> callEditor())
+                            : makeMenuItemWithAction("Edit", event -> callEditor())
                             )
                     );
 

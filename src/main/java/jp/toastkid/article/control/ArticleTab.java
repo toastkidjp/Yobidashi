@@ -227,6 +227,14 @@ public class ArticleTab extends BaseWebTab {
     }
 
     /**
+     * Return is visible of editor.
+     * @return
+     */
+    private boolean isEditorVisible() {
+        return !isNotEditorVisible();
+    }
+
+    /**
      * Return isn't visible of editor.
      * @return
      */
@@ -346,6 +354,11 @@ public class ArticleTab extends BaseWebTab {
         switchEditorVisible();
         editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
         return "";
+    }
+
+    @Override
+    public boolean isEditing() {
+        return isEditorVisible();
     }
 
     @Override
