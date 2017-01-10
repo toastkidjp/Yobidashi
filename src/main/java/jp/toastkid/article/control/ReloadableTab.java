@@ -134,4 +134,12 @@ public abstract class ReloadableTab extends Tab {
     public String saveContent() {
         return "This tab's content can't save.";
     }
+
+    /**
+     * Is this tab editing?.
+     * @return
+     */
+    public boolean isEditing() {
+        return false;
+    }
 }
