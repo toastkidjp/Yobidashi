@@ -1,7 +1,9 @@
 package jp.toastkid.libs.epub;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -10,8 +12,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,10 +28,13 @@ import jp.toastkid.yobidashi.Defines;
 
 /**
  * 記事を epub に変換して出力する.
- * @author Toast kid
  *
+ * @author Toast kid
  */
 public final class DocToEpub {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocToEpub.class);
 
     /** path/to/articles. */
     private static final String ARTICLE_PATH = Config.get("articleDir");
@@ -35,8 +43,14 @@ public final class DocToEpub {
     public static final int FILE_NAME_LENGTH = 50;
 
     /** 記事名一覧. */
-    private static final ImmutableList<File> ARTICLES
-        = Lists.immutable.of(new File(ARTICLE_PATH).listFiles());
+    private static ImmutableList<Path> articles;
+    static {
+        try {
+            articles = Files.list(Paths.get(ARTICLE_PATH)).collect(Collectors2.toImmutableList());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * ひとりWiki のハイパーリンクを再現するための検出用正規表現.
@@ -116,31 +130,28 @@ public final class DocToEpub {
      * @param prefix 記事の接頭辞
      * @return 記事ファイルオブジェクトの一覧
      */
-    private static final List<File> selectTargetsByPrefix(
+    private static final List<Path> selectTargetsByPrefix(
             final String  prefix,
             final boolean recursive
         ) {
-        final List<File> targets = ARTICLES.asParallel(Executors.newFixedThreadPool(20), 20)
-                .select(file -> file.getName().startsWith(Articles.titleToFileName(prefix)))
+        final List<Path> targets = articles.asParallel(Executors.newFixedThreadPool(20), 20)
+                .select(path -> path.getFileName().toString().startsWith(Articles.titleToFileName(prefix)))
                 .toList();
         if (recursive) {
-            final List<File> recursiveFiles = new ArrayList<>();
-            targets.forEach(file ->{
-                recursiveFiles.add(file);
-                final List<String> contents = FileUtil.readLines(
-                        file.getAbsolutePath(),
-                        Defines.ARTICLE_ENCODE
-                    );
+            final List<Path> recursiveFiles = new ArrayList<>();
+            targets.forEach(path ->{
+                recursiveFiles.add(path);
+                final List<String> contents = FileUtil.readLines(path, Defines.ARTICLE_ENCODE);
                 contents.stream()
                     .filter(content -> content.contains("[[") && content.contains("]]"))
                     .map(   content -> HYPERLINK_PAT.matcher(content))
                     .forEach(matcher -> {
                         while (matcher.find()) {
-                            final File f = new File(
+                            final Path f = Paths.get(
                                     ARTICLE_PATH,
                                     Articles.titleToFileName(matcher.group(1)).concat(".txt")
                                 );
-                            if (f.exists() && !recursiveFiles.contains(f)) {
+                            if (Files.exists(f) && !recursiveFiles.contains(f)) {
                                 recursiveFiles.add(f);
                             }
                         }
@@ -156,14 +167,13 @@ public final class DocToEpub {
      * @param targets 記事名
      * @return 記事ファイルオブジェクトの一覧
      */
-    private static final List<File> getTargets(final List<String> targets) {
-        final List<File> files = new ArrayList<>(targets.size());
+    private static final List<Path> getTargets(final List<String> targets) {
+        final List<Path> paths = new ArrayList<>(targets.size());
         targets.parallelStream()
-            .map(prefix -> new File(ARTICLE_PATH,
-                    Articles.titleToFileName(prefix).concat(".txt")))
-            .filter(ARTICLES::contains)
-            .forEach(f -> files.add(f));
-        return files;
+            .map(prefix -> Paths.get(ARTICLE_PATH, Articles.titleToFileName(prefix).concat(".txt")))
+            .filter(articles::contains)
+            .forEach(paths::add);
+        return paths;
     }
 
     /**
@@ -172,21 +182,21 @@ public final class DocToEpub {
      * @return 処理対象のコンテンツのパス一覧
      */
     private static final List<ContentMetaData> getTargetContents(
-            final List<File> targets,
+            final List<Path> targets,
             final PageLayout layout
             ) {
         final List<ContentMetaData> targetPaths = new ArrayList<>();
         final MarkdownConverter converter = new MarkdownConverter("");
         final String imageDir = Config.get("imageDir").replace("\\", "/");
         converter.containsMenubar = false;
-        targets.forEach((file) -> {
+        targets.forEach(path -> {
             final ContentMetaData cmeta = new ContentMetaData();
             final String content = converter.convert(
-                        file.getAbsolutePath(),
+                        path.toAbsolutePath().toString(),
                         Defines.ARTICLE_ENCODE
                     );
-            final String title = Articles.convertTitle(file.getName());
-            String baseName = file.getName();
+            final String title = Articles.convertTitle(path.getFileName().toString());
+            String baseName = path.getFileName().toString();
             baseName = baseName.substring(0, baseName.length() - 4);
             baseName = (FILE_NAME_LENGTH < baseName.length())
                     ? baseName.substring(0, FILE_NAME_LENGTH)
@@ -206,20 +216,16 @@ public final class DocToEpub {
             );
             // img
             final Set<String> imgs = converter.latestImagePaths;
-            imgs.parallelStream().forEach((path) -> {
-                if (new File(imageDir + path).exists()) {
-                    final ContentMetaData imgCMeta = new ContentMetaData();
-                    final String parentPath
-                        = new File(path.replace(
-                                FileUtil.FILE_PROTOCOL.concat(imageDir),
-                                ""
-                            )
-                        ).getParent() + "/";
-                    imgCMeta.source = (imageDir + path);
-                    imgCMeta.entry  = path;
-                    imgCMeta.dest   = parentPath.replace("\\", "/");
-                    targetPaths.add(imgCMeta);
-                }
+            imgs.parallelStream().filter(p -> Files.exists(Paths.get(imageDir + p))).forEach(p -> {
+                final ContentMetaData imgCMeta = new ContentMetaData();
+                final String parentPath
+                    = Paths.get(p.replace(FileUtil.FILE_PROTOCOL.concat(imageDir), ""))
+                           .getParent()
+                           .toString() + "/";
+                imgCMeta.source = (imageDir + p);
+                imgCMeta.entry  = p;
+                imgCMeta.dest   = parentPath.replace("\\", "/");
+                targetPaths.add(imgCMeta);
             });
             cmeta.entry  = outputName;
             cmeta.source = outputName;
@@ -245,9 +251,15 @@ public final class DocToEpub {
      */
     private static final void clean() {
         cleanTargets.parallelStream()
-            .map(    path -> new File(path))
-            .filter( file -> file.exists())
-            .forEach(file -> file.delete());
+            .map(Paths::get)
+            .filter(Files::exists)
+            .forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (final Exception e) {
+                    LOGGER.error("Error!", e);
+                }
+            });
     }
 
     /**

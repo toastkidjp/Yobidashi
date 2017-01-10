@@ -2,7 +2,6 @@ package jp.toastkid.libs;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -48,13 +47,4 @@ public class PropsTest {
         assertEquals(EXPECTED, Props.readDir(Paths.get(PATH)).get());
     }
 
-    /**
-     * check behavior readDir method.
-     */
-    @Test
-    public final void testReadDirFile() {
-        assertEquals(Optional.empty(), Props.readDir((File) null));
-        assertEquals(Optional.empty(), Props.readDir(new File("notExits")));
-        assertEquals(EXPECTED, Props.readDir(new File(PATH)).get());
-    }
 }

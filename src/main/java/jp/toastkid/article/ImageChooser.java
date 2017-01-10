@@ -1,12 +1,14 @@
 package jp.toastkid.article;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.net.URI;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.block.factory.Functions;
+import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import jp.toastkid.libs.utils.FileUtil;
@@ -15,12 +17,8 @@ import jp.toastkid.libs.utils.FileUtil;
  * Image file url random chooser.
  *
  * @author Toast kid
- *
  */
 public class ImageChooser {
-
-    /** image file filter. */
-    private static final FileFilter IMAGE_FILTER = f -> FileUtil.isImageFile(f.getName());
 
     /** images. */
     private final List<URI> images;
@@ -32,11 +30,11 @@ public class ImageChooser {
     public ImageChooser(final String... dirs) {
         images = ArrayAdapter.adapt(dirs)
             .select(StringUtils::isNotBlank)
-            .collect(File::new)
-            .select(f -> f.exists() && f.isDirectory())
-            .collect(f -> f.listFiles(IMAGE_FILTER))
-            .flatCollect(Arrays::asList)
-            .collect(File::toURI);
+            .collect(Paths::get)
+            .select(p -> Files.exists(p) && Files.isDirectory(p))
+            .flatCollect(Functions.throwing(f -> Files.list(f).collect(Collectors2.toList())))
+            .select(p -> FileUtil.isImageFile(p.getFileName().toString()))
+            .collect(Path::toUri);
     }
 
     /**

@@ -1,11 +1,11 @@
 package jp.toastkid.yobidashi;
 
 import java.awt.Rectangle;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -289,7 +289,7 @@ public class SideMenuController implements Initializable {
             showMessagePopup("This tab's content can't convert Aozora bunko file.");
             return;
         }
-        final String absolutePath = optional.get().file.getAbsolutePath();
+        final String absolutePath = optional.get().path.toAbsolutePath().toString();
         AobunUtils.docToTxt(absolutePath);
         showMessageDialog(
                 "Complete Converting",
@@ -316,7 +316,7 @@ public class SideMenuController implements Initializable {
         wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
                         .setMinFontSize(8.0).build();
         final Article article = optional.get();
-        wordCloud.draw(pane, article.file);
+        wordCloud.draw(pane, article.path.toString());
         tabAction.open(article.title + "のワードクラウド", pane);
     }
 
@@ -354,16 +354,13 @@ public class SideMenuController implements Initializable {
      * @param title
      */
     private void openStaticFileWithConverting(final String pathToFile, final String title) {
-        final File file = new File(pathToFile);
-        if (!file.exists()) {
-            LOGGER.warn(file.getAbsolutePath() + " is not exists.");
+        final Path path = Paths.get(pathToFile);
+        if (!Files.exists(path)) {
+            LOGGER.warn(path.toAbsolutePath().toString() + " is not exists.");
             return;
         }
-        this.openTabWithHtmlContent.accept(
-                title,
-                articleGenerator.decorate(title, file),
-                ContentType.HTML
-                );
+        this.openTabWithHtmlContent
+            .accept(title, articleGenerator.decorate(title, path), ContentType.HTML);
     }
 
     /**
@@ -529,8 +526,9 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void callLogViewer() {
-        if (!new File(PATH_APP_LOG).exists()) {
-            LOGGER.warn(new File(PATH_APP_LOG).getAbsolutePath() + " is not exists.");
+        final Path path = Paths.get(PATH_APP_LOG);
+        if (!Files.exists(path)) {
+            LOGGER.warn(path.toAbsolutePath().toString() + " is not exists.");
             return;
         }
         final String log = String.format(
@@ -719,9 +717,9 @@ public class SideMenuController implements Initializable {
     @FXML
     private void openExternalFile() {
         final FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File("."));
-        final File result = fc.showOpenDialog(stage.getScene().getWindow());
-        if (!result.exists() || !result.canRead()) {
+        fc.setInitialDirectory(Paths.get(".").toFile());
+        final Path result = fc.showOpenDialog(stage.getScene().getWindow()).toPath();
+        if (!Files.exists(result) || !Files.isReadable(result)) {
             return;
         }
 
@@ -730,7 +728,7 @@ public class SideMenuController implements Initializable {
             switch (ext) {
                 case ".txt":
                     openTabWithHtmlContent.accept(
-                            result.getAbsolutePath(),
+                            result.toAbsolutePath().toString(),
                             FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
                             ContentType.TEXT
                             );
@@ -741,7 +739,7 @@ public class SideMenuController implements Initializable {
                         return;
                     }
                     openTabWithHtmlContent.accept(
-                            result.getAbsolutePath(),
+                            result.toAbsolutePath().toString(),
                             content.toString(),
                             ContentType.HTML
                             );

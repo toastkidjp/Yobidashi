@@ -1,6 +1,9 @@
 package jp.toastkid.article.search;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,7 +22,6 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,21 +243,29 @@ public final class ArticleSearcher {
         final ExecutorService exs = Executors.newFixedThreadPool(getParallel());
         final Set<Pattern> patterns = convertPatterns(pQuery);
         final boolean isTitleOnly = patterns.isEmpty();
-        final File[] files = new File(dirPath).listFiles();
+
+        final MutableList<Path> paths = Lists.mutable.empty();
+        try {
+            Files.list(Paths.get(dirPath)).forEach(paths::add);
+        } catch (final IOException e) {
+            e.printStackTrace();
+            LOGGER.error("Error!", e);
+        }
+
         // 検索の Runnable
-        final MutableList<ArticleSearchTask> runnables = ArrayIterate
-                .reject(files, file ->
-                    StringUtils.isNotEmpty(this.selectName)
-                    && !Articles.convertTitle(file.getName()).contains(this.selectName)
+        final MutableList<ArticleSearchTask> runnables = paths
+                .select(path ->
+                    StringUtils.isEmpty(this.selectName)
+                    || Articles.convertTitle(path.getFileName().toString()).contains(this.selectName)
                 )
-                .collect(file -> new ArticleSearchTask(file.getAbsolutePath(), patterns));
+                .collect(path -> new ArticleSearchTask(path.toAbsolutePath().toString(), patterns));
         max = max + runnables.size();
         final MutableList<Future<?>> futures = Lists.mutable.empty();
         // 検索の Runnable を初期化する
         for (int i = 0; i < runnables.size(); i++) {
-            final File readingFile = files[i];
-            if (readingFile.isDirectory()) {
-                dirSearch(readingFile.getAbsolutePath(), pQuery);
+            final Path readingPath = paths.get(i);
+            if (Files.isDirectory(readingPath)) {
+                dirSearch(readingPath.toAbsolutePath().toString(), pQuery);
                 continue;
             }
             lastFilenum++;
@@ -264,10 +274,10 @@ public final class ArticleSearcher {
                 continue;
             }
             // 記事名検索の場合、ここで結果を入れる.
-            if (Articles.convertTitle(readingFile.getName()).contains(this.selectName)) {
+            if (Articles.convertTitle(readingPath).contains(this.selectName)) {
                 searchResultMap.put(
-                        readingFile.getName(),
-                        SearchResult.makeSimple(readingFile.getAbsolutePath())
+                        readingPath.getFileName().toString(),
+                        SearchResult.makeSimple(readingPath.toAbsolutePath().toString())
                 );
                 progress.set(progress.get() + 1.0);
             }
@@ -327,7 +337,7 @@ public final class ArticleSearcher {
         initializer.accept(listView);
         listView.getItems().addAll(
                 searchResultMap.entrySet().stream()
-                    .map(entry -> new Article(new File(entry.getValue().filePath)))
+                    .map(entry -> new Article(Paths.get(entry.getValue().filePath)))
                     .sorted()
                     .collect(Collectors.toList())
                 );

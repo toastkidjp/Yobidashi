@@ -9,7 +9,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,13 +16,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +37,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -149,23 +144,7 @@ public final class FileUtil {
         }
         return null;
     }
-    /**
-     * バッファ処理式ファイルリーダを渡されたファイル名と文字コードで初期化する.
-     * @param pFile リーダで読み込むファイルの名前
-     * @param pEncode 初期化する文字コード
-     * @return fileReader : 与えたパラメータで初期化したファイルリーダ
-     */
-    public static BufferedReader makeFileReader(
-            final File pFile,
-            final String pEncode
-            ) {
-        try {
-            return makeInputStreamReader(new FileInputStream(pFile), pEncode);
-        } catch (final FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
     /**
      * InputStream から BufferedReader を構築して返す.
      * <HR>
@@ -186,19 +165,7 @@ public final class FileUtil {
         }
         return null;
     }
-    /**
-     * 指定されたファイルの要素を一行ずつ入れた Set<String> を返す.
-     * @param pFilePath 指定するファイルのパス
-     * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
-     */
-    public static Set<String> createStrSetFromFile( final String pFilePath ) {
-        try {
-            return Sets.mutable.withAll(Files.readAllLines(Paths.get(new File(pFilePath).toURI())));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return Sets.mutable.empty();
-    }
+
     /**
      * 指定されたファイルの要素を一行ずつ入れた List<String> を返す.<BR>
      * 文字コードは "shift-jis" を使う.
@@ -208,6 +175,7 @@ public final class FileUtil {
     public static List<String> createStrListFromFile(final String pFilePath) {
         return readLines(pFilePath, "shift-jis");
     }
+
     /**
      * 指定されたファイルの要素を一行ずつ入れた List<String> を返す.
      * <HR>
@@ -220,27 +188,27 @@ public final class FileUtil {
             final String pFilePath,
             final String pEncode
             ) {
-        return readLines(new File(pFilePath), pEncode);
+        return readLines(Paths.get(pFilePath), pEncode);
     }
+
     /**
      * 指定されたファイルの要素を一行ずつ入れた List<String> を返す.
      * <HR>
      * (130406) 修正<BR>
-     * @param pFile 読み込むファイル
-     * @param pEncode 指定したファイルの文字コード
+     * @param path 指定するファイルのパス
+     * @param pEncode 指定するファイルの文字コード
      * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
      */
     public static MutableList<String> readLines(
-            final File pFile,
+            final Path path,
             final String pEncode
             ) {
-
-        if (pFile == null || !pFile.exists() || !pFile.canRead()) {
+        if (path == null || !Files.exists(path) || !Files.isReadable(path)) {
             return Lists.fixedSize.empty();
         }
 
         final MutableList<String> resSet = Lists.mutable.empty();
-        try (final BufferedReader fileReader = FileUtil.makeFileReader(pFile, pEncode);) {
+        try (final BufferedReader fileReader = Files.newBufferedReader(path, Charset.forName(pEncode))) {
             String str = fileReader.readLine();
             while(str != null) {
                 resSet.add(str);
@@ -525,83 +493,6 @@ public final class FileUtil {
             iOE.printStackTrace();
         }
 
-    }
-    /**
-     * filesListに格納されたファイル名を持つファイルを結合する.<BR>
-     * 出力ファイルの文字コードは"utf-8"を使う.
-     * @param filesList 統合するファイルの名前を入れたリスト
-     * @param pOutPutFileName 出力ファイル名
-     */
-    public static void mergeTextFiles(
-            final List<String> filesList,
-            final String pOutPutFileName
-            ) {
-        mergeTextFiles(filesList,pOutPutFileName,"utf-8");
-    }
-    /**
-     * filesListに格納されたファイル名を持つファイルを結合する.<BR>
-     * 読み込み対象のファイルと、出力したいファイルの文字コードを合わせておくこと
-     *
-     * 110719 修正
-     *
-     * @param filesList 統合するファイルの名前を入れたリスト
-     * @param pOutPutFileName 出力ファイル名
-     * @param outputFileEncode 出力ファイルの文字コード
-     */
-    public static void mergeTextFiles(
-            final List<String> filesList,
-            final String pOutPutFileName,
-            final String outputFileEncode
-            ) {
-        mergeTextFiles(
-                filesList,
-                pOutPutFileName,
-                outputFileEncode,
-                false
-                );
-    }
-    /**
-     * filesListに格納されたファイル名を持つファイルを結合する.<BR>
-     * 引数 isPrintFileName を true にすれば、ファイル名を記録する.<BR>
-     * 読み込み対象のファイルと、出力したいファイルの文字コードを合わせておくこと
-     *
-     * 110719 作成
-     *
-     * @param filesList 統合するファイルの名前を入れたリスト
-     * @param pOutPutFileName 出力ファイル名
-     * @param outputFileEncode 出力ファイルの文字コード
-     */
-    public static void mergeTextFiles(
-            final List<String> filesList,
-            final String pOutPutFileName,
-            final String outputFileEncode,
-            final boolean isPrintFileName
-            ) {
-        String str = "";
-        try (final PrintWriter nameWriter = makeFileWriter(pOutPutFileName , outputFileEncode);) {
-            for(int i = 0; i < filesList.size(); i++) {
-                final String processingFileName = filesList.get(i);
-                if (new File(processingFileName).exists()) {
-                    if (isPrintFileName) {
-                        nameWriter.println(processingFileName);
-                    }
-                    try (final BufferedReader fileReader
-                            = makeFileReader(processingFileName, outputFileEncode);) {
-                        str = fileReader.readLine();
-                        while(str != null) {
-                            nameWriter.println(str);
-                            str = fileReader.readLine();
-                        }
-                        fileReader.close();
-                    }
-                } else {
-                    System.err.println("ファイル " + processingFileName + " は存在しません.");
-                }
-            }
-            nameWriter.close();
-        } catch(final IOException iOE) {
-            iOE.printStackTrace();
-        }
     }
 
     /**
@@ -1046,7 +937,7 @@ public final class FileUtil {
         iterator = keySet.iterator();
         while(iterator.hasNext()) {
             nowFileAbsolutePath = iterator.next();
-            final String  nowFile = new File(nowFileAbsolutePath).getName();
+            final String  nowFile = Paths.get(nowFileAbsolutePath).getFileName().toString();
 
             tempMap = filesTMap.get(nowFileAbsolutePath);
             //System.out.println(nowFileAbsolutePath + " : " + tempMap);
@@ -1184,19 +1075,7 @@ public final class FileUtil {
     public static final void mergeDataFiles(final String[] fileNames) {
         mergeDataFiles(fileNames,"merged.csv");
     }
-    /**
-     * 指定されたパスにフォルダを生成する
-     * @param pOutDirPath
-     * @return すでにフォルダが存在するか、生成に成功したらtrue、失敗したらfalse
-     */
-    public static final boolean mkdir(final String pOutDirPath) {
-        // 結果出力用フォルダがまだ存在しないなら生成しておく
-        if (!new File(pOutDirPath).exists()) {
-            return new File(pOutDirPath).mkdirs();
-        } else {
-            return true;
-        }
-    }
+
     /**
      * テキストファイルから Set&lt;String&gt; を値に持つ Map&lt;String,Set&lt;String&gt;&gt; を構成して返す.<BR>
      * 0番目の要素をキーに、1番目以降の要素を入れた Set を値に持つ.
@@ -1339,8 +1218,20 @@ public final class FileUtil {
                             ).size()
                         );
     }
+
     /**
      * 指定したファイルの文字数を計測して返す.
+     *
+     * @param path
+     * @param pEncode
+     */
+    public static int countCharacters(final Path path, final String pEncode) {
+        return countCharacters(path.toAbsolutePath().toString(), pEncode);
+    }
+
+    /**
+     * 指定したファイルの文字数を計測して返す.
+     *
      * @param pFileName
      * @param pEncode
      */
@@ -1356,6 +1247,7 @@ public final class FileUtil {
         }
         return (int) total.sum();
     }
+
     /**
      * 指定したファイルの中身を String で返す.行間は改行記号で連結する.
      * @param pFileName
@@ -1515,46 +1407,7 @@ public final class FileUtil {
         }
         return resSet;
     }
-    /**
-     * Javaでファイルを移動するサンプルです.
-     * (111230) 拝借
-     * <PRE>
-     * ■使い方
-     *
-     * moveFile("c:\\hello.txt", "c:\new\\")
-     *
-     * c:\\hello.txtファイルをc:\new\\に移動します.
-     * </PRE>
-     * @see <a href="http://www.syboos.jp/java/doc/move-file-to-another-directory.html">
-     * File.renameToでファイルを移動</a>
-     * @param orgFilePath 移動させたいファイルのパス
-     * @param destDir 移動先フォルダのパス
-     * @return 移動が成功したか否か
-     */
-    public static boolean moveFile(
-            final String orgFilePath,
-            final String destDir
-            ) {
-        // 移動元のファイルパス
-        final File file = new File(orgFilePath);
-        // 移動先のフォルダ
-        File dir = new File(destDir);
-        if (!dir.getName().endsWith("\\")
-                || !dir.getName().endsWith(Strings.getDirSeparator())) {
-            dir = new File(dir.getAbsolutePath() + Strings.getDirSeparator());
-        }
-        //System.out.println(dir.getAbsolutePath());//111230 CO
-        // 移動
-        return file.renameTo(new File(dir, file.getName()));
-    }
-    /**
-     * ファイルが存在するか否かを返す.
-     * @param filePath ファイルへのパス
-     * @return ファイルが存在する場合は true、しない場合は false
-     */
-    public static boolean isExistFile(final String filePath) {
-        return new File(filePath).exists();
-    }
+
     /**
      * map の中身を delimiter で連結してファイルに出力する.
      * <HR>
@@ -1598,14 +1451,7 @@ public final class FileUtil {
         }
         return null;
     }
-    /**
-     * pathToFile のファイルが存在するか否かを調べる.
-     * @param pathToFile ファイルへのパス
-     * @return ファイルが存在すれば true を返す
-     */
-    public static final boolean exists(final String pathToFile) {
-        return new File(pathToFile).exists();
-    }
+
     /**
      * コピー元のパス[srcPath]から、コピー先のパス[destPath]へファイルのコピーを行う.
      * コピー処理にはFileChannel#transferToメソッドを利用する.
@@ -1636,28 +1482,7 @@ public final class FileUtil {
             return (expected != actual) ? false : true;
         }
     }
-    /**
-     * filePath を URL オブジェクトに変換して返す.
-     * JavaFX で多用するため定義しておく
-     * @return URL オブジェクト
-     */
-    public static final URL getUrl(final String filePath) {
-        try {
-            return new File(filePath).toURI().toURL();
-        } catch (final MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    /**
-     * 最終更新時刻を Unixtime で返す.
-     * @param filePath ファイルパス
-     * @return Unixtime
-     */
-    public static final long lastModified(final String filePath) {
-        final File file = new File(filePath);
-        return file != null && file.exists() ? file.lastModified() : -1;
-    }
+
     /**
      * 画像か否かを判定する.
      * @param filePath ファイルパス
@@ -1672,16 +1497,7 @@ public final class FileUtil {
         }
         return false;
     }
-    /**
-     * ファイルパスをHTMLで扱える形式に変換して返す.
-     * ex)
-     * D:\img\tomato.png -> file:///D:/img/tomato.png
-     * @param f ファイルオブジェクト
-     * @return HTMLで扱える形式のファイルパス
-     */
-    public static final String getHtmlFilePath(final File f) {
-        return getHtmlFilePath(f.getAbsolutePath());
-    }
+
     /**
      * ファイルパスをHTMLで扱える形式に変換して返す.
      * ex)
@@ -1691,33 +1507,6 @@ public final class FileUtil {
      */
     public static final String getHtmlFilePath(final String path) {
         return FILE_PROTOCOL + path.replace("\\", "/").toLowerCase();
-    }
-
-    /**
-     * File オブジェクトをファイルに出力する.
-     * @param file File object.
-     * @param pathToFile path/to/file.
-     * @see <a href="https://github.com/apache/commons-io/blob/trunk/src/main/java/org/apache/
-     *commons/io/FileUtils.java#L1138">org.apache.commons.io.FileUtils.java</a>
-     * @throws IOException
-     */
-    public static void printFile(
-            final File file,
-            final String pathToFile
-            ) throws IOException {
-        try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(pathToFile));
-                final InputStream in = new BufferedInputStream(new FileInputStream(file));
-                ) {
-            final byte[] buff = new byte[128];
-            int len;
-            while ((len = in.read(buff)) != -1) {
-                for (int i = 0; i < len; i++) {
-                    fos.write(buff[i]);
-                }
-            }
-            in.close();
-            fos.close();
-        }
     }
 
     /**
@@ -1737,11 +1526,11 @@ public final class FileUtil {
      * @param fileName
      * @return Optional string. It contains ".txt".
      */
-    public static Optional<String> findExtension(final File file) {
-        if (file == null) {
+    public static Optional<String> findExtension(final Path path) {
+        if (path == null) {
             return Optional.empty();
         }
-        return findExtension(file.getName());
+        return findExtension(path.getFileName().toString());
     }
 
     /**
@@ -1794,19 +1583,9 @@ public final class FileUtil {
     }
 
     /**
-     * 最終更新日時が n 日以内のファイルなら true を返す.
-     * @param file ファイル
-     * @param ndays n 日
-     * @return 最終更新日時が n 日以内のファイルなら true
-     */
-    public static boolean isLastModifiedNdays(final File file, final long ndays) {
-        return System.currentTimeMillis() - file.lastModified() < TimeUnit.DAYS.toMillis(ndays);
-    }
-
-    /**
-     * TODO write test.
+     * Remove file extensions from passed file path.
      * @param filePath
-     * @return
+     * @return file name removed file extension.
      */
     public static String removeExtension(final String filePath) {
         final int index = filePath.lastIndexOf(".");
@@ -1817,7 +1596,7 @@ public final class FileUtil {
     }
 
     /**
-     * capture current window.
+     * Capture current window.
      * @param fileName output file name.
      * @param rect rectangle size.
      */
@@ -1826,7 +1605,7 @@ public final class FileUtil {
             = fileName.toLowerCase().endsWith(".png") ? fileName : fileName.concat(".png");
         try {
             final BufferedImage img = new Robot().createScreenCapture(rect);
-            ImageIO.write(img, "png", new File(name));
+            ImageIO.write(img, "png", Paths.get(name).toFile());
         } catch (final IOException | AWTException e) {
             e.printStackTrace();
         }

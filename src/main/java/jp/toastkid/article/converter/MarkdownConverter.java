@@ -1,6 +1,9 @@
 package jp.toastkid.article.converter;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -183,7 +186,7 @@ public final class MarkdownConverter {
     private final String imgDir;
 
     /** File Object. */
-    private File file;
+    private Path path;
 
     /** メニューバーを含めるか否か. */
     public boolean containsMenubar = true;
@@ -200,7 +203,8 @@ public final class MarkdownConverter {
      */
     public MarkdownConverter(final String imgDir) {
         this.imgDir = StringUtils.isNotBlank(imgDir)
-                            ? new File(imgDir.replace("\\", "/")).toURI().toString() : "";
+                            ? Paths.get(imgDir.replace("\\", "/")).toUri().toString()
+                            : "";
     }
 
     /**
@@ -228,7 +232,7 @@ public final class MarkdownConverter {
             ) {
         final String outputTo = StringUtils.isEmpty(outputDir)
                 ? filePath.replaceFirst("\\.txt", ".html")
-                :  outputDir + Strings.getDirSeparator() + file.getName().replaceFirst("\\.txt", ".html");
+                :  outputDir + Strings.getDirSeparator() + path.getFileName().toString().replaceFirst("\\.txt", ".html");
         FileUtil.outPutStr(convert(filePath, fileEncode), outputTo, outputEncode);
     }
 
@@ -805,10 +809,14 @@ public final class MarkdownConverter {
         }
 
         if (str.toLowerCase().indexOf("{lastmodify}") != -1) {
-            str = str.replace(
-                    "{lastmodify}",
-                    CalendarUtil.longToStr(file.lastModified(), STANDARD_DATE_FORMAT)
-                );
+            try {
+                str = str.replace(
+                        "{lastmodify}",
+                        CalendarUtil.longToStr(Files.getLastModifiedTime(path).toMillis(), STANDARD_DATE_FORMAT)
+                    );
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
         //<del>aaaa</del>
         if (str.indexOf("&del(") != -1) {
@@ -1087,10 +1095,9 @@ public final class MarkdownConverter {
      * @param txtFilePath ファイルのパス
      */
     private final void setFile(final String txtFilePath) {
-        final File newFile = new File(txtFilePath);
-        if (newFile != null && newFile.exists()) {
-            file = newFile;
+        final Path newFile = Paths.get(txtFilePath);
+        if (newFile != null && Files.exists(newFile)) {
+            path = newFile;
         }
     }
 }
-

@@ -1,13 +1,14 @@
 package jp.toastkid.article.search;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.impl.factory.Maps;
-
-import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * 記事1件の検索結果.
@@ -38,7 +39,11 @@ public final class SearchResult {
     public SearchResult(final String pFilePath) {
         this.df           = Maps.mutable.withInitialCapacity(20);
         this.filePath     = pFilePath;
-        this.lastModified = FileUtil.lastModified(pFilePath);
+        try {
+            this.lastModified = Files.getLastModifiedTime(Paths.get(pFilePath)).toMillis();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

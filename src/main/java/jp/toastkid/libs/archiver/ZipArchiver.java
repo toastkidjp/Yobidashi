@@ -1,13 +1,15 @@
 package jp.toastkid.libs.archiver;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -72,7 +74,7 @@ public final class ZipArchiver {
      * @throws FileNotFoundException 親ディレクトリが存在しない場合
      */
     public ZipArchiver(final String zipFilePath) throws FileNotFoundException {
-        if (!(new File(zipFilePath)).getParentFile().isDirectory()) {
+        if (!Files.isDirectory(Paths.get(zipFilePath).getParent())) {
             throw new FileNotFoundException("親ディレクトリが存在しません." + zipFilePath);
         }
         this.zipFilePath = zipFilePath;
@@ -88,8 +90,8 @@ public final class ZipArchiver {
         //System.out.println("圧縮開始");
         //System.out.println("圧縮ファイル=" + filePath);
         // ファイル存在チェック
-        final File targetFile = new File(filePath);
-        if (!targetFile.isFile()) {
+        final Path targetPath = Paths.get(filePath);
+        if (!Files.exists(targetPath)) {
             throw new FileNotFoundException("指定のファイルが存在しません." + filePath);
         }
         // 圧縮先ファイルへのストリームを開く
@@ -99,7 +101,7 @@ public final class ZipArchiver {
         //System.out.println("圧縮ファイル名=" + zipFilePath);
         final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFilePath));
         // ファイル圧縮処理
-        putEntryFile(out, targetFile);
+        putEntryFile(out, targetPath);
         // 出力ストリームを閉じる
         out.flush();
         out.close();
@@ -118,13 +120,13 @@ public final class ZipArchiver {
         //System.out.println("圧縮ディレクトリ=" + directoryPath);
         targetDirPath = directoryPath;
         // ディレクトリ存在チェック
-        final File targetDirectory = new File(directoryPath);
-        if (!targetDirectory.isDirectory()) {
+        final Path targetDirectory = Paths.get(directoryPath);
+        if (!Files.isDirectory(targetDirectory)) {
             throw new FileNotFoundException("指定のディレクトリが存在しません." + directoryPath);
         }
 
         // 指定ディレクトリ直下のファイル一覧を取得
-        final List<File> rootFiles = Arrays.asList(targetDirectory.listFiles());
+        final List<Path> rootFiles = Files.list(targetDirectory).collect(Collectors.toList());
         // 圧縮先ファイルへのストリームを開く
         if (zipFilePath == null) {
             zipFilePath = getCompressFileName(directoryPath);
@@ -156,23 +158,24 @@ public final class ZipArchiver {
      */
     private void compress(
             final ZipOutputStream out,
-            final List<File> fileList
+            final List<Path> fileList
             ) throws IOException {
         // ファイルリスト分の圧縮処理
         //TODO
-        for (final File file : fileList) {
-            if (file.isFile()) {
+        for (final Path path : fileList) {
+            if (Files.exists(path)) {
                 // file compress->
-                System.out.println( zipFilePath + "<-" + file.getPath());
+                System.out.println( zipFilePath + "<-" + path.toString());
                 // ファイル書き込み
-                putEntryFile(out, file);
-            } else {
-                // ディレクトリ自体を書き込む
-                putEntryDirectory(out, file);
-                // ディレクトリ内のファイルについては再帰的に本メソッドを処理する
-                final List<File> inFiles = Arrays.asList(file.listFiles());
-                compress(out, inFiles);
+                putEntryFile(out, path);
+                continue;
             }
+
+            // ディレクトリ自体を書き込む
+            putEntryDirectory(out, path);
+            // ディレクトリ内のファイルについては再帰的に本メソッドを処理する
+            final List<Path> inFiles = Files.list(path).collect(Collectors.toList());
+            compress(out, inFiles);
         }
     }
     /**
@@ -186,13 +189,13 @@ public final class ZipArchiver {
      */
     private void putEntryFile(
             final ZipOutputStream out,
-            final File file
+            final Path file
             ) throws FileNotFoundException, IOException {
         final byte[] buf = new byte[128];
         // 圧縮元ファイルへのストリームを開く
-        final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+        final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file.toFile()));
         // エントリを作成する
-        final ZipEntry entry = new ZipEntry(getZipEntryName(file.getPath()));
+        final ZipEntry entry = new ZipEntry(getZipEntryName(file.toString()));
         out.putNextEntry(entry);
         // データを圧縮して書き込む
         int size;
@@ -208,14 +211,14 @@ public final class ZipArchiver {
      * ZipOutputStreamに対してディレクトリを登録します.
      * </pre>
      * @param out
-     * @param file
+     * @param path
      * @throws IOException
      */
     private void putEntryDirectory(
             final ZipOutputStream out,
-            final File file
+            final Path path
             ) throws IOException {
-        final ZipEntry entry = new ZipEntry(getZipEntryName(file.getPath()) + "/");
+        final ZipEntry entry = new ZipEntry(getZipEntryName(path.toString()) + "/");
         entry.setSize(0);
         out.putNextEntry(entry);
     }
@@ -234,9 +237,9 @@ public final class ZipArchiver {
     private String getZipEntryName (final String filePath) {
         if (targetDirPath == null) {
             // ファイル圧縮時
-            return (new File(filePath)).getName();
+            return (Paths.get(filePath)).getFileName().toString();
         }
-        String parantPath = (new File(targetDirPath)).getParent();
+        String parantPath = (Paths.get(targetDirPath)).getParent().toString();
         parantPath = removeLastSeparator(parantPath);
         return filePath.substring(parantPath.length() + 1);
     }

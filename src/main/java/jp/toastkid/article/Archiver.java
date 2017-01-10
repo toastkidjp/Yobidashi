@@ -1,11 +1,12 @@
 package jp.toastkid.article;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 
 import org.eclipse.collections.impl.block.factory.Procedures;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +32,28 @@ public class Archiver {
         try {
             final Zip backup
                 = new Zip("backup" + ZonedDateTime.now().toInstant().getEpochSecond() + ".zip");
-            ArrayAdapter.adapt(new File(articleDir).listFiles())
-                .select(file -> offsetMs < file.lastModified())
-                .each(Procedures.throwing((file) -> backup.entry(file)));
+            Files.list(Paths.get(articleDir))
+                .filter(path -> isBackup(path, offsetMs))
+                .forEach(Procedures.throwing(path -> backup.entry(path.toAbsolutePath().toString())));
             backup.doZip();
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
         }
+    }
+
+    /**
+     * Return is backup target.
+     * @param path
+     * @param offsetMs
+     * @return
+     */
+    private static boolean isBackup(final Path path, final long offsetMs) {
+        try {
+            return offsetMs < Files.getLastModifiedTime(path).toMillis();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

@@ -1,8 +1,12 @@
 package jp.toastkid.article;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.eclipse.collections.impl.collector.Collectors2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.epub.DocToEpub;
@@ -19,6 +23,9 @@ import jp.toastkid.yobidashi.Defines;
  *
  */
 public class EpubGenerator {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpubGenerator.class);
 
     /**
      * 現在開いている記事をePubに変換する.
@@ -48,11 +55,16 @@ public class EpubGenerator {
      * DocToEpub を動かし、EPUB_RECIPE_DIR のレシピ json から複数のePubを生成する.
      */
     public final void runEpubGenerator() {
-        DocToEpub.run(
-                ArrayIterate.collect(
-                        new File(Defines.EPUB_RECIPE_DIR).listFiles(),
-                        file -> file.getAbsolutePath())
-                .select(fileName -> fileName.toLowerCase().endsWith(".json")));
+        try {
+            DocToEpub.run(
+                    Files.list(Paths.get(Defines.EPUB_RECIPE_DIR))
+                         .map(p -> p.toAbsolutePath().toString())
+                         .filter(fileName -> fileName.toLowerCase().endsWith(".json"))
+                         .collect(Collectors2.toList())
+            );
+        } catch (final IOException e) {
+            LOGGER.error("Error!", e);
+        }
     }
 
 }

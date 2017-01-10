@@ -1,6 +1,5 @@
 package jp.toastkid.yobidashi;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.Props;
-import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * config of Wiki client.
@@ -65,9 +63,6 @@ public final class Config {
     static {
         reload();
     }
-
-    /** path/to/editor. contains option. */
-    private static String editorPath;
 
     /**
      * Get property value by key.
@@ -120,11 +115,14 @@ public final class Config {
      */
     public static void reload() {
 
-        final String dirPath = Defines.USER_DIR + "/conf";
-        final Path userDir = Paths.get(dirPath);
+        final Path userDir = Paths.get(Defines.USER_DIR + "/conf");
         if (!Files.exists(userDir)) {
-            FileUtil.mkdir(dirPath);
-            store();
+            try {
+                Files.createDirectories(userDir);
+                store();
+            } catch (final IOException e) {
+                LOGGER.error("Error!", e);
+            }
         }
 
         CONFIG.clear();
@@ -145,7 +143,7 @@ public final class Config {
     public static void store(final Map<String, String> additional) {
         CONFIG.putAll(additional);
         try (final Writer writer
-                = Files.newBufferedWriter(new File(Defines.CONF_DIR, Defines.CONF_NAME).toPath())) {
+                = Files.newBufferedWriter(Paths.get(Defines.CONF_DIR, Defines.CONF_NAME))) {
             CONFIG.store(writer, MESSAGE);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);

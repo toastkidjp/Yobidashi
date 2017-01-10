@@ -1,6 +1,5 @@
 package jp.toastkid.jfx.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
@@ -12,20 +11,23 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
+import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.Defines;
 
 /**
@@ -65,12 +67,12 @@ public class Style {
         }
         final URL resource = Style.class.getResource("/css/" + styleName.toLowerCase() + CSS);
         if (resource == null) {
-            final File userDefined = new File(USER_DEFINED_PATH, styleName.toLowerCase() + CSS);
-            if (!userDefined.exists()) {
+            final Path userDefined = Paths.get(USER_DEFINED_PATH, styleName.toLowerCase() + CSS);
+            if (!Files.exists(userDefined)) {
                 return (resource != null) ? resource.toString() : styleName.toString();
             }
             try {
-                return userDefined.toURI().toURL().toString();
+                return userDefined.toUri().toURL().toString();
             } catch (final MalformedURLException e) {
                 LOGGER.error("Caught error.", e);
             }
@@ -93,9 +95,16 @@ public class Style {
         }
 
         // read from user css dir.
-        final File userDir = new File(Style.USER_DEFINED_PATH);
-        if (userDir.exists() && userDir.isDirectory()) {
-            styles.addAll(Lists.fixedSize.of(userDir.list()));
+        final Path userDir = Paths.get(Style.USER_DEFINED_PATH);
+        if (Files.exists(userDir) && Files.isDirectory(userDir)) {
+            try {
+                Files.find(userDir, 1, Style::isValidItem)
+                     .map(Path::getFileName)
+                     .map(Path::toString)
+                     .forEach(styles::add);
+            } catch (final IOException e) {
+                LOGGER.error("Caught error.", e);
+            }
         }
 
         // select & toList
@@ -106,6 +115,20 @@ public class Style {
 
         sorted.sort((a, b) -> a.compareTo(b));
         return sorted;
+    }
+
+    /**
+     * For use in lambda.
+     * @param path
+     * @param attr
+     * @return
+     */
+    private static boolean isValidItem(final Path path, final BasicFileAttributes attr) {
+        final Optional<String> findExtension = FileUtil.findExtension(path);
+        if (!findExtension.isPresent()) {
+            return false;
+        }
+        return ".css".equals(findExtension.get());
     }
 
     /**
@@ -123,14 +146,16 @@ public class Style {
                         Paths.get(fileURL.toURI()),
                         Style.class.getClassLoader()
                         );
-                try (Stream<Path> s = Files.walk(fs.getPath("/css/"), 1)) {
+                try (final Stream<Path> s = Files.walk(fs.getPath("/css/"), 1)) {
                     return s.filter(p -> p.getFileName().toString().endsWith(CSS))
                             .map(   p -> p.getFileName().toString())
                             .collect(Collectors.toList());
                 }
             }
             // Jar でないならパスから読み込み
-             return Arrays.asList(new File(resource).list());
+            return Files.list(Paths.get(resource))
+                     .map(p -> p.getFileName().toString())
+                     .collect(Collectors2.toList());
         } catch (final URISyntaxException | IOException e) {
             LOGGER.error("Caught error.", e);
         }
