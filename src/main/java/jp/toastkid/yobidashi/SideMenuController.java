@@ -58,6 +58,8 @@ import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
+import jp.toastkid.yobidashi.event.ToolDrawerEvent;
+import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -83,15 +85,21 @@ public class SideMenuController implements Initializable {
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
-    /** menu tabs. */
-    @FXML
-    private TabPane menuTabs;
+    /** JVM Language Script Runner. */
+    private jp.toastkid.script.Main scriptRunner;
+
+    /** Name Generator. */
+    private jp.toastkid.name.Main nameGenerator;
 
     /** use for draw word-cloud. */
     private FxWordCloud wordCloud;
 
     /** for controlling window. */
     private Stage stage;
+
+    /** menu tabs. */
+    @FXML
+    private TabPane menuTabs;
 
     /** search command. */
     private Runnable search;
@@ -135,15 +143,6 @@ public class SideMenuController implements Initializable {
     /** Action of launch Script runner tab. */
     private OpenTabAction scriptOpener;
 
-    /** JVM Language Script Runner. */
-    private jp.toastkid.script.Main scriptRunner;
-
-    /** Name Generator. */
-    private jp.toastkid.name.Main nameGenerator;
-
-    /** Action of open drawer. */
-    private Runnable switchRightDrawer;
-
     /** Action of popup text. */
     private Consumer<String> onPopup;
 
@@ -158,6 +157,9 @@ public class SideMenuController implements Initializable {
 
     /** Action of save article. */
     private Runnable onSaveArticle;
+
+    /** Tool Drawer event processor. */
+    private TopicProcessor<ToolDrawerEvent> toolDrawerProcessor;
 
     /**
      * Call back up method.
@@ -673,7 +675,8 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openTools() {
-        switchRightDrawer.run();
+        getProcessor().onNext(new ToolDrawerEvent());
+        //switchRightDrawer.run();
     }
 
     /**
@@ -985,6 +988,11 @@ public class SideMenuController implements Initializable {
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         articleGenerator = new ArticleGenerator();
+        this.toolDrawerProcessor = TopicProcessor.create();
+    }
+
+    public TopicProcessor<ToolDrawerEvent> getProcessor() {
+        return toolDrawerProcessor;
     }
 
 }

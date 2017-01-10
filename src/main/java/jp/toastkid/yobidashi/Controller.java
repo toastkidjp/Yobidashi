@@ -1550,7 +1550,7 @@ public final class Controller implements Initializable {
             System.exit(0);
         });
         sideMenuController.setOnOpenScriptRunner(this::openContentTab);
-        sideMenuController.setOnOpenTools(this::switchRightDrawer);
+        sideMenuController.getProcessor().subscribe(event -> Platform.runLater(this::switchRightDrawer));
         sideMenuController.setOnPopup(this::setStatus);
         sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
         sideMenuController.setOpenTabWithHtmlContent(this::openWebTabWithContent);
