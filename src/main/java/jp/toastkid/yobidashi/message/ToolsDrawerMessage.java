@@ -1,7 +1,8 @@
 package jp.toastkid.yobidashi.message;
 
 /**
- * TODO write test.
+ * It's a mere marker.
+ *
  * @author Toast kid
  *
  */

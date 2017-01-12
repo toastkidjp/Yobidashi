@@ -1,7 +1,6 @@
 package jp.toastkid.yobidashi.message;
 
 /**
- * TODO write test.
  * Tab actions's message.
  *
  * @author Toast kid
