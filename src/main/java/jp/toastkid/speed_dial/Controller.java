@@ -4,13 +4,15 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.reactfx.util.TriConsumer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.ArticleSearchMessage;
+import reactor.core.publisher.TopicProcessor;
 
 /**
  * Speed Dial's controller.
@@ -41,8 +43,8 @@ public class Controller {
     /** Empty action. */
     private Runnable emptyAction;
 
-    /** Action of search article. */
-    private TriConsumer<Boolean, String, String> articleSearchAction;
+    /** Message sender. */
+    private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
     /**
      * Return root pane.
@@ -90,7 +92,7 @@ public class Controller {
             return;
         }
         if ("Article".equals(t)) {
-            articleSearchAction.accept(true, query, "");
+            messenger().onNext(ArticleSearchMessage.make(query));
             return;
         }
         webSearchAction.accept(query, t);
@@ -124,11 +126,11 @@ public class Controller {
     }
 
     /**
-     * Set on article search action.
-     * @param command
+     * Getter of message sender.
+     * @return messenger.
      */
-    public void setOnArticleSearch(TriConsumer<Boolean, String, String> command) {
-        this.articleSearchAction = command;
+    public TopicProcessor<Message> messenger() {
+        return messenger;
     }
 
 }

@@ -52,6 +52,7 @@ import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
@@ -373,7 +374,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callSearch() {
-        messenger.onNext(ArticleMessage.makeSearch());
+        messenger.onNext(ShowSearchDialog.make());
     }
 
     /**

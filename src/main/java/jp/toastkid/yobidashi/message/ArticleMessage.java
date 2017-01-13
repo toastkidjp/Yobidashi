@@ -14,7 +14,7 @@ public class ArticleMessage implements Message {
      *
      */
     public enum Command {
-        MAKE, LENGTH, COPY, RENAME, SEARCH, SLIDE_SHOW, DELETE,
+        MAKE, LENGTH, COPY, RENAME, SLIDE_SHOW, DELETE,
         CONVERT_AOBUN, CONVERT_EPUB, WORD_CLOUD
     }
 
@@ -51,14 +51,6 @@ public class ArticleMessage implements Message {
      */
     public static ArticleMessage makeSlideShow() {
         return new ArticleMessage(Command.SLIDE_SHOW);
-    }
-
-    /**
-     * Make search message.
-     * @return SEARCH message
-     */
-    public static ArticleMessage makeSearch() {
-        return new ArticleMessage(Command.SEARCH);
     }
 
     /**

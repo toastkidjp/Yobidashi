@@ -33,15 +33,6 @@ public class ArticleMessageTest {
     }
 
     /**
-     * Check {@link ArticleMessage#makeSearch}.
-     */
-    @Test
-    public void testMakeSearch() {
-        final ArticleMessage search = ArticleMessage.makeSearch();
-        assertEquals(Command.SEARCH, search.getCommand());
-    }
-
-    /**
      * Check {@link ArticleMessage#makeNew()}.
      */
     @Test
