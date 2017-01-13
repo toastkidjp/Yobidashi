@@ -16,7 +16,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
+import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.Message;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
 
 /**
@@ -58,8 +61,8 @@ public class ToolsController {
     @FXML
     public TextField zoomInput;
 
-    /** Chart action. */
-    private OpenTabAction chart;
+    /** Message sender. */
+    private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
     /**
      * Draw chart.
@@ -69,7 +72,7 @@ public class ToolsController {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
         final Pane content = ChartPane.make(title,
                 "日記" + month.getSelectionModel().getSelectedItem().toString());
-        chart.open(title, content);
+        messenger.onNext(ContentTabMessage.make(title, content));
     }
 
     /**
@@ -91,10 +94,6 @@ public class ToolsController {
     @FXML
     private final void callDefaultZoom() {
         zoom.setValue(1.0);;
-    }
-
-    protected void setOnDrawChart(final OpenTabAction chart) {
-        this.chart = chart;
     }
 
     /**
@@ -140,6 +139,14 @@ public class ToolsController {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
             });
+    }
+
+    /**
+     * Return message senger.
+     * @return {@link TopicProcessor}
+     */
+    public TopicProcessor<Message> getMessenger() {
+        return messenger;
     }
 
 }

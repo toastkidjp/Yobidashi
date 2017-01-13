@@ -43,7 +43,6 @@ import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -52,11 +51,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -70,6 +72,7 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.EpubGenerator;
 import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
 import jp.toastkid.article.control.BaseWebTab;
@@ -87,8 +90,21 @@ import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.jobs.FileWatcherJob;
 import jp.toastkid.libs.WebServiceHelper;
+import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
+import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.wordcloud.FxWordCloud;
+import jp.toastkid.wordcloud.JFXMasonryPane2;
+import jp.toastkid.yobidashi.message.ApplicationMessage;
+import jp.toastkid.yobidashi.message.ArticleMessage;
+import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.SnackbarMessage;
+import jp.toastkid.yobidashi.message.TabMessage;
+import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.WebTabMessage;
+import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -213,26 +229,9 @@ public final class Controller implements Initializable {
     @FXML
     private Label status;
 
-    /** Search category selector. */
-    @SuppressWarnings("rawtypes")
-    @FXML
-    private ComboBox searchCategory;
-
-    /** Web search query. */
-    @FXML
-    private TextField webQuery;
-
     /** Splitter of TabPane. */
     @FXML
     private SplitPane splitter;
-
-    /** Reload button. */
-    @FXML
-    private Button reload;
-
-    /** Web search button. */
-    @FXML
-    private Button webSearch;
 
     /** Stylesheet selector. */
     @FXML
@@ -304,6 +303,9 @@ public final class Controller implements Initializable {
     @FXML
     private JFXDrawer rightDrawer;
 
+    /** use for draw word-cloud. */
+    private FxWordCloud wordCloud;
+
     /** Side Menu pane controller. */
     @FXML
     private SideMenuController sideMenuController;
@@ -311,6 +313,10 @@ public final class Controller implements Initializable {
     /** Tools pane controller. */
     @FXML
     private ToolsController toolsController;
+
+    private Cancellation cancellation;
+
+    private Cancellation toolsCancellation;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -664,7 +670,7 @@ public final class Controller implements Initializable {
     /**
      * Show HTML source.
      */
-    private final void callHtmlSource() {
+    private final void showHtmlSource() {
         final ReloadableTab tab = getCurrentTab();
 
         if (!(tab instanceof BaseWebTab)) {
@@ -679,7 +685,6 @@ public final class Controller implements Initializable {
     /**
      * Reload tab content.
      */
-    @FXML
     private final void reload() {
         getCurrentTab().reload();
     }
@@ -772,6 +777,15 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Open specified tab with title.
+     * @param title tab's title
+     * @param content tab's content(Pane)
+     */
+    private void openContentTab(final String title, final Pane content) {
+        openTab(makeContentTab(title, content));
+    }
+
+    /**
      * Open new web tab.
      * @param title
      * @param url
@@ -841,7 +855,7 @@ public final class Controller implements Initializable {
             // add new item:
             cmc.getItemsContainer().getChildren().addAll(
                     makeContextMenuItemContainerWithAction(
-                            cmc, "文字数計測", event -> sideMenuController.callFileLength()),
+                            cmc, "文字数計測", event -> processArticleMessage(ArticleMessage.makeLength())),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Full Screen", event -> stage.setFullScreen(true)),
                     makeContextMenuItemContainerWithAction(
@@ -853,7 +867,7 @@ public final class Controller implements Initializable {
                     makeContextMenuItemContainerWithAction(
                             cmc, "Close all tabs", event -> closeAllTabs()),
                     makeContextMenuItemContainerWithAction(
-                            cmc, "Show HTML source", event -> callHtmlSource()),
+                            cmc, "Show HTML source", event -> showHtmlSource()),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Find in page", event -> openSearcher()),
                     makeContextMenuItemContainerWithAction(
@@ -876,8 +890,8 @@ public final class Controller implements Initializable {
                             ),
                     cmc.new MenuItemContainer(
                             getCurrentTab().isEditing()
-                            ? makeMenuItemWithAction("Close editor",   event -> callEditor())
-                            : makeMenuItemWithAction("Edit", event -> callEditor())
+                            ? makeMenuItemWithAction("Close editor",   event -> edit())
+                            : makeMenuItemWithAction("Edit", event -> edit())
                             )
                     );
 
@@ -1211,7 +1225,7 @@ public final class Controller implements Initializable {
      * (130512) 作成<BR>
      */
     @FXML
-    private final void callCopy() {
+    private final void copyArticle() {
         callRenameArticle(true);
     }
 
@@ -1222,7 +1236,7 @@ public final class Controller implements Initializable {
      * (130512) 作成<BR>
      */
     @FXML
-    private final void callRename() {
+    private final void renameArticle() {
         callRenameArticle(false);
     }
 
@@ -1312,7 +1326,7 @@ public final class Controller implements Initializable {
      * ファイル一覧から削除するよう処理変更<BR>
      * (130305) 作成<BR>
      */
-    private final void callDelete() {
+    private final void deleteArticle() {
         // 削除対象のファイルオブジェクト
         final Optional<Article> ofNullable = getCurrentArticleOfNullable();
         if (!ofNullable.isPresent()) {
@@ -1358,10 +1372,9 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * エディタを呼び出す.
+     * Call editor.
      */
-    @FXML
-    private final void callEditor() {
+    private final void edit() {
 
         final String edit = getCurrentTab().edit();
 
@@ -1532,29 +1545,182 @@ public final class Controller implements Initializable {
      */
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
-        sideMenuController.setOnSearch(this::searchArticle);
-        sideMenuController.setOnEdit(this::callEditor);
-        sideMenuController.setOnNewTab(this::openSpeedDialTab);
-        sideMenuController.setOnCloseTab(this::closeCurrentTab);
-        sideMenuController.setOnCloseAllTabs(this::closeAllTabs);
-        sideMenuController.setOnSlideShow(this::slideShow);
-        sideMenuController.setOnReload(this::reload);
-        sideMenuController.setOnPreviewSource(this::callHtmlSource);
-        sideMenuController.setOnWordCloud(this::openContentTab);
-        sideMenuController.setOnMakeArticle(this::makeMarkdown);
-        sideMenuController.setOnCopy(this::callCopy);
-        sideMenuController.setOnRename(this::callRename);
-        sideMenuController.setOnDelete(this::callDelete);
-        sideMenuController.setOnQuit(() -> {
-            this.stage.close();
-            System.exit(0);
-        });
-        sideMenuController.setOnOpenScriptRunner(this::openContentTab);
-        sideMenuController.setOnOpenTools(this::switchRightDrawer);
-        sideMenuController.setOnPopup(this::setStatus);
-        sideMenuController.setCurrentArticleGetter(this::getCurrentArticleOfNullable);
-        sideMenuController.setOpenTabWithHtmlContent(this::openWebTabWithContent);
-        sideMenuController.setOnSaveArticle(this::saveCurrentTab);
+        cancellation = sideMenuController.getProcessor().subscribe(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
+    }
+
+    /**
+     * Process processor's event.
+     * @param message Processor's event
+     */
+    private void processMessage(final Message message) {
+        if (message instanceof ToolsDrawerMessage) {
+            Platform.runLater(this::switchRightDrawer);
+            return;
+        }
+
+        if (message instanceof ArticleMessage) {
+            processArticleMessage((ArticleMessage) message);
+            return;
+        }
+
+        if (message instanceof TabMessage) {
+            processTabMessage((TabMessage) message);
+            return;
+        }
+
+        if (message instanceof ContentTabMessage) {
+            processContentTabMessage((ContentTabMessage) message);
+            return;
+        }
+
+        if (message instanceof WebTabMessage) {
+            processWebTabMessage((WebTabMessage) message);
+            return;
+        }
+
+        if (message instanceof SnackbarMessage) {
+            setStatus(((SnackbarMessage) message).getText());
+            return;
+        }
+
+        if (message instanceof ApplicationMessage) {
+            processApplicationMessage((ApplicationMessage) message);
+            return;
+        }
+    }
+
+    /**
+     * Open WebTabMessage with passed title and content.
+     * @param message WebTabMessage
+     */
+    private void processWebTabMessage(final WebTabMessage message) {
+        Platform.runLater(() -> openWebTabWithContent(
+                message.getTitle(), message.getContent(), message.getContentType()));
+    }
+
+    /**
+     * Open ContentTab with passed title and content.
+     * @param message ContentTabMessage
+     */
+    private void processContentTabMessage(final ContentTabMessage message) {
+        Platform.runLater(() -> openContentTab(message.getTitle(), message.getContent()));
+    }
+
+    /**
+     * Process {@link ApplicationMessage}.
+     * @param message
+     */
+    private void processApplicationMessage(ApplicationMessage message) {
+        switch (message.getCommand()) {
+            case QUIT:
+                this.stage.close();
+                System.exit(0);
+                return;
+        }
+    }
+
+    /**
+     * Process tab's message.
+     * @param message
+     */
+    private void processTabMessage(final TabMessage message) {
+        switch (message.getCommand()) {
+            case EDIT:
+                edit();
+                return;
+            case CLOSE:
+                closeCurrentTab();
+                return;
+            case CLOSE_ALL:
+                closeAllTabs();
+                return;
+            case PREVIEW:
+                showHtmlSource();
+                return;
+            case SAVE:
+                saveCurrentTab();
+                return;
+            case RELOAD:
+                reload();
+                return;
+            case OPEN:
+                openSpeedDialTab();
+                return;
+            default:
+                return;
+        }
+    }
+
+    /**
+     * Process article's message.
+     * @param message {@link ArticleMessage}'s instance
+     */
+    private void processArticleMessage(final ArticleMessage message) {
+        final Optional<Article> optional = getCurrentArticleOfNullable();
+        switch (message.getCommand()) {
+            case SEARCH:
+                Platform.runLater(this::searchArticle);
+                return;
+            case SLIDE_SHOW:
+                Platform.runLater(this::slideShow);
+                return;
+            case MAKE:
+                Platform.runLater(this::makeMarkdown);
+                return;
+            case LENGTH:
+                if (!optional.isPresent()) {
+                    snackbar.fireEvent(new SnackbarEvent("現在表示できません。"));
+                    return;
+                }
+                Platform.runLater(() -> AlertDialog.showMessage(
+                        getParent(), "文字数計測", optional.get().makeCharCountResult()));
+                return;
+            case COPY:
+                Platform.runLater(this::copyArticle);
+                return;
+            case DELETE:
+                Platform.runLater(this::deleteArticle);
+                return;
+            case RENAME:
+                Platform.runLater(this::renameArticle);
+                return;
+            case CONVERT_AOBUN:
+                if (!optional.isPresent()) {
+                    setStatus("This tab's content can't convert Aozora bunko file.");
+                    return;
+                }
+                final String absolutePath = optional.get().path.toAbsolutePath().toString();
+                AobunUtils.docToTxt(absolutePath);
+                AlertDialog.showMessage(
+                        getParent(),
+                        "Complete Converting",
+                        Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath)
+                );
+                return;
+            case CONVERT_EPUB:
+                Platform.runLater(this::convertEpub);
+                return;
+            case WORD_CLOUD:
+                final JFXMasonryPane2 pane = new JFXMasonryPane2();
+                final ScrollPane value = new ScrollPane(pane);
+                value.setFitToHeight(true);
+                value.setFitToWidth(true);
+
+                if (!optional.isPresent()) {
+                    setStatus("This tab's content can't generate word cloud.");
+                    return;
+                }
+
+                wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
+                                .setMinFontSize(8.0).build();
+                final Article article = optional.get();
+                wordCloud.draw(pane, article.path.toString());
+                Platform.runLater(() -> openContentTab(article.title + "'s word cloud", pane));
+                return;
+            default:
+                return;
+        }
     }
 
     /**
@@ -1562,7 +1728,8 @@ public final class Controller implements Initializable {
      */
     protected void setupToolMenu() {
         toolsController.init(this.stage);
-        toolsController.setOnDrawChart(this::openContentTab);
+        toolsCancellation = toolsController.getMessenger().subscribe(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(toolsCancellation::dispose));
         toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {
@@ -1577,12 +1744,36 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Open specified tab with title.
-     * @param title tab's title
-     * @param content tab's content(Pane)
+     * Convert current article to ePub.
      */
-    private void openContentTab(final String title, final Pane content) {
-        openTab(makeContentTab(title, content));
+    private void convertEpub() {
+        final RadioButton vertically   = new RadioButton("vertically");
+        final RadioButton horizontally = new RadioButton("horizontally");
+
+        new ToggleGroup() {{
+            getToggles().addAll(vertically, horizontally);
+            vertically.setSelected(true);
+        }};
+
+        final Window parent = getParent();
+        new AlertDialog.Builder(parent)
+            .setTitle("ePub").setMessage("Current Article convert to ePub.")
+            .addControl(vertically, horizontally)
+            .setOnPositive("OK", () -> {
+                final ProgressDialog pd = new ProgressDialog.Builder()
+                        .setScene(parent.getScene())
+                        .setCommand(new Task<Integer>() {
+                            @Override
+                            protected Integer call() throws Exception {
+                                final Optional<Article> optional = getCurrentArticleOfNullable();
+                                optional.ifPresent(article ->
+                                    new EpubGenerator().toEpub(article, vertically.isSelected()));
+                                return 100;
+                            }
+                        })
+                        .build();
+                pd.start(stage);
+            }).build().show();;
     }
 
     /**

@@ -12,11 +12,8 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.reactfx.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +29,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -43,21 +37,25 @@ import javafx.stage.Window;
 import jp.toastkid.article.Archiver;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.EpubGenerator;
-import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.ContentType;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.lambda.Filters;
-import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.wordcloud.FxWordCloud;
-import jp.toastkid.wordcloud.JFXMasonryPane2;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
+import jp.toastkid.yobidashi.message.ApplicationMessage;
+import jp.toastkid.yobidashi.message.ArticleMessage;
+import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.TabMessage;
+import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.WebTabMessage;
+import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -83,81 +81,21 @@ public class SideMenuController implements Initializable {
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
-    /** menu tabs. */
-    @FXML
-    private TabPane menuTabs;
-
-    /** use for draw word-cloud. */
-    private FxWordCloud wordCloud;
-
-    /** for controlling window. */
-    private Stage stage;
-
-    /** search command. */
-    private Runnable search;
-
-    /** edit article command. */
-    private Runnable edit;
-
-    /** open tab command. */
-    private Runnable open;
-
-    /** close tab command. */
-    private Runnable close;
-
-    /** slide show command. */
-    private Runnable slide;
-
-    /** tab action/ */
-    private OpenTabAction tabAction;
-
-    /** Command of reload. */
-    private Runnable reload;
-
-    /** Command of preview. */
-    private Runnable preview;
-
-    /** Command of quit this app. */
-    private Runnable onQuit;
-
-    /** Action of make new article. */
-    private Runnable onMakeArticle;
-
-    /** Command of copy article. */
-    private Runnable onCopy;
-
-    /** Command of rename article. */
-    private Runnable onRename;
-
-    /** Command of delete article. */
-    private Runnable onDelete;
-
-    /** Action of launch Script runner tab. */
-    private OpenTabAction scriptOpener;
-
     /** JVM Language Script Runner. */
     private jp.toastkid.script.Main scriptRunner;
 
     /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
 
-    /** Action of open drawer. */
-    private Runnable switchRightDrawer;
+    /** for controlling window. */
+    private Stage stage;
 
-    /** Action of popup text. */
-    private Consumer<String> onPopup;
+    /** menu tabs. */
+    @FXML
+    private TabPane menuTabs;
 
-    /** Article's getter. */
-    private Supplier<Optional<Article>> articleGetter;
-
-    /** Action open tab with html content. */
-    private TriConsumer<String, String, ContentType> openTabWithHtmlContent;
-
-    /** Action of close all tabs. */
-    private Runnable closeAll;
-
-    /** Action of save article. */
-    private Runnable onSaveArticle;
+    /** Tool Drawer event processor. */
+    private TopicProcessor<Message> messenger;
 
     /**
      * Call back up method.
@@ -230,12 +168,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     protected final void callFileLength() {
-        final Optional<Article> optional = articleGetter.get();
-        if (!optional.isPresent()) {
-            showMessagePopup("現在表示できません。");
-            return;
-        }
-        showMessageDialog("文字数計測", optional.get().makeCharCountResult());
+        messenger.onNext(ArticleMessage.makeLength());
     }
 
     /**
@@ -262,7 +195,7 @@ public class SideMenuController implements Initializable {
 
         new ConfigDialog(parent.get()).showConfigDialog();
         Config.reload();
-        reload.run();
+        messenger.onNext(TabMessage.makeReload());
     }
 
     /**
@@ -284,17 +217,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     public final void callConvertAobun() {
-        final Optional<Article> optional = articleGetter.get();
-        if (!optional.isPresent()) {
-            showMessagePopup("This tab's content can't convert Aozora bunko file.");
-            return;
-        }
-        final String absolutePath = optional.get().path.toAbsolutePath().toString();
-        AobunUtils.docToTxt(absolutePath);
-        showMessageDialog(
-                "Complete Converting",
-                Strings.join("変換が完了しました。", System.lineSeparator(), absolutePath)
-        );
+        messenger.onNext(ArticleMessage.makeConvertAobun());
     }
 
     /**
@@ -302,22 +225,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callWordCloud() {
-        final JFXMasonryPane2 pane = new JFXMasonryPane2();
-        final ScrollPane value = new ScrollPane(pane);
-        value.setFitToHeight(true);
-        value.setFitToWidth(true);
-
-        final Optional<Article> optional = articleGetter.get();
-        if (!optional.isPresent()) {
-            showMessagePopup("This tab's content can't generate word cloud.");
-            return;
-        }
-
-        wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
-                        .setMinFontSize(8.0).build();
-        final Article article = optional.get();
-        wordCloud.draw(pane, article.path.toString());
-        tabAction.open(article.title + "のワードクラウド", pane);
+        messenger.onNext(ArticleMessage.makeWordCloud());
     }
 
     /**
@@ -341,11 +249,13 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void license() {
-        openTabWithHtmlContent.accept(
+        messenger.onNext(
+            WebTabMessage.make(
                 "License",
                 FileUtil.readLines(PATH_LICENSE, "UTF-8").makeString(Strings.LINE_SEPARATOR),
                 ContentType.TEXT
-                );
+                )
+            );
     }
 
     /**
@@ -359,8 +269,9 @@ public class SideMenuController implements Initializable {
             LOGGER.warn(path.toAbsolutePath().toString() + " is not exists.");
             return;
         }
-        this.openTabWithHtmlContent
-            .accept(title, articleGenerator.decorate(title, path), ContentType.HTML);
+        messenger.onNext(
+                WebTabMessage.make(title, articleGenerator.decorate(title, path), ContentType.HTML)
+            );
     }
 
     /**
@@ -381,7 +292,7 @@ public class SideMenuController implements Initializable {
         if (scriptRunner == null) {
             scriptRunner = new jp.toastkid.script.Main();
         }
-        scriptOpener.open("Script Runner", scriptRunner.getRoot());
+        messenger.onNext(ContentTabMessage.make("Script Runner", scriptRunner.getRoot()));
     }
 
     /**
@@ -462,39 +373,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callSearch() {
-        search.run();
-    }
-
-    /**
-     * Call editor.
-     */
-    @FXML
-    private final void callEditor() {
-        edit.run();
-    }
-
-    /**
-     * Open new tab.
-     */
-    @FXML
-    private final void openSpeedDialTab() {
-        open.run();
-    }
-
-    /**
-     * Close current tab.
-     */
-    @FXML
-    private final void closeTab() {
-        close.run();
-    }
-
-    /**
-     * Close all tabs.
-     */
-    @FXML
-    private final void closeAllTabs() {
-        closeAll.run();
+        messenger.onNext(ArticleMessage.makeSearch());
     }
 
     /**
@@ -502,7 +381,39 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void slideShow() {
-        slide.run();
+        messenger.onNext(ArticleMessage.makeSlideShow());
+    }
+
+    /**
+     * Call editor.
+     */
+    @FXML
+    private final void callEditor() {
+        messenger.onNext(TabMessage.makeEdit());
+    }
+
+    /**
+     * Open new tab.
+     */
+    @FXML
+    private final void openSpeedDialTab() {
+        messenger.onNext(TabMessage.makeOpen());
+    }
+
+    /**
+     * Close current tab.
+     */
+    @FXML
+    private final void closeTab() {
+        messenger.onNext(TabMessage.makeClose());
+    }
+
+    /**
+     * Close all tabs.
+     */
+    @FXML
+    private final void closeAllTabs() {
+        messenger.onNext(TabMessage.makeCloseAll());
     }
 
     /**
@@ -510,7 +421,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void reload() {
-        reload.run();
+        messenger.onNext(TabMessage.makeReload());
     }
 
     /**
@@ -518,7 +429,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callHtmlSource() {
-        preview.run();
+        messenger.onNext(TabMessage.makePreview());
     }
 
     /**
@@ -537,8 +448,9 @@ public class SideMenuController implements Initializable {
                 );
 
         final String title = "LogViewer";
-        openTabWithHtmlContent.accept(
-                title, articleGenerator.decorate(title, log, ""), ContentType.HTML);
+        messenger.onNext(
+                WebTabMessage.make(title, articleGenerator.decorate(title, log, ""), ContentType.HTML)
+                );
     }
 
     /**
@@ -592,32 +504,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     public final void callConvertEpub() {
-        final RadioButton vertically   = new RadioButton("vertically");
-        final RadioButton horizontally = new RadioButton("horizontally");
-
-        new ToggleGroup() {{
-            getToggles().addAll(vertically, horizontally);
-            vertically.setSelected(true);
-        }};
-
-        getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
-                .setTitle("ePub").setMessage("Current Article convert to ePub.")
-                .addControl(vertically, horizontally)
-                .setOnPositive("OK", () -> {
-                    final ProgressDialog pd = new ProgressDialog.Builder()
-                            .setScene(parent.getScene())
-                            .setCommand(new Task<Integer>() {
-                                @Override
-                                protected Integer call() throws Exception {
-                                    articleGetter.get().ifPresent(article ->
-                                        new EpubGenerator().toEpub(article, vertically.isSelected()));
-                                    return 100;
-                                }
-                            })
-                            .build();
-                    pd.start(stage);
-                }).build().show()
-            );
+        messenger.onNext(ArticleMessage.makeConvertEpub());
     }
 
     /**
@@ -625,23 +512,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void quit() {
-        onQuit.run();
-    }
-
-    /**
-     * Copy article.
-     */
-    @FXML
-    private void callCopy() {
-        onCopy.run();
-    }
-
-    /**
-     * Make new article.
-     */
-    @FXML
-    private final void makeArticle() {
-        onMakeArticle.run();
+        messenger.onNext(ApplicationMessage.makeQuit());
     }
 
     /**
@@ -649,7 +520,23 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void saveArticle() {
-        onSaveArticle.run();
+        messenger.onNext(TabMessage.makeSave());
+    }
+
+    /**
+     * Make new article.
+     */
+    @FXML
+    private final void makeArticle() {
+        messenger.onNext(ArticleMessage.makeNew());
+    }
+
+    /**
+     * Copy article.
+     */
+    @FXML
+    private void callCopy() {
+        messenger.onNext(ArticleMessage.makeCopy());
     }
 
     /**
@@ -657,7 +544,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void callRename() {
-        onRename.run();
+        messenger.onNext(ArticleMessage.makeRename());
     }
 
     /**
@@ -665,7 +552,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void callDelete() {
-        onDelete.run();
+        messenger.onNext(ArticleMessage.makeDelete());
     }
 
     /**
@@ -673,7 +560,8 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openTools() {
-        switchRightDrawer.run();
+        getProcessor().onNext(new ToolsDrawerMessage());
+        //switchRightDrawer.run();
     }
 
     /**
@@ -727,10 +615,12 @@ public class SideMenuController implements Initializable {
         FileUtil.findExtension(result).ifPresent(ext -> {
             switch (ext) {
                 case ".txt":
-                    openTabWithHtmlContent.accept(
-                            result.toAbsolutePath().toString(),
-                            FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
-                            ContentType.TEXT
+                    messenger.onNext(
+                            WebTabMessage.make(
+                                    result.toAbsolutePath().toString(),
+                                    FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                                    ContentType.TEXT
+                                )
                             );
                     break;
                 case ".md":
@@ -738,86 +628,16 @@ public class SideMenuController implements Initializable {
                     if (content.length() == 0) {
                         return;
                     }
-                    openTabWithHtmlContent.accept(
-                            result.toAbsolutePath().toString(),
-                            content.toString(),
-                            ContentType.HTML
+                    messenger.onNext(
+                            WebTabMessage.make(
+                                    result.toAbsolutePath().toString(),
+                                    content.toString(),
+                                    ContentType.HTML
+                                )
                             );
                     break;
             }
         });
-    }
-
-    /**
-     * Set edit command.
-     * @param edit Command
-     */
-    protected void setOnEdit(final Runnable command) {
-        this.edit = command;
-    }
-
-    /**
-     * Set open tab command.
-     * @param open tab Command
-     */
-    protected void setOnNewTab(final Runnable command) {
-        this.open = command;
-    }
-
-    /**
-     * Set close tab command.
-     * @param close tab Command
-     */
-    protected void setOnCloseTab(final Runnable command) {
-        this.close = command;
-    }
-
-    /**
-     * Set action of close all tabs.
-     * @param object
-     */
-    protected void setOnCloseAllTabs(final Runnable command) {
-        this.closeAll = command;
-    }
-
-    /**
-     * Set search command.
-     * @param command
-     */
-    protected void setOnSearch(final Runnable command) {
-        this.search = command;
-    }
-
-    /**
-     * Set show slide show command.
-     * @param command
-     */
-    protected void setOnSlideShow(final Runnable command) {
-        this.slide = command;
-    }
-
-    /**
-     * Set WordCloud Action.
-     * @param tabAction
-     */
-    protected void setOnWordCloud(final OpenTabAction tabAction) {
-        this.tabAction = tabAction;
-    }
-
-    /**
-     * Set reloading command.
-     * @param reload
-     */
-    protected void setOnReload(final Runnable reload) {
-        this.reload = reload;
-    }
-
-    /**
-     * Set preview HTML source.
-     * @param preview
-     */
-    protected void setOnPreviewSource(final Runnable preview) {
-        this.preview = preview;
     }
 
     /**
@@ -877,54 +697,6 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Set on quit command.
-     * @param onQuit
-     */
-    protected void setOnQuit(final Runnable onQuit) {
-        this.onQuit = onQuit;
-    }
-
-    /**
-     * Set on make article action.
-     * @param c
-     */
-    public void setOnMakeArticle(final Runnable onMakeArticle) {
-        this.onMakeArticle = onMakeArticle;
-    }
-
-    /**
-     * Set on copy command.
-     * @param onCopy
-     */
-    protected void setOnCopy(final Runnable onCopy) {
-        this.onCopy = onCopy;
-    }
-
-    /**
-     * Set on rename command.
-     * @param onRename
-     */
-    protected void setOnRename(final Runnable onRename) {
-        this.onRename = onRename;
-    }
-
-    /**
-     * Set on delete command.
-     * @param onDelete
-     */
-    protected void setOnDelete(final Runnable onDelete) {
-        this.onDelete = onDelete;
-    }
-
-    /**
-     * Set on opening Script Runner's action.
-     * @param scriptOpener
-     */
-    protected void setOnOpenScriptRunner(final OpenTabAction scriptOpener) {
-        this.scriptOpener = scriptOpener;
-    }
-
-    /**
      * Show simple message dialog.
      * @param title title
      * @param message message
@@ -933,58 +705,14 @@ public class SideMenuController implements Initializable {
         getParent().ifPresent(parent -> AlertDialog.showMessage(parent, title, message));
     }
 
-    /**
-     * Show simple message popup.
-     * @param message message
-     */
-    private void showMessagePopup(final String message) {
-        onPopup.accept(message);
-    }
-
-    /**
-     * Set on OpenTools action.
-     * @param switchRightDrawer
-     */
-    public void setOnOpenTools(final Runnable switchRightDrawer) {
-        this.switchRightDrawer = switchRightDrawer;
-    }
-
-    /**
-     * Set on popup.
-     * @param onPopup
-     */
-    public void setOnPopup(final Consumer<String> onPopup) {
-        this.onPopup = onPopup;
-    }
-
-    /**
-     * Set current article getter.
-     * @param articleGetter
-     */
-    public void setCurrentArticleGetter(final Supplier<Optional<Article>> articleGetter) {
-        this.articleGetter = articleGetter;
-    }
-
-    /**
-     * Set openTabWithHtmlContent.
-     * @param openTabWithHtmlContent
-     */
-    public void setOpenTabWithHtmlContent(
-            final TriConsumer<String, String, ContentType> openTabWithHtmlContent) {
-        this.openTabWithHtmlContent = openTabWithHtmlContent;
-    }
-
-    /**
-     * Set on save article.
-     * @param command command
-     */
-    protected void setOnSaveArticle(final Runnable command) {
-        this.onSaveArticle = command;
-    }
-
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         articleGenerator = new ArticleGenerator();
+        this.messenger = TopicProcessor.create();
+    }
+
+    public TopicProcessor<Message> getProcessor() {
+        return messenger;
     }
 
 }
