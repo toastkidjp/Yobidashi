@@ -41,7 +41,7 @@ public class Loto6Controller implements Initializable {
     }
 
     /**
-     * 乱数を生成してセットする.
+     * 乱数を生成して result に表示する.
      */
     @FXML
     public void generate() {
