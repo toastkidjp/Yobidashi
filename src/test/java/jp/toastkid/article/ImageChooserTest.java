@@ -1,11 +1,11 @@
 package jp.toastkid.article;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import jp.toastkid.article.ImageChooser;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -17,7 +17,7 @@ import jp.toastkid.libs.utils.FileUtil;
 public class ImageChooserTest {
 
     /**
-     * check {@link ImageChooser#choose()}.
+     * Check {@link ImageChooser#choose()}.
      */
     @Test
     public void test() {
@@ -27,11 +27,11 @@ public class ImageChooserTest {
     }
 
     /**
-     * check irregular case.
+     * Check irregular case.
      */
-    @Test(expected=IndexOutOfBoundsException.class)
+    @Test
     public void failCase() {
-        new ImageChooser("").choose();
+        assertEquals("", new ImageChooser("").choose());
     }
 
 }
