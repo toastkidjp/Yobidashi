@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import jp.toastkid.yobidashi.Defines;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -21,6 +22,9 @@ import reactor.core.publisher.TopicProcessor;
  * @author Toast kid
  */
 public class Controller {
+
+    /** Speed dial's scene graph file. */
+    public static final String FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** Root pane. */
     @FXML

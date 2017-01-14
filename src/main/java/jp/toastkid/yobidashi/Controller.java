@@ -122,9 +122,6 @@ public final class Controller implements Initializable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
-    /** Speed dial's scene graph file. */
-    private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
-
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
 
@@ -716,7 +713,7 @@ public final class Controller implements Initializable {
      */
     private final jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
         final FXMLLoader loader = new FXMLLoader(
-                getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
+                getClass().getClassLoader().getResource(jp.toastkid.speed_dial.Controller.FXML));
         loader.load();
         return (jp.toastkid.speed_dial.Controller) loader.getController();
     }
