@@ -1,7 +1,6 @@
 package jp.toastkid.speed_dial;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,8 +9,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
+import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.SnackbarMessage;
+import jp.toastkid.yobidashi.message.WebSearchMessage;
 import reactor.core.publisher.TopicProcessor;
 
 /**
@@ -37,12 +38,6 @@ public class Controller {
     @FXML
     private ComboBox<String> type;
 
-    /** Search action. */
-    private BiConsumer<String, String> webSearchAction;
-
-    /** Empty action. */
-    private Runnable emptyAction;
-
     /** Message sender. */
     private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
@@ -66,14 +61,6 @@ public class Controller {
     }
 
     /**
-     * Set search action.
-     * @param searchAction
-     */
-    public void setOnWebSearch(final BiConsumer<String, String> searchAction) {
-        this.webSearchAction = searchAction;
-    }
-
-    /**
      * Set type's zero.
      */
     public void setZero() {
@@ -88,14 +75,14 @@ public class Controller {
         final String query = input.getText();
         final String t = type.getSelectionModel().getSelectedItem();
         if (StringUtils.isBlank(query) || StringUtils.isBlank(t)) {
-            emptyAction.run();
+            messenger.onNext(SnackbarMessage.make("You have to input any query."));
             return;
         }
         if ("Article".equals(t)) {
-            messenger().onNext(ArticleSearchMessage.make(query));
+            messenger.onNext(ArticleSearchMessage.make(query));
             return;
         }
-        webSearchAction.accept(query, t);
+        messenger.onNext(WebSearchMessage.make(query, t));
     }
 
     /**
@@ -115,14 +102,6 @@ public class Controller {
                 + "-fx-background-position: center center; "
                 + "-fx-background-size: cover;"
                 + "-fx-background-repeat: stretch;");
-    }
-
-    /**
-     * Set on empty action.
-     * @param emptyAction
-     */
-    public void setOnEmptyAction(final Runnable emptyAction) {
-        this.emptyAction = emptyAction;
     }
 
     /**

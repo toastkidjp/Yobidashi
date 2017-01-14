@@ -105,6 +105,7 @@ import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
@@ -698,10 +699,6 @@ public final class Controller implements Initializable {
             controller.setBackground(articleGenerator.getBackground());
             final Cancellation cancellation2 = controller.messenger().subscribe(this::processMessage);
             Runtime.getRuntime().addShutdownHook(new Thread(cancellation2::dispose));
-            controller.setOnWebSearch((query, type) ->
-                openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
-            );
-            controller.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
 
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
@@ -1589,6 +1586,13 @@ public final class Controller implements Initializable {
         if (message instanceof ArticleSearchMessage) {
             final ArticleSearchMessage asm = (ArticleSearchMessage) message;
             Platform.runLater(() -> searchArticle(true, asm.query(), asm.filter()));
+            return;
+        }
+
+        if (message instanceof WebSearchMessage) {
+            final WebSearchMessage wsm = (WebSearchMessage) message;
+            Platform.runLater(() ->
+                openWebTab("Loading...", WebServiceHelper.buildRequestUrl(wsm.query(), wsm.type())));
             return;
         }
 
