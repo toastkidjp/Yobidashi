@@ -95,4 +95,22 @@ public class ArticleMessageTest {
         assertEquals(Command.WORD_CLOUD, wordCloud.getCommand());
     }
 
+    /**
+     * Test for coverage.
+     */
+    @Test
+    public void test_valueOf() {
+        final Command valueOf = ArticleMessage.Command.valueOf("WORD_CLOUD");
+        assertEquals(Command.WORD_CLOUD, valueOf);
+    }
+
+    /**
+     * Test for coverage.
+     */
+    @Test
+    public void test_values() {
+        final Command[] values = ArticleMessage.Command.values();
+        assertEquals(9, values.length);
+    }
+
 }

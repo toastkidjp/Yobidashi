@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import jp.toastkid.yobidashi.message.SnackbarMessage.Command;
-
 /**
  * {@link SnackbarMessage}'s test case.
  *
@@ -20,9 +18,8 @@ public class SnackbarMessageTest {
     @Test
     public void test_make() {
         final String text = "text";
-        final SnackbarMessage message = SnackbarMessage.makeShow(text);
+        final SnackbarMessage message = SnackbarMessage.make(text);
         assertEquals(text, message.getText());
-        assertEquals(Command.SHOW, message.getCommand());
     }
 
 }

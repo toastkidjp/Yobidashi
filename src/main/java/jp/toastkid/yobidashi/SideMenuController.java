@@ -561,8 +561,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openTools() {
-        getProcessor().onNext(new ToolsDrawerMessage());
-        //switchRightDrawer.run();
+        getProcessor().onNext(ToolsDrawerMessage.make());
     }
 
     /**
