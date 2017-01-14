@@ -3,6 +3,7 @@ package jp.toastkid.bmi;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +27,15 @@ public class Controller implements Initializable {
 
     /** 身長(cm). */
     @FXML
-    public TextField height;
+    private TextField height;
 
     /** 体重(kg). */
     @FXML
-    public TextField weight;
+    private TextField weight;
 
     /** 結果を表示する. */
     @FXML
-    public TextArea result;
+    private TextArea result;
 
     @Override
     public final void initialize(
@@ -49,9 +50,13 @@ public class Controller implements Initializable {
      */
     @FXML
     private void calculate() {
+        if (this.height == null || this.weight == null) {
+            return;
+        }
+
         final String heightStr = this.height.getText();
         final String weightStr = this.weight.getText();
-        if (heightStr.isEmpty() || weightStr.isEmpty()) {
+        if (StringUtils.isAnyBlank(heightStr, weightStr)) {
             return;
         }
 
