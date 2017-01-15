@@ -15,6 +15,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.models.Articles;
+import jp.toastkid.libs.utils.MathUtil;
 
 /**
  * Base of Web tab.
@@ -115,6 +116,15 @@ public abstract class BaseWebTab extends ReloadableTab {
         return StringUtils.isEmpty(url) || Articles.isInternalLink(url)
                 ? "$('html,body').animate({ scrollTop: document.body.scrollHeight }, 'fast');"
                 : "window.scrollTo(0, document.body.scrollHeight);";
+    }
+
+    /**
+     * Return current yPosition.
+     * @return yPosition(yOffest)
+     */
+    protected int getYPosition() {
+        final Object script = getWebView().getEngine().executeScript("window.pageYOffset;");
+        return MathUtil.parseOrZero(Optional.ofNullable(script).orElse("0").toString());
     }
 
     /**
