@@ -87,6 +87,15 @@ public abstract class BaseWebTab extends ReloadableTab {
     }
 
     /**
+     * Scroll to specified y position.
+     * @param scrollTo
+     */
+    protected void scrollTo(final double scrollTo) {
+        getWebView().getEngine().executeScript(
+                String.format("window.scrollTo(0, %f);", scrollTo));
+    }
+
+    /**
      * find scroll script.
      * @param url
      * @return

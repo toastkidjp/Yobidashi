@@ -187,8 +187,12 @@ public class ArticleTab extends BaseWebTab {
 
         this.editor = new CodeArea();
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-        editor.setOnKeyTyped(event -> {
+        editor.setOnKeyPressed(event -> {
             if (getText().startsWith("* ")) {
+                return;
+            }
+
+            if (event.isControlDown() || event.getCode().isArrowKey()) {
                 return;
             }
             setText("* " + getText());
@@ -196,6 +200,9 @@ public class ArticleTab extends BaseWebTab {
         vsp = new VirtualizedScrollPane<>(editor);
         split = new SplitPane(webView, vsp);
         this.setContent(split);
+
+        vsp.estimatedScrollYProperty()
+            .addListener((value, prev, next) -> scrollTo(value.getValue().doubleValue() * 3.0d));
 
         split.setDividerPositions(0.5);
         switchEditorVisible();
@@ -216,7 +223,8 @@ public class ArticleTab extends BaseWebTab {
             split.setDividerPositions(0.5);
             vsp.setVisible(true);
             vsp.setManaged(true);
-            editor.setEstimatedScrollY(0.0);
+            editor.requestFocus();
+            editor.moveTo(0, 0);
             return;
         }
 
@@ -344,15 +352,15 @@ public class ArticleTab extends BaseWebTab {
         final Path openTarget = article.path;
         final String absPath = article.path.toAbsolutePath().toString();
         if (Files.exists(openTarget)){
-            switchEditorVisible();
             editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
+            switchEditorVisible();
             return "";
         }
 
         // ファイルが存在しない場合は、ひな形を元に新規作成する。
         Articles.generateNewArticle(article);
-        switchEditorVisible();
         editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
+        switchEditorVisible();
         return "";
     }
 
