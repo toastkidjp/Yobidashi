@@ -60,9 +60,11 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -323,6 +325,9 @@ public final class Controller implements Initializable {
                 availableProcessors + availableProcessors + availableProcessors);
 
         snackbar.registerSnackbarContainer(root);
+
+        initDragAndDrop();
+
         Mono.create(emitter -> emitter.success(
                 String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
                 )
@@ -384,33 +389,7 @@ public final class Controller implements Initializable {
                         });
 
                         // insert WebView to tabPane.
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            tabPane.getSelectionModel().selectedItemProperty().addListener(
-                                    (a, prevTab, nextTab) -> {
-                                        // (121224) タブ切り替え時の URL 表示の変更
-                                        final ReloadableTab tab = getCurrentTab();
-                                        if (tab == null) {
-                                            return;
-                                        }
-                                        final String tabUrl = tab.getUrl();
-                                        if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
-                                            urlText.setText(tabUrl);
-                                            focusOn();
-                                            return;
-                                        }
-
-                                        articleList.getSelectionModel().clearSelection();
-                                        historyList.getSelectionModel().clearSelection();
-                                        bookmarkList.getSelectionModel().clearSelection();
-                                    }
-                                );
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize right tabs. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
+                        es.execute(Controller.this::initTabPane);
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
@@ -484,6 +463,74 @@ public final class Controller implements Initializable {
             })
             .build();
         pd.start(stage);
+    }
+
+    /**
+     * Initialize Drag and Drop Events.
+     */
+    private void initDragAndDrop() {
+        root.setOnDragOver(event -> {
+            final Dragboard board = event.getDragboard();
+            if (!board.hasFiles()) {
+                return;
+            }
+            event.acceptTransferModes(TransferMode.COPY);
+        });
+        root.setOnDragDropped(event -> {
+            final Dragboard board = event.getDragboard();
+            if (!board.hasFiles()) {
+                event.setDropCompleted(false);
+                return;
+            }
+            board.getFiles().stream().forEach(f -> {
+                if (".md".equals(FileUtil.findExtension(f.toPath()).get())) {
+                    final WebTabMessage message = WebTabMessage.make(
+                            f.getAbsolutePath(),
+                            articleGenerator.decorate(f.getAbsolutePath(), f.toPath()),
+                            ContentType.HTML
+                        );
+                    processWebTabMessage(message);
+                    return;
+                }
+                openWebTabWithContent(
+                        f.getAbsolutePath(),
+                        FileUtil.readLines(f.toPath(), Defines.ARTICLE_ENCODE).makeString(System.lineSeparator()),
+                        ContentType.TEXT
+                    );
+            });
+            event.setDropCompleted(true);
+        });
+    }
+
+    /**
+     * Initialize tab pane.
+     */
+    private void initTabPane() {
+        final long start = System.currentTimeMillis();
+        tabPane.getSelectionModel().selectedItemProperty().addListener(
+                (a, prevTab, nextTab) -> {
+                    // (121224) タブ切り替え時の URL 表示の変更
+                    final ReloadableTab tab = getCurrentTab();
+                    if (tab == null) {
+                        return;
+                    }
+                    final String tabUrl = tab.getUrl();
+                    if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
+                        urlText.setText(tabUrl);
+                        focusOn();
+                        return;
+                    }
+
+                    articleList.getSelectionModel().clearSelection();
+                    historyList.getSelectionModel().clearSelection();
+                    bookmarkList.getSelectionModel().clearSelection();
+                }
+            );
+        final String message = Thread.currentThread().getName()
+                + " Ended initialize right tabs. "
+                + (System.currentTimeMillis() - start) + "ms";
+        //TODO modify with rx : setProgress(message);
+        LOGGER.info(message);
     }
 
     /**
