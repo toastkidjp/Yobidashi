@@ -72,10 +72,10 @@ public final class TinySegmenter {
         ctype.add("O");
         ctype.add("O");
         ctype.add("O");
-        final String[] o = input.split("");
-        for (int i = 0; i < o.length; i++) {
-            seg.add(o[i]);
-            ctype.add(this.cc.classify(o[i]));
+        for (int i = 0; i < input.length(); i++) {
+            final String c = Character.toString(input.charAt(i));
+            seg.add(c);
+            ctype.add(this.cc.classify(c));
         }
         seg.add("E1");
         seg.add("E2");
