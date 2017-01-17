@@ -1,6 +1,7 @@
 package jp.toastkid.libs.utils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Lists;
@@ -119,7 +121,13 @@ public final class AobunUtils {
         if (isMkdir) {
             outputPath = outputDir + Strings.getDirSeparator() + outputPath;
         }
-        FileUtil.outPutList(output, outputPath, Defines.ARTICLE_ENCODE);
+        try {
+            final byte[] outputBytes = output.stream().collect(Collectors.joining(Strings.LINE_SEPARATOR))
+                                                      .getBytes(StandardCharsets.UTF_8);
+            Files.write(Paths.get(outputPath), outputBytes);
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
     }
 
     /**
@@ -127,7 +135,7 @@ public final class AobunUtils {
      * @param filePath ファイルパス
      * @return 文書タイトル
      */
-    public static String getTitleFromPath(final String filePath) {
+    private static String getTitleFromPath(final String filePath) {
         return Articles.convertTitle(Paths.get(filePath).getFileName().toString()).replace("_", " ");
     }
 
@@ -137,7 +145,7 @@ public final class AobunUtils {
      * @param list      書籍の内容を入れた文字列 List
      * @return 変換した文字列の List
      */
-    public static List<String> convert(
+    private static List<String> convert(
             final String       bookTitle,
             final List<String> list
             ) {

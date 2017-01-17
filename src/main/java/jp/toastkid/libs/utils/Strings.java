@@ -44,30 +44,6 @@ public final class Strings {
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
-     * htmlStringConvert()メソッドで使用.
-     */
-    private static final String[] olds = {
-                " ",
-                "\"",
-                ",",
-                "<",
-                ">",
-                "     "
-             };
-
-    /**
-     * htmlStringConvert()メソッドで使用.
-     */
-    private static final String[] news = {
-                "&nbsp;",
-                "&#34;",
-                "&#44;",
-                "&#60;",
-                "&#62;",
-                "&nbsp;&nbsp;&nbsp;&nbsp; "
-             };
-
-    /**
      * ファイルパスのフォルダ区切り記号を取得し返す
      */
     public static String getDirSeparator(){
@@ -126,6 +102,7 @@ public final class Strings {
         final double value = bi.setScale(k,BigDecimal.ROUND_HALF_UP).doubleValue();
         return value;
     }
+
     /**
      * カーネル法により類似度を計算し、値を返す.<BR>
      * Lamdaは0.9を使う.
@@ -140,6 +117,7 @@ public final class Strings {
             ){
         return calcSimilarity(x,y,SAMPLE_LAMDA);
     }
+
     /**
      * カーネル法により類似度を計算し、値を返す
      * @param x : 比較する文字列
@@ -210,82 +188,7 @@ public final class Strings {
         final double similarity = xy / Math.sqrt( xx * yy );
         return similarity;
     }
-    /**
-     * カーネル法により類似度を計算し、値を返す
-     * @param x : 比較する文字列
-     * @param y : 比較する文字列
-     * @return similarity : 類似度
-     */
-    public static double calcSimilarity(
-            final ArrayList<String> x,
-            final String y
-            ){
-        return calcSimilarity(x,y,SAMPLE_LAMDA);
-    }
-    /**
-     * カーネル法により類似度を計算し、値を返す
-     * @param x : 比較する文字列
-     * @param y : 比較する文字列
-     * @param lamda
-     * @return similarity : 類似度
-     */
-    public static double calcSimilarity(
-            final ArrayList<String> x,
-                                        final String y,
-                                        final double lamda
-                                        ){
-        String tmp = "";
-        ArrayList<String> arrangeXY;
-        arrangeXY = new ArrayList<String>();
-        double xx = 0.0;
-        double yy = 0.0;
-        double xy = 0.0;
 
-        double tmpxx = 0;
-        double tmpyy = 0;
-
-        arrangeXY.addAll(x);
-
-        for(int i = 0; i < y.length() - 1; i++){
-            for(int j = i + 1; j < y.length(); j++){
-                tmp = "" + y.charAt(i) + y.charAt(j);
-                if(arrangeXY.contains(tmp) == false){
-                    arrangeXY.add(tmp);
-                }
-            }
-        }
-        //int i = 0; i < arrangexy.size(); i++
-        for(int i = 0; i < arrangeXY.size(); i++){
-            for(int x1 = 0 ;x1 < x.size() - 1; x1++){
-                if(("" + x.get(x1)).equals("" + arrangeXY.get(i).charAt(0))){
-                    for(int x2 = x1 + 1; x2 < x.size(); x2++){
-                        if((""+x.get(x2)).equals(""+arrangeXY.get(i).charAt(1))){
-                            tmpxx += Math.pow(lamda,(x2-x1+1));
-                        }
-                    }
-                }
-            }
-            for(int y1 = 0; y1 < y.length() - 1; y1++){
-                if( ("" + y.charAt(y1) ).equals("" + arrangeXY.get(i).charAt(0) ) ){
-                    for(int y2 = y1 + 1; y2 < y.length(); y2++){
-                        if( ("" + y.charAt(y2) ).equals( "" + arrangeXY.get(i).charAt(1) ) ){
-                            tmpyy += Math.pow(
-                                              lamda,
-                                              ( y2 - y1 + 1 )
-                                              );
-                        }
-                    }
-                }
-            }
-            xx = xx + tmpxx * tmpxx;
-            yy = yy + tmpyy * tmpyy;
-            xy = xy + tmpxx * tmpyy;
-            tmpxx = 0.0;
-            tmpyy = 0.0;
-        }//int i = 0; i < arrangexy.size(); i++
-        final double similarity = xy / Math.sqrt( xx * yy );
-        return similarity;
-    }
     /**
      * 文字列を２グラムに分解して返す
      * @param pStr
@@ -294,13 +197,10 @@ public final class Strings {
     public static ArrayList<String> getBiGrams(final String pStr){
         final ArrayList<String> resList = new ArrayList<String>();
         for(int i = 0; i < pStr.length() - 1; i++){
-            for(int j = i + 1; j < pStr.length(); j++){
-                resList.add( "" + pStr.charAt(i) + pStr.charAt(j));
-            }
+            resList.add("" + pStr.charAt(i) + pStr.charAt(i + 1));
         }
         return resList;
     }
-    //////////////////文字列操作///////////////////////
 
     /**
      * アルファベット全角半角統一(半角に統一)
@@ -320,6 +220,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
+
     /**
      * 数字全角半角統一(全角に統一)
      * @param x : 処理する文字列
@@ -336,6 +237,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
+
     /**
      * 半角全角カタカナひらがな統一(ひらがなに統一)
      * @param x : 処理する文字列
@@ -355,6 +257,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
+
     /**
      * 記号全角半角統一(半角に統一)
      * @param x : 処理する文字列
@@ -374,6 +277,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
+
     /**
      * 記号全角半角統一(全角に統一)
      * @param x : 処理する文字列
@@ -412,20 +316,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
-    /**
-     * クロスサイトスクリプティング防止処理
-     * @param pStr
-     * @return 変換した文字列
-     */
-    public static String encodeHTML(final String pStr){
-        String res = pStr;
-        res = res.replace(">","&gt;");
-        res = res.replace("<","&lt;");
-        res = res.replace("\"","&quot;");
-        res = res.replace("\'","&#039;");
-        res = res.replace(" ","&ensp;");
-        return res;
-    }
+
     /**
      * 渡された文字列を ' で括って返す.
      * Excelやデータベースで使用するファイルを作成する際に役立つ.
@@ -436,6 +327,7 @@ public final class Strings {
         final StringBuilder resBuf = new StringBuilder(str.length() + 2 );
         return resBuf.append("'").append(str).append("'").toString();
     }
+
     /**
      * 渡された文字列を " で括って返す.
      * Excelやデータベースで使用するファイルを作成する際に役立つ.
@@ -446,6 +338,7 @@ public final class Strings {
         final StringBuilder resBuf = new StringBuilder(str.length() + 2 );
         return resBuf.append("\"").append(str).append("\"").toString();
     }
+
     /**
      * 渡された文字列に付いた " をすべて削除する.
      * @param str "で括りたい文字列
@@ -455,60 +348,7 @@ public final class Strings {
     public static String removeQuote(final String str){
         return str.replaceAll("\"", "");
     }
-    /**
-     * 二つの文字列を連結し返却する
-     * @param a : 連結する文字列A
-     * @param b : 連結する文字列B
-     * @return 連結した文字列 a + b
-     */
-    public static String uniteTwoString(
-            final String a,
-            final String b
-        ){
-        return a + b;
-    }
-    /**
-     * 行末に<br />を追加、
-     * その他HTMLに特有な文字を変換する、HP 作成支援用のメソッド
-     * @see <a href = "http://to.totomo.net/559.htm">作者のWebサイト</a>
-     * @param str
-     * @return 行末に <br />を追加した文字列
-     */
-     public static String htmlStringConvert(String str) {
-         try{
-             for(int i=0 ; i < olds.length ; i++ )   {
-                 str = str.replaceAll( olds[i], news[i] );
-             }
-             str =  str + "<br>";
-             for(int i=0 ; i < olds.length ; i++ )  {
-                 str = str.replaceAll( olds[i], news[i] );
-             }
-         }catch(final Exception e){
-             e.printStackTrace();
-         }
-         return str;
-     }
-    /**
-     * 二つの文字列を parseDouble し、その除算結果を返す.<BR>
-     * Double.parseDouble(a) / Double.parseDouble(b);
-     * @param a
-     * @param b
-     * @return Double.parseDouble(a) / Double.parseDouble(b) の値(double値)
-     */
-    public static double parseDoubleDivide(
-            final String a,
-            final String b
-            ) {
-        return Double.parseDouble(a) / Double.parseDouble(b);
-    }
-    /**
-     * System.out.println("Debug_" + str); を実行する
-     * <HR>
-     * @param str
-     */
-    public static void printDebugString(final String str){
-        System.out.println("Debug_" + str);
-    }
+
     /**
      * 2つの文字列のレーベンシュタイン距離(置換許容)を計算する.
      * @see <a href="http://www.mwsoft.jp/programming/munou/javascript_levenshtein.html">
@@ -587,17 +427,18 @@ public final class Strings {
         }
         return joined.toString();
     }
+
     /**
      * 0から9までのintに0をつけて返す.例として、3を渡した時は03を返す.
      * @param number
      * @return 3を渡した時は03
      */
     public static String addZero(final int number) {
-        if (9 < number) {
-            Integer.toString(number);
-        }
-        return "0" + number;
+        return number < 0 || 9 < number
+                ? Integer.toString(number)
+                : "0" + number;
     }
+
     /**
      * MD5で生成したlongのhash値を返す.
      * @param str 文字列
@@ -623,6 +464,7 @@ public final class Strings {
         }
         return hash;
     }
+
     /**
      * MD5で生成したlongのhash値を返す.
      * @param str 文字列

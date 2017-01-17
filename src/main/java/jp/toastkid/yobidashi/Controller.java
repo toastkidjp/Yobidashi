@@ -1322,7 +1322,7 @@ public final class Controller implements Initializable {
                 boolean success = false;
                 try {
                     success = isCopy
-                            ? FileUtil.copyTransfer(path.toAbsolutePath().toString(), dest.toAbsolutePath().toString())
+                            ? Files.copy(path, dest) != null
                             : Files.move(path, dest) != null;
                 } catch (final IOException e) {
                     LOGGER.error("Error", e);;

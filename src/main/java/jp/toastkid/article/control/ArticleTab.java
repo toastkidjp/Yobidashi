@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -28,7 +29,7 @@ import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
-import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Config.Key;
 import jp.toastkid.yobidashi.Defines;
@@ -165,15 +166,6 @@ public class ArticleTab extends BaseWebTab {
      */
     private double convertToWebViewY(double value) {
         return value * SCALE_FACTOR;
-    }
-
-    /**
-     * Convert to Editor y position.
-     * @param value
-     * @return
-     */
-    private double convertToEditorY(double value) {
-        return value / SCALE_FACTOR;
     }
 
     /**
@@ -385,17 +377,21 @@ public class ArticleTab extends BaseWebTab {
     @Override
     public String edit() {
         final Path openTarget = article.path;
-        final String absPath = article.path.toAbsolutePath().toString();
-        if (Files.exists(openTarget)){
-            editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
-            switchEditorVisible();
-            return "";
+        if (!Files.exists(openTarget)){
+            // ファイルが存在しない場合は、ひな形を元に新規作成する。
+            Articles.generateNewArticle(article);
         }
 
-        // ファイルが存在しない場合は、ひな形を元に新規作成する。
-        Articles.generateNewArticle(article);
-        editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
-        switchEditorVisible();
+        try {
+            final String content = Files.readAllLines(openTarget)
+                                        .stream()
+                                        .collect(Collectors.joining(Strings.LINE_SEPARATOR));
+            editor.replaceText(content);
+            switchEditorVisible();
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+            return e.getMessage();
+        }
         return "";
     }
 

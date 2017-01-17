@@ -1,4 +1,4 @@
-package jp.toastkid.article;
+package jp.toastkid.article.converter;
 
 import static org.junit.Assert.assertEquals;
 

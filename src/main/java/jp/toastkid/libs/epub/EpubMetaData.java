@@ -1,12 +1,16 @@
 package jp.toastkid.libs.epub;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
 
 /**
  * Epub's meta data.
@@ -14,6 +18,9 @@ import jp.toastkid.yobidashi.Defines;
  *
  */
 public final class EpubMetaData {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpubMetaData.class);
 
     /** for use toString(). */
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -69,12 +76,20 @@ public final class EpubMetaData {
         }
         return super.toString();
     }
+
     /**
-     * ルールセットをファイルに出力する.
+     * Output rule-set to file.
      */
     public final void store() {
         final String outputName = ruleSetFileName;
         this.ruleSetFileName = null;
-        FileUtil.outPutStr(this.toString(), outputName, Defines.ARTICLE_ENCODE);
+        try {
+            Files.write(
+                    Paths.get(outputName),
+                    this.toString().getBytes(StandardCharsets.UTF_8)
+                    );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
     }
 }

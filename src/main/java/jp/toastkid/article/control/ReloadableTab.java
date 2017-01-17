@@ -54,13 +54,11 @@ public abstract class ReloadableTab extends Tab {
      * @param action
      */
     public void close(final Consumer<Tab> action) {
-        LOGGER.info("attempt to close");
         if (this.getText().startsWith("* ")) {
             // TODO snackbar 通知
             LOGGER.info("can't close");
             return;
         }
-        LOGGER.info("close");
         action.accept(this);
     }
 

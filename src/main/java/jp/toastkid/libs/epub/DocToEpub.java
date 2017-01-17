@@ -1,6 +1,7 @@
 package jp.toastkid.libs.epub;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,9 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.block.factory.Procedures;
 import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -23,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.toastkid.article.converter.MarkdownConverter;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Defines;
 
@@ -77,7 +81,12 @@ public final class DocToEpub {
      * @param fileNames names of json file
      */
     public static void run(final Iterable<String> args) {
-        args.forEach(json -> generate(FileUtil.getStrFromFile(json, Defines.ARTICLE_ENCODE)));
+        args.forEach(Procedures.throwing(json ->
+            Files.readAllLines(Paths.get(json))
+                 .stream()
+                 .collect(Collectors.joining(Strings.LINE_SEPARATOR))
+            )
+        );
         clean();
     }
 
@@ -231,14 +240,18 @@ public final class DocToEpub {
             cmeta.source = outputName;
             cmeta.title  = title;
             cmeta.dest   = "";
-            FileUtil.outPutStr(
-                    convertedSource.replace(
-                        FileUtil.FILE_PROTOCOL.concat(imageDir),
-                        "OEBPS/"
-                    ),
-                    outputName,
-                    Defines.ARTICLE_ENCODE
-            );
+            try {
+                Files.write(
+                        Paths.get(outputName),
+                        convertedSource.replace(
+                                FileUtil.FILE_PROTOCOL.concat(imageDir),
+                                "OEBPS/"
+                                ).getBytes(StandardCharsets.UTF_8
+                        )
+                );
+            } catch (final IOException e) {
+                LOGGER.error("ERROR!", e);
+            }
             targetPaths.add(cmeta);
             cleanTargets.add(outputName);
         });

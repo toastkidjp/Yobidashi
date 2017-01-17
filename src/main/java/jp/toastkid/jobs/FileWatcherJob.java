@@ -12,6 +12,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -31,6 +32,8 @@ public class FileWatcherJob implements Runnable {
     /** File watcher task list. */
     private final MutableMap<Path, Long> targets = Maps.mutable.empty();
 
+    private Cancellation cancellation;
+
     @Override
     public void run() {
         final Path backup = Paths.get("backup");
@@ -42,7 +45,7 @@ public class FileWatcherJob implements Runnable {
                 LOGGER.error("Error", e);
             }
         }
-        Flux.<Path>create(emitter -> {
+        cancellation = Flux.<Path>create(emitter -> {
             targets
                 .select(FileWatcherJob::isTarget)
                 .forEachKeyValue((file, ms) -> emitter.next(file));
@@ -63,6 +66,13 @@ public class FileWatcherJob implements Runnable {
                 LOGGER.error("Error", e);
             }
         });
+    }
+
+    /**
+     * For testing.
+     */
+    public void stop() {
+        cancellation.dispose();
     }
 
     /**

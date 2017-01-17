@@ -2,8 +2,16 @@ package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +19,14 @@ import java.util.Optional;
 import org.junit.Test;
 
 /**
- * FileUtil's test.
+ * {@link FileUtil}'s test.
  * @author Toast kid
  *
  */
 public class FileUtilTest {
 
     /**
-     * test uriToPath().
+     * Test uriToPath().
      */
     @Test
     public void testUriToPath() {
@@ -32,7 +40,7 @@ public class FileUtilTest {
     }
 
     /**
-     * test findExtension().
+     * Test findExtension().
      */
     @Test
     public void testFindExtension() {
@@ -48,7 +56,7 @@ public class FileUtilTest {
     }
 
     /**
-     * test {@link FileUtil#readDirLines(String)}.
+     * Test {@link FileUtil#readDirLines(String)}.
      */
     @Test
     public void testReadDirLines() {
@@ -86,7 +94,7 @@ public class FileUtilTest {
     }
 
     /**
-     * test {@link FileUtil#readLines(String, String)}.
+     * Test {@link FileUtil#readLines(String, String)}.
      */
     @Test
     public void testReadLines() {
@@ -94,4 +102,67 @@ public class FileUtilTest {
         assertNotNull(readLines);
         assertTrue(readLines.isEmpty());
     }
+
+    /**
+     * Test {@link FileUtil#makeFileReader(String, String)}.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void test_makeFileReader() throws URISyntaxException {
+        final String path = Paths.get(
+                getClass().getClassLoader().getResource("utils/file/a.txt").toURI()).toString();
+        final BufferedReader reader = FileUtil.makeFileReader(path, "UTF-8");
+        assertNotNull(reader);
+        assertTrue(reader instanceof BufferedReader);
+    }
+
+    /**
+     * Test {@link FileUtil#makeFileReader(String, String)}'s failure case.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void test_makeFileReader_failure_case() {
+        assertNull(FileUtil.makeFileReader("utils/file/notFound.txt", "UTF-8"));
+    }
+
+    /**
+     * Test {@link FileUtil#makeFileWriter(String, String)}.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void test_makeFileWriter() throws URISyntaxException {
+        final String path = Paths.get(
+                getClass().getClassLoader().getResource("utils/file/a.txt").toURI()).toString();
+        final PrintWriter writer = FileUtil.makeFileWriter(path, "UTF-8");
+        assertNotNull(writer);
+        assertTrue(writer instanceof PrintWriter);
+    }
+
+    /**
+     * Test {@link FileUtil#makeFileWriter(String, String)}'s failure case.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void test_makeFileWriter_failure_case() {
+        assertNull(FileUtil.makeFileWriter("utils/file/notFound.txt", "UTF-8"));
+    }
+
+    /**
+     * Smoke test of {@link FileUtil#capture(String, Rectangle)}.
+     * @throws IOException
+     */
+    @Test
+    public void test_capture() throws IOException {
+        FileUtil.capture(Files.createTempFile("temp", ".png").toAbsolutePath().toString(), new Rectangle(1, 1));
+    }
+
+    /**
+     * Failure case of {@link FileUtil#capture(String, Rectangle)}.
+     * @throws IOException
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void test_capture_failure_case() throws IOException {
+        FileUtil.capture(Files.createTempFile("temp", ".png").toAbsolutePath().toString(), new Rectangle());
+    }
+
 }
