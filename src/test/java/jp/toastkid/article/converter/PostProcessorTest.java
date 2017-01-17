@@ -1,7 +1,7 @@
 /**
  * .
  */
-package jp.toastkid.article;
+package jp.toastkid.article.converter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,8 +35,8 @@ public class PostProcessorTest {
     public void testProcess() {
         assertEquals(
                 "<h2><a id=\"tomato\" href=\"#tomato\">■</a>"
-                + "<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
-                + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></h2>",
+                + "<a class='redLink' href=\"file:///internal/md/746F6D61746F.md\">tomato</a>"
+                + " <a class='redLink' href=\"file:///internal/md/746F6D61746F.md\">tomato</a></h2>",
                 processor.process("<h2>[[tomato]] [[md:tomato]]</h2>")
                 );
     }
@@ -50,9 +50,9 @@ public class PostProcessorTest {
     public void testGenerateSubheading() {
         processor.process("<h2>[[tomato]] [[md:tomato]]</h2>");
 
-        final String extected = "<ul class=\"nav\"><li><a href=\"#tomato\">"
-                + "<a class=\"redLink\" href=\"/txt/746F6D61746F.txt\">tomato</a>"
-                + " <a class=\"redLink\" href=\"/md/746F6D61746F.md\">tomato</a></a><br/>"
+        final String extected = "<ul><li><a href=\"#tomato\">"
+                + "<a class='redLink' href=\"file:///internal/md/746F6D61746F.md\">tomato</a>"
+                + " <a class='redLink' href=\"file:///internal/md/746F6D61746F.md\">tomato</a></a></li>"
                 + System.lineSeparator() + "</ul>";
 
         assertEquals(extected, processor.generateSubheadings());

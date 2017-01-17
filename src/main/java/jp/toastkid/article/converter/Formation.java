@@ -1,6 +1,6 @@
 package jp.toastkid.article.converter;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jp.toastkid.libs.utils.FileUtil;
@@ -11,25 +11,18 @@ import jp.toastkid.libs.utils.FileUtil;
  * @author Toast kid
  *
  */
-public final class Formation {
+public enum Formation {
+
+    DV_4_4_2, TV_4_5_1, DV_4_5_1, TV_3_6_1;
+
+    /** File's encoding. */
+    private static final String ENCODE = "utf-8";
 
     /** リソースフォルダ */
     private static final String RESOURCES_DIR = "assets/football/";
 
     /** サッカーのプレイ人数 */
     private static final int ELEVEN   = 11;
-
-    /** 4-4-2 の 守備的 MF 2人 */
-    public  static final int DV_4_4_2 = 0;
-
-    /** 4-2-3-1 */
-    public  static final int TV_4_5_1 = 1;
-
-    /** 4-2-3-1 */
-    public  static final int DV_4_5_1 = 2;
-
-    /** 3-5-1-1 */
-    private static final int TV_3_6_1 = 3;
 
     /**
      * ピッチの HTML を構築して返す.
@@ -39,7 +32,7 @@ public final class Formation {
      */
     public static final String getPitch(
             final List<Footballer> team,
-            final int formation
+            final Formation formation
             ) {
         final StringBuilder output = new StringBuilder();
         output.append("<table><tr></tr><tr><td>");
@@ -107,38 +100,19 @@ public final class Formation {
      * @param formation このクラスのフォーメーション定数
      * @return ポジション一覧
      */
-    private static final List<String> getPositionList(final int formation) {
-        final List<String> positionList = new ArrayList<String>(ELEVEN);
-        if (DV_4_4_2 == formation) {
-            positionList.addAll(
-                    FileUtil.readLinesFromStream(
-                            RESOURCES_DIR + "DV_4_4_2.txt",
-                            "utf-8"
-                    )
-                );
-        } else if (DV_4_5_1 == formation) {
-            positionList.addAll(
-                    FileUtil.readLinesFromStream(
-                            RESOURCES_DIR + "DV_4_5_1.txt",
-                            "utf-8"
-                    )
-                );
-        } else if (TV_4_5_1 == formation) {
-            positionList.addAll(
-                    FileUtil.readLinesFromStream(
-                            RESOURCES_DIR + "TV_4_5_1.txt",
-                            "utf-8"
-                    )
-                );
-        } else if (TV_3_6_1 == formation) {
-            positionList.addAll(
-                    FileUtil.readLinesFromStream(
-                            RESOURCES_DIR + "TV_3_6_1.txt",
-                            "utf-8"
-                    )
-                );
+    private static final List<String> getPositionList(final Formation formation) {
+        switch (formation) {
+            case DV_4_4_2:
+                return FileUtil.readLinesFromStream(RESOURCES_DIR + "DV_4_4_2.txt", ENCODE);
+            case DV_4_5_1:
+                return FileUtil.readLinesFromStream(RESOURCES_DIR + "DV_4_5_1.txt", ENCODE);
+            case TV_4_5_1:
+                return FileUtil.readLinesFromStream(RESOURCES_DIR + "TV_4_5_1.txt", ENCODE);
+            case TV_3_6_1:
+                return FileUtil.readLinesFromStream(RESOURCES_DIR + "TV_3_6_1.txt", ENCODE);
+            default:
+                return Collections.emptyList();
         }
-        return positionList;
     }
 
     /**
@@ -146,7 +120,7 @@ public final class Formation {
      * @param str 文字列
      * @return フォーメーション定数
      */
-    public static final int parseFormation(final String str) {
+    public static final Formation parseFormation(final String str) {
         final String target = str.toLowerCase().replace("{formation:", "");
         if (target.startsWith("4-5-1tv")
                 || target.startsWith("4-3-2-1")) {

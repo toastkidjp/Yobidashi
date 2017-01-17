@@ -60,9 +60,11 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -98,11 +100,14 @@ import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.JFXMasonryPane2;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
+import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
@@ -118,9 +123,6 @@ public final class Controller implements Initializable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-
-    /** Speed dial's scene graph file. */
-    private static final String SPEED_DIAL_FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
@@ -314,10 +316,6 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
-    private Cancellation cancellation;
-
-    private Cancellation toolsCancellation;
-
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -327,6 +325,9 @@ public final class Controller implements Initializable {
                 availableProcessors + availableProcessors + availableProcessors);
 
         snackbar.registerSnackbarContainer(root);
+
+        initDragAndDrop();
+
         Mono.create(emitter -> emitter.success(
                 String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
                 )
@@ -388,33 +389,7 @@ public final class Controller implements Initializable {
                         });
 
                         // insert WebView to tabPane.
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            tabPane.getSelectionModel().selectedItemProperty().addListener(
-                                    (a, prevTab, nextTab) -> {
-                                        // (121224) タブ切り替え時の URL 表示の変更
-                                        final ReloadableTab tab = getCurrentTab();
-                                        if (tab == null) {
-                                            return;
-                                        }
-                                        final String tabUrl = tab.getUrl();
-                                        if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
-                                            urlText.setText(tabUrl);
-                                            focusOn();
-                                            return;
-                                        }
-
-                                        articleList.getSelectionModel().clearSelection();
-                                        historyList.getSelectionModel().clearSelection();
-                                        bookmarkList.getSelectionModel().clearSelection();
-                                    }
-                                );
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize right tabs. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
+                        es.execute(Controller.this::initTabPane);
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
@@ -488,6 +463,74 @@ public final class Controller implements Initializable {
             })
             .build();
         pd.start(stage);
+    }
+
+    /**
+     * Initialize Drag and Drop Events.
+     */
+    private void initDragAndDrop() {
+        root.setOnDragOver(event -> {
+            final Dragboard board = event.getDragboard();
+            if (!board.hasFiles()) {
+                return;
+            }
+            event.acceptTransferModes(TransferMode.COPY);
+        });
+        root.setOnDragDropped(event -> {
+            final Dragboard board = event.getDragboard();
+            if (!board.hasFiles()) {
+                event.setDropCompleted(false);
+                return;
+            }
+            board.getFiles().stream().forEach(f -> {
+                if (".md".equals(FileUtil.findExtension(f.toPath()).get())) {
+                    final WebTabMessage message = WebTabMessage.make(
+                            f.getAbsolutePath(),
+                            articleGenerator.decorate(f.getAbsolutePath(), f.toPath()),
+                            ContentType.HTML
+                        );
+                    processWebTabMessage(message);
+                    return;
+                }
+                openWebTabWithContent(
+                        f.getAbsolutePath(),
+                        FileUtil.readLines(f.toPath(), Defines.ARTICLE_ENCODE).makeString(System.lineSeparator()),
+                        ContentType.TEXT
+                    );
+            });
+            event.setDropCompleted(true);
+        });
+    }
+
+    /**
+     * Initialize tab pane.
+     */
+    private void initTabPane() {
+        final long start = System.currentTimeMillis();
+        tabPane.getSelectionModel().selectedItemProperty().addListener(
+                (a, prevTab, nextTab) -> {
+                    // (121224) タブ切り替え時の URL 表示の変更
+                    final ReloadableTab tab = getCurrentTab();
+                    if (tab == null) {
+                        return;
+                    }
+                    final String tabUrl = tab.getUrl();
+                    if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
+                        urlText.setText(tabUrl);
+                        focusOn();
+                        return;
+                    }
+
+                    articleList.getSelectionModel().clearSelection();
+                    historyList.getSelectionModel().clearSelection();
+                    bookmarkList.getSelectionModel().clearSelection();
+                }
+            );
+        final String message = Thread.currentThread().getName()
+                + " Ended initialize right tabs. "
+                + (System.currentTimeMillis() - start) + "ms";
+        //TODO modify with rx : setProgress(message);
+        LOGGER.info(message);
     }
 
     /**
@@ -698,11 +741,8 @@ public final class Controller implements Initializable {
             controller.setTitle(Config.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
-            controller.setOnArticleSearch(this::doSearch);
-            controller.setOnWebSearch((query, type) ->
-                openWebTab("Loading...", WebServiceHelper.buildRequestUrl(query, type))
-            );
-            controller.setOnEmptyAction(() -> showSnackbar("You have to input any query."));
+            final Cancellation cancellation2 = controller.messenger().subscribe(this::processMessage);
+            Runtime.getRuntime().addShutdownHook(new Thread(cancellation2::dispose));
 
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
@@ -720,7 +760,7 @@ public final class Controller implements Initializable {
      */
     private final jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
         final FXMLLoader loader = new FXMLLoader(
-                getClass().getClassLoader().getResource(SPEED_DIAL_FXML));
+                getClass().getClassLoader().getResource(jp.toastkid.speed_dial.Controller.FXML));
         loader.load();
         return (jp.toastkid.speed_dial.Controller) loader.getController();
     }
@@ -875,7 +915,7 @@ public final class Controller implements Initializable {
                     makeContextMenuItemContainerWithAction(
                             cmc, "Go to bottom of this page", event -> moveToBottom()),
                     makeContextMenuItemContainerWithAction(
-                            cmc, "Search all article", event -> searchArticle("", "")),
+                            cmc, "Search article", event -> showSearchDialog("", "")),
                     makeContextMenuItemContainerWithAction(
                             cmc,
                             isRightDrawerClosing() ? "Open tools" : "Close tools",
@@ -932,7 +972,8 @@ public final class Controller implements Initializable {
      * Show left panel.
      */
     private void showLeftPane() {
-        SplitterTransitionFactory.makeHorizontalSlide(splitter, DEFAULT_DIVIDER_POSITION, DEFAULT_DIVIDER_POSITION).play();
+        SplitterTransitionFactory
+            .makeHorizontalSlide(splitter, DEFAULT_DIVIDER_POSITION, DEFAULT_DIVIDER_POSITION).play();
         splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
     }
 
@@ -982,18 +1023,14 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Alias for using method reference.
-     */
-    private void searchArticle() {
-        searchArticle("", "");
-    }
-
-    /**
-     * 再帰的に呼び出すためメソッドに切り出し.
+     * Show search order dialog.
+     * 再帰的に呼び出すためメソッドに切り出し.-
      * @param q クエリ
-     * @param f 記事名フィルタ文字列
+-    * @param f 記事名フィルタ文字列
      */
-    protected void searchArticle(final String q, final String f) {
+    private void showSearchDialog(final String q, final String f) {
+        queryInput.setText(q);
+        filterInput.setText(f);
         final CheckBox isAnd       = new JFXCheckBox("AND Search"){{setSelected(true);}};
         new AlertDialog.Builder(getParent())
             .setTitle("All article search").setMessage("この操作の実行には時間がかかります。")
@@ -1009,7 +1046,7 @@ public final class Controller implements Initializable {
                     ((AutoCompleteTextField) filterInput).getEntries().add(filter);
                 }
 
-                doSearch(isAnd.isSelected(), query, filter);
+                searchArticle(isAnd.isSelected(), query, filter);
             }).build().show();
     }
 
@@ -1019,14 +1056,14 @@ public final class Controller implements Initializable {
      * @param query
      * @param filter
      */
-    private void doSearch(final boolean isAnd, final String query, final String filter) {
+    private void searchArticle(final boolean isAnd, final String query, final String filter) {
         final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
                 .setHomeDirPath(Config.get("articleDir"))
                 .setAnd(isAnd)
                 .setSelectName(filter)
                 .setEmptyAction(() -> {
                     showSnackbar(String.format("Not found article with '%s'.", query));
-                    searchArticle(queryInput.getText(), filterInput.getText());
+                    showSearchDialog(queryInput.getText(), filterInput.getText());
                 })
                 .setSuccessAction(this::setStatus)
                 .setTabPane(leftTabs)
@@ -1285,7 +1322,7 @@ public final class Controller implements Initializable {
                 boolean success = false;
                 try {
                     success = isCopy
-                            ? FileUtil.copyTransfer(path.toAbsolutePath().toString(), dest.toAbsolutePath().toString())
+                            ? Files.copy(path, dest) != null
                             : Files.move(path, dest) != null;
                 } catch (final IOException e) {
                     LOGGER.error("Error", e);;
@@ -1545,7 +1582,8 @@ public final class Controller implements Initializable {
      */
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
-        cancellation = sideMenuController.getProcessor().subscribe(this::processMessage);
+        final Cancellation cancellation
+            = sideMenuController.getProcessor().subscribe(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
     }
 
@@ -1588,6 +1626,24 @@ public final class Controller implements Initializable {
             processApplicationMessage((ApplicationMessage) message);
             return;
         }
+
+        if (message instanceof ArticleSearchMessage) {
+            final ArticleSearchMessage asm = (ArticleSearchMessage) message;
+            Platform.runLater(() -> searchArticle(true, asm.query(), asm.filter()));
+            return;
+        }
+
+        if (message instanceof WebSearchMessage) {
+            final WebSearchMessage wsm = (WebSearchMessage) message;
+            Platform.runLater(() ->
+                openWebTab("Loading...", WebServiceHelper.buildRequestUrl(wsm.query(), wsm.type())));
+            return;
+        }
+
+        if (message instanceof ShowSearchDialog) {
+            Platform.runLater(() -> showSearchDialog("", ""));
+            return;
+        }
     }
 
     /**
@@ -1614,7 +1670,7 @@ public final class Controller implements Initializable {
     private void processApplicationMessage(ApplicationMessage message) {
         switch (message.getCommand()) {
             case QUIT:
-                this.stage.close();
+                Platform.runLater(stage::close);
                 System.exit(0);
                 return;
         }
@@ -1627,25 +1683,25 @@ public final class Controller implements Initializable {
     private void processTabMessage(final TabMessage message) {
         switch (message.getCommand()) {
             case EDIT:
-                edit();
+                Platform.runLater(this::edit);
                 return;
             case CLOSE:
-                closeCurrentTab();
+                Platform.runLater(this::closeCurrentTab);
                 return;
             case CLOSE_ALL:
-                closeAllTabs();
+                Platform.runLater(this::closeAllTabs);
                 return;
             case PREVIEW:
-                showHtmlSource();
+                Platform.runLater(this::showHtmlSource);
                 return;
             case SAVE:
-                saveCurrentTab();
+                Platform.runLater(this::saveCurrentTab);
                 return;
             case RELOAD:
-                reload();
+                Platform.runLater(this::reload);
                 return;
             case OPEN:
-                openSpeedDialTab();
+                Platform.runLater(this::openSpeedDialTab);
                 return;
             default:
                 return;
@@ -1659,9 +1715,6 @@ public final class Controller implements Initializable {
     private void processArticleMessage(final ArticleMessage message) {
         final Optional<Article> optional = getCurrentArticleOfNullable();
         switch (message.getCommand()) {
-            case SEARCH:
-                Platform.runLater(this::searchArticle);
-                return;
             case SLIDE_SHOW:
                 Platform.runLater(this::slideShow);
                 return;
@@ -1728,8 +1781,9 @@ public final class Controller implements Initializable {
      */
     protected void setupToolMenu() {
         toolsController.init(this.stage);
-        toolsCancellation = toolsController.getMessenger().subscribe(this::processMessage);
-        Runtime.getRuntime().addShutdownHook(new Thread(toolsCancellation::dispose));
+        final Cancellation cancellation
+            = toolsController.getMessenger().subscribe(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
         toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {

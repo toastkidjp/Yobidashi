@@ -1,16 +1,20 @@
 package jp.toastkid.speed_dial;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.reactfx.util.TriConsumer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.message.ArticleSearchMessage;
+import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.SnackbarMessage;
+import jp.toastkid.yobidashi.message.WebSearchMessage;
+import reactor.core.publisher.TopicProcessor;
 
 /**
  * Speed Dial's controller.
@@ -18,6 +22,9 @@ import javafx.scene.layout.Pane;
  * @author Toast kid
  */
 public class Controller {
+
+    /** Speed dial's scene graph file. */
+    public static final String FXML = Defines.SCENE_DIR + "/SpeedDial.fxml";
 
     /** Root pane. */
     @FXML
@@ -35,14 +42,8 @@ public class Controller {
     @FXML
     private ComboBox<String> type;
 
-    /** Search action. */
-    private BiConsumer<String, String> webSearchAction;
-
-    /** Empty action. */
-    private Runnable emptyAction;
-
-    /** Action of search article. */
-    private TriConsumer<Boolean, String, String> articleSearchAction;
+    /** Message sender. */
+    private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
     /**
      * Return root pane.
@@ -64,14 +65,6 @@ public class Controller {
     }
 
     /**
-     * Set search action.
-     * @param searchAction
-     */
-    public void setOnWebSearch(final BiConsumer<String, String> searchAction) {
-        this.webSearchAction = searchAction;
-    }
-
-    /**
      * Set type's zero.
      */
     public void setZero() {
@@ -86,14 +79,14 @@ public class Controller {
         final String query = input.getText();
         final String t = type.getSelectionModel().getSelectedItem();
         if (StringUtils.isBlank(query) || StringUtils.isBlank(t)) {
-            emptyAction.run();
+            messenger.onNext(SnackbarMessage.make("You have to input any query."));
             return;
         }
         if ("Article".equals(t)) {
-            articleSearchAction.accept(true, query, "");
+            messenger.onNext(ArticleSearchMessage.make(query));
             return;
         }
-        webSearchAction.accept(query, t);
+        messenger.onNext(WebSearchMessage.make(query, t));
     }
 
     /**
@@ -116,19 +109,11 @@ public class Controller {
     }
 
     /**
-     * Set on empty action.
-     * @param emptyAction
+     * Getter of message sender.
+     * @return messenger.
      */
-    public void setOnEmptyAction(final Runnable emptyAction) {
-        this.emptyAction = emptyAction;
-    }
-
-    /**
-     * Set on article search action.
-     * @param command
-     */
-    public void setOnArticleSearch(TriConsumer<Boolean, String, String> command) {
-        this.articleSearchAction = command;
+    public TopicProcessor<Message> messenger() {
+        return messenger;
     }
 
 }

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 
-import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.yobidashi.Config;
 
 /**
@@ -13,9 +12,6 @@ import jp.toastkid.yobidashi.Config;
  *
  */
 public final class ArticleSearcherTest {
-
-    /** 中身を検索させるので false. */
-    private static final boolean IS_TITLE_ONLY = false;
 
     /** AND 検索させるので true. */
     private static final boolean IS_AND        = true;

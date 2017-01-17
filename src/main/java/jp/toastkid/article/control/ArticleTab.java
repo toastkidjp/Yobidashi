@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -28,8 +29,7 @@ import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
-import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.libs.utils.MathUtil;
+import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.Config;
 import jp.toastkid.yobidashi.Config.Key;
 import jp.toastkid.yobidashi.Defines;
@@ -41,11 +41,14 @@ import jp.toastkid.yobidashi.Defines;
  */
 public class ArticleTab extends BaseWebTab {
 
-    /** Article HTML generator. */
-    private static final ArticleGenerator GENERATOR = new ArticleGenerator();
-
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
+
+    /** WebView - Editor y pos. */
+    private static final double SCALE_FACTOR = 3.0d;
+
+    /** Article HTML generator. */
+    private static final ArticleGenerator GENERATOR = new ArticleGenerator();
 
     /** Article. */
     private final Article article;
@@ -65,7 +68,7 @@ public class ArticleTab extends BaseWebTab {
     /** HTML content. */
     private String content;
 
-    /** Content's yOffset. */
+    /** WebView's y position. */
     private int yOffset;
 
     /**
@@ -137,6 +140,45 @@ public class ArticleTab extends BaseWebTab {
         this.onLoad = b.onLoad;
 
         final WebView webView = getWebView();
+        initWebView(webView,b.onOpenNewArticle, b.onOpenUrl);
+
+        this.editor = new CodeArea();
+        initEditor();
+        vsp = new VirtualizedScrollPane<>(editor);
+        vsp.estimatedScrollYProperty()
+            .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
+        split = new SplitPane(webView, vsp);
+        split.setDividerPositions(0.5);
+
+        this.setContent(split);
+        switchEditorVisible();
+
+        Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
+
+        // 新規タブで開く場合
+        this.loadUrl(article.toInternalUrl());
+    }
+
+    /**
+     * Convert to WebView y position.
+     * @param value
+     * @return
+     */
+    private double convertToWebViewY(double value) {
+        return value * SCALE_FACTOR;
+    }
+
+    /**
+     * Initialize WebView.
+     * @param webView
+     * @param onOpenNewArticle
+     * @param onOpenUrl
+     */
+    private void initWebView(
+            final WebView webView,
+            final Consumer<Article> onOpenNewArticle,
+            final BiConsumer<String, String> onOpenUrl
+            ) {
         final WebEngine engine = webView.getEngine();
         //engine.setCreatePopupHandler(handler);
         final Worker<Void> loadWorker = engine.getLoadWorker();
@@ -153,7 +195,7 @@ public class ArticleTab extends BaseWebTab {
                         if (State.SCHEDULED.equals(observable.getValue())) {
                             System.out.println("loader stop ");
                             //loadWorker.cancel();
-                            b.onOpenUrl.accept(LOADING, url);
+                            onOpenUrl.accept(LOADING, url);
                             //reload();
                             return;
                         }
@@ -163,7 +205,7 @@ public class ArticleTab extends BaseWebTab {
                     if (State.SCHEDULED.equals(observable.getValue())) {
                         loadWorker.cancel();
                         System.out.println(getText() + " open new tab " + url);
-                        openNewTab(url, b.onOpenNewArticle, b.onOpenUrl);
+                        openNewTab(url, onOpenNewArticle, onOpenUrl);
                         return;
                     }
 
@@ -176,35 +218,29 @@ public class ArticleTab extends BaseWebTab {
                         this.setText(StringUtils.isNotBlank(title) ? title : article.title);
                         onLoad.run();
                         hideSpinner();
-
-                        final int j = this.yOffset;
-                        if (j == 0) {
-                            return;
+                        if (yOffset != 0) {
+                            scrollTo(yOffset);
                         }
-                        engine.executeScript(String.format("window.scrollTo(0, %d);", j));
                     }
                 });
+        engine.setOnAlert(e -> LOGGER.info(e.getData()));
+    }
 
-        this.editor = new CodeArea();
+    /**
+     * Initialize editor.
+     */
+    private void initEditor() {
         editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-        editor.setOnKeyTyped(event -> {
+        editor.setOnKeyPressed(event -> {
             if (getText().startsWith("* ")) {
+                return;
+            }
+
+            if (event.isControlDown() || event.getCode().isArrowKey()) {
                 return;
             }
             setText("* " + getText());
         });
-        vsp = new VirtualizedScrollPane<>(editor);
-        split = new SplitPane(webView, vsp);
-        this.setContent(split);
-
-        split.setDividerPositions(0.5);
-        switchEditorVisible();
-
-        Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
-
-        // 新規タブで開く場合
-        engine.setOnAlert(e -> LOGGER.info(e.getData()));
-        this.loadUrl(article.toInternalUrl());
     }
 
     /**
@@ -216,14 +252,17 @@ public class ArticleTab extends BaseWebTab {
             split.setDividerPositions(0.5);
             vsp.setVisible(true);
             vsp.setManaged(true);
-            editor.setEstimatedScrollY(0.0);
+            editor.requestFocus();
+            editor.moveTo(0, 0);
             return;
         }
 
+        yOffset = getYPosition();
         SplitterTransitionFactory.makeHorizontalSlide(split, 1.0d, 1.0d).play();
         vsp.setVisible(false);
         vsp.setManaged(false);
         split.setDividerPositions(1.0);
+        reload();
     }
 
     /**
@@ -276,11 +315,7 @@ public class ArticleTab extends BaseWebTab {
      * @param isReload
      */
     public void loadUrl(final String url, final boolean isReload) {
-        final WebEngine engine = getWebView().getEngine();
-        if (isReload) {
-            final Object script = engine.executeScript("window.pageYOffset;");
-            yOffset = script != null ? MathUtil.parseOrZero(script.toString()) : 0;
-        }
+        yOffset = isReload ? getYPosition() : 0;
         loadArticle();
     }
 
@@ -342,17 +377,21 @@ public class ArticleTab extends BaseWebTab {
     @Override
     public String edit() {
         final Path openTarget = article.path;
-        final String absPath = article.path.toAbsolutePath().toString();
-        if (Files.exists(openTarget)){
-            switchEditorVisible();
-            editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
-            return "";
+        if (!Files.exists(openTarget)){
+            // ファイルが存在しない場合は、ひな形を元に新規作成する。
+            Articles.generateNewArticle(article);
         }
 
-        // ファイルが存在しない場合は、ひな形を元に新規作成する。
-        Articles.generateNewArticle(article);
-        switchEditorVisible();
-        editor.replaceText(FileUtil.getStrFromFile(absPath, Defines.ARTICLE_ENCODE));
+        try {
+            final String content = Files.readAllLines(openTarget)
+                                        .stream()
+                                        .collect(Collectors.joining(Strings.LINE_SEPARATOR));
+            editor.replaceText(content);
+            switchEditorVisible();
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+            return e.getMessage();
+        }
         return "";
     }
 

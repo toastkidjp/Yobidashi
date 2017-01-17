@@ -3,16 +3,16 @@ package jp.toastkid.loto6;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.MathUtil;
 
 /**
- * Lot6 number generator.
+ * Loto 6 number generator.
  * @author Toast kid
  *
  */
@@ -41,7 +41,7 @@ public class Loto6Controller implements Initializable {
     }
 
     /**
-     * 乱数を生成してセットする.
+     * 乱数を生成して result に表示する.
      */
     @FXML
     public void generate() {
@@ -51,6 +51,7 @@ public class Loto6Controller implements Initializable {
                 inputWord.getText(),
                 false
                 );
-        result.setText(CollectionUtil.implode(randomIntegerSet, " / ") );
+        result.setText(
+                randomIntegerSet.stream().map(i -> i.toString()).collect(Collectors.joining(" / ")));
     }
 }

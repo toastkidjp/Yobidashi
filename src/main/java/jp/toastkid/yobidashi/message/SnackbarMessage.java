@@ -1,23 +1,11 @@
 package jp.toastkid.yobidashi.message;
 
 /**
- * Snackbar event.
+ * Snackbar event message.
  * @author Toast kid
  *
  */
 public class SnackbarMessage implements Message {
-
-    /**
-     * Command.
-     * @author Toast kid
-     *
-     */
-    public enum Command {
-        SHOW
-    }
-
-    /** This instance's command. */
-    private final Command command;
 
     /** This instance's text. */
     private final String text;
@@ -27,26 +15,17 @@ public class SnackbarMessage implements Message {
      * @param c
      * @param text
      */
-    private SnackbarMessage(final Command c, final String text) {
-        this.command = c;
+    private SnackbarMessage(final String text) {
         this.text = text;
     }
 
     /**
-     * Make SHOW event.
+     * Make message.
      * @param text
      * @return
      */
-    public static SnackbarMessage makeShow(final String text) {
-        return new SnackbarMessage(Command.SHOW, text);
-    }
-
-    /**
-     * Return Command.
-     * @return
-     */
-    public Command getCommand() {
-        return command;
+    public static SnackbarMessage make(final String text) {
+        return new SnackbarMessage(text);
     }
 
     /**

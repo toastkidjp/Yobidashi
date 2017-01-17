@@ -140,7 +140,7 @@ public final class FxWordCloud {
         final RichIterable<Pair<String, Integer>> iter = map.keyValuesView()
             .toSortedMap((t1, t2) ->
                 Integer.compare(t1.getTwo(), t2.getTwo()), key -> key, value -> value)
-            .chunk(numOfWords).iterator().next();
+            ;//.drop(numOfWords);
         final int max = iter.collectInt(Pair::getTwo).max();
         // System.out.println(max + " " + iter.toList().toString());
         canvas.getChildren().addAll(

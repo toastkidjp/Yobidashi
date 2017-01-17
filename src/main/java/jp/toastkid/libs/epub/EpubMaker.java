@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,7 +29,6 @@ import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.yobidashi.Defines;
 
 /**
  * ePub を生成する.
@@ -87,8 +87,9 @@ public final class EpubMaker {
         final List<String> cleanTargets = new ArrayList<>(DEFAULT_REMOVE_TARGETS);
         final List<Pair<String, String>> pairs = new ArrayList<>(REQUIRED_METAFILE_PAIRS.toList());
         pairs.addAll(prepareContents());
-        // titlePage
-        FileUtil.outPutStr(
+        try {
+            Files.write(
+                Paths.get("title_page.xhtml"),
                 Articles.bindArgs(
                         Resource.TITLE_PAGE,
                         new HashMap<String, String>(){
@@ -101,10 +102,11 @@ public final class EpubMaker {
                             put("author", meta.author);
                             put("version", meta.version);
                         }}
-                ),
-                "title_page.xhtml",
-                Defines.ARTICLE_ENCODE
+                ).getBytes(StandardCharsets.UTF_8)
             );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
         archive(pairs);
         clean(cleanTargets);
     }
@@ -149,14 +151,17 @@ public final class EpubMaker {
                 .append(LINE_SEPARATOR);
             }
         }
-        FileUtil.outPutStr(
-            Articles.bindArgs(
-                Resource.NAVDOC,
-                Maps.mutable.with("title", meta.title, "content", sb.toString())
-            ),
-            "navdoc.html",
-            Defines.ARTICLE_ENCODE
-        );
+        try {
+            Files.write(
+                    Paths.get("navdoc.html"),
+                    Articles.bindArgs(
+                            Resource.NAVDOC,
+                            Maps.mutable.with("title", meta.title, "content", sb.toString())
+                        ).getBytes(StandardCharsets.UTF_8)
+                    );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
     }
 
     /**
@@ -183,17 +188,20 @@ public final class EpubMaker {
                 order++;
             }
         }
-        FileUtil.outPutStr(
-            Articles.bindArgs(
-                Resource.TOC_NCX,
-                Maps.mutable.of(
-                        "title",   meta.title,
-                        "content", sb.toString()
-                        )
-            ),
-            "toc.ncx",
-            Defines.ARTICLE_ENCODE
-        );
+        try {
+            Files.write(
+                    Paths.get("toc.ncx"),
+                    Articles.bindArgs(
+                            Resource.TOC_NCX,
+                            Maps.mutable.of(
+                                    "title",   meta.title,
+                                    "content", sb.toString()
+                                    )
+                        ).getBytes(StandardCharsets.UTF_8)
+                    );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
     }
 
     /**
@@ -231,26 +239,29 @@ public final class EpubMaker {
                 .append(LINE_SEPARATOR);
             contentCount++;
         }
-        FileUtil.outPutStr(
-            Articles.bindArgs(
-                    Resource.CONTENT_OPF,
-                    new HashMap<String, String>(){
-                        /** default. */
-                        private static final long serialVersionUID = 1L;
-                    {
-                        put("date",      CalendarUtil.getCurrentISODate());
-                        put("title",     meta.title);
-                        put("author",    meta.author);
-                        put("editor",    meta.editor);
-                        put("publisher", meta.publisher);
-                        put("content",   content.toString());
-                        put("idref",     idref.toString());
-                        put("ppd",       meta.direction.toString().toLowerCase());
-                    }}
-            ),
-            "content.opf",
-            Defines.ARTICLE_ENCODE
-        );
+        try {
+            Files.write(
+                Paths.get("content.opf"),
+                Articles.bindArgs(
+                        Resource.CONTENT_OPF,
+                        new HashMap<String, String>(){
+                            /** default. */
+                            private static final long serialVersionUID = 1L;
+                        {
+                            put("date",      CalendarUtil.getCurrentISODate());
+                            put("title",     meta.title);
+                            put("author",    meta.author);
+                            put("editor",    meta.editor);
+                            put("publisher", meta.publisher);
+                            put("content",   content.toString());
+                            put("idref",     idref.toString());
+                            put("ppd",       meta.direction.toString().toLowerCase());
+                        }}
+                ).getBytes(StandardCharsets.UTF_8)
+            );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR", e);
+        }
     }
 
     /**

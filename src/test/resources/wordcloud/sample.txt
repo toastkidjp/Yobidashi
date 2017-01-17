@@ -1,0 +1,29 @@
+背景
+
+Material design はアプリだけでなく Web サイトでも使われていて、最近では大分見慣れてきた感があります。せっかくなのでデスクトップアプリでも Material design を取り入れてみたいところです。
+今回は JFoenix という OSS を導入してみます。
+Material design とは
+
+Google が発表した新しいUIデザインのガイドラインで、Android OS 5.0 以降の標準 UI として採用されています。
+JFoenix とは
+
+JavaFX アプリケーションの見た目を Material design に変更できる UI ライブラリです。
+
+    公式サイト
+    GitHub Repository
+
+特徴
+
+マイグレーションコストが低いです。
+基本的な JavaFX の Control を継承して作られているので、FXML ファイルを書き換えれば導入することができます。
+ライセンス
+
+元々 LGPL だったのが、最近 Apache version 2 に変更されました。企業でも使いやすくなっています。
+Control クラス
+
+標準の Control クラスに 「JFX」 の prefix がついた形で命名されています。
+(ex) Button → JFXButton
+
+テキストエディタで置換する場合は defaultButton 等のプロパティを書き換えないよう注意してください。
+
+現在用意されている Control (GitHub Repository)

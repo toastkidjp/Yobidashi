@@ -3,7 +3,6 @@ package jp.toastkid.yobidashi;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +11,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -52,6 +52,7 @@ import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
@@ -373,7 +374,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callSearch() {
-        messenger.onNext(ArticleMessage.makeSearch());
+        messenger.onNext(ShowSearchDialog.make());
     }
 
     /**
@@ -442,15 +443,24 @@ public class SideMenuController implements Initializable {
             LOGGER.warn(path.toAbsolutePath().toString() + " is not exists.");
             return;
         }
-        final String log = String.format(
-                "<pre>%s</pre>",
-                FileUtil.getStrFromFile(PATH_APP_LOG, StandardCharsets.UTF_8.name())
-                );
 
-        final String title = "LogViewer";
-        messenger.onNext(
-                WebTabMessage.make(title, articleGenerator.decorate(title, log, ""), ContentType.HTML)
-                );
+        try {
+            final String content = Files.readAllLines(path)
+                                        .stream()
+                                        .collect(Collectors.joining(Strings.LINE_SEPARATOR))
+                                        .replace("$", "\\$");
+            final String log = String.format("<pre>%s</pre>", content);
+            final String title = "LogViewer";
+            messenger.onNext(
+                    WebTabMessage.make(
+                            title,
+                            articleGenerator.decorate(title, log, ""),
+                            ContentType.HTML
+                            )
+                    );
+        } catch (final IOException e) {
+            LOGGER.error("ERROR!", e);
+        }
     }
 
     /**
@@ -560,8 +570,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openTools() {
-        getProcessor().onNext(new ToolsDrawerMessage());
-        //switchRightDrawer.run();
+        getProcessor().onNext(ToolsDrawerMessage.make());
     }
 
     /**

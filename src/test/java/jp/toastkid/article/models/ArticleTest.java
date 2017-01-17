@@ -3,6 +3,7 @@ package jp.toastkid.article.models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -118,6 +119,38 @@ public class ArticleTest {
         final Article clone = a.clone();
         assertNotSame(a, clone);
         assertEquals(a, clone);
+    }
+
+    /**
+     * Check {@link Article#isValid()}.
+     */
+    @Test
+    public void test_isValid() {
+        assertTrue(a.isValid());
+    }
+
+    /**
+     * Check {@link Article#toString()}.
+     */
+    @Test
+    public void test_toString() {
+        assertNotNull(a.toString());
+    }
+
+    /**
+     * Check {@link Article#hashCode()}.
+     */
+    @Test
+    public void test_hashCode() {
+        assertEquals(1660617097L, a.hashCode());
+    }
+
+    /**
+     * Check {@link Article#makeCharCountResult()}.
+     */
+    @Test
+    public void test_makeCharCountResult() {
+        assertTrue(a.makeCharCountResult().startsWith("日記2013-08-31(土) は 427 字です。"));
     }
 
 }

@@ -11,12 +11,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.libs.utils.CalendarUtil;
-import jp.toastkid.libs.utils.CollectionUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -47,9 +48,6 @@ public final class MarkdownConverter {
 
     /** 既定の日付フォーマットから秒以下を除いたもの. */
     public  static final String WITHOUT_SECONDS      = "yyyy-MM-dd (E) HH:mm";
-
-    /** output encoding. */
-    private static String outputEncode = "UTF-8";
 
     /** 折り畳みのデフォルト表示文字列 */
     private static final String MESSAGE_DEFAULT_EXPAND = "ここをクリックすると開きます.";
@@ -208,35 +206,6 @@ public final class MarkdownConverter {
     }
 
     /**
-     * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.
-     * <HR>
-     * @param filePath   コンバートしたいファイルのパス
-     * @param fileEncode コンバートしたいファイルのエンコード
-     */
-    public void convertedToHtml(final String filePath, final String fileEncode) {
-        convertedToHtml(filePath, fileEncode, "");
-    }
-
-    /**
-     * .txt ファイルを YukiWiki のルールに従って HTML ファイルへ変換し、出力する.
-     * <HR>
-     * (111229) ヘッダ・フッタ処理をこちらに移動
-     * @param filePath   コンバートしたいファイルのパス
-     * @param fileEncode コンバートしたいファイルのエンコード
-     * @param outputDir     コンバート後のファイルを出力するフォルダ
-     */
-    public void convertedToHtml(
-            final String filePath,
-            final String fileEncode,
-            final String outputDir
-            ) {
-        final String outputTo = StringUtils.isEmpty(outputDir)
-                ? filePath.replaceFirst("\\.txt", ".html")
-                :  outputDir + Strings.getDirSeparator() + path.getFileName().toString().replaceFirst("\\.txt", ".html");
-        FileUtil.outPutStr(convert(filePath, fileEncode), outputTo, outputEncode);
-    }
-
-    /**
      * .txt ファイルを読み込み、Wiki 変換した文字列を返す.
      * @param filePath 変換するソースのテキストファイルパス
      * @param fileEncode 変換するソースのテキストファイル文字コード
@@ -244,7 +213,7 @@ public final class MarkdownConverter {
      * @return txtFilePath の中身を Wiki 変換した文字列
      */
     public String convert(final String filePath, final String fileEncode) {
-        return CollectionUtil.implode(convertToLines(filePath, fileEncode), Strings.LINE_SEPARATOR);
+        return convertToLines(filePath, fileEncode).makeString(Strings.LINE_SEPARATOR);
     }
 
     /**
@@ -253,9 +222,9 @@ public final class MarkdownConverter {
      * @param fileEncode テキストファイルの文字コード
      * @return Wiki 変換された行を入れた List
      */
-    public List<String> convertToLines(final String filePath, final String fileEncode) {
+    public MutableList<String> convertToLines(final String filePath, final String fileEncode) {
         this.latestImagePaths = Sets.mutable.empty();
-        List<String> strs = FileUtil.readLines(filePath, fileEncode);
+        MutableList<String> strs = FileUtil.readLines(filePath, fileEncode);
 
         // ソースディレクトリパスの取り出し
         final StringBuilder dirBuf = new StringBuilder(filePath.length());
@@ -295,11 +264,11 @@ public final class MarkdownConverter {
      * @param sources .txt ファイルを読み込んだ List
      * @param isCount 文字数計測に含めるか否か
      */
-    public List<String> wikiConvert(
-            final List<String> sources,
+    public MutableList<String> wikiConvert(
+            final MutableList<String> sources,
             final boolean isCount
             ) {
-        final List<String> contents = new ArrayList<>(sources.size());
+        final MutableList<String> contents = Lists.mutable.empty();
         boolean isInBlockQuote = false;
         boolean isInQuote      = false;
         boolean isInPre        = false;
@@ -313,7 +282,7 @@ public final class MarkdownConverter {
 
         YolpMapBuilder map = null;
 
-        int formation = -1;
+        Formation formation = null;
         List<Footballer> team = new ArrayList<>(11);
         int uLTagDepth  = 0;
         int oLTagDepth  = 0;
@@ -713,7 +682,7 @@ public final class MarkdownConverter {
             // (130917) 実装中
             if (!isInPre && !isInFormation && str.startsWith("{formation")) {
                 isInFormation = true;
-                formation   = Formation.parseFormation(str);
+                formation     = Formation.parseFormation(str);
             }
             if (!isInPre && isInFormation) {
                 if (str.indexOf("|") != -1) {
@@ -722,7 +691,7 @@ public final class MarkdownConverter {
                 if ("{formation}".equals(str)) {
                     contents.add(Formation.getPitch(team, formation));
                     isInFormation = false;
-                    formation   = -1;
+                    formation   = null;
                     team = new ArrayList<>(11);
                 }
                 str = "";

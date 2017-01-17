@@ -100,6 +100,10 @@ public class WebTab extends BaseWebTab {
                     setText(StringUtils.isNotEmpty(newTitle) ? newTitle : b.title);
                     hideSpinner();
                     break;
+                case READY:
+                case RUNNING:
+                default:
+                    break;
             }
         });
 

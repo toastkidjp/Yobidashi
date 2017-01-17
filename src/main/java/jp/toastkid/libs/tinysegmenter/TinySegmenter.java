@@ -33,7 +33,7 @@ public final class TinySegmenter {
     /** 数値を結果に含めるか否か */
     public boolean isAllowNum       = true;
     /** このクラス唯一のインスタンス. */
-    private static TinySegmenter ts = new TinySegmenter();;
+    private static TinySegmenter ts = new TinySegmenter();
 
     /**
      * init singleton instance.
@@ -147,8 +147,10 @@ public final class TinySegmenter {
             score += this.score(this.sMap.TQ4, p3 + c2 + c3 + c4);
             String p = "O";
             if (0 < score ) {
-                if (this.isAllowWord(word.toString().trim())){
+                if (isAllowWord(word.toString().trim())){
                     result.add(word.toString());
+                } else {
+                    System.out.println("Drop: " + word);
                 }
                 word.delete(0, word.length());
                 p = "B";
@@ -193,15 +195,15 @@ public final class TinySegmenter {
         if (1 < word.length() ){
             firstChar = word.substring(0,1);
         }
-        if (!this.isAllowChar
-                && ( this.stopChars.matcher(firstChar).matches()) || word.length() == 1 ){
+        if (!isAllowChar
+                && (stopChars.matcher(firstChar).matches() || word.length() == 1 )) {
             return false;
         }
         if (!this.isAllowNum
                 && StringUtils.isNumeric(word)) {
             return false;
         }
-        return StringUtils.isNotEmpty(word.toString());
+        return StringUtils.isNotEmpty(word);
     }
     /**
      * @param args

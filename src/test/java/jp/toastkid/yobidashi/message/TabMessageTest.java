@@ -77,4 +77,22 @@ public class TabMessageTest {
         assertEquals(Command.SAVE, save.getCommand());
     }
 
+    /**
+     * Test for coverage.
+     */
+    @Test
+    public void test_valueOf() {
+        final Command valueOf = TabMessage.Command.valueOf("SAVE");
+        assertEquals(Command.SAVE, valueOf);
+    }
+
+    /**
+     * Test for coverage.
+     */
+    @Test
+    public void test_values() {
+        final Command[] values = TabMessage.Command.values();
+        assertEquals(7, values.length);
+    }
+
 }

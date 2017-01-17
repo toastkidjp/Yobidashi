@@ -8,7 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ScrollPane;
 
 /**
- * コントローラ.
+ * Controller.
  * @author Toast kid
  */
 public final class Controller implements Initializable {

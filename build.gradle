@@ -58,6 +58,7 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile group: 'org.testfx', name: 'testfx-junit', version: '4.0.5-alpha'
 }
 
 compileJava {

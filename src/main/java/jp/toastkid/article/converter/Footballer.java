@@ -8,18 +8,24 @@ import jp.toastkid.libs.utils.MathUtil;
  *
  */
 public final class Footballer {
+
     /** Football position. */
     public static enum Position {
         GK, DF, MF, FW
     };
+
     /** family name. */
     public String familyName;
+
     /** full name. */
     public String fullName;
+
     /** position. */
     public Position position;
+
     /** uniform number. */
     public int number;
+
     /**
      * @param str
      */
@@ -35,6 +41,7 @@ public final class Footballer {
         }
         return fb;
     }
+
     /**
      * ポジション表記に合った定数を返す。
      * @param pos ポジション表記(DF,GK 等)

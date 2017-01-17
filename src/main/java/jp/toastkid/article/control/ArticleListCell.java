@@ -44,4 +44,12 @@ public class ArticleListCell extends JFXListCell<Article> {
         ((Label) cellContent).setText(text);
     }
 
+    /**
+     * For use testing.
+     * @return cell text
+     */
+    public String cellText() {
+        return ((Label) cellContent).getText();
+    }
+
 }

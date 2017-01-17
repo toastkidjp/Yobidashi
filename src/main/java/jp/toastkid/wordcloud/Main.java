@@ -42,14 +42,14 @@ public final class Main extends Application {
      * @param parent
      */
     public Main() {
-        loadDialog(null);
+        load(null);
     }
 
     /**
-     * FXML からロードする.
+     * Load controller and scene from FXML.
      * @return Parent オブジェクト
      */
-    private final void loadDialog(final Window window) {
+    private final void load(final Window window) {
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             if (scene == null) {
@@ -70,6 +70,9 @@ public final class Main extends Application {
         Platform.runLater(()-> controller.parent.requestLayout());
     }
 
+    /**
+     * Show this app.
+     */
     public void show() {
         stage.showAndWait();
     }

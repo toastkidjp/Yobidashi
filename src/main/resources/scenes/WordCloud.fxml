@@ -2,7 +2,7 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
-<?import jp.toastkid.gui.jfx.wordcloud.JFXMasonryPane2 ?>
+<?import jp.toastkid.wordcloud.JFXMasonryPane2 ?>
 
 <VBox
     fx:controller="jp.toastkid.wordcloud.Controller"

@@ -9,8 +9,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
-import org.junit.Ignore;
+import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.junit.Test;
 
 /**
@@ -35,6 +35,39 @@ public final class StringsTest {
 
     /** sample of snake_case string. */
     private static final String SNAKE = "tomato_curry";
+
+    /**
+     * Check {@link Strings#calcScaledSimilarity(String, String, double)}.
+     */
+    @Test
+    public void test_calcScaledSimilarity_3_args() {
+        assertEquals(
+                0.58,
+                Strings.calcScaledSimilarity("ロイ・キーン", "ロビー・キーン", Strings.SAMPLE_LAMDA),
+                0.00001d
+                );
+    }
+
+    /**
+     * Check {@link Strings#calcScaledSimilarity(String, String, double, int)}.
+     */
+    @Test
+    public void test_calcScaledSimilarity_4_args() {
+        assertEquals(
+                0.6,
+                Strings.calcScaledSimilarity("ロイ・キーン", "ロビー・キーン", Strings.SAMPLE_LAMDA, 1),
+                0.00001d
+                );
+    }
+
+    /**
+     * {@link Strings#getBiGrams(String)}.
+     */
+    @Test
+    public void test_getBiGrams() {
+        final ArrayList<String> biGrams = Strings.getBiGrams("隣の客はよく柿食う客だ");
+        assertEquals("[隣の, の客, 客は, はよ, よく, く柿, 柿食, 食う, う客, 客だ]", biGrams.toString());
+    }
 
     /**
      * {@link jp.toastkid.libs.utils.Strings#getDirSeparator()} 's test method.
@@ -65,83 +98,27 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double)} 's test method.
-     */
-    @Ignore
-    public final void testCalcScaledSimilarityStringStringDouble() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#calcScaledSimilarity(java.lang.String, java.lang.String, double, int)} 's test method.
-     */
-    @Ignore
-    public final void testCalcScaledSimilarityStringStringDoubleInt() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testCalcSimilarityStringString() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.lang.String, java.lang.String, double)} 's test method.
-     */
-    @Ignore
-    public final void testCalcSimilarityStringStringDouble() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testCalcSimilarityArrayListOfStringString() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#calcSimilarity(java.util.ArrayList, java.lang.String, double)} 's test method.
-     */
-    @Ignore
-    public final void testCalcSimilarityArrayListOfStringStringDouble() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getBiGrams(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testGetBiGrams() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#alphaNonDist(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testAlphaNonDist() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#numNonDist(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testNumNonDist() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
      * {@link jp.toastkid.libs.utils.Strings#katahiraNonDist(java.lang.String)} 's test method.
      */
     @Test
     public final void testKatahiraNonDist() {
         assertEquals("あｶさ他", Strings.katahiraNonDist("アｶさ他"));
+    }
+
+    /**
+     * Check {@link Strings#alphaNonDist(String)}.
+     */
+    @Test
+    public void test_alphaNonDist() {
+        assertEquals("ABCDEF", Strings.alphaNonDist("ＡＢＣＤＥＦ"));
+    }
+
+    /**
+     * Check {@link Strings#numNonDist(String)}.
+     */
+    @Test
+    public void test_numNonDist() {
+        assertEquals("１２３４５６", Strings.numNonDist("123456"));
     }
 
     /**
@@ -153,131 +130,11 @@ public final class StringsTest {
     }
 
     /**
-     * {@link jp.toastkid.libs.utils.Strings#kataZenHanNonDist(java.lang.String)} 's test method.
+     * Check of {@link Strings#kigouFullSizeNonDist(String)}.
      */
-    @Ignore
-    public final void testKataZenHanNonDist() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#encodeHTML(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testEncodeHTML() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#doubleQuote(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testQuoteString() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#removeQuote(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testRemoveQuote() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#uniteTwoString(java.lang.String, java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testUniteTwoString() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#htmlStringConvert(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testHtmlStringConvert() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#parseDoubleDivide(java.lang.String, java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testParseDoubleDivide() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.article.ArticleGenerator#titleToFileName(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testToBytedString_EUC_JP() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.article.ArticleGenerator#decodeBytedStr(java.lang.String, java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testDecodeBytedStr() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#printDebugString(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testPrintDebugString() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowTime()} 's test method.
-     */
-    @Ignore
-    public final void testGetNowTime() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowOclock()} 's test method.
-     */
-    @Ignore
-    public final void testGetNowOclock() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getNowTime_YMDHMSSE()} 's test method.
-     */
-    @Ignore
-    public final void testGetNowTime_YMDHMSSE() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#toYmdhmsse(java.util.Date)} 's test method.
-     */
-    @Ignore
-    public final void testGetNowTime_YMDHMSSEDate() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#toUniTypeDate(java.util.Date)} 's test method.
-     */
-    @Ignore
-    public final void testGetNowTime_YMDHMSSE_typeUni() {
-        fail("まだ実装されていません"); // TODO
-    }
-
-    /**
-     * {@link jp.toastkid.libs.utils.Strings#getRSSURLsMap(java.lang.String)} 's test method.
-     */
-    @Ignore
-    public final void testGetRSSURLsMap() {
-        fail("まだ実装されていません"); // TODO
+    @Test
+    public final void test_kigouFullSizeNonDist() {
+        assertEquals("＄＄＆＆", Strings.kigouFullSizeNonDist("$＄＆&"));
     }
 
     /**
@@ -288,6 +145,7 @@ public final class StringsTest {
         assertEquals(1, Strings.levenshteinDistance("last", "least"));
         assertEquals(3, Strings.levenshteinDistance("kitten", "sitting"));
     }
+
     /**
      * {@link jp.toastkid.libs.utils.Strings#getFolderStrList(java.lang.String, int)} 's test method.
      */
@@ -302,18 +160,24 @@ public final class StringsTest {
                 "しろねずみ》であることを半七はかねて知っていた。"
         };
         final List<String> actual = Strings.getFolderStrs(
-                CollectionUtil.implode(target, ""),
+                ArrayIterate.makeString(target, ""),
                 target[0].length()
             );
         assertEquals(Arrays.asList(target), actual);
     }
+
     /**
      * {@link jp.toastkid.libs.utils.Strings#addZero(int)} 's test method.
      */
     @Test
     public void addZeroTest() {
-        assertEquals("03", Strings.addZero(3));
+        assertEquals("-1", Strings.addZero(-1));
+        assertEquals("00", Strings.addZero(0));
+        assertEquals("09", Strings.addZero(9));
+        assertEquals("11", Strings.addZero(11));
+        assertEquals("10", Strings.addZero(10));
     }
+
     /**
      * StringUtil#md5Hash 's test method.
      */
@@ -328,6 +192,7 @@ public final class StringsTest {
         assertTrue(set.allSatisfy(l -> {return l instanceof Long;}));
         assertEquals(4, set.size());
     }
+
     /**
      * StringUtil#longHash 's test method.
      */
@@ -342,6 +207,7 @@ public final class StringsTest {
         assertTrue(set.allSatisfy(l -> {return l instanceof Long;}));
         assertEquals(4, set.size());
     }
+
     /**
      * replace の動作確認.
      */
@@ -357,6 +223,7 @@ public final class StringsTest {
         assertEquals("thomasbthomas", Strings.replace("cbc", 'c', "thomas"));
         assertEquals("&lt;b>", Strings.replace("<b>", '<', "&lt;"));
     }
+
     /**
      * replace(str, map) の動作確認.
      */
@@ -393,8 +260,9 @@ public final class StringsTest {
         // ちゃんと処理される
         assertEquals("&lt;b&gt;H&amp;M&lt;/b&gt;", Strings.replace("<b>H&M</b>", map));
     }
+
     /**
-     * test isHttpUrl().
+     * Check of  isHttpUrl().
      */
     @Test
     public void isHttpUrlTest() {
@@ -406,7 +274,7 @@ public final class StringsTest {
     }
 
     /**
-     * test join(). (Array ver.)
+     * Check of  join(). (Array ver.)
      */
     @Test
     public void testJoin() {
@@ -417,7 +285,7 @@ public final class StringsTest {
     }
 
     /**
-     * test join().
+     * Check of  join().
      */
     @Test
     public void testJoinSimple() {
@@ -485,7 +353,7 @@ public final class StringsTest {
     }
 
     /**
-     * test {@link Strings#builder()}.
+     * Check of  {@link Strings#builder()}.
      */
     @Test
     public void testBuilder() {
@@ -500,10 +368,62 @@ public final class StringsTest {
     }
 
     /**
-     * test {@link Strings#escapeForRegex(String)}.
+     * Check of  {@link Strings#escapeForRegex(String)}.
      */
     @Test
     public void testEscapeForRegex() {
         assertEquals("\\{\\(\\)\\}", Strings.escapeForRegex("{()}"));
     }
+
+    /**
+     * Check of {@link Strings#singleQuote(String)}.
+     */
+    @Test
+    public void test_singleQuote() {
+        assertEquals("'abc'", Strings.singleQuote("abc"));
+        assertEquals("''", Strings.singleQuote(""));
+    }
+
+    /**
+     * Check of {@link Strings#doubleQuote(String)}.
+     */
+    @Test
+    public void test_doubleQuote() {
+        assertEquals("\"abc\"", Strings.doubleQuote("abc"));
+        assertEquals("\"\"", Strings.doubleQuote(""));
+    }
+
+    /**
+     * Check of {@link Strings#singleQuote(String)} is not nullable.
+     */
+    @Test(expected=NullPointerException.class)
+    public void test_singleQuote_not_nullable() {
+        Strings.singleQuote(null);
+    }
+
+    /**
+     * Check of {@link Strings#doubleQuote(String)} is not nullable.
+     */
+    @Test(expected=NullPointerException.class)
+    public void test_doubleQuote_not_nullable() {
+        Strings.doubleQuote(null);
+    }
+
+    /**
+     * Check of {@link Strings#removeQuote(String)}.
+     */
+    @Test
+    public void test_removeQuote() {
+        assertEquals("tomato", Strings.removeQuote("\"tomato\""));
+        assertEquals("tomato", Strings.removeQuote("tomato"));
+    }
+
+    /**
+     * Check of {@link Strings#removeQuote(String)} is not nullable.
+     */
+    @Test(expected=NullPointerException.class)
+    public void test_removeQuote_not_nullable() {
+        Strings.removeQuote(null);
+    }
+
 }

@@ -1,6 +1,7 @@
 package jp.toastkid.libs.tinysegmenter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class TinySegmenterTest {
     public final void testSegment() {
         assertEquals(
                 "[隣, の, 客, は, AK, 4, 7, 振り, かざし, て, ギャアギャア, わめき, た, てる, 客, だ]",
-                this.ts.segment("隣の客はAK47振りかざしてギャアギャアわめきたてる客だ。").toString()
+                ts.segment("隣の客はAK47振りかざしてギャアギャアわめきたてる客だ。").toString()
                 );
     }
 }
