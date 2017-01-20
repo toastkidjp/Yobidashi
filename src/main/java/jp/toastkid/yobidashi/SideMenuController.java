@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +48,14 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.rss.RssFeeder;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
+import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
@@ -227,6 +230,21 @@ public class SideMenuController implements Initializable {
     @FXML
     private final void callWordCloud() {
         messenger.onNext(ArticleMessage.makeWordCloud());
+    }
+
+    /**
+     * Open RSS Feeder．
+     */
+    @FXML
+    private final void callRssFeeder() {
+        final long start = System.currentTimeMillis();
+        final String content = RssFeeder.run();
+        if (StringUtils.isEmpty(content)) {
+            messenger.onNext(SnackbarMessage.make("Can't fetch RSS content."));
+            return;
+        }
+        messenger.onNext(WebTabMessage.make("RSS Feeder", content, ContentType.HTML));
+        messenger.onNext(SnackbarMessage.make("Done：" + (System.currentTimeMillis() - start) + "[ms]"));
     }
 
     /**

@@ -1074,26 +1074,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Call RSS Feeder．
-     */
-    @FXML
-    private final void callRssFeeder() {
-        final long start = System.currentTimeMillis();
-       /* TODO impl
-        * openArticleTab("RSS Feeder");
-        String content = RssFeeder.run();
-        if (StringUtils.isEmpty(content)) {
-            content = "コンテンツを取得できませんでした.";
-        }
-        articleGenerator.generateHtml(content, "RSS Feeder");
-        loadDefaultFile();*/
-        setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
-    }
-
-    /**
      * Show slide show.
      */
-    @FXML
     private void slideShow() {
         final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
         if (!articleOr.isPresent()) {
@@ -1106,7 +1088,6 @@ public final class Controller implements Initializable {
     /**
      * Open home.
      */
-    @FXML
     private final void callHome() {
         openSpeedDialTab();
     }
