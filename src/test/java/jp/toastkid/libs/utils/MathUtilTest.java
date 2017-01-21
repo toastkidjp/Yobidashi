@@ -9,18 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jp.toastkid.libs.utils.MathUtil;
-
 import org.junit.Test;
 
 /**
- * MathUtil のテストケース.
+ * {@link MathUtil}'s test case.
  * @author Toast kid
  *
  */
 public final class MathUtilTest {
+
     /**
-     * MathUtil#min() のテスト
+     * MathUtil#min()'s test case.
      */
     @Test
     public final void testMinPrimitive() {
@@ -28,7 +27,7 @@ public final class MathUtilTest {
         assertEquals(1, MathUtil.minPrim(array));
     }
     /**
-     * MathUtil#max() のテスト
+     * MathUtil#max()'s test case.
      */
     @Test
     public final void testMaxPrimitive() {
@@ -37,7 +36,7 @@ public final class MathUtilTest {
     }
 
     /**
-     * MathUtil#min() のテスト
+     * MathUtil#min()'s test case.
      */
     @Test
     public final void testMin() {
@@ -45,7 +44,7 @@ public final class MathUtilTest {
         assertEquals(1, MathUtil.min(array).intValue());
     }
     /**
-     * MathUtil#max() のテスト
+     * MathUtil#max()'s test case.
      */
     @Test
     public final void testMax() {
@@ -53,7 +52,7 @@ public final class MathUtilTest {
         assertEquals(33, MathUtil.max(array).intValue());
     }
     /**
-     * MathUtil#getInt() のテスト.
+     * MathUtil#getInt()'s test case..
      */
     @Test
     public final void getIntTest() {
@@ -130,7 +129,7 @@ public final class MathUtilTest {
      */
     @Test
     public final void testMakeRandamNumberArray() {
-        final int size = 4;
+        final int size = 5;
         final int max = 4;
         final int[] array = MathUtil.makeRandamNumberArray(max, size);
         assertEquals(size, array.length);
@@ -187,5 +186,48 @@ public final class MathUtilTest {
         assertEquals(0, MathUtil.parseOrZero(Long.toString(Long.MAX_VALUE)));
         assertEquals(0, MathUtil.parseOrZero("and"));
         assertEquals(0, MathUtil.parseOrZero(null));
+    }
+
+    /**
+     * Check of {@link MathUtil#newtonAlgorithm(int, double[])}.
+     */
+    @Test
+    public final void test_newtonAlgorithm() {
+        assertEquals(-1, MathUtil.newtonAlgorithm(3, new double[]{1d, 3d, 3d, 1d}));;
+    }
+
+    /**
+     * Check of {@link MathUtil#fibonacci(int)}.
+     */
+    @Test
+    public final void test_fibonacci() {
+        assertEquals(21, MathUtil.fibonacci(8));
+        assertEquals(0, MathUtil.fibonacci(0));
+        assertEquals(1, MathUtil.fibonacci(1));
+    }
+
+    /**
+     * Check of {@link MathUtil#factorial(int)}.
+     */
+    @Test
+    public final void test_factorial() {
+        assertEquals(1, MathUtil.factorial(-1));
+        assertEquals(1, MathUtil.factorial(0));
+        assertEquals(1, MathUtil.factorial(1));
+        assertEquals(2, MathUtil.factorial(2));
+        assertEquals(5040, MathUtil.factorial(7));
+    }
+
+    /**
+     * Check of {@link MathUtil#nCr(int, int)}.
+     */
+    @Test
+    public final void test_nCr() {
+        assertEquals(1, MathUtil.nCr(-1, -1));
+        assertEquals(1, MathUtil.nCr(0, 0));
+        assertEquals(0, MathUtil.nCr(0, 1));
+        assertEquals(1, MathUtil.nCr(3, 0));
+        assertEquals(3, MathUtil.nCr(3, 1));
+        assertEquals(3, MathUtil.nCr(3, 2));
     }
 }
