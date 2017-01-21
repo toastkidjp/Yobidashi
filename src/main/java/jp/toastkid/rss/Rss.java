@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * TODO write test.
+ * RSS item.
  * @author Toast kid
  *
  */

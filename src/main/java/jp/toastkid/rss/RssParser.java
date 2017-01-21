@@ -62,7 +62,7 @@ public class RssParser {
     }
 
     /**
-     * parse rss.
+     * Parse RSS.
      * @param rss String.
      * @return Rss items.
      */
@@ -76,7 +76,7 @@ public class RssParser {
     }
 
     /**
-     * parse rss.
+     * Parse RSS.
      * @param rss String.
      * @return Rss items.
      */
@@ -85,7 +85,7 @@ public class RssParser {
     }
 
     /**
-     * parse rss.
+     * Parse RSS.
      * @param rss string iterable
      * @return Rss items.
      */

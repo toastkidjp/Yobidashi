@@ -2,15 +2,13 @@ package jp.toastkid.rss;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
 
 /**
  * RSS Feeder.
@@ -20,11 +18,8 @@ import jp.toastkid.yobidashi.Defines;
  */
 public final class RssFeeder {
 
-    /** RSS取得対象のURLリスト. */
-    private static final String PATH_RSS_TARGETS = Defines.USER_DIR + "/res/rss";
-
     /** line separator. */
-    private static final String LINE_SEPARATOR   = System.lineSeparator();
+    private static final String LINE_SEPARATOR = System.lineSeparator();
 
     /** RSS headings. */
     private final List<String> headings;
@@ -40,12 +35,9 @@ public final class RssFeeder {
      * RSS を取得し、その結果をHTMLで返す．
      * @return RSS取得結果.
      */
-    public String run() {
-        if (!Files.exists(Paths.get(PATH_RSS_TARGETS))) {
-            return null;
-        }
+    public String run(final Path pathToDir) {
         final StringBuilder content = new StringBuilder();
-        final List<String> urls = FileUtil.readDirLines(PATH_RSS_TARGETS);
+        final List<String> urls = FileUtil.readDirLines(pathToDir);
         urls.parallelStream()
             .filter(this::isValidUrl)
             .map(this::fetch)
@@ -58,7 +50,7 @@ public final class RssFeeder {
      * @param url
      * @return
      */
-    private boolean isValidUrl(String url) {
+    private boolean isValidUrl(final String url) {
         return StringUtils.isNotBlank(url) && url.startsWith("http");
     }
 

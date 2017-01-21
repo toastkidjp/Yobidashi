@@ -82,6 +82,9 @@ public class SideMenuController implements Initializable {
     /** /path/to/log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
+    /** RSS取得対象のURLリスト. */
+    private static final String PATH_RSS_TARGETS = Defines.USER_DIR + "/res/rss";
+
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
@@ -237,9 +240,13 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callRssFeeder() {
+        if (!Files.exists(Paths.get(PATH_RSS_TARGETS))) {
+            messenger.onNext(SnackbarMessage.make("Can't read RSS targets."));
+            return;
+        }
         final long start = System.currentTimeMillis();
         final RssFeeder feeder = new RssFeeder();
-        final String rss = feeder.run();
+        final String rss = feeder.run(Paths.get(PATH_RSS_TARGETS));
         final String content = articleGenerator.decorate("RSS Feeder", rss, null);
         if (StringUtils.isEmpty(content)) {
             messenger.onNext(SnackbarMessage.make("Can't fetch RSS content."));
