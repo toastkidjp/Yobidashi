@@ -9,7 +9,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 設定ダイアログのコントローラ.
@@ -55,14 +56,15 @@ public final class ConfigDialogController {
      * ファイルから設定値を読み込んでセットしておく.
      */
     public final void loadConfig() {
-        author.setText(Config.get("author"));
-        wikiTitle.setText(Config.get("wikiTitle"));
-        wikiIcon.setText(Config.get("wikiIcon"));
-        articleFolder.setText(Config.get( "articleDir"));
-        pictureFolder.setText(Config.get("imageDir"));
-        musicFolder.setText(Config.get("musicDir"));
-        home.setText(Config.get("home"));
-        viewTemplate.getSelectionModel().select(Config.get("viewTemplate"));
+        final Config config = new Config(Defines.CONFIG);
+        author.setText(config.get("author"));
+        wikiTitle.setText(config.get("wikiTitle"));
+        wikiIcon.setText(config.get("wikiIcon"));
+        articleFolder.setText(config.get( "articleDir"));
+        pictureFolder.setText(config.get("imageDir"));
+        musicFolder.setText(config.get("musicDir"));
+        home.setText(config.get("home"));
+        viewTemplate.getSelectionModel().select(config.get("viewTemplate"));
     }
 
     /**
@@ -95,7 +97,8 @@ public final class ConfigDialogController {
             newValues.put("home", home.getText());
         }
         newValues.put("viewTemplate", viewTemplate.getSelectionModel().getSelectedItem().toString());
-        Config.store(newValues);
+        final Config config = new Config(Defines.CONFIG);
+        config.store(newValues);
         home.getScene().getWindow().hide();
     }
 

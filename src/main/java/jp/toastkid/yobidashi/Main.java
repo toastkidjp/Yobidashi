@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -69,7 +70,6 @@ public final class Main extends Application {
             stage.setScene(scene);
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
-            stage.setTitle(Config.get(Config.Key.APP_TITLE));
             stage.initStyle(StageStyle.DECORATED);
             final Screen screen = Screen.getScreens().get(0);
             final Rectangle2D bounds = screen.getVisualBounds();

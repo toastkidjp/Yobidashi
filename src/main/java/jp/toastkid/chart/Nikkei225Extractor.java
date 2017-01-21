@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Extract Nikkei 225 from article.

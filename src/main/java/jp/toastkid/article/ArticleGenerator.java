@@ -14,9 +14,9 @@ import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.CalendarUtil;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Config.Key;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
+import jp.toastkid.yobidashi.models.Config.Key;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -42,14 +42,17 @@ public final class ArticleGenerator {
     /** Image file chooser. */
     private final ImageChooser chooser;
 
+    private final Config config;
+
     /**
      * init functions.
      * @param conf
      */
-    public ArticleGenerator() {
+    public ArticleGenerator(final Config config) {
         final long start = System.currentTimeMillis();
+        this.config = config;
         this.converter = Mono.<MarkdownConverter>create(
-                emitter -> emitter.success(new MarkdownConverter(Config.get("imageDir")))
+                emitter -> emitter.success(new MarkdownConverter(config))
             )
             .subscribeOn(Schedulers.elastic())
             .block();
@@ -68,7 +71,7 @@ public final class ArticleGenerator {
      */
     public String decorate(final String title, final Path file) {
 
-        final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
+        final PostProcessor post = new PostProcessor(config.get(Key.ARTICLE_DIR));
         final String processed   = post.process(convertToHtml(file));
         final String subheading  = post.generateSubheadings();
         return decorate(title, processed, subheading);
@@ -90,8 +93,8 @@ public final class ArticleGenerator {
             {
                 put("installDir",  Defines.findInstallDir());
                 put("title",       title);
-                put("wikiIcon",    Config.get("wikiIcon"));
-                put("wikiTitle",   Config.get("wikiTitle", "Wiklone"));
+                put("wikiIcon",    config.get("wikiIcon"));
+                put("wikiTitle",   config.get("wikiTitle", "Wiklone"));
                 put("subheadings", subheading);
                 put("jarPath",     getClass().getClassLoader().getResource("assets/").toString());
                 put("content",

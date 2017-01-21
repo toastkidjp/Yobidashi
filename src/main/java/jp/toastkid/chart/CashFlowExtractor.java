@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 日記から家計簿の部分を取り出し、計算する。

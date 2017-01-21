@@ -27,8 +27,8 @@ import jp.toastkid.article.converter.MarkdownConverter;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 記事を epub に変換して出力する.
@@ -41,16 +41,20 @@ public final class DocToEpub {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocToEpub.class);
 
     /** path/to/articles. */
-    private static final String ARTICLE_PATH = Config.get("articleDir");
+    private static String articlePath;
 
     /** ファイル名の制限. */
     public static final int FILE_NAME_LENGTH = 50;
+
+    private static Config conf;
 
     /** 記事名一覧. */
     private static ImmutableList<Path> articles;
     static {
         try {
-            articles = Files.list(Paths.get(ARTICLE_PATH)).collect(Collectors2.toImmutableList());
+            conf = new Config(Defines.CONFIG);
+            articlePath = conf.get("articleDir");
+            articles = Files.list(Paths.get(articlePath)).collect(Collectors2.toImmutableList());
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -157,7 +161,7 @@ public final class DocToEpub {
                     .forEach(matcher -> {
                         while (matcher.find()) {
                             final Path f = Paths.get(
-                                    ARTICLE_PATH,
+                                    articlePath,
                                     Articles.titleToFileName(matcher.group(1)).concat(".txt")
                                 );
                             if (Files.exists(f) && !recursiveFiles.contains(f)) {
@@ -179,7 +183,7 @@ public final class DocToEpub {
     private static final List<Path> getTargets(final List<String> targets) {
         final List<Path> paths = new ArrayList<>(targets.size());
         targets.parallelStream()
-            .map(prefix -> Paths.get(ARTICLE_PATH, Articles.titleToFileName(prefix).concat(".txt")))
+            .map(prefix -> Paths.get(articlePath, Articles.titleToFileName(prefix).concat(".txt")))
             .filter(articles::contains)
             .forEach(paths::add);
         return paths;
@@ -195,8 +199,8 @@ public final class DocToEpub {
             final PageLayout layout
             ) {
         final List<ContentMetaData> targetPaths = new ArrayList<>();
-        final MarkdownConverter converter = new MarkdownConverter("");
-        final String imageDir = Config.get("imageDir").replace("\\", "/");
+        final MarkdownConverter converter = new MarkdownConverter(conf);
+        final String imageDir = conf.get("imageDir").replace("\\", "/");
         converter.containsMenubar = false;
         targets.forEach(path -> {
             final ContentMetaData cmeta = new ContentMetaData();

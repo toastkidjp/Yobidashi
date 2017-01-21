@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
@@ -64,14 +66,19 @@ public class ToolsController {
     /** Message sender. */
     private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
+    private Config conf;
+
     /**
      * Draw chart.
      */
     @FXML
     private final void drawChart() {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
-        final Pane content = ChartPane.make(title,
-                "日記" + month.getSelectionModel().getSelectedItem().toString());
+        final Pane content = ChartPane.make(
+                conf.get(Key.ARTICLE_DIR),
+                title,
+                "日記" + month.getSelectionModel().getSelectedItem().toString()
+                );
         messenger.onNext(ContentTabMessage.make(title, content));
     }
 
@@ -147,6 +154,14 @@ public class ToolsController {
      */
     public TopicProcessor<Message> getMessenger() {
         return messenger;
+    }
+
+    /**
+     * Pass {@link Config} object.
+     * @param conf
+     */
+    public void setConfig(Config conf) {
+        this.conf = conf;
     }
 
 }

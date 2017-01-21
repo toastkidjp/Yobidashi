@@ -1,10 +1,10 @@
-package jp.toastkid.yobidashi;
+package jp.toastkid.yobidashi.models;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
@@ -12,16 +12,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.libs.Props;
-
 /**
  * config of Wiki client.
- *
- * <ol>
- * <li>Config……可変値
- * <li>Define……固定値
- * </ol>
- * <HR>
  *
  * @author Toast kid
  * @version 0.0.1
@@ -59,8 +51,17 @@ public final class Config {
     private static final String MESSAGE = "Tool's Property.";
 
     /** Configrations. */
-    private static final Properties CONFIG = new Properties();
-    static {
+    private final Properties config = new Properties();
+
+    /** path/to/userDir.  */
+    private final Path path;
+
+    /**
+     * Initialize with path.
+     * @param userDir
+     */
+    public Config(final Path userDir) {
+        this.path = userDir;
         reload();
     }
 
@@ -69,16 +70,7 @@ public final class Config {
      * @param key string
      * @return property value object
      */
-    public static final Object getByObject(final String key) {
-        return CONFIG.getProperty(key, "");
-    }
-
-    /**
-     * Get property value by key.
-     * @param key string
-     * @return property value object
-     */
-    public static final String get(final String key) {
+    public final String get(final String key) {
         return get(key, "");
     }
 
@@ -87,7 +79,7 @@ public final class Config {
      * @param key key
      * @return property value object
      */
-    public static final String get(final Key key) {
+    public final String get(final Key key) {
         return get(key.text, "");
     }
 
@@ -96,7 +88,7 @@ public final class Config {
      * @param key key
      * @return property value object
      */
-    public static final String get(final Key key, final String substitute) {
+    public final String get(final Key key, final String substitute) {
         return get(key.text, substitute);
     }
 
@@ -106,33 +98,37 @@ public final class Config {
      * @param substitute default value
      * @return property value object
      */
-    public static final String get(final String key, final String substitute) {
-        return CONFIG.getProperty(key, substitute).toString();
+    public final String get(final String key, final String substitute) {
+        return config.getProperty(key, substitute).toString();
     }
 
     /**
-     * 設定を再読み込みする.
+     * Reload config.
      */
-    public static void reload() {
-
-        final Path userDir = Paths.get(Defines.USER_DIR + "/conf");
-        if (!Files.exists(userDir)) {
+    public void reload() {
+        if (!Files.exists(path)) {
             try {
-                Files.createDirectories(userDir);
+                Files.createDirectories(path);
                 store();
             } catch (final IOException e) {
                 LOGGER.error("Error!", e);
             }
         }
 
-        CONFIG.clear();
-        CONFIG.putAll(Props.readDir(Defines.CONF_DIR).get());
+        config.clear();
+        final Properties p = new Properties();
+        try (final Reader reader = Files.newBufferedReader(path)) {
+            p.load(reader);
+        } catch (final IOException e) {
+            LOGGER.error("Occurred error!", e);
+        }
+        config.putAll(p);
     }
 
     /**
      * store configurations to file.
      */
-    public static void store() {
+    public void store() {
         store(Maps.fixedSize.empty());
     }
 
@@ -140,11 +136,10 @@ public final class Config {
      * store configurations with passed pairs to file.
      * @param additional key-value pairs.
      */
-    public static void store(final Map<String, String> additional) {
-        CONFIG.putAll(additional);
-        try (final Writer writer
-                = Files.newBufferedWriter(Paths.get(Defines.CONF_DIR, Defines.CONF_NAME))) {
-            CONFIG.store(writer, MESSAGE);
+    public void store(final Map<String, String> additional) {
+        config.putAll(additional);
+        try (final Writer writer = Files.newBufferedWriter(path)) {
+            config.store(writer, MESSAGE);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
         }
@@ -155,7 +150,7 @@ public final class Config {
      * @param key
      * @param value
      */
-    public static void store(final Key key, final String value) {
+    public void store(final Key key, final String value) {
         store(Maps.fixedSize.of(key.text, value));
     }
 
@@ -164,7 +159,7 @@ public final class Config {
      * @param key
      * @param value
      */
-    public static void store(final String key, final String value) {
+    public void store(final String key, final String value) {
         store(Maps.fixedSize.of(key, value));
     }
 

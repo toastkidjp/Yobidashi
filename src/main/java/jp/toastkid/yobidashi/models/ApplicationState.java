@@ -1,4 +1,4 @@
-package jp.toastkid.yobidashi;
+package jp.toastkid.yobidashi.models;
 
 import java.text.NumberFormat;
 import java.util.Map;

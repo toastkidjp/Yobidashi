@@ -17,8 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 青空文庫に関する便利クラス
@@ -192,7 +191,7 @@ public final class AobunUtils {
             }
         }
         output.set(0, Strings.kigouFullSizeNonDist(bookTitle) + " " + output.get(0));
-        output.add(1, Config.get(Config.Key.AUTHOR));
+        output.add(1, "");
         output.add(2, "");
         output.add(3, "---------------------------------------------------");
         output.add(4, "");

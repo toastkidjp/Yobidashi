@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 
-import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * ファイル検索クラスのテスト.
@@ -14,10 +15,10 @@ import jp.toastkid.yobidashi.Config;
 public final class ArticleSearcherTest {
 
     /** AND 検索させるので true. */
-    private static final boolean IS_AND        = true;
+    private static final boolean IS_AND = true;
 
     /** 検索対象クエリ. */
-    private static final String  QUERY         = "ラーメン 二郎";
+    private static final String  QUERY  = "ラーメン 二郎";
 
     /**
      * 並列数による検索スピードの違いを検証.
@@ -25,8 +26,9 @@ public final class ArticleSearcherTest {
      */
     @Ignore
     public final void testSearch() {
+        final Config conf = new Config(Defines.CONFIG);
         final ArticleSearcher fs = new ArticleSearcher.Builder()
-            .setHomeDirPath(Config.get("articleDir"))
+            .setHomeDirPath(conf.get("articleDir"))
             .setAnd(IS_AND)
             .build();
         fs.setParallel(5);

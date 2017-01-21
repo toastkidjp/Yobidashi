@@ -32,8 +32,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Config.Key;
 
 /**
  * Chart controller.
@@ -64,15 +62,16 @@ public class ChartPane extends VBox {
 
     /**
      * make chart view.
+     * @param articleDir
      * @param category
      * @param prefix ex: "日記2012-11".
      * @return pane contains chart.
      */
-    public static ChartPane make(final String category, final String prefix) {
+    public static ChartPane make(final String articleDir, final String category, final String prefix) {
 
         final ChartDataExtractor extractor = findExtractor(category);
         final Map<String, Number> dataMap
-            = extractor.extract(Config.get(Key.ARTICLE_DIR), prefix);
+            = extractor.extract(articleDir, prefix);
         final String title = extractor.getTitle();
 
         final LineChart<String,Number> chart = makeChart(title, dataMap, findThreshold(category));

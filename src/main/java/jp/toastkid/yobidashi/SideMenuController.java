@@ -59,6 +59,10 @@ import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
+import jp.toastkid.yobidashi.models.ApplicationState;
+import jp.toastkid.yobidashi.models.BookmarkManager;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -88,6 +92,9 @@ public class SideMenuController implements Initializable {
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
+    /** ePub Generator. */
+    private EpubGenerator ePubGenerator;
+
     /** JVM Language Script Runner. */
     private jp.toastkid.script.Main scriptRunner;
 
@@ -103,6 +110,8 @@ public class SideMenuController implements Initializable {
 
     /** Tool Drawer event processor. */
     private TopicProcessor<Message> messenger;
+
+    private Config conf;
 
     /**
      * Call back up method.
@@ -122,7 +131,7 @@ public class SideMenuController implements Initializable {
                             @Override
                             protected Integer call() throws Exception {
                                 final long start = System.currentTimeMillis();
-                                sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
+                                sArchivePath = conf.get(Config.Key.ARTICLE_DIR);
                                 try {
                                     new ZipArchiver().doDirectory(sArchivePath);
                                     //new ZipArchiver().doDirectory(iArchivePath);
@@ -201,7 +210,7 @@ public class SideMenuController implements Initializable {
         }
 
         new ConfigDialog(parent.get()).showConfigDialog();
-        Config.reload();
+        conf.reload();
         messenger.onNext(TabMessage.makeReload());
     }
 
@@ -509,7 +518,7 @@ public class SideMenuController implements Initializable {
                 }
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                new Archiver().simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+                new Archiver().simpleBackup(conf.get(Config.Key.ARTICLE_DIR), epochDay);
             }).build().show()
         );
     }
@@ -527,7 +536,7 @@ public class SideMenuController implements Initializable {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    new EpubGenerator().runEpubGenerator();
+                                    ePubGenerator.runEpubGenerator();
                                     return 100;
                                 }
                             })
@@ -613,7 +622,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openArticleFolder() {
-        openFolder(Config.get(Config.Key.ARTICLE_DIR));
+        openFolder(conf.get(Config.Key.ARTICLE_DIR));
     }
 
     /**
@@ -621,7 +630,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openImageFolder() {
-        openFolder(Config.get(Config.Key.IMAGE_DIR));
+        openFolder(conf.get(Config.Key.IMAGE_DIR));
     }
 
     /**
@@ -743,12 +752,24 @@ public class SideMenuController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        articleGenerator = new ArticleGenerator();
         this.messenger = TopicProcessor.create();
     }
 
+    /**
+     * Getter of messenger.
+     * @return messenger
+     */
     public TopicProcessor<Message> getProcessor() {
         return messenger;
+    }
+
+    /**
+     * Pass {@link Config} object.
+     * @param conf
+     */
+    public void setConfig(final Config conf) {
+        this.articleGenerator = new ArticleGenerator(conf);
+        this.ePubGenerator    = new EpubGenerator(conf);
     }
 
 }
