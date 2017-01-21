@@ -21,9 +21,6 @@ import jp.toastkid.rss.Rss.Item;
  */
 public class RssParser {
 
-    /** Empty object. */
-    private static final Rss EMPTY = new Rss();
-
     /** pattern of description. */
     private static final Pattern DESCRIPTION_PATTERN
         = Pattern.compile("<description>(.+?)</description>", Pattern.DOTALL);
@@ -94,7 +91,7 @@ public class RssParser {
      */
     public Rss parse(final Iterable<String> rssLines) {
         if (rss == null) {
-            return EMPTY;
+            return Rss.empty();
         }
         Lists.immutable.withAll(rssLines).each(line -> {
             //System.out.println("" + line);
@@ -120,7 +117,7 @@ public class RssParser {
                 if (rss == null) {
                     init();
                 }
-                currentItem.content.append(line);
+                currentItem.addContent(line);
             }
             if (line.contains("<pubDate")) {
                 extractPubDate(line);
@@ -141,32 +138,44 @@ public class RssParser {
         return this.rss;
     }
 
+    /**
+     * Extract pubData.
+     * @param line
+     */
     private void extractPubDate(final String line) {
-        if (rss == null) {
-            return;
+        if (rss != null) {
+            rss.setDate(extract(line, PUBDATE_PATTERN));
         }
-        rss.date = extract(line, PUBDATE_PATTERN);
     }
 
+    /**
+     * Extract date.
+     * @param line
+     */
     private void extractDate(final String line) {
-        if (rss == null) {
-            return;
+        if (rss != null) {
+            rss.setDate(extract(line, DATE_PATTERN));
         }
-        rss.date = extract(line, DATE_PATTERN);
     }
 
+    /**
+     * Extract creator.
+     * @param line
+     */
     private void extractCreator(final String line) {
-        if (rss == null) {
-            return;
+        if (rss != null) {
+            rss.setCreator(extract(line, CREATOR_PATTERN));
         }
-        rss.creator = extract(line, CREATOR_PATTERN);
     }
 
+    /**
+     * Extract subject.
+     * @param line
+     */
     private void extractSubject(final String line) {
-        if (rss == null) {
-            return;
+        if (rss != null) {
+            rss.addSubjects(extract(line, SUBJECT_PATTERN));
         }
-        rss.subjects.add(extract(line, SUBJECT_PATTERN));
     }
 
     /**
@@ -176,28 +185,38 @@ public class RssParser {
     private void extractTitle(final String line) {
         final String title = HtmlUtil.extractTitle(line);
         if (currentItem == null) {
-            rss.title = title;
-        } else {
-            currentItem.title = title;
+            rss.setTitle(title);
+            return;
         }
+
+        currentItem.setTitle(title);
     }
 
+    /**
+     * Extract description.
+     * @param line
+     */
     private void extractDescription(final String line) {
         final String description = extract(line, DESCRIPTION_PATTERN);
         if (currentItem == null) {
             rss.setDescription(description);
-        } else {
-            currentItem.description = description;
+            return;
         }
+
+        currentItem.setDescription(description);
     }
 
+    /**
+     * Extract link.
+     * @param line
+     */
     private void extractLink(final String line) {
         final String link = extract(line, LINK_PATTERN);
         if (currentItem == null) {
             rss.setLink(link);
-        } else {
-            currentItem.link = link;
+            return;
         }
+        currentItem.setLink(link);
     }
 
     /**

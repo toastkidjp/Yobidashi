@@ -47,10 +47,19 @@ public final class RssFeeder {
         final StringBuilder content = new StringBuilder();
         final List<String> urls = FileUtil.readDirLines(PATH_RSS_TARGETS);
         urls.parallelStream()
-            .filter((url) ->  {return StringUtils.isNotBlank(url) && url.startsWith("http");})
-            .forEach((url) -> {content.append(getFeed(url)).append(LINE_SEPARATOR);}
-            );
+            .filter(this::isValidUrl)
+            .map(this::fetch)
+            .forEach(rss -> content.append(makeTable(rss)).append(LINE_SEPARATOR));
         return content.toString();
+    }
+
+    /**
+     * Is valid url.
+     * @param url
+     * @return
+     */
+    private boolean isValidUrl(String url) {
+        return StringUtils.isNotBlank(url) && url.startsWith("http");
     }
 
     /**
@@ -58,13 +67,13 @@ public final class RssFeeder {
      * @param url URL(文字列)
      * @return URL1件単位でのRSS取得結果.
      */
-    private String getFeed(final String url) {
+    private Rss fetch(final String url) {
         try {
-            return makeTable(new RssParser().parse(new URI(url)));
+            return new RssParser().parse(new URI(url));
         } catch (final URISyntaxException e) {
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 
     /**
@@ -89,13 +98,13 @@ public final class RssFeeder {
         for (final Rss.Item item : rss.items()) {
             //System.out.println(entry.toString());
             table.append("<tr>");
-            table.append("<td><a href=\"").append(item.link).append("\">")
-                    .append(item.title).append("</a>");
+            table.append("<td><a href=\"").append(item.getLink()).append("\">")
+                    .append(item.getTitle()).append("</a>");
             table.append("<br/>");
             // 記事の詳細
-            table.append(item.date).append("</td>");
+            table.append(item.getDate()).append("</td>");
             // 記事の詳細
-            table.append("<td>").append(item.description).append("</td>");
+            table.append("<td>").append(item.getDescription()).append("</td>");
             table.append("</tr>");
         }
         table.append("</tr>");
