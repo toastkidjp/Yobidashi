@@ -238,7 +238,9 @@ public class SideMenuController implements Initializable {
     @FXML
     private final void callRssFeeder() {
         final long start = System.currentTimeMillis();
-        final String content = RssFeeder.run();
+        final RssFeeder feeder = new RssFeeder();
+        final String rss = feeder.run();
+        final String content = articleGenerator.decorate("RSS Feeder", rss, null);
         if (StringUtils.isEmpty(content)) {
             messenger.onNext(SnackbarMessage.make("Can't fetch RSS content."));
             return;
