@@ -47,7 +47,7 @@ public class FileWatcherJob implements Runnable {
         }
         cancellation = Flux.<Path>create(emitter -> {
             targets
-                .select(FileWatcherJob::isTarget)
+                .select(this::isTarget)
                 .forEachKeyValue((file, ms) -> emitter.next(file));
             emitter.complete();
         })
@@ -81,11 +81,12 @@ public class FileWatcherJob implements Runnable {
      * @param ms
      * @return
      */
-    private static boolean isTarget(final Path path, final long ms) {
+    private boolean isTarget(final Path path, final long ms) {
         try {
             return ms < Files.getLastModifiedTime(path).toMillis();
         } catch (final IOException e) {
             LOGGER.error("Error", e);
+            targets.remove(path);
         }
         return false;
     }

@@ -514,8 +514,11 @@ public final class Controller implements Initializable {
                     if (tab == null) {
                         return;
                     }
+
+                    setTitleOnToolbar(tab.getTitle());
+
                     final String tabUrl = tab.getUrl();
-                    if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
+                    if (!StringUtils.isEmpty(tabUrl)){
                         urlText.setText(tabUrl);
                         focusOn();
                         return;
@@ -1213,7 +1216,7 @@ public final class Controller implements Initializable {
     private final void makeMarkdown() {
         final TextField input = new JFXTextField();
         final String newArticleMessage = "Please could you input new article's title?";
-        input.setPromptText(newArticleMessage);
+        input.setPromptText("New article name");
         new AlertDialog.Builder(getParent())
                 .setTitle("Make new article")
                 .setMessage(newArticleMessage)
@@ -1280,7 +1283,7 @@ public final class Controller implements Initializable {
         final Article article = articleOr.get();
         final String currentTitle = article.title;
 
-        final TextField input = new TextField(prefix.concat(currentTitle));
+        final TextField input = new JFXTextField(prefix.concat(currentTitle));
 
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
