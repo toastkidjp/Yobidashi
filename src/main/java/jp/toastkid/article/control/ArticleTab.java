@@ -30,9 +30,9 @@ import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Config.Key;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Article tab.
@@ -48,7 +48,7 @@ public class ArticleTab extends BaseWebTab {
     private static final double SCALE_FACTOR = 3.0d;
 
     /** Article HTML generator. */
-    private static final ArticleGenerator GENERATOR = new ArticleGenerator();
+    private final ArticleGenerator generator;
 
     /** Article. */
     private final Article article;
@@ -71,6 +71,9 @@ public class ArticleTab extends BaseWebTab {
     /** WebView's y position. */
     private int yOffset;
 
+    /** Dir of article. */
+    private final String articleDir;
+
     /**
      * {@link ArticleTab}'s builder.
      *
@@ -90,8 +93,15 @@ public class ArticleTab extends BaseWebTab {
 
         private BiConsumer<String, String> onOpenUrl;
 
+        private Config conf;
+
         public Node makeContent() {
             return null;
+        }
+
+        public Builder setConfig(final Config conf) {
+            this.conf = conf;
+            return this;
         }
 
         public Builder setArticle(final Article article) {
@@ -137,6 +147,8 @@ public class ArticleTab extends BaseWebTab {
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
         this.article = b.article;
+        this.generator = new ArticleGenerator(b.conf);
+        this.articleDir = b.conf.get(Key.ARTICLE_DIR);
         this.onLoad = b.onLoad;
 
         final WebView webView = getWebView();
@@ -185,7 +197,7 @@ public class ArticleTab extends BaseWebTab {
         loadWorker.stateProperty().addListener(
                 (observable, prev, next) -> {
                     final String url = engine.getLocation();
-                    System.out.println(getText() + " " + url + " " + observable.getValue());
+                    //System.out.println(getText() + " " + url + " " + observable.getValue());
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
                         return;
@@ -323,16 +335,16 @@ public class ArticleTab extends BaseWebTab {
      * Load specified article with options.
      */
     private void loadArticle() {
-        final PostProcessor post = new PostProcessor(Config.get(Key.ARTICLE_DIR));
+        final PostProcessor post = new PostProcessor(articleDir);
 
         final Path openTarget = this.article.path;
         if (!Files.exists(openTarget)) {
             Articles.generateNewArticle(article);
         }
 
-        final String processed  = post.process(GENERATOR.convertToHtml(this.article));
+        final String processed  = post.process(generator.convertToHtml(this.article));
         final String subheading = post.generateSubheadings();
-        content = GENERATOR.decorate(this.article.title, processed, subheading);
+        content = generator.decorate(this.article.title, processed, subheading);
 
         final WebEngine engine = getWebView().getEngine();
         engine.loadContent(content);

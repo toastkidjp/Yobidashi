@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.eclipse.collections.api.set.primitive.IntSet;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
@@ -174,7 +175,7 @@ public class JapaneseHolidayTest {
     }
 
     /**
-     * check {@link JapaneseHoliday#findHolidaysSet(int, int)}.
+     * Check {@link JapaneseHoliday#findHolidaysSet(int, int)}.
      */
     @Test
     public final void  testFindHolidaysSet() {
@@ -195,7 +196,7 @@ public class JapaneseHolidayTest {
     }
 
     /**
-     * check {@link JapaneseHoliday#findHolidaysSet(int, int)} when passed month over 12.
+     * Check {@link JapaneseHoliday#findHolidaysSet(int, int)} when passed month over 12.
      */
     @Test(expected=IllegalArgumentException.class)
     public final void  testFindHolidaysSetIllegalMonth() {
@@ -203,7 +204,7 @@ public class JapaneseHolidayTest {
     }
 
     /**
-     * check {@link JapaneseHoliday#findHolidaysSet(int, int)} when passed month = -1.
+     * Check {@link JapaneseHoliday#findHolidaysSet(int, int)} when passed month = -1.
      */
     @Test(expected=IllegalArgumentException.class)
     public final void  testFindHolidaysSetIllegalMonthUnder() {
@@ -211,7 +212,7 @@ public class JapaneseHolidayTest {
     }
 
     /**
-     * check {@link JapaneseHoliday#findHolidaysSet(int, int)}.
+     * Check {@link JapaneseHoliday#findHolidaysSet(int, int)}.
      */
     @Test
     public final void  testFindHolidaysIntSet() {
@@ -219,5 +220,51 @@ public class JapaneseHolidayTest {
         assertTrue(holidays instanceof IntSet);
         assertEquals(3, holidays.size());
         assertEquals(IntSets.mutable.of(3, 4, 5), holidays);
+    }
+
+    /**
+     * Check {@link JapaneseHoliday#listHoliDayDates(int, int)}.
+     */
+    @Test
+    public void test_listHoliDayDates() {
+        final Set<LocalDate> holiDayDates = JapaneseHoliday.listHoliDayDates(2015, 9);
+        assertEquals("[2015-09-21, 2015-09-22, 2015-09-23]", holiDayDates.toString());
+    }
+
+    /**
+     * Check {@link JapaneseHoliday#listHoliDayDates(int, int)}'s irregular case.
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void test_listHoliDayDates_minus_month() {
+        JapaneseHoliday.listHoliDayDates(2017, -1);
+    }
+
+    /**
+     * Check {@link JapaneseHoliday#listHoliDayDates(int, int)}'s irregular case.
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void test_listHoliDayDates_zeo_month() {
+        JapaneseHoliday.listHoliDayDates(2017, 0);
+    }
+
+    /**
+     * Check {@link JapaneseHoliday#listHoliDayDates(int, int)}'s irregular case.
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void test_listHoliDayDates_over_month() {
+        JapaneseHoliday.listHoliDayDates(2017, 13);
+    }
+
+    /**
+     * Check {@link JapaneseHoliday#isHoliday(long)}.
+     */
+    @Test
+    public void test_isHoliday() {
+        assertFalse(JapaneseHoliday.isHoliday(1442674800000L));
+        assertFalse(JapaneseHoliday.isHoliday(1442761199999L));
+        assertTrue(JapaneseHoliday.isHoliday(1442761200000L));
+        assertTrue(JapaneseHoliday.isHoliday(1443020399999L));
+        assertFalse(JapaneseHoliday.isHoliday(1443020400000L));
+
     }
 }

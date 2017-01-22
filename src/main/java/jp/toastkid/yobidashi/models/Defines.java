@@ -1,5 +1,6 @@
-package jp.toastkid.yobidashi;
+package jp.toastkid.yobidashi.models;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jp.toastkid.libs.utils.FileUtil;
@@ -39,10 +40,7 @@ public final class Defines {
     public static final String SLIDE_CSS_DIR      = USER_DIR + "/css/slide/";
 
     /** 設定ファイルフォルダのパス. */
-    public static final String CONF_DIR           = USER_DIR + "/conf/";
-
-    /** 設定ファイル名. */
-    public static final String CONF_NAME          = "config.properties";
+    public static final Path   CONFIG           = Paths.get(USER_DIR + "/conf/config.properties");
 
     /** 設定ファイルの文字コード. */
     public static final String CONF_ENCODE        = "UTF-8";

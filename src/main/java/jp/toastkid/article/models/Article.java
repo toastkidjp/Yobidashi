@@ -13,7 +13,7 @@ import org.eclipse.collections.impl.factory.Sets;
 import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Article model.

@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * {@link Articles}' test case.

@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Utilities of {@link Article}.
@@ -42,6 +42,12 @@ public final class Articles {
 
     /** line separator. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
+
+    /** Config. */
+    private static Config config;
+    static {
+        config = new Config(Defines.CONFIG);
+    }
 
     /**
      * Private constructor.
@@ -144,7 +150,7 @@ public final class Articles {
      * @return Article オブジェクト
      */
     private static Article find(final String fileName) {
-        return new Article(Paths.get(Config.get("articleDir"), fileName));
+        return new Article(Paths.get(config.get("articleDir"), fileName));
     }
 
     /**

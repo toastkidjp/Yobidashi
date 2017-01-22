@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,15 +48,21 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.rss.RssFeeder;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
+import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
+import jp.toastkid.yobidashi.models.ApplicationState;
+import jp.toastkid.yobidashi.models.BookmarkManager;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -79,8 +86,14 @@ public class SideMenuController implements Initializable {
     /** /path/to/log file. */
     private static final String PATH_APP_LOG     = Defines.LOG_DIR    + "/app.log";
 
+    /** RSS取得対象のURLリスト. */
+    private static final String PATH_RSS_TARGETS = Defines.USER_DIR + "/res/rss";
+
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
+
+    /** ePub Generator. */
+    private EpubGenerator ePubGenerator;
 
     /** JVM Language Script Runner. */
     private jp.toastkid.script.Main scriptRunner;
@@ -97,6 +110,8 @@ public class SideMenuController implements Initializable {
 
     /** Tool Drawer event processor. */
     private TopicProcessor<Message> messenger;
+
+    private Config conf;
 
     /**
      * Call back up method.
@@ -116,7 +131,7 @@ public class SideMenuController implements Initializable {
                             @Override
                             protected Integer call() throws Exception {
                                 final long start = System.currentTimeMillis();
-                                sArchivePath = Config.get(Config.Key.ARTICLE_DIR);
+                                sArchivePath = conf.get(Config.Key.ARTICLE_DIR);
                                 try {
                                     new ZipArchiver().doDirectory(sArchivePath);
                                     //new ZipArchiver().doDirectory(iArchivePath);
@@ -195,7 +210,7 @@ public class SideMenuController implements Initializable {
         }
 
         new ConfigDialog(parent.get()).showConfigDialog();
-        Config.reload();
+        conf.reload();
         messenger.onNext(TabMessage.makeReload());
     }
 
@@ -227,6 +242,27 @@ public class SideMenuController implements Initializable {
     @FXML
     private final void callWordCloud() {
         messenger.onNext(ArticleMessage.makeWordCloud());
+    }
+
+    /**
+     * Open RSS Feeder．
+     */
+    @FXML
+    private final void callRssFeeder() {
+        if (!Files.exists(Paths.get(PATH_RSS_TARGETS))) {
+            messenger.onNext(SnackbarMessage.make("Can't read RSS targets."));
+            return;
+        }
+        final long start = System.currentTimeMillis();
+        final RssFeeder feeder = new RssFeeder();
+        final String rss = feeder.run(Paths.get(PATH_RSS_TARGETS));
+        final String content = articleGenerator.decorate("RSS Feeder", rss, null);
+        if (StringUtils.isEmpty(content)) {
+            messenger.onNext(SnackbarMessage.make("Can't fetch RSS content."));
+            return;
+        }
+        messenger.onNext(WebTabMessage.make("RSS Feeder", content, ContentType.HTML));
+        messenger.onNext(SnackbarMessage.make("Done：" + (System.currentTimeMillis() - start) + "[ms]"));
     }
 
     /**
@@ -482,7 +518,7 @@ public class SideMenuController implements Initializable {
                 }
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                new Archiver().simpleBackup(Config.get(Config.Key.ARTICLE_DIR), epochDay);
+                new Archiver().simpleBackup(conf.get(Config.Key.ARTICLE_DIR), epochDay);
             }).build().show()
         );
     }
@@ -500,7 +536,7 @@ public class SideMenuController implements Initializable {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    new EpubGenerator().runEpubGenerator();
+                                    ePubGenerator.runEpubGenerator();
                                     return 100;
                                 }
                             })
@@ -586,7 +622,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openArticleFolder() {
-        openFolder(Config.get(Config.Key.ARTICLE_DIR));
+        openFolder(conf.get(Config.Key.ARTICLE_DIR));
     }
 
     /**
@@ -594,7 +630,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openImageFolder() {
-        openFolder(Config.get(Config.Key.IMAGE_DIR));
+        openFolder(conf.get(Config.Key.IMAGE_DIR));
     }
 
     /**
@@ -647,6 +683,15 @@ public class SideMenuController implements Initializable {
                     break;
             }
         });
+    }
+
+    /**
+     * Call Garbage Collection.
+     */
+    @FXML
+    private void callGC() {
+        System.gc();
+        messenger.onNext(SnackbarMessage.make("Called garbage collection."));
     }
 
     /**
@@ -716,12 +761,24 @@ public class SideMenuController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        articleGenerator = new ArticleGenerator();
         this.messenger = TopicProcessor.create();
     }
 
+    /**
+     * Getter of messenger.
+     * @return messenger
+     */
     public TopicProcessor<Message> getProcessor() {
         return messenger;
+    }
+
+    /**
+     * Pass {@link Config} object.
+     * @param conf
+     */
+    public void setConfig(final Config conf) {
+        this.articleGenerator = new ArticleGenerator(conf);
+        this.ePubGenerator    = new EpubGenerator(conf);
     }
 
 }

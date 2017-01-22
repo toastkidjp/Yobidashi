@@ -109,6 +109,9 @@ import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
+import jp.toastkid.yobidashi.models.BookmarkManager;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -316,6 +319,12 @@ public final class Controller implements Initializable {
     @FXML
     private ToolsController toolsController;
 
+    /** Config. */
+    private Config conf;
+
+    /** ePub generator. */
+    private EpubGenerator ePubGenerator;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -327,6 +336,8 @@ public final class Controller implements Initializable {
         snackbar.registerSnackbarContainer(root);
 
         initDragAndDrop();
+
+        conf = new Config(Defines.CONFIG);
 
         Mono.create(emitter -> emitter.success(
                 String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
@@ -352,7 +363,7 @@ public final class Controller implements Initializable {
 
                         es.execute(() -> {
                             final long start = System.currentTimeMillis();
-                            articleGenerator = new ArticleGenerator();
+                            articleGenerator = new ArticleGenerator(conf);
                             Platform.runLater(Controller.this::callHome);
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize Articles. "
@@ -514,8 +525,11 @@ public final class Controller implements Initializable {
                     if (tab == null) {
                         return;
                     }
+
+                    setTitleOnToolbar(tab.getTitle());
+
                     final String tabUrl = tab.getUrl();
-                    if (!StringUtils.isEmpty(tabUrl) && !tabUrl.startsWith("about")){
+                    if (!StringUtils.isEmpty(tabUrl)){
                         urlText.setText(tabUrl);
                         focusOn();
                         return;
@@ -558,8 +572,8 @@ public final class Controller implements Initializable {
      */
     private void setTitleOnToolbar(final String titleStr) {
         final String text = titleStr == null
-                ? Config.get(Config.Key.APP_TITLE)
-                : titleStr + " - " + Config.get(Config.Key.APP_TITLE);
+                ? conf.get(Config.Key.APP_TITLE)
+                : titleStr + " - " + conf.get(Config.Key.APP_TITLE);
         title.setText(text);
         titleTooltip.setText(text);
     }
@@ -653,7 +667,7 @@ public final class Controller implements Initializable {
      * set stylesheet name in combobox.
      */
     private void setStylesheet() {
-        final String stylesheet = Config.get(Config.Key.STYLESHEET);
+        final String stylesheet = conf.get(Config.Key.STYLESHEET);
         style.getSelectionModel().select(StringUtils.isEmpty(stylesheet)
                 ? 0 : style.getItems().indexOf(stylesheet));
     }
@@ -738,7 +752,7 @@ public final class Controller implements Initializable {
     private void openSpeedDialTab() {
         try {
             final jp.toastkid.speed_dial.Controller controller = readSpeedDial();
-            controller.setTitle(Config.get(Config.Key.APP_TITLE));
+            controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
             final Cancellation cancellation2 = controller.messenger().subscribe(this::processMessage);
@@ -791,6 +805,7 @@ public final class Controller implements Initializable {
     private ArticleTab makeArticleTab(final Article article) {
         return new ArticleTab.Builder()
                 .setArticle(article)
+                .setConfig(conf)
                 .setOnClose(this::closeTab)
                 .setOnContextMenuRequested(event -> showContextMenu())
                 .setOnOpenNewArticle(this::openArticleTab)
@@ -1058,7 +1073,7 @@ public final class Controller implements Initializable {
      */
     private void searchArticle(final boolean isAnd, final String query, final String filter) {
         final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
-                .setHomeDirPath(Config.get("articleDir"))
+                .setHomeDirPath(conf.get("articleDir"))
                 .setAnd(isAnd)
                 .setSelectName(filter)
                 .setEmptyAction(() -> {
@@ -1074,26 +1089,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Call RSS Feeder．
-     */
-    @FXML
-    private final void callRssFeeder() {
-        final long start = System.currentTimeMillis();
-       /* TODO impl
-        * openArticleTab("RSS Feeder");
-        String content = RssFeeder.run();
-        if (StringUtils.isEmpty(content)) {
-            content = "コンテンツを取得できませんでした.";
-        }
-        articleGenerator.generateHtml(content, "RSS Feeder");
-        loadDefaultFile();*/
-        setStatus("Done：" + (System.currentTimeMillis() - start) + "[ms]");
-    }
-
-    /**
      * Show slide show.
      */
-    @FXML
     private void slideShow() {
         final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
         if (!articleOr.isPresent()) {
@@ -1106,7 +1103,6 @@ public final class Controller implements Initializable {
     /**
      * Open home.
      */
-    @FXML
     private final void callHome() {
         openSpeedDialTab();
     }
@@ -1160,7 +1156,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Articles.readAllArticleNames(Config.get("articleDir")))
+        Flux.fromIterable(Articles.readAllArticleNames(conf.get("articleDir")))
             .subscribeOn(Schedulers.newSingle("I/O"))
             .doOnTerminate(this::focusOn)
             .subscribe(items::add);
@@ -1232,7 +1228,7 @@ public final class Controller implements Initializable {
     private final void makeMarkdown() {
         final TextField input = new JFXTextField();
         final String newArticleMessage = "Please could you input new article's title?";
-        input.setPromptText(newArticleMessage);
+        input.setPromptText("New article name");
         new AlertDialog.Builder(getParent())
                 .setTitle("Make new article")
                 .setMessage(newArticleMessage)
@@ -1299,7 +1295,7 @@ public final class Controller implements Initializable {
         final Article article = articleOr.get();
         final String currentTitle = article.title;
 
-        final TextField input = new TextField(prefix.concat(currentTitle));
+        final TextField input = new JFXTextField(prefix.concat(currentTitle));
 
         final String renameMessage = "新しいファイル名を入力して下さい。";
         input.setPromptText(renameMessage);
@@ -1312,7 +1308,7 @@ public final class Controller implements Initializable {
                     return;
                 }
                 final Path dest = Paths.get(
-                        Config.get(Config.Key.ARTICLE_DIR),
+                        conf.get(Config.Key.ARTICLE_DIR),
                         Articles.titleToFileName(newTitle) + article.extention()
                         );
                 if (Files.exists(dest)){
@@ -1495,7 +1491,7 @@ public final class Controller implements Initializable {
                 if (job == null) {
                     return;
                 }
-                job.getJobSettings().setJobName(Config.get(Config.Key.APP_TITLE));
+                job.getJobSettings().setJobName(conf.get(Config.Key.APP_TITLE));
                 LOGGER.info("jobName [{}]\n", job.getJobSettings().getJobName());
                 tab.print(job);
                 job.endJob();
@@ -1528,7 +1524,7 @@ public final class Controller implements Initializable {
 
         // for highlighting script area.
         stylesheets.add(getClass().getClassLoader().getResource("keywords.css").toExternalForm());
-        Config.store(Config.Key.STYLESHEET, styleName);
+        conf.store(Config.Key.STYLESHEET, styleName);
     }
 
     /**
@@ -1537,6 +1533,8 @@ public final class Controller implements Initializable {
      */
     public final void setStage(final Stage stage) {
         this.stage = stage;
+        // TODO check.
+        stage.setTitle(conf.get(Config.Key.APP_TITLE));
     }
 
     /**
@@ -1585,6 +1583,7 @@ public final class Controller implements Initializable {
         final Cancellation cancellation
             = sideMenuController.getProcessor().subscribe(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
+        sideMenuController.setConfig(conf);
     }
 
     /**
@@ -1784,6 +1783,7 @@ public final class Controller implements Initializable {
         final Cancellation cancellation
             = toolsController.getMessenger().subscribe(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
+        toolsController.setConfig(conf);
         toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
             tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((a, prevTab, nextTab) -> {
@@ -1809,6 +1809,10 @@ public final class Controller implements Initializable {
             vertically.setSelected(true);
         }};
 
+        if (ePubGenerator == null) {
+            ePubGenerator = new EpubGenerator(conf);
+        }
+
         final Window parent = getParent();
         new AlertDialog.Builder(parent)
             .setTitle("ePub").setMessage("Current Article convert to ePub.")
@@ -1821,7 +1825,7 @@ public final class Controller implements Initializable {
                             protected Integer call() throws Exception {
                                 final Optional<Article> optional = getCurrentArticleOfNullable();
                                 optional.ifPresent(article ->
-                                    new EpubGenerator().toEpub(article, vertically.isSelected()));
+                                    ePubGenerator.toEpub(article, vertically.isSelected()));
                                 return 100;
                             }
                         })

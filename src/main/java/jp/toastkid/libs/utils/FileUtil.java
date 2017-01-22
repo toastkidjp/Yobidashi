@@ -335,7 +335,15 @@ public final class FileUtil {
      * @return list contains all files content.
      */
     public static List<String> readDirLines(final String pathToDir) {
-        final Path dir = Paths.get(pathToDir);
+        return readDirLines(Paths.get(pathToDir));
+    }
+
+    /**
+     * read all files content. not recursive.
+     * @param pathToDir
+     * @return list contains all files content.
+     */
+    public static List<String> readDirLines(final Path dir) {
         if (!Files.isDirectory(dir)) {
             return Collections.emptyList();
         }

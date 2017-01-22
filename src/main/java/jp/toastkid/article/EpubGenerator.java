@@ -13,8 +13,8 @@ import jp.toastkid.libs.epub.DocToEpub;
 import jp.toastkid.libs.epub.EpubMetaData;
 import jp.toastkid.libs.epub.PageLayout;
 import jp.toastkid.libs.epub.PageProgressDirection;
-import jp.toastkid.yobidashi.Config;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * ePub generator.
@@ -27,6 +27,16 @@ public class EpubGenerator {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(EpubGenerator.class);
 
+    /** Config. */
+    private final Config config;
+
+    /**
+     * Constructor.
+     */
+    public EpubGenerator(final Config config) {
+        this.config = config;
+    }
+
     /**
      * 現在開いている記事をePubに変換する.
      * @param isVertival
@@ -36,7 +46,7 @@ public class EpubGenerator {
         final EpubMetaData meta = new EpubMetaData();
         meta.recursive = true;
         final String convertTitle = article.title;
-        final String author       = Config.get(Config.Key.AUTHOR);
+        final String author       = config.get(Config.Key.AUTHOR);
         meta.title        = convertTitle;
         meta.subtitle     = convertTitle;
         meta.author       = author;

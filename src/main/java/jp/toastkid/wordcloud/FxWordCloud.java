@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import jp.toastkid.libs.tinysegmenter.TinySegmenter;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Utility of word cloud for JavaFX.

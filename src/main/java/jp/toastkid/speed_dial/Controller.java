@@ -9,11 +9,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import jp.toastkid.yobidashi.Defines;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.publisher.TopicProcessor;
 
 /**

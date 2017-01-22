@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * ファイルの文字数を計算する。
@@ -54,11 +54,9 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
             LOGGER.info("Error!", e);
         }
         int overall = 0;
-        System.out.println(list.size());
         for (final Path path : list) {
             final String name = Articles.decodeBytedStr(
                     FileUtil.removeExtension(path.getFileName().toString()), Defines.TITLE_ENCODE);
-            System.out.println(name);
             if (name.startsWith(pPrefix)){
                 String putKey = name;
                 // (130503) 修正

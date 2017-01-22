@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.Defines;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * JavaFX stylesheet definition.

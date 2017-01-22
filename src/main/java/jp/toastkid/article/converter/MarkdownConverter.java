@@ -21,7 +21,8 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.yobidashi.Config;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 
 /**
  * This class convert Markdown file to HTML.
@@ -195,14 +196,16 @@ public final class MarkdownConverter {
     /** 前回の処理で回収した画像のパス一覧. DocToEpubで参照. */
     public Set<String> latestImagePaths;
 
+    /** Config. */
+    private final Config config;
+
     /**
      * 指定されたパスで変換器を初期化する.
      * @param imgDir 画像のフォルダ
      */
-    public MarkdownConverter(final String imgDir) {
-        this.imgDir = StringUtils.isNotBlank(imgDir)
-                            ? Paths.get(imgDir.replace("\\", "/")).toUri().toString()
-                            : "";
+    public MarkdownConverter(final Config config) {
+        this.config = config;
+        this.imgDir = config.get(Key.IMAGE_DIR);
     }
 
     /**
@@ -622,7 +625,7 @@ public final class MarkdownConverter {
                  */
                 isInMap = true;
                 map = new YolpMapBuilder();
-                map.setAppId(Config.get("yid", ""));
+                map.setAppId(config.get("yid", ""));
                 final String[] content = str.substring(5, str.length() - 1).split(VALUE_SEPARATOR);
                 for (final String s : content) {
                     //System.out.println(s);

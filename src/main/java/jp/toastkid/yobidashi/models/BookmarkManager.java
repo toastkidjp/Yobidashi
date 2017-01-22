@@ -1,4 +1,4 @@
-package jp.toastkid.yobidashi;
+package jp.toastkid.yobidashi.models;
 
 import java.io.IOException;
 import java.nio.file.Files;
