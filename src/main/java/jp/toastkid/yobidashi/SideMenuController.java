@@ -686,6 +686,15 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Call Garbage Collection.
+     */
+    @FXML
+    private void callGC() {
+        System.gc();
+        messenger.onNext(SnackbarMessage.make("Called garbage collection."));
+    }
+
+    /**
      * for use shortcut when start-up.
      */
     private void putAccerelator() {

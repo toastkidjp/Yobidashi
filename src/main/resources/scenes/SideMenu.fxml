@@ -79,6 +79,7 @@
               <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
               <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" />
               <MenuLabel onAction="#openTools" text="Open tools" />
+              <MenuLabel onAction="#callGC" text="Launch Garbage Collection" />
               <MenuLabel onAction="#callLogViewer" text="LogViewer" />
             </JFXListView>
           </content>
