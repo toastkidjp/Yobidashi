@@ -197,7 +197,7 @@ public class ArticleTab extends BaseWebTab {
         loadWorker.stateProperty().addListener(
                 (observable, prev, next) -> {
                     final String url = engine.getLocation();
-                    System.out.println(getText() + " " + url + " " + observable.getValue());
+                    //System.out.println(getText() + " " + url + " " + observable.getValue());
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
                         return;
