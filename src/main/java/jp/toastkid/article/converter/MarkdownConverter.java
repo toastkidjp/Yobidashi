@@ -1,9 +1,5 @@
 package jp.toastkid.article.converter;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,12 +13,10 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Config.Key;
 
 /**
  * This class convert Markdown file to HTML.
@@ -53,59 +47,15 @@ public final class MarkdownConverter {
     /** 折り畳みのデフォルト表示文字列 */
     private static final String MESSAGE_DEFAULT_EXPAND = "ここをクリックすると開きます.";
 
-    /**
-     * {center}中央揃え{center}検出用正規表現.
-     */
-    private static final Pattern CENTER_PATTERN
-        = Pattern.compile("\\{center\\}(.+?)\\{center\\}", Pattern.DOTALL);
-
-    /**
-     * ひとりWiki の&color()プラグインを再現するための検出用正規表現.
-     * ひとりWiki プラグインとの互換性を持たせるためのもの
-     */
-    private static final Pattern COLOR_PAT = Pattern.compile("&color\\((.+?)\\)", Pattern.DOTALL);
-
     /** color pattern. */
     private static final Pattern COLOR_PATTERN
         = Pattern.compile("\\{color:(.+?)\\}(.+?)\\{color\\}", Pattern.DOTALL);
-
-    /** background pattern. */
-    private static final Pattern BACKGROUND_PATTERN
-        = Pattern.compile("\\{bgcolor:(.+?)\\}(.+?)\\{bgcolor\\}", Pattern.DOTALL);
-
-    /**
-     * ひとりWiki のボールド表記を再現するための検出用正規表現.
-     * ひとりWiki プラグインとの互換性を持たせるためのもの
-     */
-    private static final Pattern BOLDING_PATTERN = Pattern.compile("''(.+?)''", Pattern.DOTALL);
-
-    /**
-     * italic 検出用正規表現.
-     */
-    private static final Pattern ITALIC_PATTERN = Pattern.compile("'''(.+?)'''", Pattern.DOTALL);
-
-    /**
-     * ひとりWiki の&del()プラグインを再現するための検出用正規表現.
-     * ひとりWiki プラグインとの互換性を持たせるためのもの
-     */
-    private static final Pattern DEL_PAT = Pattern.compile("&del\\((.+?)\\)", Pattern.DOTALL);
 
     /**
      * Markdown での取り消し線検出用正規表現.
      */
     private static final Pattern DELETE_MARKDOWN_PATTERN
         = Pattern.compile("~~(.+?)~~", Pattern.DOTALL);
-
-    /**
-     * 下線検出用正規表現.
-     */
-    private static final Pattern UNDERLINE_PATTERN = Pattern.compile("\\+(.+?)\\+", Pattern.DOTALL);
-
-    /**
-     * ひとりWiki の&img()プラグインを再現するための検出用正規表現.
-     * ひとりWiki プラグインとの互換性を持たせるためのもの
-     */
-    private static final Pattern IMG_PAT = Pattern.compile("&img\\((.+)\\)", Pattern.DOTALL);
 
     /**
      * ひとりWiki の&ruby()プラグインを再現するための検出用正規表現.
@@ -140,10 +90,6 @@ public final class MarkdownConverter {
     private static final Pattern TOOLTIP_PATTERN
         = Pattern.compile("\\{tooltip\\:(.+?)\\}", Pattern.DOTALL);
 
-    /** Overflow hidden の正規表現. */
-    private static final Pattern OVERFLOW_HIDDEN_PATTERN
-        = Pattern.compile("\\{hide\\:(.+?)\\}", Pattern.DOTALL);
-
     /** 数値付きリストを検出する正規表現. */
     private static final Pattern ORDERED_LIST_PATTERN
         = Pattern.compile("^[\\d+]\\. ", Pattern.DOTALL);
@@ -154,9 +100,6 @@ public final class MarkdownConverter {
 
     /** yukiwiki's header pattern. */
     private static final Pattern HEADER_PATTERN = Pattern.compile(".\\#*");
-
-    /** Blockquote tag. */
-    private static final String QUOTE_TAG = "{quote}";
 
     /** 段落の頭に p タグを許容するタグ. (130727) */
     private static final String[] ALLOW_P_TAGS = {
@@ -178,15 +121,6 @@ public final class MarkdownConverter {
     /** Matcher. */
     private Matcher matcher;
 
-    /** title. */
-    private String title = "";
-
-    /** Path to image dir. */
-    private final String imgDir;
-
-    /** File Object. */
-    private Path path;
-
     /** メニューバーを含めるか否か. */
     public boolean containsMenubar = true;
 
@@ -205,7 +139,6 @@ public final class MarkdownConverter {
      */
     public MarkdownConverter(final Config config) {
         this.config = config;
-        this.imgDir = config.get(Key.IMAGE_DIR);
     }
 
     /**
@@ -242,7 +175,7 @@ public final class MarkdownConverter {
             dirBuf.append(splited[i]);
             dirBuf.append(dirSeparator);
         }
-        setFile(filePath);
+
         try {
             strs = wikiConvert(strs, true);
         } catch (final Exception e) {
@@ -273,8 +206,6 @@ public final class MarkdownConverter {
             ) {
         final MutableList<String> contents = Lists.mutable.empty();
         boolean isInBlockQuote = false;
-        boolean isInQuote      = false;
-        boolean isInPre        = false;
         boolean isInP          = false;
         boolean isInTable      = false;
         boolean isInExpand     = false;
@@ -296,7 +227,7 @@ public final class MarkdownConverter {
             // 変換前の行を保存しておく
             final String source = str;
             // AA area のところは変換処理をしない.
-            str = (isInAA || isInQuote || isInCodeBlock) ? str : convertLine(str);
+            str = (isInAA || isInCodeBlock) ? str : convertLine(str);
 
             final String lineSep = Strings.LINE_SEPARATOR;
 
@@ -306,27 +237,8 @@ public final class MarkdownConverter {
                 continue;
             }
 
-            if (str.startsWith(" ") && !isInPre && !isInCodeBlock) {
-                if (isInP) {
-                    contents.add("</p>");
-                    isInP = false;
-                }
-                str = "<pre>" + lineSep + str;
-                str = str.replaceFirst(lineSep + " ", lineSep);
-                isInPre = true;
-            }
             // (130713)
             //isInQuote
-            if (str.startsWith(QUOTE_TAG) && !isInQuote) {
-                if (isInP) {
-                    contents.add("</p>");
-                    isInP = false;
-                }
-                str = str.replace(QUOTE_TAG, "");
-                str = str.length() != 0 ? str.substring(1).trim() : str;
-                str = "<blockquote>" + lineSep + str;
-                isInQuote = true;
-            }
             if (str.startsWith(">") && !isInBlockQuote) {
                 if (isInP) {
                     contents.add("</p>");
@@ -431,9 +343,7 @@ public final class MarkdownConverter {
                 }
                 oLTagDepth = 1;
             }
-            if (!isInPre
-                    && !isInCodeBlock
-                    && !isInQuote
+            if (!isInCodeBlock
                     && !isInBlockQuote
                     && uLTagDepth == 0
                     && oLTagDepth == 0
@@ -454,26 +364,6 @@ public final class MarkdownConverter {
                         isInP = true;
                     }
                 }
-            }
-            if (isInPre
-                    && !(str.startsWith(" "))
-                    && !(str.startsWith("<pre>"))
-                    ) {
-                isInPre = false;
-                str = "</pre>" + lineSep + "<p>" + str;
-                isInP = true;
-            }
-            if (isInPre) {
-                str = str.replaceFirst("^ ", "");
-            }
-
-            if (isInQuote && str.startsWith(QUOTE_TAG) && !str.startsWith("<block")) {
-                isInQuote = false;
-                str = str.replace(QUOTE_TAG, "");
-                final boolean isNotEmpty = str.length() != 0;
-                str = new StringBuilder().append("</blockquote>").append(lineSep)
-                        .append(isNotEmpty ? "<p>" + str : "").toString();
-                isInP = isNotEmpty;
             }
 
             if (isInBlockQuote) {
@@ -544,42 +434,6 @@ public final class MarkdownConverter {
                 str = "</div><Script>close(\"expander" + expanderCount + "\");</Script>";
                 isInExpand = false;
                 expanderCount++;
-            }
-
-            // code block.
-            if (!isInCodeBlock && str.trim().startsWith("{code")) {
-
-                if (isInP) {
-                    contents.add("</p>");
-                    isInP = false;
-                }
-
-                String title = null;
-                String type = null;
-                final String[] split = str.split(":");
-                if (1 < split.length) {
-                    final String[] properties = split[1].split(VALUE_SEPARATOR);
-                    if (0 < properties.length) {
-                        for (final String s : properties) {
-                            final String[] prop = s.split("=");
-                            switch (prop[0]) {
-                                case "style":
-                                    type = prop[1].substring(0, prop[1].length() - 1);
-                                    break;
-                                case "title":
-                                    title = "<span class=\"code-title\">"
-                                            + prop[1].substring(0, prop[1].length() - 1)
-                                            + "</span><br/>";
-                                    break;
-                            }
-                        }
-                    }
-                }//title
-                str = new StringBuilder("<pre>")
-                        .append(StringUtils.isNotBlank(title) ? title : "").append("<code")
-                        .append(StringUtils.isNotBlank(type) ? String.format(" class=\"%s\"", type) : "")
-                        .append(">").append(sources.get(++i)).toString();
-                isInCodeBlock = true;
             }
 
             // Markdown code block
@@ -683,11 +537,11 @@ public final class MarkdownConverter {
                 }
             }
             // (130917) 実装中
-            if (!isInPre && !isInFormation && str.startsWith("{formation")) {
+            if (!isInFormation && str.startsWith("{formation")) {
                 isInFormation = true;
                 formation     = Formation.parseFormation(str);
             }
-            if (!isInPre && isInFormation) {
+            if (isInFormation) {
                 if (str.indexOf("|") != -1) {
                     team.add(Footballer.getFootballer(str));
                 }
@@ -775,28 +629,6 @@ public final class MarkdownConverter {
             str = str.replaceFirst("---*-", "<hr/>");
         }
 
-        // ひとりWiki用プラグイン変換
-        if (str.indexOf("&br()") != -1) {
-            str = str.replaceAll("&br\\(\\)", "<br/>");
-        }
-
-        if (str.toLowerCase().indexOf("{lastmodify}") != -1) {
-            try {
-                str = str.replace(
-                        "{lastmodify}",
-                        CalendarUtil.longToStr(Files.getLastModifiedTime(path).toMillis(), STANDARD_DATE_FORMAT)
-                    );
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //<del>aaaa</del>
-        if (str.indexOf("&del(") != -1) {
-            matcher = DEL_PAT.matcher(str);
-            while (matcher.find()) {
-                str = str.replaceAll(DEL_PAT.pattern(), "<del>" + matcher.group(1) + "</del>");
-            }
-        }
 
         if (str.contains("~~")) {
             matcher = DELETE_MARKDOWN_PATTERN.matcher(str);
@@ -806,34 +638,6 @@ public final class MarkdownConverter {
             }
         }
 
-        // italic(文字列)
-        if (str.indexOf("'''") != -1) {
-            matcher = ITALIC_PATTERN.matcher(str);
-            while (matcher.find()) {
-                str = str.replaceAll(ITALIC_PATTERN.pattern(), "<i>" + matcher.group(1) + "</i>");
-            }
-        }
-
-        // bolding
-        if (str.indexOf("''") != -1) {
-            matcher = BOLDING_PATTERN.matcher(str);
-            while (matcher.find()) {
-                str = str.replaceAll(BOLDING_PATTERN.pattern(), "<b>" + matcher.group(1) + "</b>");
-            }
-        }
-        //&img(代替文字列,画像) →<img src="画像" alt="代替文字列">
-        if (str.indexOf("&img(") != -1) {
-            matcher = IMG_PAT.matcher(str);
-            while (matcher.find()) {
-                final String[] found = matcher.group(1).split(",");
-                // (121010) 画像フォルダのパスを追加
-                str = str.replaceAll(
-                        IMG_PAT.pattern(),
-                        "<p><img src=\""+ imgDir + found[1] + "\" alt=\"" + found[0] + "\" /></p>"
-                        );
-                latestImagePaths.add(found[1]);
-            }
-        }
         //&ruby(文字列,ルビ)→<ruby><rb>文字列</rb><rp>(</rp><rt>ルビ</rt><rp>)</rp></ruby>
         if (str.indexOf("&ruby(") != -1) {
             matcher = RUBY_PAT.matcher(str);
@@ -858,27 +662,6 @@ public final class MarkdownConverter {
             }
         }
 
-        // color
-        if (str.indexOf("&color(") != -1) {
-            matcher = COLOR_PAT.matcher(str);
-            while (matcher.find()) {
-                final String[] found = matcher.group(1).split(",");
-                //&color(文字色,背景色,文字列)
-                //<span style="color: white; background-color: ">ホワイト</span>
-                //<span style="color: white; background-color: black">
-                if (found.length == 2) {
-                    str = str.replaceAll(
-                            COLOR_PAT.pattern(),
-                            HtmlUtil.getColor(found[0], found[1])
-                            );
-                } else if (found.length == 3) {
-                    str = str.replaceAll(
-                            COLOR_PAT.pattern(),
-                            HtmlUtil.getColor(found[0], found[1], found[2])
-                            );
-                }
-            }
-        }
         //COLOR_PATTERN
         if (str.indexOf("{color") != -1) {
             matcher = COLOR_PATTERN.matcher(str);
@@ -886,29 +669,6 @@ public final class MarkdownConverter {
                 str = str.replaceAll(
                         COLOR_PATTERN.pattern(),
                         HtmlUtil.getColor(matcher.group(1), matcher.group(2))
-                        );
-            }
-        }
-
-        if (str.indexOf("{bgcolor") != -1) {
-            matcher = BACKGROUND_PATTERN.matcher(str);
-            while (matcher.find()) {
-                str = str.replaceAll(
-                        BACKGROUND_PATTERN.pattern(),
-                        HtmlUtil.getColor(null, matcher.group(1), matcher.group(2))
-                        );
-            }
-        }
-
-        // centering.
-        if (str.indexOf("{center}") != -1) {
-            matcher = CENTER_PATTERN.matcher(str);
-            while (matcher.find()) {
-                final String found = matcher.group(1);
-                //<div style="text-align:center;">まん中</div></li>
-                str = str.replace(
-                        matcher.group(0),
-                        "<div style=\"text-align:center;\">" + found + "</div>"
                         );
             }
         }
@@ -941,18 +701,6 @@ public final class MarkdownConverter {
             }
         }
 
-        if (str.indexOf("{hide:") != -1) {
-            matcher = OVERFLOW_HIDDEN_PATTERN.matcher(str);
-            while (matcher.find()) {
-                final String found = matcher.group(1);
-                str = str.replaceAll(
-                        OVERFLOW_HIDDEN_PATTERN.pattern(),
-                        Strings.join(
-                            "<span class=\"overflowhidden\" tabIndex=\"0\">", found, "</span>")
-                        );
-            }
-        }
-
         // Wikipedia link.
         if (str.indexOf("ikipedia:") != -1) {
             matcher = WIKIPEDIA_PATTERN.matcher(str);
@@ -978,42 +726,6 @@ public final class MarkdownConverter {
                     .append(isHashTag ? "?src=hash" : "")
                     .append("\">").append(found).append("</a>");
                 str = str.replaceFirst(TWITTER_PATTERN.pattern(), link.toString());
-            }
-        }
-
-        /* {calendar}.
-        if (str.contains("alendar")) {
-            matcher = CALENDAR_PATTERN.matcher(str);
-            while (matcher.find()) {
-                final String found = matcher.group(1);
-                final Calendar cal = Calendar.getInstance();
-                if (found.contains("=")) {
-                    ArrayAdapter.adapt(found.split(VALUE_SEPARATOR)).select(it -> {return it.contains("=");})
-                        .each(it -> {
-                            final String[] pair = it.split("=");
-                            if (pair.length < 1) {
-                                return;
-                            }
-                            switch (pair[0]) {
-                                case "year":
-                                    cal.set(Calendar.YEAR,  Integer.parseInt(pair[1]));
-                                    break;
-                                case "month":
-                                    cal.set(Calendar.MONTH, Integer.parseInt(pair[1]) - 1);
-                                    break;
-                            }
-                        });
-                }
-                str = str.replaceFirst(CALENDAR_PATTERN.pattern(), HtmlCalendar.makeOneMonth(cal));
-            }
-        }*/
-
-        // under line.
-        if (str.contains("+")) {
-            matcher = UNDERLINE_PATTERN.matcher(str);
-            while (matcher.find()) {
-                final String found = matcher.group(1);
-                str = str.replaceFirst(UNDERLINE_PATTERN.pattern(), HtmlUtil.underLine(found));
             }
         }
 
@@ -1046,30 +758,4 @@ public final class MarkdownConverter {
         return "<img src=\"" + link + "\" alt=\"" + alt + "\" />";
     }
 
-    /**
-     * タイトルを返す.
-     * @return title タイトル
-     */
-    public final String getTitle() {
-        return title;
-    }
-
-    /**
-     * タイトルをセットする.
-     * @param title 設定する title
-     */
-    public void setTitle(final String title) {
-        this.title = title;
-    }
-
-    /**
-     * txtFilePath が示すファイルが存在する時のみ、 file を セットする.
-     * @param txtFilePath ファイルのパス
-     */
-    private final void setFile(final String txtFilePath) {
-        final Path newFile = Paths.get(txtFilePath);
-        if (newFile != null && Files.exists(newFile)) {
-            path = newFile;
-        }
-    }
 }

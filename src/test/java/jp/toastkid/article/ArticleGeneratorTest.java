@@ -40,8 +40,9 @@ public final class ArticleGeneratorTest {
     @Test
     public void test_convertToHtml() {
         final String convertToHtml = gen.convertToHtml(Paths.get(PATH));
+        System.out.println(convertToHtml);
         assertTrue(convertToHtml.startsWith(
-                "<h2> [[日記2016-02-26(金)]] [[日記2016-02-25(木)]]</h2>"));
+                "<h1> [[日記2016-02-26(金)]] [[日記2016-02-25(木)]]</h1>"));
     }
 
     /**

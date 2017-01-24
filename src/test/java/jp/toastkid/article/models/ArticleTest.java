@@ -150,7 +150,10 @@ public class ArticleTest {
      */
     @Test
     public void test_makeCharCountResult() {
-        assertTrue(a.makeCharCountResult().startsWith("日記2013-08-31(土) は 427 字です。"));
+        //System.out.println(a.makeCharCountResult());
+        assertTrue(a.makeCharCountResult().contains("日記2013-08-31(土) "));
+        assertTrue(a.makeCharCountResult().contains(" 字です。"));
+        assertTrue(a.makeCharCountResult().contains("2[KB]"));
     }
 
 }
