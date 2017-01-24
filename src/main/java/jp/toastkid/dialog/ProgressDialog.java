@@ -82,17 +82,6 @@ public final class ProgressDialog extends Application implements AutoCloseable {
         }
     }
 
-    public ProgressDialog() {
-        this(new Builder().setCommand(new Task<Integer>(){
-            @Override
-            protected Integer call() throws Exception {
-                updateMessage("Please wait 5s...");
-                Thread.sleep(5000L);
-                return 0;
-            }
-        }));
-    }
-
     /**
      * Load scene file.
      */

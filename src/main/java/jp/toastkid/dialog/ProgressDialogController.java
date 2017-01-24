@@ -3,7 +3,6 @@ package jp.toastkid.dialog;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSpinner;
 
 import javafx.fxml.FXML;
@@ -19,16 +18,21 @@ import javafx.scene.layout.VBox;
  */
 public class ProgressDialogController implements Initializable {
 
+    /** Progres bar */
     @FXML
     protected ProgressBar pb;
+
+    /** Spinner.*/
     @FXML
     protected JFXSpinner pin;
+
+    /** Label. */
     @FXML
     protected Label label;
+
+    /** Background. */
     @FXML
     protected VBox background;
-    @FXML
-    protected JFXSnackbar snackbar;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

@@ -51,19 +51,35 @@ public final class AlertDialog extends Application {
      *
      */
     public static class Builder {
+
+        /** Parent window. */
         private final Window parent;
+
+        /** Title. */
         private String title;
+
+        /** Message. */
         private String message;
 
+        /** Negative button's text. */
         private String negaText;
+
+        /** Negative action. */
         private Runnable negaAction;
 
+        /** Positive button's text. */
         private String posiText;
+
+        /** Positive button's action. */
         private Runnable posiAction;
 
+        /** Neutral button's text. */
         private String neutralText;
+
+        /** Neutral button's action. */
         private Runnable neutralAction;
 
+        /** Dialog's controls. */
         private final MutableList<Node> cntrs;
 
         public Builder() {
@@ -166,6 +182,9 @@ public final class AlertDialog extends Application {
         stage.setResizable(false);
     }
 
+    /**
+     * Show and wait dialog.
+     */
     public void show() {
         stage.showAndWait();
     }
@@ -181,15 +200,6 @@ public final class AlertDialog extends Application {
         showInputDialog("title", "message", null, null);
         System.out.println("check - " + isChecked());
         //*/
-    }
-
-    /**
-     * 渡されたコントロールをセットする。
-     * @param control
-     */
-    public AlertDialog setControl(final Node control) {
-        controller.add(control);
-        return this;
     }
 
     /**
