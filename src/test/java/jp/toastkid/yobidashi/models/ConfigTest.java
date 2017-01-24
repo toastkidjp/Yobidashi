@@ -61,6 +61,14 @@ public class ConfigTest {
      * Test of {@link Config#get(jp.toastkid.yobidashi.models.Config.Key)}.
      */
     @Test
+    public void testGet_Key() {
+        assertEquals("Y!obidashi", c.get(jp.toastkid.yobidashi.models.Config.Key.APP_TITLE, "sub"));
+    }
+
+    /**
+     * Test of {@link Config#get(jp.toastkid.yobidashi.models.Config.Key)}.
+     */
+    @Test
     public void testGetString() {
         assertEquals("Y!obidashi", c.get(jp.toastkid.yobidashi.models.Config.Key.APP_TITLE));
         assertEquals("D:/Article/Article/", c.get(jp.toastkid.yobidashi.models.Config.Key.ARTICLE_DIR));

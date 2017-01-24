@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Sets;
 
 import javafx.collections.FXCollections;
@@ -43,14 +42,55 @@ public class ChartPane extends VBox {
     /** default width. */
     private static final double DEFAULT_WIDTH = 1200.0;
 
-    /** 「日記の文字数」.  (130406)*/
-    public static final String DIARY     = "日記の文字数";
+    /**
+     * Chart's category.
+     *
+     * @author Toast kid
+     *
+     */
+    public enum Category {
+        DIARY("日記の文字数", 3_000), OUTGO("出費", 30_000), NIKKEI225("日経平均株価", 10_000);
 
-    /** 「出費」.(130406)*/
-    public static final String OUTGO     = "出費";
+        private final String text;
 
-    /** 「日経平均株価」.  (130406)*/
-    public static final String NIKKEI225 = "日経平均株価";
+        private final int    threshold;
+
+        /**
+         * Initialize with text.
+         * @param text
+         */
+        private Category(final String text, final int threshold) {
+            this.text = text;
+            this.threshold = threshold;
+        }
+
+        public String text() {
+            return this.text;
+        }
+
+        public int threshold() {
+            return this.threshold;
+        }
+
+        /**
+         * Find Category object with text.
+         * @param text
+         * @return
+         */
+        public static Category findByText(final String text) {
+
+            if (text == null) {
+                return null;
+            }
+
+            for (final Category c : Category.values()) {
+                if (text.equals(c.text)) {
+                    return c;
+                }
+            }
+            return null;
+        }
+    }
 
     /**
      * call super constructor.
@@ -67,14 +107,14 @@ public class ChartPane extends VBox {
      * @param prefix ex: "日記2012-11".
      * @return pane contains chart.
      */
-    public static ChartPane make(final String articleDir, final String category, final String prefix) {
+    public static ChartPane make(final String articleDir, final Category category, final String prefix) {
 
         final ChartDataExtractor extractor = findExtractor(category);
         final Map<String, Number> dataMap
             = extractor.extract(articleDir, prefix);
         final String title = extractor.getTitle();
 
-        final LineChart<String,Number> chart = makeChart(title, dataMap, findThreshold(category));
+        final LineChart<String,Number> chart = makeChart(title, dataMap, category.threshold);
         final Label dataLabel = new Label();
         initBackground(chart, dataLabel);
 
@@ -159,29 +199,6 @@ public class ChartPane extends VBox {
     }
 
     /**
-     * find threshold.
-     * @param category
-     * @return
-     */
-    private static int findThreshold(final String category) {
-
-        if (StringUtils.isEmpty(category)) {
-            return 0;
-        }
-
-        switch (category) {
-            case DIARY:
-                return 3_000;
-            case OUTGO:
-                return 20_000;
-            case NIKKEI225:
-                return 10_000;
-            default:
-                return 0;
-        }
-    }
-
-    /**
      * init chart.
      * @param title
      * @param yAxis
@@ -224,23 +241,26 @@ public class ChartPane extends VBox {
      * @param category
      * @return Extractor.
      */
-    private static ChartDataExtractor findExtractor(final String category) {
+    private static ChartDataExtractor findExtractor(final Category category) {
+        if (category == null) {
+            throw new IllegalArgumentException();
+        }
         switch (category) {
-            case DIARY:
-                return new FilesLengthExtractor();
             case NIKKEI225:
                 return new Nikkei225Extractor();
             case OUTGO:
                 return new CashFlowExtractor();
+            case DIARY:
+            default:
+                return new FilesLengthExtractor();
         }
-        return null;
     }
 
     /**
      * 月のリストを取得する.
      * @return 月の文字列表現を要素に持つ List
      */
-    public static final List<String> getMonthsList() {
+    public static final List<String> readMonths() {
         final List<String> monthSelector = new ArrayList<>();
         final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM");
         final String now = LocalDateTime.now().format(pattern);
