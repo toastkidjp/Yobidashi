@@ -152,7 +152,9 @@ public final class AlertDialog extends Application {
         stage.setTitle(b.title);
         controller.setTitle(b.title);
 
-        if (b.parent == null || b.parent.getScene().getStylesheets() == null) {
+        if (b.parent == null
+                || b.parent.getScene() == null
+                || b.parent.getScene().getStylesheets() == null) {
             return;
         }
         // StyleSheet をコピーする.
@@ -240,5 +242,12 @@ public final class AlertDialog extends Application {
             builder.addControl(textArea);
         }
         builder.build().show();
+    }
+
+    /**
+     * Close this dialog.
+     */
+    public void close() {
+        stage.close();
     }
 }

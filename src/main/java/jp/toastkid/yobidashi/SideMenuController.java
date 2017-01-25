@@ -111,6 +111,7 @@ public class SideMenuController implements Initializable {
     /** Tool Drawer event processor. */
     private TopicProcessor<Message> messenger;
 
+    /** Config. */
     private Config conf;
 
     /**
@@ -209,8 +210,7 @@ public class SideMenuController implements Initializable {
             return;
         }
 
-        new ConfigDialog(parent.get()).showConfigDialog();
-        conf.reload();
+        new ConfigDialog(parent.get()).showAndWait();
         messenger.onNext(TabMessage.makeReload());
     }
 
@@ -777,6 +777,7 @@ public class SideMenuController implements Initializable {
      * @param conf
      */
     public void setConfig(final Config conf) {
+        this.conf = conf;
         this.articleGenerator = new ArticleGenerator(conf);
         this.ePubGenerator    = new EpubGenerator(conf);
     }

@@ -1,17 +1,19 @@
 package jp.toastkid.yobidashi.dialog;
 
-import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import com.jfoenix.controls.JFXTextField;
+
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Window;
+import jp.toastkid.dialog.AlertDialog;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 
 /**
@@ -21,54 +23,80 @@ import jp.toastkid.yobidashi.models.Defines;
  * JavaFX2.2でダイアログを作る方法</a>
  *
  */
-public final class ConfigDialog  extends Application {
+public final class ConfigDialog {
 
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigDialog.class);
+    /** Dialog. */
+    private final AlertDialog dialog;
 
-    /** Path to FXML. */
-    private static final String FXML_PATH = Defines.SCENE_DIR + "/ConfigDialog.fxml";
+    /** author(tool user name). */
+    private TextField author;
 
-    /** Controller object. */
-    private ConfigDialogController controller;
+    /** tool's title. */
+    private TextField toolTitle;
 
-    /** Stage. */
-    private Stage dialog;
+    /** tool's icon. */
+    private TextField toolIcon;
 
-    /** Scene. */
-    private Scene scene = null;
+    /** path/to/article_dir. */
+    private TextField articleFolder;
+
+    /** path/to/picture_dir. */
+    private TextField pictureFolder;
 
     /**
-     * シーンファイルをロードしておく.
+     * Read config values from passed path file.
      */
-    public ConfigDialog(final Window window) {
-        loadDialog(window);
-        controller.loadConfig();
-        // copy StyleSheet.
-        this.scene.getStylesheets().addAll(window.getScene().getStylesheets());
+    public final void loadConfig(final Path path) {
+        final Config config = new Config(path);
+        author        = new JFXTextField(config.get(Key.AUTHOR));
+        toolTitle     = new JFXTextField(config.get(Key.APP_TITLE));
+        toolIcon      = new JFXTextField(config.get(Key.APP_ICON));
+        articleFolder = new JFXTextField(config.get(Key.ARTICLE_DIR));
+        pictureFolder = new JFXTextField(config.get(Key.IMAGE_DIR));
     }
 
     /**
-     * Load scene from FXML.
-     * @return Parent オブジェクト
+     * Initialize config dialog.
      */
-    private final void loadDialog(final Window window) {
-        final FXMLLoader loader
-            = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
-        try {
-            if (scene == null) {
-                scene = new Scene(loader.load());
-            }
-        } catch (final IOException e) {
-            LOGGER.error("Caught Error.", e);
+    public ConfigDialog(final Window window) {
+        loadConfig(Defines.CONFIG);
+        dialog = new AlertDialog.Builder(window)
+                .setTitle("Config")
+                .setOnPositive("Save", () -> store(Defines.CONFIG))
+                .setOnNegative("Cancel", () -> {})
+                .addControl(
+                        new Label("Author"),         author,
+                        new Label("App Title"),      toolTitle,
+                        new Label("App Icon"),       toolIcon,
+                        new Label("Article folder"), articleFolder,
+                        new Label("Picture folder"), pictureFolder
+                        )
+                .build();
+    }
+
+    /**
+     * Store values to path.
+     */
+    public final void store(final Path path) {
+        final Map<String,String> newValues = new HashMap<String,String>(10);
+        if (StringUtils.isNotEmpty(author.getText())) {
+            newValues.put(Key.AUTHOR.text(),      author.getText());
         }
-        controller = loader.getController();
-        dialog = new Stage(StageStyle.UTILITY);
-        dialog.setScene(scene);
-        dialog.initOwner(window);
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.setResizable(false);
-        dialog.setTitle("Config");
+        if (StringUtils.isNotEmpty(toolTitle.getText())) {
+            newValues.put(Key.APP_TITLE.text(),   toolTitle.getText());
+        }
+        if (StringUtils.isNotEmpty(toolIcon.getText())) {
+            newValues.put(Key.APP_ICON.text(),    toolIcon.getText());
+        }
+        if (StringUtils.isNotEmpty(articleFolder.getText())) {
+            newValues.put(Key.ARTICLE_DIR.text(), articleFolder.getText());
+        }
+        if (StringUtils.isNotEmpty(pictureFolder.getText())) {
+            newValues.put(Key.IMAGE_DIR.text(),   pictureFolder.getText());
+        }
+        final Config config = new Config(path);
+        config.store(newValues);
+        dialog.close();
     }
 
     /**
@@ -80,20 +108,8 @@ public final class ConfigDialog  extends Application {
      * @param checkText チェックボックスの文字列、null か空白を指定した時は表示しない
      * @return input 入力文字列
      */
-    public final void showConfigDialog() {
-        dialog.showAndWait();
+    public final void showAndWait() {
+        dialog.show();
     }
 
-    @Override
-    public void start(final Stage arg0) throws Exception {
-        showConfigDialog();
-    }
-
-    /**
-     *
-     * @param args
-     */
-    public static void main(final String[] args) {
-        Application.launch(ConfigDialog.class);
-    }
 }

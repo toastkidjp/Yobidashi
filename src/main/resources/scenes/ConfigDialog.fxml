@@ -17,28 +17,13 @@
     <Label text="Author" />
     <JFXTextField fx:id="author" onAction="#storeConfig" />
     <Label text="Tool title" />
-    <JFXTextField fx:id="wikiTitle" onAction="#storeConfig" />
+    <JFXTextField fx:id="toolTitle" onAction="#storeConfig" />
     <Label text="Tool icon" />
-    <JFXTextField fx:id="wikiIcon" onAction="#storeConfig" />
+    <JFXTextField fx:id="toolIcon" onAction="#storeConfig" />
     <Label text="Article folder" />
     <JFXTextField fx:id="articleFolder" onAction="#storeConfig" />
     <Label text="Picture folder" />
     <JFXTextField fx:id="pictureFolder" onAction="#storeConfig" />
-    <Label text="Music folder" />
-    <JFXTextField fx:id="musicFolder" onAction="#storeConfig" />
-    <Label text="Home" />
-    <JFXTextField fx:id="home" onAction="#storeConfig" />
-    <Label text="View Template" />
-    <ComboBox fx:id="viewTemplate" prefWidth="150.0" promptText="Select" >
-      <tooltip>
-        <Tooltip text="テンプレートの種類を選択します。" />
-      </tooltip>
-      <items>
-        <FXCollections fx:factory="observableArrayList">
-          <String fx:value="SECOND" />
-        </FXCollections>
-      </items>
-    </ComboBox>
     <HBox alignment="BOTTOM_RIGHT" prefHeight="92.0" prefWidth="600.0">
       <children>
         <JFXButton defaultButton="true" buttonType="RAISED" onAction="#storeConfig" text="OK" />

@@ -31,6 +31,7 @@ public final class Config {
     public enum Key {
         AUTHOR("author"),
         APP_TITLE("appTitle"),
+        APP_ICON("appIcon"),
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
         IMAGE_DIR("imageDir");
@@ -44,6 +45,14 @@ public final class Config {
          */
         private Key(final String text) {
             this.text = text;
+        }
+
+        /**
+         * Return text.
+         * @return text
+         */
+        public String text() {
+            return this.text;
         }
     }
 

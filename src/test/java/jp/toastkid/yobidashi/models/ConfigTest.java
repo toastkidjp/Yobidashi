@@ -1,6 +1,7 @@
 package jp.toastkid.yobidashi.models;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import jp.toastkid.yobidashi.models.Config.Key;
 
 /**
  * {@link Config}'s test case.
@@ -100,6 +103,16 @@ public class ConfigTest {
         c.store();
         final long stored = Files.getLastModifiedTime(path).toMillis();
         assertTrue(stored > pre);
+    }
+
+    /**
+     * Test of {@link Config.Key}.
+     */
+    @Test
+    public void testKey() {
+        assertEquals("author", Key.AUTHOR.text());
+        assertSame(Key.AUTHOR, Key.valueOf("AUTHOR"));
+        assertTrue(0 != Key.values().length);
     }
 
 }
