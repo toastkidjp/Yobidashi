@@ -130,6 +130,9 @@ public final class Controller implements Initializable {
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
 
+    /** Speed Dial's title. */
+    private static final String TITLE_SPEED_DIAL = "Speed Dial";
+
     /** WebView's highliting. */
     private static final String WINDOW_FIND_DOWN
         = "window.find(\"{0}\", false, false, true, false, true, false)";
@@ -761,7 +764,7 @@ public final class Controller implements Initializable {
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
             sdRoot.setPrefHeight(tabPane.getHeight());
-            openTab(makeContentTab("Speed Dial", sdRoot));
+            openTab(makeContentTab(TITLE_SPEED_DIAL, sdRoot));
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -1142,7 +1145,7 @@ public final class Controller implements Initializable {
                             && ((ArticleTab) tab).getArticle().equals(property.getValue()))
                     .findFirst();
             if (first.isPresent()) {
-                first.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
+                tabPane.getSelectionModel().select(first.get());
                 return;
             }
             openArticleTab(property.getValue());
@@ -1380,11 +1383,18 @@ public final class Controller implements Initializable {
             .setMessage(deleteTarget + " を削除しますか？")
             .setOnPositive("OK", () -> {
                 try {
+                    FILE_WATCHER.remove(article.path);
                     Files.delete(article.path);
                     AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                    openSpeedDialTab();
-                    // (130309) そしてファイル一覧から削除
-                    articleList.getItems().remove(deleteTarget);
+                    closeCurrentTab();
+                    final Optional<Tab> first = tabPane.getTabs().stream()
+                            .filter(tab -> TITLE_SPEED_DIAL.equals(tab.getText()))
+                            .findFirst();
+                    if (first.isPresent()) {
+                        tabPane.getSelectionModel().select(first.get());
+                    } else {
+                        openSpeedDialTab();
+                    }
                     removeHistory(article);
                 } catch (final Exception e) {
                     e.printStackTrace();
@@ -1395,10 +1405,21 @@ public final class Controller implements Initializable {
 
     /**
      * 履歴リストから指定した記事名を削除する.
-     * @param deleteTarget 削除する記事名
+     * @param deleteTarget 削除する Article
      */
     private final void removeHistory(final Article deleteTarget) {
-        final ObservableList<Article> items = historyList.getItems();
+        removeItem(deleteTarget, articleList);
+        removeItem(deleteTarget, historyList);
+        removeItem(deleteTarget, bookmarkList);
+    }
+
+    /**
+     * Remove Item from passed ListView.
+     * @param deleteTarget
+     * @param listView
+     */
+    private final void removeItem(final Article deleteTarget, final ListView<Article> listView) {
+        final ObservableList<Article> items = listView.getItems();
         if (items.indexOf(deleteTarget) != -1) {
             items.remove(deleteTarget);
         }
@@ -1533,7 +1554,6 @@ public final class Controller implements Initializable {
      */
     public final void setStage(final Stage stage) {
         this.stage = stage;
-        // TODO check.
         stage.setTitle(conf.get(Config.Key.APP_TITLE));
     }
 
