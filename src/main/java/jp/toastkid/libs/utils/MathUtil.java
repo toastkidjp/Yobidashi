@@ -20,79 +20,10 @@ import org.eclipse.collections.impl.factory.primitive.IntSets;
 public final class MathUtil {
 
     /**
-     * @return xor で生成した乱数
-     */
-    public static long xor() {
-        return (xor128());
-    }
-
-    /** メソッド xor128() で使用 (120325 追加) */
-    private static long xor_x = 123456789;
-
-    /** メソッド xor128() で使用 (120325 追加) */
-    private static long xor_y = 362436069;
-
-    /** メソッド xor128() で使用 (120325 追加) */
-    private static long xor_z = 521288629;
-
-    /** メソッド xor128() で使用 (120325 追加) */
-    private static long xor_w = 88675123;
-
-    /**
      * Private constructor.
      */
     private MathUtil() {
         // NOP.
-    }
-
-    /**
-     * 以下、<a href="http://www001.upp.so-net.ne.jp/isaku/rand.html">良い乱数・悪い乱数</a>より
-     * <HR>
-     *
-     * <H2>XorShift</H2>
-     * 高速な乱数に XorShift というのがある。
-     * <PRE>
-     * unsigned long xor128(){
-     * static unsigned long x=123456789,y=362436069,z=521288629,w=88675123;
-     * unsigned long t;
-     * t=(x^(x<<11));x=y;y=z;z=w; return( w=(w^(w>>19))^(t^(t>>8)) );
-     * }
-     * </PRE>
-http://www.jstatsoft.org/v08/i14/
-
-周期はメルセンヌツイスタほどはないが、実用上は十分といえる。とりあえず、１億個の生成速度を XorShift を含めて Core 2 Duo E6600 ＋ VS2005 で計ったところ、
-
- zsfmt(SSE2)   :  156ms
- SFMT(SSE2)    :  156ms
- zmtrand(SSE2) :  250ms
- zxor          :  265ms
- zmtrand       :  266ms
- xor128()      :  328ms
- zsfmt         :  375ms
- mt19937ar     :  625ms
- SFMT          : 1046ms
- rand()        : 1969ms
-
-となった。SSE2 を使わない場合高速である。
-
-論文の 2 ページ目に n が 32 と 64 の場合には T=(I+La)(I+Rb)では (a,b) が見つからなかったと書いてあるが、
-n が 64 の場合 (7,9) は条件を満たしている。
-また、同じく 2 ページ目の下にある 81 個の (a,b,c) のうち、|9,5,1| は |9,5,14| の間違いである。
-さらに 4 ページ目の最初にあるプログラムの y=(y>>17); は y^=(y>>17); の間違いである。
-
-http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題があると書かれている。
-     * <HR>
-     * (120325) 作成<BR>
-     * @return xor128  で生成した乱数
-     */
-    public static long xor128(){
-
-        long t;
-        t=(xor_x^(xor_x << 11));
-        xor_x = xor_y;
-        xor_y = xor_z;
-        xor_z = xor_w;
-        return xor_w = ( xor_w ^ ( xor_w >> 19 ) ) ^ ( t ^ ( t >> 8 ) ) ;
     }
 
     /**
@@ -129,32 +60,13 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
     }
 
     /**
-     * 引数として渡された２数の最大公約数をユークリッドの互除法で求める
-     * @param num1 引数１
-     * @param num2 引数２
-     * @return num1 : ２数の最大公約数
-     * @see <a href = "http://www11.atwiki.jp/darui_program/">せっかくだから俺はプログラマの道を選ぶぜ@wiki</a>
-     */
-    public static int calcEucridian(int num1, int num2){
-        while( num1 != num2 ) {
-            if( num1 > num2 ) {
-                num1 = num1 - num2;
-            } else{
-                num2 = num2 - num1;
-            }
-        }
-        return num1;
-    }
-
-    /**
-     * 引数として渡された２数の最大公約数をユークリッドの互除法で求める
+     * 引数として渡された２数の最大公約数をユークリッドの互除法で求める.
      * @param a 引数１
      * @param b 引数２
      * @return a : ２数の最大公約数
      */
-    public static int calcEucridian2(int a, int b){
+    public static int calcEucridian(int a, int b){
         int p = 0;
-        //int res = 0;
         while(a != 0 && b != 0){
             p = a / b;
             a = a - (p * b);
@@ -163,10 +75,10 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
                 a = b;
                 b = temp;
             }
-            //res++;
         }
         return a;
     }
+
     /**
      * ニュートンアルゴリズムで方程式 a[3]x^3 + a[2]x^2 + a[1]x + a[0] = 0 の解の一つを求める
      *
@@ -279,75 +191,8 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         }
         return factorialVal;
     }
-    /**
-     * ベクトルの内積を求める<BR>
-     * (110720作成)
-     * @see <a href="http://monogusa-math.blogspot.com/">数学プログラミングノート </a>
-     * @param vec1 ベクトル1(double 型配列)
-     * @param vec2 ベクトル2(double 型配列)
-     * @param n ベクトルの要素数
-     * @return ベクトルの内積
-     */
-    public static double inner_product(
-            final double[] vec1,
-            final double[] vec2,
-            final int n) {
-        double s = 0.0;
-        for (int i = 0; i < n; i++ ) {
-            s += vec1[i] * vec2[i];
-        }
-        return s;
-    }
-    /**
-     * 3点A,B,Cからなる三角形の重心を求める (2次元)
-     * (110720作成)
-     * @param A 点の座標1(double 型配列)
-     * @param B 点の座標2(double 型配列)
-     * @param C 点の座標3(double 型配列)
-     * @return 重心の先頭アドレス
-     * @see <a href="http://monogusa-math.blogspot.com/">数学プログラミングノート </a>
-     */
-    public static double[] triangle_center_of_gravity(
-            final double[] A,
-            final double[] B,
-            final double[] C
-            ){
-        final double[] G = new double[2];
-        G[0] = (A[0] + B[0] + C[0]) / 3.0;
-        G[1] = (A[1] + B[1] + C[1]) / 3.0;
-        return G;
-    }
-    /**
-     * 3ベクトルの重心を求める
-     * (110720作成)
-     * @param A ベクトル(double 型配列)
-     * @param B ベクトル(double 型配列)
-     * @param C ベクトル(double 型配列)
-     * @return 重心
-     * @see <a href="http://monogusa-math.blogspot.com/">数学プログラミングノート </a>
-     */
-    public static double[] triangle_center_of_gravityOld(
-            final double[] A,
-            final double[] B,
-            final double[] C){
-        final double[] G = new double[A.length];
-        for (int i = 0; i < G.length; i++) {
-            G[i] = (A[i] + B[i] + C[i]) / G.length;
-        }
-        return G;
-    }
-    /**
-     * 左から 0 を詰めた 6 ケタ整数の文字列表現を返す。<HR>
-     * <HR>
-     * (120819) 作成<BR>
-     * @param authorId 整数
-     * @return 左から 0 を詰めた 6 ケタ整数の文字列表現 (例)879 → 000879
-     */
-    public static String reformedIntStr(final int authorId) {
-        final StringBuilder bui = new StringBuilder("00000");
-        bui.append( authorId );
-        return bui.substring( bui.length() - 6, bui.length());
-    }
+
+
     /**
      * 渡された文字列から seed を作り、乱数生成クラスのオブジェクトを返す。
      * @param seedStr
@@ -361,6 +206,7 @@ http://www.iro.umontreal.ca/~lecuyer/myftp/papers/xorshift.pdf には、問題�
         }
         return new Random(score);
     }
+
     /**
      * 最大値 max の要素を  size 個持つ TreeSet を生成して返す。
      * 日付が変わると生成される値も変わる。

@@ -1,6 +1,7 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +39,8 @@ public class GzipUtilsTest {
                 "[31, -117, 8, 0, 0, 0, 0, 0, 0, 0, -85, 86, -54, 73, 77, 43, 81, -78, 82, 42, -55,"
                 + " -49, 77, 44, -55, 87, -46, 81, 42, -54, 76, -49, 0, 10, 24, 25, 24, -44, 2,"
                 + " 0, 32, 114, -102, -113, 29, 0, 0, 0]",
-                Arrays.toString(GzipUtils.gzip(PAIR)));;
+                Arrays.toString(GzipUtils.gzip(PAIR)));
+        assertNull(GzipUtils.gzip(null));
     }
 
     /**
@@ -49,8 +51,9 @@ public class GzipUtilsTest {
     @Test
     public final void testGunzip() throws IOException {
         final String gunzip = GzipUtils.gunzip(GzipUtils.gzip(PAIR), Pair.class).toString();
-        System.out.println(gunzip);
+        //System.out.println(gunzip);
         assertEquals("{\"left\":\"tomato\",\"right\":200}", gunzip);
+        assertNull(GzipUtils.gunzip(null, null));
     }
 
     /**

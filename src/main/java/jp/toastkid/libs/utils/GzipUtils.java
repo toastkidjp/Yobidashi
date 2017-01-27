@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Gzip converting utility.
+ *
  * @author Toast kid
  *
  */

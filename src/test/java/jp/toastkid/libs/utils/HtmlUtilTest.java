@@ -4,6 +4,7 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Map;
 
@@ -174,6 +175,7 @@ public final class HtmlUtilTest {
     @Test
     public final void testTabRemove() {
         assertEquals("ab", HtmlUtil.tabRemove("a\tb"));
+        assertEquals("ab", HtmlUtil.tabRemove("ab"));
     }
 
     /**
@@ -181,7 +183,7 @@ public final class HtmlUtilTest {
      */
     @Test
     public final void testExtractBody() {
-        assertEquals("<body>tomato</body>", HtmlUtil.extractTitle("<body>tomato</body>"));
+        assertEquals("tomato", HtmlUtil.extractBody("<body>tomato</body>"));
     }
 
     /**
@@ -190,6 +192,8 @@ public final class HtmlUtilTest {
     @Test
     public final void testExtractTitle() {
         assertEquals("tomato", HtmlUtil.extractTitle("<title>tomato</title>"));
+        assertEquals("  ", HtmlUtil.extractTitle("  "));
+        assertNull(HtmlUtil.extractTitle(null));
     }
 
     /**
@@ -206,6 +210,11 @@ public final class HtmlUtilTest {
     @Test
     public final void testInLineCode() {
         assertEquals("<code>text</code>", HtmlUtil.inLineCode("text"));
+    }
+
+    @Test
+    public void test_tagScriptRemove() {
+        System.out.println(HtmlUtil.tagScriptRemove("<a href='http://www.yahoo.com'><Script>alert(\"hello\");</Script></a>"));
     }
 
 }

@@ -1,6 +1,5 @@
 package jp.toastkid.libs.utils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +23,7 @@ public final class HtmlUtil {
 
     /** body の中身を抜き出す正規表現. */
     private static final Pattern BODY_PATTERN
-        = Pattern.compile("<[B|b]ody>(.+?)<[B|b]ody>", Pattern.DOTALL);
+        = Pattern.compile("<[B|b]ody>(.+?)</[B|b]ody>", Pattern.DOTALL);
 
     /** HTML のタイトルを抜き出す正規表現. */
     private static final Pattern TITLE_PATTERN
@@ -207,31 +206,7 @@ public final class HtmlUtil {
         link.append("</a>");
         return link.toString();
     }
-    /**
-     * 文字列中から RSS の URL だけを抜き出して Map で返す.
-     * <HR>
-     * <PRE>
-     * String str = WebDocumentUtil.getWebDocs(
-     * "http://www.itmedia.co.jp/info/rss/kw.html", "UTF-8").toString();
-     * HashSet<String> resSet = StringUtil.getRSSURLs( str );
-     * System.out.println( ColleUtil.getStringFromSet(resSet, StringUtil.lineSeparator));
-     * </PRE>
-     * <HR>
-     * (120903) 作成<BR>
-     * @param str
-     */
-    public static HashMap<String,String> getRssUrlsMap( final String str ) {
-        final HashMap<String,String> resSet = new HashMap<>(100);
-        final Matcher matcher = RDF_PATTERN.matcher(str);
-        while (matcher.find()) {
-            final String matched = "http://" + matcher.group(1) + ".rdf";
-            if(matched.length() < 100){
-                //System.out.println("match : " +  matched);
-                resSet.put("get",matched);
-            }
-        }
-        return resSet;
-    }
+
     /**
      * html から bodyタグで囲まれている部分を抜き出して返す.
      * @param html 文字列

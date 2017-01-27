@@ -1763,7 +1763,7 @@ public final class Controller implements Initializable {
                     return;
                 }
                 final String absolutePath = optional.get().path.toAbsolutePath().toString();
-                AobunUtils.docToTxt(absolutePath);
+                AobunUtils.docToTxt(optional.get().path, Paths.get(Defines.findInstallDir()));
                 AlertDialog.showMessage(
                         getParent(),
                         "Complete Converting",

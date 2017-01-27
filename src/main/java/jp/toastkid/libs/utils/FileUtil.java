@@ -192,14 +192,10 @@ public final class FileUtil {
      * @return
      */
     private static BufferedReader makeReader(final String filePath, final String pEncode) {
-        final BufferedReader fileReader;
         final InputStream in = FileUtil.getStream(filePath);
-        if (in != null) {
-            fileReader = FileUtil.makeInputStreamReader(in, pEncode);
-        } else {
-            fileReader = FileUtil.makeFileReader(filePath, pEncode);
-        }
-        return fileReader;
+        return in != null
+                ? FileUtil.makeInputStreamReader(in, pEncode)
+                : FileUtil.makeFileReader(filePath, pEncode);
     }
 
     /**
@@ -283,6 +279,9 @@ public final class FileUtil {
      * @return 既知の画像拡張子ならtrue
      */
     public static final boolean isImageFile(final String filePath) {
+        if (filePath == null) {
+            return false;
+        }
         final String lowerCase = filePath.toLowerCase();
         for (final String identifier : IMAGE_FILE_IDENTIFIERS) {
             if (lowerCase.endsWith(identifier)) {
@@ -369,11 +368,11 @@ public final class FileUtil {
      * @return file name removed file extension.
      */
     public static String removeExtension(final String filePath) {
-        final int index = filePath.lastIndexOf(".");
-        if (index == -1) {
-            return filePath;
+        if (filePath == null) {
+            return null;
         }
-        return filePath.substring(0, index);
+        final int index = filePath.lastIndexOf(".");
+        return index == -1 ? filePath : filePath.substring(0, index);
     }
 
     /**
