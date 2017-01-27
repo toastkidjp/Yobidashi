@@ -1,7 +1,6 @@
 package jp.toastkid.jfx.common.control;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,21 +22,11 @@ public class MenuLabel extends Label {
      * The action handler is normally called when the user types the ENTER key.
      */
     private final ObjectProperty<EventHandler<ActionEvent>> onAction
-        = new ObjectPropertyBase<EventHandler<ActionEvent>>() {
+        = new SimpleObjectProperty<EventHandler<ActionEvent>>() {
 
         @Override
         protected void invalidated() {
             setEventHandler(ActionEvent.ACTION, get());
-        }
-
-        @Override
-        public Object getBean() {
-            return MenuLabel.this;
-        }
-
-        @Override
-        public String getName() {
-            return "onAction";
         }
     };
 

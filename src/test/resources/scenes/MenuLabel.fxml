@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import jp.toastkid.jfx.common.control.MenuLabel?>
+
+<StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+  fx:controller="jp.toastkid.jfx.common.control.MenuLabelTestController">
+  <JFXListView styleClass="left-tabs">
+    <MenuLabel fx:id="label" accelerator="Ctrl+T" mnemonicParsing="true" onAction="#test" text="Test" />
+    <MenuLabel text="Empty" />
+  </JFXListView>
+</StackPane>
