@@ -52,15 +52,6 @@ public class ConfigTest {
     }
 
     /**
-     * Test of {@link Config#get(String, String)}.
-     * @throws URISyntaxException
-     */
-    @Test
-    public void test_get_substitute() throws URISyntaxException {
-        assertEquals("substitute", c.get("NotExists", "substitute"));
-    }
-
-    /**
      * Test of {@link Config#get(jp.toastkid.yobidashi.models.Config.Key)}.
      */
     @Test
@@ -94,6 +85,20 @@ public class ConfigTest {
     }
 
     /**
+     * Test of {@link Config#reload()}.
+     * @throws IOException
+     */
+    @Test
+    public void testReload_() throws IOException {
+        c.reload();
+        assertEquals("Y!obidashi", c.get(jp.toastkid.yobidashi.models.Config.Key.APP_TITLE));
+        assertEquals("D:/Article/Article/", c.get(jp.toastkid.yobidashi.models.Config.Key.ARTICLE_DIR));
+        assertEquals("Toast kid", c.get(jp.toastkid.yobidashi.models.Config.Key.AUTHOR));
+        assertEquals("D:/Article/", c.get(jp.toastkid.yobidashi.models.Config.Key.IMAGE_DIR));
+        assertEquals("INTER", c.get(jp.toastkid.yobidashi.models.Config.Key.STYLESHEET));
+    }
+
+    /**
      * Test of {@link Config#store()}.
      * @throws IOException
      */
@@ -103,6 +108,21 @@ public class ConfigTest {
         c.store();
         final long stored = Files.getLastModifiedTime(path).toMillis();
         assertTrue(stored > pre);
+    }
+
+    /**
+     * Test of {@link Config#store(Key, String)}.
+     * @throws IOException
+     */
+    @Test
+    public void testStore_Key_String() throws IOException {
+        final long pre = Files.getLastModifiedTime(path).toMillis();
+        c.store(Key.APP_TITLE, "modified");
+        final long stored = Files.getLastModifiedTime(path).toMillis();
+        assertTrue(stored > pre);
+        c.reload();
+        assertEquals("modified", c.get(Key.APP_TITLE));
+        c.store(Key.APP_TITLE, "Y!obidashi");
     }
 
     /**

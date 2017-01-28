@@ -17,6 +17,7 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.HtmlUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 
 /**
  * This class convert Markdown file to HTML.
@@ -479,7 +480,7 @@ public final class MarkdownConverter {
                  */
                 isInMap = true;
                 map = new YolpMapBuilder();
-                map.setAppId(config.get("yid", ""));
+                map.setAppId(config.get(Key.YID, ""));
                 final String[] content = str.substring(5, str.length() - 1).split(VALUE_SEPARATOR);
                 for (final String s : content) {
                     //System.out.println(s);

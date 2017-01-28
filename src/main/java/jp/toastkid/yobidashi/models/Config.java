@@ -34,7 +34,8 @@ public final class Config {
         APP_ICON("appIcon"),
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
-        IMAGE_DIR("imageDir");
+        IMAGE_DIR("imageDir"),
+        YID("yid");
 
         /** Key of Config. */
         private final String text;
@@ -76,10 +77,10 @@ public final class Config {
 
     /**
      * Get property value by key.
-     * @param key string
+     * @param key key
      * @return property value object
      */
-    public final String get(final String key) {
+    public final String get(final Key key) {
         return get(key, "");
     }
 
@@ -88,27 +89,8 @@ public final class Config {
      * @param key key
      * @return property value object
      */
-    public final String get(final Key key) {
-        return get(key.text, "");
-    }
-
-    /**
-     * Get property value by key.
-     * @param key key
-     * @return property value object
-     */
     public final String get(final Key key, final String substitute) {
-        return get(key.text, substitute);
-    }
-
-    /**
-     * get property value by key.
-     * @param key string
-     * @param substitute default value
-     * @return property value object
-     */
-    public final String get(final String key, final String substitute) {
-        return config.getProperty(key, substitute).toString();
+        return config.getProperty(key.text, substitute).toString();
     }
 
     /**
@@ -161,15 +143,6 @@ public final class Config {
      */
     public void store(final Key key, final String value) {
         store(Maps.fixedSize.of(key.text, value));
-    }
-
-    /**
-     * store configurations with passed single pair to file.
-     * @param key
-     * @param value
-     */
-    public void store(final String key, final String value) {
-        store(Maps.fixedSize.of(key, value));
     }
 
 }

@@ -111,6 +111,7 @@ import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
@@ -1065,7 +1066,7 @@ public final class Controller implements Initializable {
                 }
 
                 searchArticle(isAnd.isSelected(), query, filter);
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -1076,7 +1077,7 @@ public final class Controller implements Initializable {
      */
     private void searchArticle(final boolean isAnd, final String query, final String filter) {
         final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
-                .setHomeDirPath(conf.get("articleDir"))
+                .setHomeDirPath(conf.get(Key.ARTICLE_DIR))
                 .setAnd(isAnd)
                 .setSelectName(filter)
                 .setEmptyAction(() -> {
@@ -1159,7 +1160,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Articles.readAllArticleNames(conf.get("articleDir")))
+        Flux.fromIterable(Articles.readAllArticleNames(conf.get(Key.ARTICLE_DIR)))
             .subscribeOn(Schedulers.newSingle("I/O"))
             .doOnTerminate(this::focusOn)
             .subscribe(items::add);
@@ -1175,7 +1176,7 @@ public final class Controller implements Initializable {
             emitter.success("");
             })
             .subscribe(
-                empty -> new BookmarkManager().readLines()
+                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
                     .collect(Articles::findByTitle)
                     .each(bookmarks::add)
                     );
@@ -1222,7 +1223,7 @@ public final class Controller implements Initializable {
                 historyList.getItems().clear();
                 FILE_WATCHER.clear();
             })
-            .build().show();
+            .build().showAndWait();
     }
 
     /**
@@ -1236,7 +1237,7 @@ public final class Controller implements Initializable {
                 .setTitle("Make new article")
                 .setMessage(newArticleMessage)
                 .addControl(input)
-                .build().show();
+                .build().showAndWait();
         final String newFileName = input.getText();
         if (StringUtils.isEmpty(newFileName)){
             return;
@@ -1351,7 +1352,7 @@ public final class Controller implements Initializable {
                     message = "ファイル名の変更に失敗しました。";
                 }
                 AlertDialog.showMessage(parent, title, message);
-            }).build().show();;
+            }).build().showAndWait();;
     }
 
     /**
@@ -1400,7 +1401,7 @@ public final class Controller implements Initializable {
                     e.printStackTrace();
                     AlertDialog.showMessage(parent, "Failed!", deleteTarget + " を削除できませんでした。");
                 }
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -1517,7 +1518,7 @@ public final class Controller implements Initializable {
                 tab.print(job);
                 job.endJob();
                 AlertDialog.showMessage(getParent(), "Complete print to PDF", "PDF印刷が正常に完了しました。");
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -1851,7 +1852,7 @@ public final class Controller implements Initializable {
                         })
                         .build();
                 pd.start(stage);
-            }).build().show();;
+            }).build().showAndWait();;
     }
 
     /**

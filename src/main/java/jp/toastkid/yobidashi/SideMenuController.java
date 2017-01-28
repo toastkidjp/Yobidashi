@@ -153,7 +153,7 @@ public class SideMenuController implements Initializable {
                             }
                         })
                         .build();
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -177,7 +177,7 @@ public class SideMenuController implements Initializable {
                     LOGGER.error("Error", e);;
                 }
             })
-            .build().show();
+            .build().showAndWait();
     }
 
     /**
@@ -270,7 +270,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void editBookmark() {
-        new BookmarkManager().edit(stage);
+        new BookmarkManager(Defines.PATH_TO_BOOKMARK).edit(stage);
     }
 
     /**
@@ -519,7 +519,7 @@ public class SideMenuController implements Initializable {
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
                 new Archiver().simpleBackup(conf.get(Config.Key.ARTICLE_DIR), epochDay);
-            }).build().show()
+            }).build().showAndWait()
         );
     }
 
@@ -542,7 +542,7 @@ public class SideMenuController implements Initializable {
                             })
                             .build();
                     pd.start(stage);
-                }).build().show());
+                }).build().showAndWait());
     }
 
     /**

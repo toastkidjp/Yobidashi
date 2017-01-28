@@ -187,8 +187,15 @@ public final class AlertDialog extends Application {
     /**
      * Show and wait dialog.
      */
-    public void show() {
+    public void showAndWait() {
         stage.showAndWait();
+    }
+
+    /**
+     * Show dialog. It's for use test.
+     */
+    public void show() {
+        stage.show();
     }
 
     @Override
@@ -241,7 +248,7 @@ public final class AlertDialog extends Application {
             }};
             builder.addControl(textArea);
         }
-        builder.build().show();
+        builder.build().showAndWait();
     }
 
     /**

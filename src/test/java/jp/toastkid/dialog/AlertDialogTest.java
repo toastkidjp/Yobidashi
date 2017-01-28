@@ -42,7 +42,7 @@ public class AlertDialogTest extends ApplicationTest {
                     .setOnNegative("No", () -> {})
                     .addControl(textField)
                     .build();
-            dialog.show();
+            dialog.showAndWait();
             final AlertDialogController controller
                 = (AlertDialogController) Whitebox.getInternalState(dialog, "controller");
             try {

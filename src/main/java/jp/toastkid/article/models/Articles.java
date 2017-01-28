@@ -25,6 +25,7 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 
 /**
@@ -150,7 +151,7 @@ public final class Articles {
      * @return Article オブジェクト
      */
     private static Article find(final String fileName) {
-        return new Article(Paths.get(config.get("articleDir"), fileName));
+        return new Article(Paths.get(config.get(Key.ARTICLE_DIR), fileName));
     }
 
     /**

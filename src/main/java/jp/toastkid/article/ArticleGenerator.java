@@ -15,8 +15,8 @@ import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Defines;
 import jp.toastkid.yobidashi.models.Config.Key;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -93,8 +93,6 @@ public final class ArticleGenerator {
             {
                 put("installDir",  Defines.findInstallDir());
                 put("title",       title);
-                put("wikiIcon",    config.get("wikiIcon"));
-                put("wikiTitle",   config.get("wikiTitle", "Wiklone"));
                 put("subheadings", subheading);
                 put("jarPath",     getClass().getClassLoader().getResource("assets/").toString());
                 put("content",

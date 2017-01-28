@@ -28,6 +28,7 @@ import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 
 /**
@@ -53,7 +54,7 @@ public final class DocToEpub {
     static {
         try {
             conf = new Config(Defines.CONFIG);
-            articlePath = conf.get("articleDir");
+            articlePath = conf.get(Key.ARTICLE_DIR);
             articles = Files.list(Paths.get(articlePath)).collect(Collectors2.toImmutableList());
         } catch (final IOException e) {
             e.printStackTrace();
@@ -200,7 +201,7 @@ public final class DocToEpub {
             ) {
         final List<ContentMetaData> targetPaths = new ArrayList<>();
         final MarkdownConverter converter = new MarkdownConverter(conf);
-        final String imageDir = conf.get("imageDir").replace("\\", "/");
+        final String imageDir = conf.get(Key.IMAGE_DIR).replace("\\", "/");
         converter.containsMenubar = false;
         targets.forEach(path -> {
             final ContentMetaData cmeta = new ContentMetaData();

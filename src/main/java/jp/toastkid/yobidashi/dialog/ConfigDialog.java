@@ -109,7 +109,7 @@ public final class ConfigDialog {
      * @return input 入力文字列
      */
     public final void showAndWait() {
-        dialog.show();
+        dialog.showAndWait();
     }
 
 }
