@@ -53,6 +53,7 @@ import jp.toastkid.yobidashi.dialog.ConfigDialog;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.EditorTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -111,6 +112,7 @@ public class SideMenuController implements Initializable {
     /** Tool Drawer event processor. */
     private TopicProcessor<Message> messenger;
 
+    /** Config. */
     private Config conf;
 
     /**
@@ -152,7 +154,7 @@ public class SideMenuController implements Initializable {
                             }
                         })
                         .build();
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -176,7 +178,7 @@ public class SideMenuController implements Initializable {
                     LOGGER.error("Error", e);;
                 }
             })
-            .build().show();
+            .build().showAndWait();
     }
 
     /**
@@ -209,8 +211,7 @@ public class SideMenuController implements Initializable {
             return;
         }
 
-        new ConfigDialog(parent.get()).showConfigDialog();
-        conf.reload();
+        new ConfigDialog(parent.get()).showAndWait();
         messenger.onNext(TabMessage.makeReload());
     }
 
@@ -270,7 +271,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void editBookmark() {
-        new BookmarkManager().edit(stage);
+        new BookmarkManager(Defines.PATH_TO_BOOKMARK).edit(stage);
     }
 
     /**
@@ -519,7 +520,7 @@ public class SideMenuController implements Initializable {
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
                 new Archiver().simpleBackup(conf.get(Config.Key.ARTICLE_DIR), epochDay);
-            }).build().show()
+            }).build().showAndWait()
         );
     }
 
@@ -542,7 +543,7 @@ public class SideMenuController implements Initializable {
                             })
                             .build();
                     pd.start(stage);
-                }).build().show());
+                }).build().showAndWait());
     }
 
     /**
@@ -656,33 +657,7 @@ public class SideMenuController implements Initializable {
             return;
         }
 
-        final StringBuilder content = new StringBuilder();
-        FileUtil.findExtension(result).ifPresent(ext -> {
-            switch (ext) {
-                case ".txt":
-                    messenger.onNext(
-                            WebTabMessage.make(
-                                    result.toAbsolutePath().toString(),
-                                    FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
-                                    ContentType.TEXT
-                                )
-                            );
-                    break;
-                case ".md":
-                    content.append(articleGenerator.convertToHtml(result));
-                    if (content.length() == 0) {
-                        return;
-                    }
-                    messenger.onNext(
-                            WebTabMessage.make(
-                                    result.toAbsolutePath().toString(),
-                                    content.toString(),
-                                    ContentType.HTML
-                                )
-                            );
-                    break;
-            }
-        });
+        messenger.onNext(EditorTabMessage.make(result));
     }
 
     /**
@@ -777,6 +752,7 @@ public class SideMenuController implements Initializable {
      * @param conf
      */
     public void setConfig(final Config conf) {
+        this.conf = conf;
         this.articleGenerator = new ArticleGenerator(conf);
         this.ePubGenerator    = new EpubGenerator(conf);
     }

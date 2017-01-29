@@ -88,6 +88,6 @@ public final class Nikkei225Extractor implements ChartDataExtractor {
         if (prefix == null) {
             throw new IllegalStateException("'prefix' is null.");
         }
-        return ChartPane.NIKKEI225 + ": " + prefix.substring(2) + " ";
+        return ChartPane.Category.NIKKEI225.text() + ": " + prefix.substring(2) + " ";
     }
 }

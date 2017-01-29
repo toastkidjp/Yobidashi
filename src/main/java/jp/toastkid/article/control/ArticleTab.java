@@ -159,7 +159,7 @@ public class ArticleTab extends BaseWebTab {
         vsp = new VirtualizedScrollPane<>(editor);
         vsp.estimatedScrollYProperty()
             .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        split = new SplitPane(webView, vsp);
+        split = new SplitPane(vsp, webView);
         split.setDividerPositions(0.5);
 
         this.setContent(split);
@@ -248,7 +248,13 @@ public class ArticleTab extends BaseWebTab {
                 return;
             }
 
-            if (event.isControlDown() || event.getCode().isArrowKey()) {
+            if (event.isControlDown()) {
+                return;
+            }
+
+            if (!event.getCode().isLetterKey()
+                    && !event.getCode().isDigitKey()
+                    && !event.getCode().isWhitespaceKey()) {
                 return;
             }
             setText("* " + getText());
@@ -270,10 +276,10 @@ public class ArticleTab extends BaseWebTab {
         }
 
         yOffset = getYPosition();
-        SplitterTransitionFactory.makeHorizontalSlide(split, 1.0d, 1.0d).play();
+        SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
         vsp.setVisible(false);
         vsp.setManaged(false);
-        split.setDividerPositions(1.0);
+        split.setDividerPositions(0.0);
         reload();
     }
 
@@ -290,7 +296,7 @@ public class ArticleTab extends BaseWebTab {
      * @return
      */
     private boolean isNotEditorVisible() {
-        return 0.9 < split.getDividerPositions()[0];
+        return split.getDividerPositions()[0] < 0.1d;
     }
 
     /**

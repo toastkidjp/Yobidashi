@@ -2,13 +2,10 @@ package jp.toastkid.libs;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -31,19 +28,10 @@ public class Zip implements Serializable {
     /**
      * should pass output path and archive name.
      * @param pathToZip
-     * @throws FileNotFoundException
-     */
-    public Zip(final String pathToZip) throws FileNotFoundException {
-        this.out = new ZipOutputStream(new FileOutputStream(pathToZip));
-    }
-
-    /**
-     * entry single file.
-     * @param path
      * @throws IOException
      */
-    public void entry(final String path) throws IOException {
-        this.entry(Paths.get(path));
+    public Zip(final Path pathToZip) throws IOException {
+        this.out = new ZipOutputStream(Files.newOutputStream(pathToZip));
     }
 
     /**

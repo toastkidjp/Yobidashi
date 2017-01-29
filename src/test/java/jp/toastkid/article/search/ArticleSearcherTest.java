@@ -1,18 +1,24 @@
 package jp.toastkid.article.search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Ignore;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
-import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Defines;
+import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
+
+import javafx.application.Platform;
+import javafx.scene.control.TabPane;
+import javafx.stage.Stage;
 
 /**
  * ファイル検索クラスのテスト.
  * @author Toast kid
  *
  */
-public final class ArticleSearcherTest {
+public final class ArticleSearcherTest extends ApplicationTest {
 
     /** AND 検索させるので true. */
     private static final boolean IS_AND = true;
@@ -23,20 +29,20 @@ public final class ArticleSearcherTest {
     /**
      * 並列数による検索スピードの違いを検証.
      * <b>普段は実行しない.</b>
+     * @throws URISyntaxException
      */
-    @Ignore
-    public final void testSearch() {
-        final Config conf = new Config(Defines.CONFIG);
+    @Test
+    public final void testSearch() throws URISyntaxException {
         final ArticleSearcher fs = new ArticleSearcher.Builder()
-            .setHomeDirPath(conf.get("articleDir"))
+            .setHomeDirPath(Paths.get(getClass().getClassLoader().getResource("chart").toURI()).toString())
             .setAnd(IS_AND)
+            .setEmptyAction(() -> {})
+            .setSuccessAction(str -> assertTrue(true))
+            .setTabPane(new TabPane())
+            .setListViewInitializer(lv -> {})
             .build();
         fs.setParallel(5);
-        search(fs);
-        fs.setParallel(10);
-        search(fs);
-        fs.setParallel(20);
-        search(fs);
+        Platform.runLater(() -> search(fs));
     }
 
     /**
@@ -50,7 +56,7 @@ public final class ArticleSearcherTest {
     /**
      * 並列数に 0 以下がセットされる時は 1 が強制セットされることを確認.
      */
-    @Ignore
+    @Test
     public void setAndGetParallelTest() {
         final ArticleSearcher fs = new ArticleSearcher.Builder()
             .setHomeDirPath("").setAnd(false).build();
@@ -64,5 +70,10 @@ public final class ArticleSearcherTest {
         assertEquals(1, fs.getParallel());
         fs.setParallel(2);
         assertEquals(2, fs.getParallel());
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        // NOP.
     }
 }

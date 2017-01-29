@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jp.toastkid.chart.ChartPane;
+import jp.toastkid.chart.ChartPane.Category;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.models.Config;
@@ -76,7 +77,7 @@ public class ToolsController {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
         final Pane content = ChartPane.make(
                 conf.get(Key.ARTICLE_DIR),
-                title,
+                Category.findByText(title),
                 "日記" + month.getSelectionModel().getSelectedItem().toString()
                 );
         messenger.onNext(ContentTabMessage.make(title, content));
@@ -109,7 +110,7 @@ public class ToolsController {
     private final void initChartTool() {
         @SuppressWarnings("unused")
         final ObservableList<String> items = month.<String>getItems();
-        items.addAll(ChartPane.getMonthsList());
+        items.addAll(ChartPane.readMonths());
         graphKind.getSelectionModel().select(0);
         month.getSelectionModel().select(items.size() - 1);
     }

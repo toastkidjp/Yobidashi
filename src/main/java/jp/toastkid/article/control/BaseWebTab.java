@@ -5,14 +5,18 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXSpinner;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.concurrent.Worker.State;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.MathUtil;
@@ -24,6 +28,9 @@ import jp.toastkid.libs.utils.MathUtil;
  *
  */
 public abstract class BaseWebTab extends ReloadableTab {
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditorTab.class);
 
     /** WebView. */
     private final WebView wv;
@@ -39,9 +46,41 @@ public abstract class BaseWebTab extends ReloadableTab {
      */
     public BaseWebTab(final String title, final Node content, final Consumer<Tab> closeAction) {
         super(title, content, closeAction);
-        wv = new WebView();
         spinner = new JFXSpinner();
         this.setGraphic(new HBox(this.getGraphic(), spinner));
+        wv = new WebView();
+        initWebView();
+    }
+
+    /**
+     * Set up WebView.
+     */
+    protected void initWebView() {
+        final WebEngine engine = wv.getEngine();
+        engine.getLoadWorker().stateProperty().addListener((value, prev, next) -> {
+            final State state = value.getValue();
+            switch (state) {
+                case SCHEDULED:
+                    setText(LOADING);
+                    showSpinner();
+                    break;
+                case FAILED:
+                case CANCELLED:
+                    hideSpinner();
+                    break;
+                case SUCCEEDED:
+                    final String currentTitle = getText();
+                    final String newTitle = engine.getTitle();
+                    setText(StringUtils.isNotEmpty(newTitle) ? newTitle : currentTitle);
+                    hideSpinner();
+                    break;
+                case READY:
+                case RUNNING:
+                default:
+                    break;
+            }
+        });
+        engine.setOnAlert(e -> LOGGER.info(e.getData()));
     }
 
     @Override

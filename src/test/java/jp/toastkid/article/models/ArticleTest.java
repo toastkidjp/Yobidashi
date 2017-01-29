@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.toastkid.article.models.Article.Extension;
+
 /**
  * {@link Article}'s test cases.
  * @author Toast kid
@@ -150,7 +152,34 @@ public class ArticleTest {
      */
     @Test
     public void test_makeCharCountResult() {
-        assertTrue(a.makeCharCountResult().startsWith("日記2013-08-31(土) は 427 字です。"));
+        //System.out.println(a.makeCharCountResult());
+        assertTrue(a.makeCharCountResult().contains("日記2013-08-31(土) "));
+        assertTrue(a.makeCharCountResult().contains(" 字です。"));
+        assertTrue(a.makeCharCountResult().contains("2[KB]"));
     }
+
+    /**
+     * Check {@link Article.Extension#values()}.
+     */
+    @Test
+    public void test_text() {
+    	assertEquals(".md", Extension.MD.text());
+	}
+
+    /**
+     * Check {@link Article.Extension#values()}.
+     */
+    @Test
+    public void test_() {
+    	assertEquals(Extension.valueOf("MD"), Extension.MD);
+	}
+
+    /**
+     * Check {@link Article.Extension#values()}.
+     */
+    @Test
+    public void test() {
+		assertTrue(Extension.values().length != 0);
+	}
 
 }

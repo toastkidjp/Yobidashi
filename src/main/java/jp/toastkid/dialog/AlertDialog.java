@@ -51,19 +51,35 @@ public final class AlertDialog extends Application {
      *
      */
     public static class Builder {
+
+        /** Parent window. */
         private final Window parent;
+
+        /** Title. */
         private String title;
+
+        /** Message. */
         private String message;
 
+        /** Negative button's text. */
         private String negaText;
+
+        /** Negative action. */
         private Runnable negaAction;
 
+        /** Positive button's text. */
         private String posiText;
+
+        /** Positive button's action. */
         private Runnable posiAction;
 
+        /** Neutral button's text. */
         private String neutralText;
+
+        /** Neutral button's action. */
         private Runnable neutralAction;
 
+        /** Dialog's controls. */
         private final MutableList<Node> cntrs;
 
         public Builder() {
@@ -136,7 +152,9 @@ public final class AlertDialog extends Application {
         stage.setTitle(b.title);
         controller.setTitle(b.title);
 
-        if (b.parent == null || b.parent.getScene().getStylesheets() == null) {
+        if (b.parent == null
+                || b.parent.getScene() == null
+                || b.parent.getScene().getStylesheets() == null) {
             return;
         }
         // StyleSheet をコピーする.
@@ -166,8 +184,18 @@ public final class AlertDialog extends Application {
         stage.setResizable(false);
     }
 
-    public void show() {
+    /**
+     * Show and wait dialog.
+     */
+    public void showAndWait() {
         stage.showAndWait();
+    }
+
+    /**
+     * Show dialog. It's for use test.
+     */
+    public void show() {
+        stage.show();
     }
 
     @Override
@@ -181,15 +209,6 @@ public final class AlertDialog extends Application {
         showInputDialog("title", "message", null, null);
         System.out.println("check - " + isChecked());
         //*/
-    }
-
-    /**
-     * 渡されたコントロールをセットする。
-     * @param control
-     */
-    public AlertDialog setControl(final Node control) {
-        controller.add(control);
-        return this;
     }
 
     /**
@@ -229,6 +248,13 @@ public final class AlertDialog extends Application {
             }};
             builder.addControl(textArea);
         }
-        builder.build().show();
+        builder.build().showAndWait();
+    }
+
+    /**
+     * Close this dialog.
+     */
+    public void close() {
+        stage.close();
     }
 }

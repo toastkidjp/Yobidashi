@@ -30,11 +30,12 @@ public class Archiver {
      */
     public void simpleBackup(final String articleDir, final long offsetMs) {
         try {
-            final Zip backup
-                = new Zip("backup" + ZonedDateTime.now().toInstant().getEpochSecond() + ".zip");
+            final Path pathToZip
+                = Paths.get("backup" + ZonedDateTime.now().toInstant().getEpochSecond() + ".zip");
+            final Zip backup = new Zip(pathToZip);
             Files.list(Paths.get(articleDir))
                 .filter(path -> isBackup(path, offsetMs))
-                .forEach(Procedures.throwing(path -> backup.entry(path.toAbsolutePath().toString())));
+                .forEach(Procedures.throwing(path -> backup.entry(path.toAbsolutePath())));
             backup.doZip();
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);

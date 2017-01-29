@@ -60,4 +60,5 @@ This software contains following open source softwares. Thanks a lot. :bow:
 
 | Name | License | Comment |
 |:---|:---|:---|
+| [TestFX](https://github.com/TestFX/TestFX) | EUPL | JavaFX testing library.
 | [Mockito](http://mockito.org/) | MIT | Mock lib for testing.

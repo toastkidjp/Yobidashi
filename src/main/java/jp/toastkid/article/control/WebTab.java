@@ -4,11 +4,9 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javafx.concurrent.Worker.State;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.models.ContentType;
 
@@ -83,29 +81,6 @@ public class WebTab extends BaseWebTab {
         super(b.title, null, b.closeAction);
         wv = getWebView();
         this.setContent(wv);
-        final WebEngine engine = wv.getEngine();
-        engine.getLoadWorker().stateProperty().addListener((value, prev, next) -> {
-            final State state = value.getValue();
-            switch (state) {
-                case SCHEDULED:
-                    setText(LOADING);
-                    showSpinner();
-                    break;
-                case FAILED:
-                case CANCELLED:
-                    hideSpinner();
-                    break;
-                case SUCCEEDED:
-                    final String newTitle = engine.getTitle();
-                    setText(StringUtils.isNotEmpty(newTitle) ? newTitle : b.title);
-                    hideSpinner();
-                    break;
-                case READY:
-                case RUNNING:
-                default:
-                    break;
-            }
-        });
 
         if (StringUtils.isNotBlank(b.content)) {
             wv.getEngine().loadContent(b.content, b.contentType.getText());

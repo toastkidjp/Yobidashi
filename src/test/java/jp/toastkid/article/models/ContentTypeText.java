@@ -1,6 +1,7 @@
 package jp.toastkid.article.models;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import org.junit.Test;
 public class ContentTypeText {
 
     /**
-     * {@link ContentType}'s test.
+     * {@link ContentType#getText()}'s test.
      */
     @Test
     public void testHtml() {
@@ -21,12 +22,28 @@ public class ContentTypeText {
     }
 
     /**
-     * {@link ContentType}'s test.
+     * {@link ContentType#getText()}'s test.
      */
     @Test
     public void testText() {
         assertEquals("text/plain", ContentType.TEXT.getText());
         assertEquals("TEXT", ContentType.TEXT.toString());
+    }
+
+    /**
+     * {@link ContentType#valueOf(String)}'s test.
+     */
+    @Test
+    public void test_valueOf() {
+        assertEquals(ContentType.HTML, ContentType.valueOf("HTML"));
+    }
+
+    /**
+     * {@link ContentType#values()}'s test.
+     */
+    @Test
+    public void test_for_tc() {
+        assertTrue(ContentType.values().length != 0);
     }
 
 }

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 /**
- * 外部 Web サービス.
+ * 外部 Web サービスのURLを生成する Helper.
  * @author Toast kid
  * @version 0.0.1
  */
@@ -62,19 +62,6 @@ public class WebServiceHelper {
     /**
      * 各種キーワード検索用の URL を返す。
      * @param targetQuery 検索キーワード
-     * @param type  検索種別(文字列)
-     * @return 各種キーワード検索用の URL
-     */
-    public static String buildRequestUrl(
-            final String query,
-            final String type
-            ) {
-        return buildRequestUrl(query, Type.find(type));
-    }
-
-    /**
-     * 各種キーワード検索用の URL を返す。
-     * @param targetQuery 検索キーワード
      * @param type  検索種別
      * @return 各種キーワード検索用の URL
      */
@@ -82,6 +69,11 @@ public class WebServiceHelper {
             final String query,
             final Type type
             ) {
+
+        if (type == null) {
+            return null;
+        }
+
         String targetQuery = null;
         try {
             targetQuery = URLEncoder.encode(query, "UTF-8");
@@ -91,10 +83,9 @@ public class WebServiceHelper {
 
         switch (type) {
             case REALTIME_SEARCH:
-                return "http://realtime.search.yahoo.co.jp/search?ei=utf-8&p=" + targetQuery;
+                return "http://realtime.search.yahoo.co.jp/search?ei=UTF-8&p=" + targetQuery;
             case WIKIPEDIA:
-                return "https://ja.wikipedia.org/wiki/Special:Search?search="
-                        + targetQuery + "&sourceid=Mozilla-search";
+                return "https://ja.wikipedia.org/wiki/Special:Search?search=" + targetQuery;
             case TABELOG:
                 return "https://tabelog.com/japan/0/0/lst/?vs=1&sk="
                         + targetQuery + "&SrtT=trend&LstCosT=0&sa=&cid=top_navi1&sw=" + targetQuery;

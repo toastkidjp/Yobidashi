@@ -1,6 +1,7 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -67,6 +68,14 @@ public class FileUtilTest {
     }
 
     /**
+     * Test {@link FileUtil#readDirLines(String)}.
+     */
+    @Test
+    public void testReadDirLines_file() {
+        assertTrue(FileUtil.readDirLines("src/test/resources/utils/file/a.txt").isEmpty());;
+    }
+
+    /**
      * {@link FileUtil#countCharacters(String, String)}.
      */
     @Test
@@ -91,6 +100,8 @@ public class FileUtilTest {
     @Test
     public void testRemoveExtension() {
         assertEquals("a", FileUtil.removeExtension("a.txt"));
+        assertEquals("abc", FileUtil.removeExtension("abc"));
+        assertNull(FileUtil.removeExtension(null));
     }
 
     /**
@@ -99,6 +110,16 @@ public class FileUtilTest {
     @Test
     public void testReadLines() {
         final List<String> readLines = FileUtil.readLines("not_exists", "UTF-8");
+        assertNotNull(readLines);
+        assertTrue(readLines.isEmpty());
+    }
+
+    /**
+     * Test {@link FileUtil#readLines(String, String)}.
+     */
+    @Test
+    public void testReadLines_null() {
+        final List<String> readLines = FileUtil.readLines((Path) null, "UTF-8");
         assertNotNull(readLines);
         assertTrue(readLines.isEmpty());
     }
@@ -154,6 +175,23 @@ public class FileUtilTest {
     @Test
     public void test_capture() throws IOException {
         FileUtil.capture(Files.createTempFile("temp", ".png").toAbsolutePath().toString(), new Rectangle(1, 1));
+    }
+
+    /**
+     * {@link FileUtil#isImageFile(String)}'s test case.
+     * @throws IOException
+     */
+    @Test
+    public void test_isImageFile() throws IOException {
+        assertTrue(FileUtil.isImageFile("sample.jpg"));
+        assertTrue(FileUtil.isImageFile("sample.jpeg"));
+        assertTrue(FileUtil.isImageFile("sample.png"));
+
+        assertFalse(FileUtil.isImageFile("sample.txt"));
+        assertFalse(FileUtil.isImageFile("sample.md"));
+        assertFalse(FileUtil.isImageFile("sample"));
+        assertFalse(FileUtil.isImageFile(""));
+        assertFalse(FileUtil.isImageFile(null));
     }
 
     /**

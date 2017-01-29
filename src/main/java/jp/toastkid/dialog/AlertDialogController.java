@@ -128,14 +128,6 @@ public final class AlertDialogController implements Initializable {
     }
 
     /**
-     * add one child node.
-     * @param cntr
-     */
-    public void add(final Node cntr) {
-        inputBox.getChildren().add(cntr);
-    }
-
-    /**
      * add multiple children nodes.
      * @param cntr
      */

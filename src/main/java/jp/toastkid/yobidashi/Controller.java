@@ -79,6 +79,7 @@ import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
 import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.control.ContentTab;
+import jp.toastkid.article.control.EditorTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
@@ -102,6 +103,7 @@ import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.EditorTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -111,6 +113,7 @@ import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
@@ -129,6 +132,9 @@ public final class Controller implements Initializable {
 
     /** default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
+
+    /** Speed Dial's title. */
+    private static final String TITLE_SPEED_DIAL = "Speed Dial";
 
     /** WebView's highliting. */
     private static final String WINDOW_FIND_DOWN
@@ -494,13 +500,8 @@ public final class Controller implements Initializable {
                 return;
             }
             board.getFiles().stream().forEach(f -> {
-                if (".md".equals(FileUtil.findExtension(f.toPath()).get())) {
-                    final WebTabMessage message = WebTabMessage.make(
-                            f.getAbsolutePath(),
-                            articleGenerator.decorate(f.getAbsolutePath(), f.toPath()),
-                            ContentType.HTML
-                        );
-                    processWebTabMessage(message);
+                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).get())) {
+                    processEditorTabMessage(EditorTabMessage.make(Paths.get(f.getAbsolutePath())));
                     return;
                 }
                 openWebTabWithContent(
@@ -761,7 +762,7 @@ public final class Controller implements Initializable {
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
             sdRoot.setPrefHeight(tabPane.getHeight());
-            openTab(makeContentTab("Speed Dial", sdRoot));
+            openTab(makeContentTab(TITLE_SPEED_DIAL, sdRoot));
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -864,6 +865,19 @@ public final class Controller implements Initializable {
                 .setTitle(title)
                 .setContent(content)
                 .setContentType(contentType)
+                .setOnClose(this::closeTab)
+                .build();
+        openTab(tab);
+    }
+
+    /**
+     * Open new editor tab.
+     * @param path
+     */
+    private void openEditorTab(final Path path) {
+        final EditorTab tab = new EditorTab.Builder()
+                .setPath(path)
+                .setConfig(conf)
                 .setOnClose(this::closeTab)
                 .build();
         openTab(tab);
@@ -1062,7 +1076,7 @@ public final class Controller implements Initializable {
                 }
 
                 searchArticle(isAnd.isSelected(), query, filter);
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -1073,7 +1087,7 @@ public final class Controller implements Initializable {
      */
     private void searchArticle(final boolean isAnd, final String query, final String filter) {
         final ArticleSearcher fileSearcher = new ArticleSearcher.Builder()
-                .setHomeDirPath(conf.get("articleDir"))
+                .setHomeDirPath(conf.get(Key.ARTICLE_DIR))
                 .setAnd(isAnd)
                 .setSelectName(filter)
                 .setEmptyAction(() -> {
@@ -1142,7 +1156,7 @@ public final class Controller implements Initializable {
                             && ((ArticleTab) tab).getArticle().equals(property.getValue()))
                     .findFirst();
             if (first.isPresent()) {
-                first.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
+                tabPane.getSelectionModel().select(first.get());
                 return;
             }
             openArticleTab(property.getValue());
@@ -1156,7 +1170,7 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Articles.readAllArticleNames(conf.get("articleDir")))
+        Flux.fromIterable(Articles.readAllArticleNames(conf.get(Key.ARTICLE_DIR)))
             .subscribeOn(Schedulers.newSingle("I/O"))
             .doOnTerminate(this::focusOn)
             .subscribe(items::add);
@@ -1172,7 +1186,7 @@ public final class Controller implements Initializable {
             emitter.success("");
             })
             .subscribe(
-                empty -> new BookmarkManager().readLines()
+                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
                     .collect(Articles::findByTitle)
                     .each(bookmarks::add)
                     );
@@ -1219,7 +1233,7 @@ public final class Controller implements Initializable {
                 historyList.getItems().clear();
                 FILE_WATCHER.clear();
             })
-            .build().show();
+            .build().showAndWait();
     }
 
     /**
@@ -1233,7 +1247,7 @@ public final class Controller implements Initializable {
                 .setTitle("Make new article")
                 .setMessage(newArticleMessage)
                 .addControl(input)
-                .build().show();
+                .build().showAndWait();
         final String newFileName = input.getText();
         if (StringUtils.isEmpty(newFileName)){
             return;
@@ -1348,7 +1362,7 @@ public final class Controller implements Initializable {
                     message = "ファイル名の変更に失敗しました。";
                 }
                 AlertDialog.showMessage(parent, title, message);
-            }).build().show();;
+            }).build().showAndWait();;
     }
 
     /**
@@ -1380,25 +1394,43 @@ public final class Controller implements Initializable {
             .setMessage(deleteTarget + " を削除しますか？")
             .setOnPositive("OK", () -> {
                 try {
+                    FILE_WATCHER.remove(article.path);
                     Files.delete(article.path);
                     AlertDialog.showMessage(parent, "削除完了", deleteTarget + " を削除しました。");
-                    openSpeedDialTab();
-                    // (130309) そしてファイル一覧から削除
-                    articleList.getItems().remove(deleteTarget);
+                    closeCurrentTab();
+                    final Optional<Tab> first = tabPane.getTabs().stream()
+                            .filter(tab -> TITLE_SPEED_DIAL.equals(tab.getText()))
+                            .findFirst();
+                    if (first.isPresent()) {
+                        tabPane.getSelectionModel().select(first.get());
+                    } else {
+                        openSpeedDialTab();
+                    }
                     removeHistory(article);
                 } catch (final Exception e) {
                     e.printStackTrace();
                     AlertDialog.showMessage(parent, "Failed!", deleteTarget + " を削除できませんでした。");
                 }
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
      * 履歴リストから指定した記事名を削除する.
-     * @param deleteTarget 削除する記事名
+     * @param deleteTarget 削除する Article
      */
     private final void removeHistory(final Article deleteTarget) {
-        final ObservableList<Article> items = historyList.getItems();
+        removeItem(deleteTarget, articleList);
+        removeItem(deleteTarget, historyList);
+        removeItem(deleteTarget, bookmarkList);
+    }
+
+    /**
+     * Remove Item from passed ListView.
+     * @param deleteTarget
+     * @param listView
+     */
+    private final void removeItem(final Article deleteTarget, final ListView<Article> listView) {
+        final ObservableList<Article> items = listView.getItems();
         if (items.indexOf(deleteTarget) != -1) {
             items.remove(deleteTarget);
         }
@@ -1496,7 +1528,7 @@ public final class Controller implements Initializable {
                 tab.print(job);
                 job.endJob();
                 AlertDialog.showMessage(getParent(), "Complete print to PDF", "PDF印刷が正常に完了しました。");
-            }).build().show();
+            }).build().showAndWait();
     }
 
     /**
@@ -1533,7 +1565,6 @@ public final class Controller implements Initializable {
      */
     public final void setStage(final Stage stage) {
         this.stage = stage;
-        // TODO check.
         stage.setTitle(conf.get(Config.Key.APP_TITLE));
     }
 
@@ -1616,6 +1647,11 @@ public final class Controller implements Initializable {
             return;
         }
 
+        if (message instanceof EditorTabMessage) {
+            processEditorTabMessage((EditorTabMessage) message);
+            return;
+        }
+
         if (message instanceof SnackbarMessage) {
             setStatus(((SnackbarMessage) message).getText());
             return;
@@ -1643,6 +1679,14 @@ public final class Controller implements Initializable {
             Platform.runLater(() -> showSearchDialog("", ""));
             return;
         }
+    }
+
+    /**
+     * Process {@link EditorTabMessage}'s object.
+     * @param message {@link EditorTabMessage}
+     */
+    private void processEditorTabMessage(final EditorTabMessage message) {
+        Platform.runLater(() -> openEditorTab(message.getPath()));
     }
 
     /**
@@ -1743,7 +1787,7 @@ public final class Controller implements Initializable {
                     return;
                 }
                 final String absolutePath = optional.get().path.toAbsolutePath().toString();
-                AobunUtils.docToTxt(absolutePath);
+                AobunUtils.docToTxt(optional.get().path, Paths.get(Defines.findInstallDir()));
                 AlertDialog.showMessage(
                         getParent(),
                         "Complete Converting",
@@ -1831,7 +1875,7 @@ public final class Controller implements Initializable {
                         })
                         .build();
                 pd.start(stage);
-            }).build().show();;
+            }).build().showAndWait();;
     }
 
     /**

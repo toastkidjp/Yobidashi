@@ -4,15 +4,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +29,6 @@ public final class AobunUtils {
     /** 改ページ記号 */
     public static final String REPAGE = "［＃改ページ］";
 
-    /** 処理対象フォルダ */
-    private static final String targetDirPath = "D:/MyWiki/MyWikiData";
-
     /** ルビの正規表現 */
     private static final Pattern RUBY_PATTERN = Pattern.compile("&ruby\\((.+?)\\)", Pattern.DOTALL);
 
@@ -42,59 +36,15 @@ public final class AobunUtils {
     private static Matcher matcher;
 
     /**
-     * @param args
-     */
-    public static void main(final String[] args) {
-        process("(秘)");
-    }
-
-    /**
-     * 複数ファイルの変換処理を実施する。
-     */
-    private static void process(final String prefix) {
-        final List<Path> files = Lists.mutable.empty();
-        try {
-            Files.list(Paths.get(targetDirPath)).forEach(files::add);
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        final int length = files.size();
-        for (int i = 0; i < length; i++){
-            final Path path = files.get(i);
-            if (Files.isDirectory(path)) {
-                continue;
-            }
-
-            final String title = Articles.convertTitle(path.getFileName().toString());
-            if (title.startsWith(prefix)) {
-                docToTxt(path.toAbsolutePath().toString(), prefix);
-                System.out.println("Now processing (" + (i + 1) + " / " + length + ") ... " + title);
-            }
-        }
-        System.out.println("done.");
-    }
-
-    /**
      * 記事を青空文庫形式のテキストファイルに変換して出力する。
-     * @param pFilePath 処理対象記事ファイルのパス
+     * @param source 処理対象記事ファイルのパス
+     * @param outputTo   出力フォルダ
      */
-    public static final void docToTxt(final String pFilePath) {
-        docToTxt(pFilePath, "");
-    }
-
-    /**
-     * 記事を青空文庫形式のテキストファイルに変換して出力する。
-     * @param pFilePath 処理対象記事ファイルのパス
-     * @param pPrefix   出力フォルダ名となる
-     */
-    public static final void docToTxt(
-            final String pFilePath,
-            final String pPrefix
-            ) {
-        final String        bookTitle  = getTitleFromPath(pFilePath);
-        final List<String>  list       = FileUtil.readLines(pFilePath, Defines.ARTICLE_ENCODE);
+    public static final void docToTxt(final Path source, final Path outputTo) {
+        final String        bookTitle  = getTitleFromPath(source);
+        final List<String>  list       = FileUtil.readLines(source, Defines.ARTICLE_ENCODE);
         final List<String>  output     = convert(bookTitle, list);
-        outputFile(output, bookTitle, pPrefix);
+        outputFile(output, bookTitle, outputTo);
     }
 
     /**
@@ -106,24 +56,13 @@ public final class AobunUtils {
     private static void outputFile(
             final List<String> output,
             final String bookTitle,
-            final String outputDir
+            final Path outputDir
             ) {
-        boolean isMkdir = false;
-        if (StringUtils.isNotEmpty(outputDir)) {
-            try {
-                isMkdir = Files.createDirectories(Paths.get(outputDir)) != null;
-            } catch (final IOException e) {
-                LOGGER.error("Error!", e);
-            }
-        }
-        String outputPath = bookTitle.replace("?", "").replace(" ", "_") + ".txt";
-        if (isMkdir) {
-            outputPath = outputDir + Strings.getDirSeparator() + outputPath;
-        }
+        final String outputPath = bookTitle.replace("?", "").replace(" ", "_") + ".txt";
         try {
             final byte[] outputBytes = output.stream().collect(Collectors.joining(Strings.LINE_SEPARATOR))
                                                       .getBytes(StandardCharsets.UTF_8);
-            Files.write(Paths.get(outputPath), outputBytes);
+            Files.write(outputDir.resolve(outputPath), outputBytes);
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
         }
@@ -131,11 +70,11 @@ public final class AobunUtils {
 
     /**
      * ファイルパスを文書タイトルに変換して返す。
-     * @param filePath ファイルパス
+     * @param path ファイルパス
      * @return 文書タイトル
      */
-    private static String getTitleFromPath(final String filePath) {
-        return Articles.convertTitle(Paths.get(filePath).getFileName().toString()).replace("_", " ");
+    private static String getTitleFromPath(final Path path) {
+        return Articles.convertTitle(path.getFileName().toString()).replace("_", " ");
     }
 
     /**
@@ -155,25 +94,25 @@ public final class AobunUtils {
                 str = reform(str);
             }
 
-            if (str.startsWith("***")) {
-                str = str.replaceFirst("\\*\\*\\*", "");
+            if (str.startsWith("###")) {
+                str = str.replaceFirst("###", "");
                 output.add("");
                 output.add(str + "［＃「" + str + "」は小見出し］");
-            } else if (str.startsWith("**")) {
-                str = str.replaceFirst("\\*\\*", "");
+            } else if (str.startsWith("##")) {
+                str = str.replaceFirst("##", "");
                 output.add("");
                 output.add(str + "［＃「" + str + "」は中見出し］");
-            } else if (str.startsWith("*")) {
-                str = str.replaceFirst("\\*", "");
+            } else if (str.startsWith("#")) {
+                str = str.replaceFirst("#", "");
                 str = str.trim();
-                output.add(str/* + "［＃「" + str + "」は大見出し］"*/);
-            } else if (str.equals("----")) {
+                output.add(str + "［＃「" + str + "」は大見出し］");
+            } else if (str.equals("---")) {
                 output.add("");
                 output.add("---------------------------------------------------");
                 output.add("");
             } else if (str.length() == 0
                     || str.startsWith("-")
-                    || str.startsWith("#")
+                    || str.startsWith("1.")
                     ) {
                 // パラグラフ単位での収集
                 if (paragraph.length() != 0) {

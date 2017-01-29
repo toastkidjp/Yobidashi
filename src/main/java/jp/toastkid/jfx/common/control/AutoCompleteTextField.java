@@ -1,5 +1,6 @@
 package jp.toastkid.jfx.common.control;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
@@ -57,18 +58,20 @@ public class AutoCompleteTextField extends JFXTextField {
                 return;
             }
 
-            final LinkedList<String> searchResult = new LinkedList<>();
-            searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
-            if (entries.size() > 0) {
-                populatePopup(searchResult);
-                if (!entriesPopup.isShowing()) {
-                    entriesPopup.show(AutoCompleteTextField.this, Side.BOTTOM, 0, 0);
-                }
-            } else {
+            final List<String> searchResult = new ArrayList<>(
+                    entries.subSet(getText(), getText() + Character.MAX_VALUE));
+
+            if (0 == entries.size()) {
                 entriesPopup.hide();
+                return;
+            }
+
+            populatePopup(searchResult);
+            if (!entriesPopup.isShowing()) {
+                entriesPopup.show(AutoCompleteTextField.this, Side.BOTTOM, 0, 0);
             }
         });
-        focusedProperty().addListener((value, bool1, bool2) -> {entriesPopup.hide();});
+        focusedProperty().addListener((value, bool1, bool2) -> entriesPopup.hide());
     }
 
     /**
@@ -86,7 +89,7 @@ public class AutoCompleteTextField extends JFXTextField {
      *
      * @param searchResult The set of matching strings.
      */
-    private void populatePopup(List<String> searchResult) {
+    private void populatePopup(final List<String> searchResult) {
         final List<CustomMenuItem> menuItems = new LinkedList<>();
         // If you'd like more entries, modify this line.
         final int maxEntries = 10;

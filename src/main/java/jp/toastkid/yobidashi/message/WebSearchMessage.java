@@ -1,5 +1,8 @@
 package jp.toastkid.yobidashi.message;
 
+import jp.toastkid.libs.WebServiceHelper;
+import jp.toastkid.libs.WebServiceHelper.Type;
+
 /**
  * TODO write test.
  * Web search event's message.
@@ -13,7 +16,7 @@ public class WebSearchMessage implements Message {
     private final String query;
 
     /** search type. */
-    private final String type;
+    private final Type type;
 
     /**
      * Call from internal.
@@ -22,7 +25,7 @@ public class WebSearchMessage implements Message {
      */
     private WebSearchMessage(String query, String type) {
         this.query = query;
-        this.type  = type;
+        this.type  = WebServiceHelper.Type.find(type);
     }
 
     /**
@@ -38,7 +41,7 @@ public class WebSearchMessage implements Message {
         return query;
     }
 
-    public String type() {
+    public Type type() {
         return type;
     }
 }

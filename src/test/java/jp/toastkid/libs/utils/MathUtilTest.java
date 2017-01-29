@@ -26,6 +26,7 @@ public final class MathUtilTest {
         final int[] array = new int[]{19, 2, 4, 1, 33, 22, 2};
         assertEquals(1, MathUtil.minPrim(array));
     }
+
     /**
      * MathUtil#max()'s test case.
      */
@@ -43,6 +44,7 @@ public final class MathUtilTest {
         final Integer[] array = new Integer[]{19, 2, 4, 1, 33, 22, 2};
         assertEquals(1, MathUtil.min(array).intValue());
     }
+
     /**
      * MathUtil#max()'s test case.
      */
@@ -51,6 +53,7 @@ public final class MathUtilTest {
         final Integer[] array = new Integer[]{19, 2, 4, 1, 33, 22, 2};
         assertEquals(33, MathUtil.max(array).intValue());
     }
+
     /**
      * MathUtil#getInt()'s test case..
      */
@@ -63,6 +66,7 @@ public final class MathUtilTest {
         assertEquals(0, MathUtil.getInt(" "));
         assertEquals(0, MathUtil.getInt("tomato"));
     }
+
     /**
      * getDailyRandomIntSet の基本動作を確認する.
      */
@@ -74,6 +78,7 @@ public final class MathUtilTest {
         assertEquals(size, set.size());
         assertTrue(Collections.max(set) <= new Integer(max));
     }
+
     /**
      * sizeが0以下の時は IllegalArgumentException を返すことのテスト.
      */
@@ -89,6 +94,7 @@ public final class MathUtilTest {
             }
         }
     }
+
     /**
      * size より max が小さい時は0から連番を返すことを確認.
      */
@@ -100,6 +106,7 @@ public final class MathUtilTest {
         assertEquals(max, set.size());
         assertEquals(new Integer(max), Collections.max(set));
     }
+
     /**
      * size と max が同じ数値の時でも正常に Set を返すことを確認.
      */
@@ -111,6 +118,7 @@ public final class MathUtilTest {
         assertEquals(max, set.size());
         assertEquals(new Integer(max - 1), Collections.max(set));
     }
+
     /**
      * 0 を除外したときに最大値が4になることを確認.
      */
@@ -137,7 +145,7 @@ public final class MathUtilTest {
     }
 
     /**
-     * test {@link MathUtil#leastSquare(double[][])}.
+     * Test {@link MathUtil#leastSquare(double[][])}.
      */
     @Test
     public final void testLeastSquare() {
@@ -154,7 +162,7 @@ public final class MathUtilTest {
     }
 
     /**
-     * test {@link MathUtil#leastSquare(double[][])}.
+     * Test {@link MathUtil#leastSquare(double[][])}.
      */
     @Test
     public final void testLeastSquareUseMap() {
@@ -174,7 +182,7 @@ public final class MathUtilTest {
     }
 
     /**
-     * test {@link MathUtil#parseOrZero(String)}.
+     * Test {@link MathUtil#parseOrZero(String)}.
      */
     @Test
     public final void testParseOrZero() {
@@ -197,13 +205,24 @@ public final class MathUtilTest {
     }
 
     /**
+     * Check of {@link MathUtil#calcEucridian(int, int)}.
+     */
+    @Test
+    public void test_calcEucridian() {
+        assertEquals(2, MathUtil.calcEucridian(12, 206));
+    }
+
+    /**
      * Check of {@link MathUtil#fibonacci(int)}.
      */
     @Test
     public final void test_fibonacci() {
         assertEquals(21, MathUtil.fibonacci(8));
+        assertEquals(-1, MathUtil.fibonacci(-2));
+        assertEquals(1, MathUtil.fibonacci(-1));
         assertEquals(0, MathUtil.fibonacci(0));
         assertEquals(1, MathUtil.fibonacci(1));
+        assertEquals(1, MathUtil.fibonacci(2));
     }
 
     /**
@@ -223,11 +242,13 @@ public final class MathUtilTest {
      */
     @Test
     public final void test_nCr() {
-        assertEquals(1, MathUtil.nCr(-1, -1));
-        assertEquals(1, MathUtil.nCr(0, 0));
-        assertEquals(0, MathUtil.nCr(0, 1));
-        assertEquals(1, MathUtil.nCr(3, 0));
-        assertEquals(3, MathUtil.nCr(3, 1));
-        assertEquals(3, MathUtil.nCr(3, 2));
+        assertEquals(1,  MathUtil.nCr(-1, -1));
+        assertEquals(1,  MathUtil.nCr(0, 0));
+        assertEquals(0,  MathUtil.nCr(0, 1));
+        assertEquals(1,  MathUtil.nCr(3, 0));
+        assertEquals(3,  MathUtil.nCr(3, 1));
+        assertEquals(3,  MathUtil.nCr(3, 2));
+        assertEquals(15, MathUtil.nCr(6, 2));
+        assertEquals(20, MathUtil.nCr(6, 3));
     }
 }
