@@ -53,6 +53,7 @@ import jp.toastkid.yobidashi.dialog.ConfigDialog;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.EditorTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -656,33 +657,7 @@ public class SideMenuController implements Initializable {
             return;
         }
 
-        final StringBuilder content = new StringBuilder();
-        FileUtil.findExtension(result).ifPresent(ext -> {
-            switch (ext) {
-                case ".txt":
-                    messenger.onNext(
-                            WebTabMessage.make(
-                                    result.toAbsolutePath().toString(),
-                                    FileUtil.readLines(result, "UTF-8").makeString(Strings.LINE_SEPARATOR),
-                                    ContentType.TEXT
-                                )
-                            );
-                    break;
-                case ".md":
-                    content.append(articleGenerator.convertToHtml(result));
-                    if (content.length() == 0) {
-                        return;
-                    }
-                    messenger.onNext(
-                            WebTabMessage.make(
-                                    result.toAbsolutePath().toString(),
-                                    content.toString(),
-                                    ContentType.HTML
-                                )
-                            );
-                    break;
-            }
-        });
+        messenger.onNext(EditorTabMessage.make(result));
     }
 
     /**

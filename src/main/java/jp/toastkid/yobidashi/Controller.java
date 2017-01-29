@@ -79,6 +79,7 @@ import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
 import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.control.ContentTab;
+import jp.toastkid.article.control.EditorTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.models.Article;
@@ -102,6 +103,7 @@ import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
+import jp.toastkid.yobidashi.message.EditorTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -498,13 +500,8 @@ public final class Controller implements Initializable {
                 return;
             }
             board.getFiles().stream().forEach(f -> {
-                if (".md".equals(FileUtil.findExtension(f.toPath()).get())) {
-                    final WebTabMessage message = WebTabMessage.make(
-                            f.getAbsolutePath(),
-                            articleGenerator.decorate(f.getAbsolutePath(), f.toPath()),
-                            ContentType.HTML
-                        );
-                    processWebTabMessage(message);
+                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).get())) {
+                    processEditorTabMessage(EditorTabMessage.make(Paths.get(f.getAbsolutePath())));
                     return;
                 }
                 openWebTabWithContent(
@@ -868,6 +865,19 @@ public final class Controller implements Initializable {
                 .setTitle(title)
                 .setContent(content)
                 .setContentType(contentType)
+                .setOnClose(this::closeTab)
+                .build();
+        openTab(tab);
+    }
+
+    /**
+     * Open new editor tab.
+     * @param path
+     */
+    private void openEditorTab(final Path path) {
+        final EditorTab tab = new EditorTab.Builder()
+                .setPath(path)
+                .setConfig(conf)
                 .setOnClose(this::closeTab)
                 .build();
         openTab(tab);
@@ -1637,6 +1647,11 @@ public final class Controller implements Initializable {
             return;
         }
 
+        if (message instanceof EditorTabMessage) {
+            processEditorTabMessage((EditorTabMessage) message);
+            return;
+        }
+
         if (message instanceof SnackbarMessage) {
             setStatus(((SnackbarMessage) message).getText());
             return;
@@ -1664,6 +1679,14 @@ public final class Controller implements Initializable {
             Platform.runLater(() -> showSearchDialog("", ""));
             return;
         }
+    }
+
+    /**
+     * Process {@link EditorTabMessage}'s object.
+     * @param message {@link EditorTabMessage}
+     */
+    private void processEditorTabMessage(final EditorTabMessage message) {
+        Platform.runLater(() -> openEditorTab(message.getPath()));
     }
 
     /**
