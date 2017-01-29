@@ -28,6 +28,7 @@ public class FileWatcherJobTest {
         fileWatcherJob.remove(removable);
         fileWatcherJob.run();
         fileWatcherJob.stop();
+        fileWatcherJob.clear();
     }
 
 }

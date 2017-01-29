@@ -48,6 +48,8 @@ public class ResponseTest {
     public final void testToString() throws UnsupportedEncodingException {
         final Response response = makeObj();
         assertTrue(response instanceof Response);
+        assertTrue(response.toString()
+                .contains("[header={tomato=[fake]},body={116,111,109,97,116,111}]"));
         assertEquals("{tomato=[fake]}", response.header().toString());
         assertEquals("[116, 111, 109, 97, 116, 111]", Arrays.toString(response.body()));
     }
