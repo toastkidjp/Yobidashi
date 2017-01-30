@@ -8,9 +8,12 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javafx.scene.text.Font;
 
 /**
  * config of Wiki client.
@@ -22,6 +25,9 @@ public final class Config {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
+
+    /** Default font. */
+    private static final Font DEFAULT_FONT = Font.getDefault();
 
     /**
      * Keys of Config.
@@ -35,6 +41,9 @@ public final class Config {
         ARTICLE_DIR("articleDir"),
         STYLESHEET("stylesheet"),
         IMAGE_DIR("imageDir"),
+        FONT_SIZE("fontSize"),
+        FONT_FAMILY("fontFamily"),
+        TEST("test"),
         YID("yid");
 
         /** Key of Config. */
@@ -91,6 +100,30 @@ public final class Config {
      */
     public final String get(final Key key, final String substitute) {
         return config.getProperty(key.text, substitute).toString();
+    }
+
+    /**
+     * Get property int value by key.
+     * @param key key
+     * @return property value object
+     */
+    public final int getInt(final Key key, final int substitute) {
+        if (!config.containsKey(key.text)) {
+            return substitute;
+        }
+        final String string = get(key).toString();
+        if (StringUtils.isBlank(string)) {
+            return substitute;
+        }
+        return Integer.parseInt(string);
+    }
+
+    /**
+     * Return font.
+     * @return Font
+     */
+    public final Font getFont() {
+        return Font.font(get(Key.FONT_FAMILY, DEFAULT_FONT.getFamily()), getInt(Key.FONT_SIZE, 16));
     }
 
     /**

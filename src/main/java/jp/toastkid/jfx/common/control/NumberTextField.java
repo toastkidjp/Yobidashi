@@ -1,5 +1,7 @@
 package jp.toastkid.jfx.common.control;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.jfoenix.controls.JFXTextField;
 
 /**
@@ -27,5 +29,13 @@ public class NumberTextField extends JFXTextField {
 
     private boolean validate(final String text) {
         return text.matches("[0-9]*");
+    }
+
+    public int intValue() {
+        final String text = getText();
+        if (StringUtils.isBlank(text)) {
+            return 0;
+        }
+        return Integer.parseInt(text);
     }
 }

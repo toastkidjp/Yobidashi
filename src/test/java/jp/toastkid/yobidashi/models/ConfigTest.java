@@ -1,6 +1,7 @@
 package jp.toastkid.yobidashi.models;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -12,7 +13,9 @@ import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
+import javafx.stage.Stage;
 import jp.toastkid.yobidashi.models.Config.Key;
 
 /**
@@ -21,7 +24,7 @@ import jp.toastkid.yobidashi.models.Config.Key;
  * @author Toast kid
  *
  */
-public class ConfigTest {
+public class ConfigTest extends ApplicationTest {
 
     /** Test object. */
     private Config c;
@@ -69,6 +72,32 @@ public class ConfigTest {
         assertEquals("Toast kid", c.get(jp.toastkid.yobidashi.models.Config.Key.AUTHOR));
         assertEquals("D:/Article/", c.get(jp.toastkid.yobidashi.models.Config.Key.IMAGE_DIR));
         assertEquals("INTER", c.get(jp.toastkid.yobidashi.models.Config.Key.STYLESHEET));
+    }
+
+    /**
+     * Test of {@link Config#getInt(Key, int)}.}
+     */
+    @Test
+    public void testGetInt() {
+        assertEquals(10, c.getInt(Key.FONT_SIZE, -1));
+        assertEquals(-1, c.getInt(Key.TEST, -1));
+    }
+
+    /**
+     * Test of {@link Config#getFont()}.}
+     */
+    @Test
+    public void test_getFont() {
+        assertNotNull(c.getFont());
+        assertEquals(10, c.getFont().getSize(), 0.0d);
+    }
+
+    /**
+     * Test of {@link Config#getInt(Key, int)}'s irregular case.
+     */
+    @Test(expected=NumberFormatException.class)
+    public void testGetInt_IrregularCase() {
+        assertEquals(-1, c.getInt(Key.APP_TITLE, -1));
     }
 
     /**
@@ -133,6 +162,11 @@ public class ConfigTest {
         assertEquals("author", Key.AUTHOR.text());
         assertSame(Key.AUTHOR, Key.valueOf("AUTHOR"));
         assertTrue(0 != Key.values().length);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        // NOP.
     }
 
 }

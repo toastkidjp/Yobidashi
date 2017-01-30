@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
@@ -79,6 +81,7 @@ import jp.toastkid.article.control.ArticleListCell;
 import jp.toastkid.article.control.ArticleTab;
 import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.control.ContentTab;
+import jp.toastkid.article.control.Editable;
 import jp.toastkid.article.control.EditorTab;
 import jp.toastkid.article.control.ReloadableTab;
 import jp.toastkid.article.control.WebTab;
@@ -104,6 +107,7 @@ import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.EditorTabMessage;
+import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -795,7 +799,9 @@ public final class Controller implements Initializable {
      * @param article tab's article
      */
     private void openArticleTab(final Article article) {
-        openTab(makeArticleTab(article));
+        final ArticleTab articleTab = makeArticleTab(article);
+        articleTab.setFont(conf.getFont());
+        openTab(articleTab);
     }
 
     /**
@@ -880,6 +886,7 @@ public final class Controller implements Initializable {
                 .setConfig(conf)
                 .setOnClose(this::closeTab)
                 .build();
+        tab.setFont(conf.getFont());
         openTab(tab);
     }
 
@@ -922,7 +929,8 @@ public final class Controller implements Initializable {
             }
 
             // add new item:
-            cmc.getItemsContainer().getChildren().addAll(
+            final ObservableList<Node> itemContainer = cmc.getItemsContainer().getChildren();
+            itemContainer.addAll(
                     makeContextMenuItemContainerWithAction(
                             cmc, "文字数計測", event -> processArticleMessage(ArticleMessage.makeLength())),
                     makeContextMenuItemContainerWithAction(
@@ -956,13 +964,14 @@ public final class Controller implements Initializable {
                             isHideLeftPane()
                             ? makeMenuItemWithAction("記事一覧を開く",   event -> showLeftPane())
                             : makeMenuItemWithAction("記事一覧を閉じる", event -> hideLeftPane())
-                            ),
-                    cmc.new MenuItemContainer(
-                            getCurrentTab().isEditing()
-                            ? makeMenuItemWithAction("Close editor",   event -> edit())
-                            : makeMenuItemWithAction("Edit", event -> edit())
                             )
                     );
+            editableOr().ifPresent(editor -> itemContainer.add(cmc.new MenuItemContainer(
+                    editor.isEditing()
+                    ? makeMenuItemWithAction("Close editor",   event -> edit())
+                    : makeMenuItemWithAction("Edit", event -> edit())
+                    )
+                ));
 
             return (PopupWindow)window;
         }
@@ -1256,16 +1265,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Save current tab's content.
-     */
-    private void saveCurrentTab() {
-        final String message = getCurrentTab().saveContent();
-        if (StringUtils.isNotBlank(message)) {
-            setStatus(message);
-        }
-    }
-
-    /**
      * Call copy article。
      * <HR>
      * (130707) メッセージ変更<BR>
@@ -1437,15 +1436,26 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Save current tab's content.
+     */
+    private void saveCurrentTab() {
+        editableOr().ifPresent(Editable::saveContent);
+    }
+
+    /**
      * Call editor.
      */
     private final void edit() {
+        editableOr().ifPresent(Editable::edit);
+    }
 
-        final String edit = getCurrentTab().edit();
-
-        if (StringUtils.isNotEmpty(edit)) {
-            setStatus(edit);
-        }
+    /**
+     * Return Optional&lt;Editable&gt;.
+     * @return Optional&lt;Editable&gt;.
+     */
+    private final Optional<Editable> editableOr() {
+        final ReloadableTab tab = getCurrentTab();
+        return Optional.ofNullable(tab).filter(t -> t instanceof Editable).map(Editable.class::cast);
     }
 
     /**
@@ -1679,6 +1689,28 @@ public final class Controller implements Initializable {
             Platform.runLater(() -> showSearchDialog("", ""));
             return;
         }
+
+        if (message instanceof FontMessage) {
+            final FontMessage fontEvent = (FontMessage) message;
+            final int size = fontEvent.getSize();
+            conf.store(Maps.mutable.of(
+                    Key.FONT_SIZE.text(),   Integer.toString(size),
+                    Key.FONT_FAMILY.text(), fontEvent.getFont().getFamily()
+                    ));
+            applyFontToEditor();
+            return;
+        }
+    }
+
+    /**
+     * Apply current font to editor tab.
+     */
+    private void applyFontToEditor() {
+        final Font font = conf.getFont();
+        tabPane.getTabs().stream()
+            .filter(Editable.class::isInstance)
+            .map(Editable.class::cast)
+            .forEach(tab -> Platform.runLater(() -> tab.setFont(font)));
     }
 
     /**

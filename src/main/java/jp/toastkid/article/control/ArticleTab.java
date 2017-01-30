@@ -22,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.ArticleGenerator;
@@ -39,7 +40,7 @@ import jp.toastkid.yobidashi.models.Defines;
  *
  * @author Toast kid
  */
-public class ArticleTab extends BaseWebTab {
+public class ArticleTab extends BaseWebTab implements Editable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
@@ -159,6 +160,7 @@ public class ArticleTab extends BaseWebTab {
         vsp = new VirtualizedScrollPane<>(editor);
         vsp.estimatedScrollYProperty()
             .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
+        vsp.setPrefHeight(700.0d);
         split = new SplitPane(vsp, webView);
         split.setDividerPositions(0.5);
 
@@ -259,6 +261,12 @@ public class ArticleTab extends BaseWebTab {
             }
             setText("* " + getText());
         });
+    }
+
+    @Override
+    public void setFont(final Font font) {
+        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
+                font.getFamily(), font.getSize()));
     }
 
     /**
