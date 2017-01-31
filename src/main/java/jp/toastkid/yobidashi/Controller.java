@@ -91,6 +91,7 @@ import jp.toastkid.article.models.ContentType;
 import jp.toastkid.article.search.ArticleSearcher;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
+import jp.toastkid.jfx.common.FontFactory;
 import jp.toastkid.jfx.common.Style;
 import jp.toastkid.jfx.common.control.AutoCompleteTextField;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
@@ -800,7 +801,7 @@ public final class Controller implements Initializable {
      */
     private void openArticleTab(final Article article) {
         final ArticleTab articleTab = makeArticleTab(article);
-        articleTab.setFont(conf.getFont());
+        articleTab.setFont(readFont());
         openTab(articleTab);
     }
 
@@ -886,7 +887,7 @@ public final class Controller implements Initializable {
                 .setConfig(conf)
                 .setOnClose(this::closeTab)
                 .build();
-        tab.setFont(conf.getFont());
+        tab.setFont(readFont());
         openTab(tab);
     }
 
@@ -1706,11 +1707,19 @@ public final class Controller implements Initializable {
      * Apply current font to editor tab.
      */
     private void applyFontToEditor() {
-        final Font font = conf.getFont();
+        final Font font = readFont();
         tabPane.getTabs().stream()
             .filter(Editable.class::isInstance)
             .map(Editable.class::cast)
             .forEach(tab -> Platform.runLater(() -> tab.setFont(font)));
+    }
+
+    /**
+     * Read font form config.
+     * @return Font
+     */
+    private Font readFont() {
+        return FontFactory.make(conf.get(Key.FONT_FAMILY), conf.getInt(Key.FONT_SIZE, 16));
     }
 
     /**

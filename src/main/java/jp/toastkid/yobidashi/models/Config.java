@@ -13,8 +13,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.scene.text.Font;
-
 /**
  * config of Wiki client.
  *
@@ -25,9 +23,6 @@ public final class Config {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
-
-    /** Default font. */
-    private static final Font DEFAULT_FONT = Font.getDefault();
 
     /**
      * Keys of Config.
@@ -116,14 +111,6 @@ public final class Config {
             return substitute;
         }
         return Integer.parseInt(string);
-    }
-
-    /**
-     * Return font.
-     * @return Font
-     */
-    public final Font getFont() {
-        return Font.font(get(Key.FONT_FAMILY, DEFAULT_FONT.getFamily()), getInt(Key.FONT_SIZE, 16));
     }
 
     /**

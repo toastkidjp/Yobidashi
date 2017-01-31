@@ -3,6 +3,7 @@ package jp.toastkid.article.control;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -15,16 +16,26 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.PlatformUtil;
+
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.InputMethodRequests;
+import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Window;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
@@ -261,6 +272,96 @@ public class ArticleTab extends BaseWebTab implements Editable {
             }
             setText("* " + getText());
         });
+
+        if (editor.getOnInputMethodTextChanged() == null) {
+            editor.setOnInputMethodTextChanged(event -> {
+                handleInputMethodEvent(event);
+            });
+}
+
+        editor.setInputMethodRequests(new InputMethodRequests() {
+            @Override public Point2D getTextLocation(int offset) {
+                final Scene scene = editor.getScene();
+                final Window window = scene.getWindow();
+                // Don't use imstart here because it isn't initialized yet.
+               // Rectangle2D characterBounds = getCharacterBounds(editor.getSelection().getStart() + offset);
+                //Point2D p = editor.localToScene(characterBounds.getMinX(), characterBounds.getMaxY());
+                final Point2D location = new Point2D(window.getX() + scene.getX() ,
+                                               window.getY() + scene.getY() );
+                return location;
+            }
+
+            @Override
+            public int getLocationOffset(int x, int y) {
+                return 0;
+            }
+
+            @Override
+            public void cancelLatestCommittedText() {
+                // TODO
+            }
+
+            @Override
+            public String getSelectedText() {
+                final IndexRange selection = editor.getSelection();
+
+                return editor.getText(selection.getStart(), selection.getEnd());
+            }
+        });
+    }
+
+    // Start/Length of the text under input method composition
+    private int imstart;
+    private int imlength;
+    // Holds concrete attributes for the composition runs
+    private final List<Shape> imattrs = new java.util.ArrayList<Shape>();
+
+    protected void handleInputMethodEvent(InputMethodEvent event) {
+        if (editor.isEditable() && !editor.isDisabled()) {
+
+            // just replace the text on iOS
+            if (PlatformUtil.isIOS()) {
+               editor.replaceText(event.getCommitted());
+               return;
+            }
+
+            // remove previous input method text (if any) or selected text
+            if (imlength != 0) {
+                //removeHighlight(imattrs);
+                imattrs.clear();
+                editor.selectRange(imstart, imstart + imlength);
+            }
+
+            // Insert committed text
+            if (event.getCommitted().length() != 0) {
+                final String committed = event.getCommitted();
+                editor.replaceText(editor.getSelection(), committed);
+            }
+
+            // Replace composed text
+            imstart = editor.getSelection().getStart();
+            final StringBuilder composed = new StringBuilder();
+            for (final InputMethodTextRun run : event.getComposed()) {
+                composed.append(run.getText());
+            }
+            editor.replaceText(editor.getSelection(), composed.toString());
+            imlength = composed.length();
+            if (imlength != 0) {
+                int pos = imstart;
+                for (final InputMethodTextRun run : event.getComposed()) {
+                    final int endPos = pos + run.getText().length();
+                    //createInputMethodAttributes(run.getHighlight(), pos, endPos);
+                    pos = endPos;
+                }
+                //addHighlight(imattrs, imstart);
+
+                // Set caret position in composed text
+                final int caretPos = event.getCaretPosition();
+                if (caretPos >= 0 && caretPos < imlength) {
+                    editor.selectRange(imstart + caretPos, imstart + caretPos);
+                }
+            }
+        }
     }
 
     @Override
