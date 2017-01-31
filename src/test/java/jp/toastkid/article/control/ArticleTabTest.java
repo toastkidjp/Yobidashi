@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.application.Platform;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import jp.toastkid.article.models.Article;
@@ -115,6 +116,14 @@ public class ArticleTabTest extends ApplicationTest {
     @Test
     public void testLoadUrlStringBoolean() {
         Platform.runLater(() -> tab.loadUrl("", false));
+    }
+
+    /**
+     * Test of {@link EditorTab#setFont(Font)()}.
+     */
+    @Test
+    public void test_setFont() {
+        Platform.runLater(() -> tab.setFont(Font.getDefault()));
     }
 
     /**

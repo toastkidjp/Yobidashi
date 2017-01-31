@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.application.Platform;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
@@ -57,8 +58,8 @@ public class EditorTabTest extends ApplicationTest {
     @Test
     public void testGetUrl() {
         final String url = tab.getUrl();
-        assertTrue(tab.getUrl().startsWith("file:/"));
-        assertTrue(tab.getUrl().endsWith("C6FCB5AD323031332D30382D333128C5DA29.md"));
+        assertTrue(url.startsWith("file:/"));
+        assertTrue(url.endsWith("C6FCB5AD323031332D30382D333128C5DA29.md"));
     }
 
     /**
@@ -92,6 +93,14 @@ public class EditorTabTest extends ApplicationTest {
     @Test
     public void testHtmlSource() {
         assertNotNull(tab.htmlSource());
+    }
+
+    /**
+     * Test of {@link EditorTab#setFont(Font)()}.
+     */
+    @Test
+    public void test_setFont() {
+        Platform.runLater(() -> tab.setFont(Font.getDefault()));
     }
 
     @Override
