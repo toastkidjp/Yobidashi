@@ -67,8 +67,6 @@ public abstract class BaseWebTab extends ReloadableTab {
                     break;
                 case FAILED:
                 case CANCELLED:
-                    hideSpinner();
-                    break;
                 case SUCCEEDED:
                     final String currentTitle = getText();
                     final String newTitle = engine.getTitle();

@@ -215,7 +215,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
         loadWorker.stateProperty().addListener(
                 (observable, prev, next) -> {
                     final String url = engine.getLocation();
-                    //System.out.println(getText() + " " + url + " " + observable.getValue());
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
                         return;
@@ -223,10 +222,8 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
                     if (url.startsWith("http")) {
                         if (State.SCHEDULED.equals(observable.getValue())) {
-                            System.out.println("loader stop ");
-                            //loadWorker.cancel();
                             onOpenUrl.accept(LOADING, url);
-                            //reload();
+                            reload();
                             return;
                         }
                         return;
@@ -234,23 +231,17 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
                     if (State.SCHEDULED.equals(observable.getValue())) {
                         loadWorker.cancel();
-                        System.out.println(getText() + " open new tab " + url);
                         openNewTab(url, onOpenNewArticle, onOpenUrl);
+                        setText(article.title);
                         return;
                     }
 
-                    if (State.CANCELLED.equals(observable.getValue())) {
-                        hideSpinner();
-                    }
-
                     if (State.SUCCEEDED.equals(observable.getValue())) {
-                        final String title = engine.getTitle();
-                        this.setText(StringUtils.isNotBlank(title) ? title : article.title);
                         onLoad.run();
-                        hideSpinner();
                         if (yOffset != 0) {
                             scrollTo(yOffset);
                         }
+                        return;
                     }
                 });
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
