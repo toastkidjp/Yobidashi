@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import jp.toastkid.article.control.editor.ArticleTab;
 
 /**
  * Content tab.

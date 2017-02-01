@@ -8,6 +8,7 @@ import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.web.WebView;
+import jp.toastkid.article.control.editor.ArticleTab;
 import jp.toastkid.article.models.ContentType;
 
 /**

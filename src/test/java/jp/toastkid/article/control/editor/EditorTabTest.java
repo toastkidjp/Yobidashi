@@ -1,4 +1,4 @@
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,7 @@ import org.testfx.framework.junit.ApplicationTest;
 import javafx.application.Platform;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import jp.toastkid.article.control.editor.EditorTab;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
 /**

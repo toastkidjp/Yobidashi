@@ -1,7 +1,7 @@
 /**
  *
  */
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,6 +18,7 @@ import javafx.application.Platform;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import jp.toastkid.article.control.editor.ArticleTab;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
@@ -37,7 +38,7 @@ public class ArticleTabTest extends ApplicationTest {
     private ArticleTab tab;
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#reload()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#reload()} 's test method.
      */
     @Test
     public void testReload() {
@@ -45,7 +46,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#loadUrl(java.lang.String)} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#loadUrl(java.lang.String)} 's test method.
      */
     @Test
     public void testLoadUrlString() {
@@ -53,7 +54,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#getTitle()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#getTitle()} 's test method.
      */
     @Test
     public void testGetTitle() {
@@ -61,7 +62,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#getUrl()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#getUrl()} 's test method.
      */
     @Test
     public void testGetUrl() {
@@ -69,7 +70,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#edit()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#edit()} 's test method.
      */
     @Test
     public void testEdit() {
@@ -85,7 +86,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#saveContent()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#saveContent()} 's test method.
      */
     @Test
     public void testSaveContent() {
@@ -93,7 +94,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#htmlSource()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#htmlSource()} 's test method.
      */
     @Test
     public void testHtmlSource() {
@@ -101,7 +102,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#getWebView()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#getWebView()} 's test method.
      */
     @Test
     public void testGetWebView() {
@@ -111,7 +112,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#loadUrl(java.lang.String, boolean)} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#loadUrl(java.lang.String, boolean)} 's test method.
      */
     @Test
     public void testLoadUrlStringBoolean() {
@@ -127,7 +128,7 @@ public class ArticleTabTest extends ApplicationTest {
     }
 
     /**
-     * {@link jp.toastkid.article.control.ArticleTab#getArticle()} 's test method.
+     * {@link jp.toastkid.article.control.editor.ArticleTab#getArticle()} 's test method.
      */
     @Test
     public void testGetArticle() {

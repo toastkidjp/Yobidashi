@@ -1,4 +1,4 @@
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import javafx.scene.text.Font;
 

@@ -1,4 +1,4 @@
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +17,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
