@@ -1,4 +1,4 @@
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
@@ -27,7 +29,7 @@ import jp.toastkid.yobidashi.models.Defines;
  * @author Toast kid
  *
  */
-public class EditorTab extends BaseWebTab {
+public class EditorTab extends BaseWebTab implements Editable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorTab.class);
@@ -240,6 +242,12 @@ public class EditorTab extends BaseWebTab {
     @Override
     public String getUrl() {
         return path.toUri().toString();
+    }
+
+    @Override
+    public void setFont(final Font font) {
+        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
+                font.getFamily(), font.getSize()));
     }
 
 }

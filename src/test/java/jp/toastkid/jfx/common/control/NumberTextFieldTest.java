@@ -50,6 +50,25 @@ public class NumberTextFieldTest extends ApplicationTest {
         assertEquals("12123454567890", numberTextField.getText());
     }
 
+    /**
+     * {@link NumberTextField#intValue()}.
+     */
+    @Test
+    public void test_intValue() {
+        numberTextField.setText(null);
+        assertEquals(0, numberTextField.intValue());
+        numberTextField.setText("");
+        assertEquals(0, numberTextField.intValue());
+        numberTextField.setText(" ");
+        assertEquals(0, numberTextField.intValue());
+        numberTextField.setText("0");
+        assertEquals(0, numberTextField.intValue());
+        numberTextField.setText("1");
+        assertEquals(1, numberTextField.intValue());
+        numberTextField.setText("-1");
+        assertEquals(-1, numberTextField.intValue());
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         // NOP

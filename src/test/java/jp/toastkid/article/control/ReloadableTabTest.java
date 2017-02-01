@@ -1,6 +1,5 @@
 package jp.toastkid.article.control;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,30 +41,6 @@ public class ReloadableTabTest extends ApplicationTest {
     public void testSetCloseAction() {
         tab.setCloseAction(tab -> assertTrue(true));
         tab.close(tab -> assertTrue(true));
-    }
-
-    /**
-     * Test of {@link ReloadableTab#edit()}.
-     */
-    @Test
-    public void testEdit() {
-        assertEquals("This tab's content can't edit.", tab.edit());
-    }
-
-    /**
-     * Test of {@link ReloadableTab#saveContent()}.
-     */
-    @Test
-    public void testSaveContent() {
-        assertEquals("This tab's content can't save.", tab.saveContent());
-    }
-
-    /**
-     * Test of {@link ReloadableTab#isEditing()}.
-     */
-    @Test
-    public void testIsEditing() {
-        assertEquals(false, tab.isEditing());
     }
 
     @Override

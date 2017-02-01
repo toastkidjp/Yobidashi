@@ -1,8 +1,10 @@
-package jp.toastkid.article.control;
+package jp.toastkid.article.control.editor;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -15,6 +17,8 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.PlatformUtil;
+
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
@@ -22,9 +26,14 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
@@ -39,7 +48,7 @@ import jp.toastkid.yobidashi.models.Defines;
  *
  * @author Toast kid
  */
-public class ArticleTab extends BaseWebTab {
+public class ArticleTab extends BaseWebTab implements Editable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
@@ -73,6 +82,15 @@ public class ArticleTab extends BaseWebTab {
 
     /** Dir of article. */
     private final String articleDir;
+
+    /** Start of the text under input method composition. */
+    private int imstart;
+
+    /** Length of the text under input method composition. */
+    private int imlength;
+
+    /** Holds concrete attributes for the composition runs. */
+    private final List<Shape> imattrs = new ArrayList<Shape>();
 
     /**
      * {@link ArticleTab}'s builder.
@@ -159,6 +177,7 @@ public class ArticleTab extends BaseWebTab {
         vsp = new VirtualizedScrollPane<>(editor);
         vsp.estimatedScrollYProperty()
             .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
+        vsp.setPrefHeight(700.0d);
         split = new SplitPane(vsp, webView);
         split.setDividerPositions(0.5);
 
@@ -192,12 +211,10 @@ public class ArticleTab extends BaseWebTab {
             final BiConsumer<String, String> onOpenUrl
             ) {
         final WebEngine engine = webView.getEngine();
-        //engine.setCreatePopupHandler(handler);
         final Worker<Void> loadWorker = engine.getLoadWorker();
         loadWorker.stateProperty().addListener(
                 (observable, prev, next) -> {
                     final String url = engine.getLocation();
-                    //System.out.println(getText() + " " + url + " " + observable.getValue());
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
                         return;
@@ -205,10 +222,8 @@ public class ArticleTab extends BaseWebTab {
 
                     if (url.startsWith("http")) {
                         if (State.SCHEDULED.equals(observable.getValue())) {
-                            System.out.println("loader stop ");
-                            //loadWorker.cancel();
                             onOpenUrl.accept(LOADING, url);
-                            //reload();
+                            reload();
                             return;
                         }
                         return;
@@ -216,23 +231,17 @@ public class ArticleTab extends BaseWebTab {
 
                     if (State.SCHEDULED.equals(observable.getValue())) {
                         loadWorker.cancel();
-                        System.out.println(getText() + " open new tab " + url);
                         openNewTab(url, onOpenNewArticle, onOpenUrl);
+                        setText(article.title);
                         return;
                     }
 
-                    if (State.CANCELLED.equals(observable.getValue())) {
-                        hideSpinner();
-                    }
-
                     if (State.SUCCEEDED.equals(observable.getValue())) {
-                        final String title = engine.getTitle();
-                        this.setText(StringUtils.isNotBlank(title) ? title : article.title);
                         onLoad.run();
-                        hideSpinner();
                         if (yOffset != 0) {
                             scrollTo(yOffset);
                         }
+                        return;
                     }
                 });
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
@@ -259,6 +268,72 @@ public class ArticleTab extends BaseWebTab {
             }
             setText("* " + getText());
         });
+
+        if (editor.getOnInputMethodTextChanged() == null) {
+            editor.setOnInputMethodTextChanged(this::handleInputMethodEvent);
+        }
+
+        editor.setInputMethodRequests(new EditorInputMethodRequests(editor));
+    }
+
+    /**
+     * Handle input method event.
+     * @param event
+     */
+    private void handleInputMethodEvent(final InputMethodEvent event) {
+        if (!editor.isEditable() || editor.isDisabled()) {
+            return;
+        }
+
+        // just replace the text on iOS
+        if (PlatformUtil.isIOS()) {
+           editor.replaceText(event.getCommitted());
+           return;
+        }
+
+        // remove previous input method text (if any) or selected text
+        if (imlength != 0) {
+            //removeHighlight(imattrs);
+            imattrs.clear();
+            editor.selectRange(imstart, imstart + imlength);
+        }
+
+        // Insert committed text
+        if (event.getCommitted().length() != 0) {
+            final String committed = event.getCommitted();
+            editor.replaceText(editor.getSelection(), committed);
+        }
+
+        // Replace composed text
+        imstart = editor.getSelection().getStart();
+        final StringBuilder composed = new StringBuilder();
+        for (final InputMethodTextRun run : event.getComposed()) {
+            composed.append(run.getText());
+        }
+        editor.replaceText(editor.getSelection(), composed.toString());
+        imlength = composed.length();
+        if (imlength == 0) {
+            return;
+        }
+        int pos = imstart;
+        for (final InputMethodTextRun run : event.getComposed()) {
+            final int endPos = pos + run.getText().length();
+            //createInputMethodAttributes(run.getHighlight(), pos, endPos);
+            pos = endPos;
+        }
+        //addHighlight(imattrs, imstart);
+
+        // Set caret position in composed text
+        final int caretPos = event.getCaretPosition();
+        if (caretPos >= 0 && caretPos < imlength) {
+            editor.selectRange(imstart + caretPos, imstart + caretPos);
+        }
+    }
+
+    @Override
+    public void setFont(final Font font) {
+        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
+                font.getFamily(), font.getSize()));
     }
 
     /**

@@ -18,6 +18,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import jp.toastkid.article.control.editor.EditorTab;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.MathUtil;
 
@@ -66,8 +67,6 @@ public abstract class BaseWebTab extends ReloadableTab {
                     break;
                 case FAILED:
                 case CANCELLED:
-                    hideSpinner();
-                    break;
                 case SUCCEEDED:
                     final String currentTitle = getText();
                     final String newTitle = engine.getTitle();

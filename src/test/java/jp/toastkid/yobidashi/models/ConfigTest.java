@@ -72,6 +72,23 @@ public class ConfigTest {
     }
 
     /**
+     * Test of {@link Config#getInt(Key, int)}.}
+     */
+    @Test
+    public void testGetInt() {
+        assertEquals(10, c.getInt(Key.FONT_SIZE, -1));
+        assertEquals(-1, c.getInt(Key.TEST, -1));
+    }
+
+    /**
+     * Test of {@link Config#getInt(Key, int)}'s irregular case.
+     */
+    @Test(expected=NumberFormatException.class)
+    public void testGetInt_IrregularCase() {
+        assertEquals(-1, c.getInt(Key.APP_TITLE, -1));
+    }
+
+    /**
      * Test of {@link Config#reload()}.
      */
     @Test
