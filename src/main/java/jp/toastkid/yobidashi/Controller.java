@@ -1440,7 +1440,7 @@ public final class Controller implements Initializable {
      * Save current tab's content.
      */
     private void saveCurrentTab() {
-        editableOr().ifPresent(Editable::saveContent);
+        editableOr().map(Editable::saveContent).ifPresent(this::showSnackbar);
     }
 
     /**
