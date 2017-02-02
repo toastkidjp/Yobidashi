@@ -1,6 +1,6 @@
 package jp.toastkid.article.control;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -8,6 +8,7 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import jp.toastkid.article.models.ContentType;
 
 /**
  * {@link WebTab}'s test.
@@ -18,6 +19,9 @@ public class WebTabTest extends ApplicationTest {
 
     /** Test object. */
     private WebTab tab;
+
+    /** Tab with content. */
+    private WebTab tabWithContent;
 
     /**
      * Test of {@link WebTab#reload()}.
@@ -34,8 +38,16 @@ public class WebTabTest extends ApplicationTest {
     public void testLoadUrl() {
         Platform.runLater(() -> {
             tab.loadUrl("http://www.yahoo.co.jp");
-            assertEquals("http://www.yahoo.co.jp", tab.getUrl());
+            assertNull(tab.getUrl());
         });
+    }
+
+    /**
+     * Test of tab with content.
+     */
+    @Test
+    public void test_tabWithContent() {
+        assertNull(tabWithContent.getTitle());
     }
 
     /**
@@ -44,12 +56,22 @@ public class WebTabTest extends ApplicationTest {
     @Test
     public void testPrint() {
         // FIXME implement.
+        Platform.runLater(() -> tab.print(null));;
     }
 
     @Override
     public void start(Stage stage) throws Exception {
         tab = new WebTab.Builder()
+                .setTitle("Title")
                 .setUrl("https://www.yahoo.co.jp")
+                .setOnClose(tab -> assertTrue(true))
+                .build();
+
+        tabWithContent = new WebTab.Builder()
+                .setTitle("WithContent")
+                .setUrl("https://www.yahoo.co.jp")
+                .setContent("Content")
+                .setContentType(ContentType.TEXT)
                 .setOnClose(tab -> assertTrue(true))
                 .build();
     }

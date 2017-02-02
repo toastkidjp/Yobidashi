@@ -150,46 +150,4 @@ public final class CalendarUtil {
         return UNI_DF_HOLDER.format(date).toString();
     }
 
-    /**
-     * 「2012-05-11(金)」のような形式をした現在日時(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120512) MyWiki作成のため、作成
-     * @return 現在時刻の文字列表現
-     */
-    public static String getNowDate_YMDE_forMyWiki() {
-        return HIFUN_COMBINED_HOLDER.format(LocalDateTime.now()).toString();
-    }
-
-    /**
-     * 引数として渡された年月日から「2012-05-11(金)」のような形式をした
-     * 年月日表現(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120516) 作成
-     * @param year 年
-     * @param month 月(0始まり、5月なら <b>4</b> を指定)
-     * @param day 日
-     * @return 「2012-05-11(金)」のような形式をした年月日表現
-     */
-    public static String getNowDate_YMDE_forMyWiki(
-            final int year,
-            final int month,
-            final int day
-            ) {
-        final LocalDate ld = LocalDate.of(year,month,day);
-        return HIFUN_COMBINED_HOLDER.format(ld).toString();
-    }
-
-    /**
-     * 引数として渡された LocalDateTime クラスのオブジェクトから、
-     * 「2012-05-11(金)」のような形式をした年月日表現(年/月/日/曜日)を取得する.
-     * <HR>
-     * (120818) 作成<BR>
-     * @param ld LocalDateTime クラスのオブジェクト
-     * @return 「2012-05-11(金)」のような形式をした年月日表現
-     */
-    public static String getNowDate_YMDE_forMyWiki(final LocalDateTime ld) {
-        return HIFUN_COMBINED_HOLDER.format(ld).toString();
-    }
-
-
 }

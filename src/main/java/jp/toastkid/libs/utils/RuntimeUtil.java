@@ -1,8 +1,6 @@
 package jp.toastkid.libs.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * 他プログラム起動関連のメソッドを収録.
@@ -10,7 +8,7 @@ import java.io.InputStreamReader;
  * (120120) callExplorer() 作成<BR>
  * (120119) callCalculator() 作成<BR>
  * (120109) 作成<BR>
- * @author 10fmi13
+ * @author Toast kid
  * @see <a href="http://www.atmarkit.co.jp/fjava/javatips/172java057.html">    プログラムから別のアプリケーションを起動するには </a>
  * @see <a href="http://allabout.co.jp/gm/gc/80624/">外部のプログラムを実行するには？</a>
  */
@@ -36,19 +34,7 @@ public final class RuntimeUtil {
     public static Process launch(final String pPath) {
         return launchProcess(pPath, false);
     }
-    /**
-     * 他の Java プログラムを Runtime クラスの exec() メソッドを使って起動させる.
-     * 誤作動防止のため、フルパスで指定すること
-     * <HR>
-     * launch("\"C:\\allabout\\FreeLife.jar\"");
-     * <HR>
-     * (120109) 作成
-     * @param pJavaAppPath 起動したい Java プログラムのパス
-     * @return Process
-     */
-    public static Process launchJavaApp(final String pJavaAppPath) {
-        return launchProcess(pJavaAppPath, true);
-    }
+
     /**
      * 他のプログラムを Runtime クラスの exec() メソッドを使って起動させる.
      * 誤作動防止のため、フルパスで指定すること
@@ -64,42 +50,15 @@ public final class RuntimeUtil {
             final String pPath,
             final boolean isJava
             ) {
-        Process retPro = null;
         try {
             final Runtime rt = Runtime.getRuntime();
-            if (isJava) {
-                retPro = rt.exec("java -jar " + pPath);
-            }else{
-                retPro = rt.exec(pPath);
-            }
+            return rt.exec(isJava ? "java -jar " + pPath : pPath);
         } catch (final IOException ex) {
             ex.printStackTrace();
         }
-        return retPro;
+        return null;
     }
-    /**
-     * Process クラスのオブジェクトから内容を read して文字列にし、返す.
-     * <HR>
-     * (120109) 作成
-     * @param proc Process クラスのオブジェクト
-     * @return 文字列
-     */
-    public static String getProcessStr(final Process proc) {
-        final StringBuffer result = new StringBuffer(3000);
-        final String lineSepar = Strings.LINE_SEPARATOR;
-        try (final InputStreamReader isr = new InputStreamReader(proc.getInputStream());
-             final BufferedReader    br  = new BufferedReader(isr);) {
-            String str = br.readLine();
-            while ( str != null ) {
-                result.append(str);
-                result.append(lineSepar);
-                str = br.readLine();
-            }
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-        return result.toString();
-    }
+
     /**
      * Windows 環境の場合、電卓を呼び出す.
      * <HR>
@@ -116,6 +75,7 @@ public final class RuntimeUtil {
         }
         return null;
     }
+
     /**
      * Windows 環境の場合、コマンドプロンプトを呼び出す.
      * @see <a href="http://www.atmarkit.co.jp/fjava/javatips/172java057.html">
@@ -133,6 +93,7 @@ public final class RuntimeUtil {
         }
         return null;
     }
+
     /**
      * Windows 環境の場合、引数で指定したフォルダをエクスプローラで呼び出す.
      * <HR>

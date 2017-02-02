@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 
 import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.control.editor.ArticleTab;
@@ -38,10 +37,6 @@ public class WebTab extends BaseWebTab {
         private String content;
 
         private ContentType contentType;
-
-        public Node makeContent() {
-            return null;
-        }
 
         public Builder setTitle(final String title) {
             this.title = title;

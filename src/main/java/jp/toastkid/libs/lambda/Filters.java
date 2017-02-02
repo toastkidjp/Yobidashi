@@ -8,6 +8,13 @@ package jp.toastkid.libs.lambda;
 public class Filters {
 
     /**
+     * Deny make instance.
+     */
+    private Filters() {
+        // NOP.
+    }
+
+    /**
      * Return Predicate use filter out null.
      * @return filter out null objects.
      */

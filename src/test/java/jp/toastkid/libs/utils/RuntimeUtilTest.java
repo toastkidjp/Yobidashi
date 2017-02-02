@@ -1,19 +1,29 @@
 package jp.toastkid.libs.utils;
 
 import static org.junit.Assert.assertTrue;
-import jp.toastkid.libs.utils.RuntimeUtil;
 
 import org.junit.Test;
 
 /**
  * {@link RuntimeUtil}'s test cases.
+ *
  * @author Toast kid
  *
  */
 public class RuntimeUtilTest {
 
     /**
-     * test {@link RuntimeUtil#calcUsedMemorySize()}.
+     * Test methods.
+     */
+    @Test
+    public void test() {
+        RuntimeUtil.callCalculator().destroy();
+        RuntimeUtil.callCmd().destroy();
+        RuntimeUtil.callExplorer(".").destroy();
+    }
+
+    /**
+     * Test {@link RuntimeUtil#calcUsedMemorySize()}.
      */
     @Test
     public final void testCalcUsedMemorySize() {
