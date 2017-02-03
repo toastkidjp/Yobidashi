@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.primitive.IntSet;
 import org.eclipse.collections.api.set.primitive.MutableIntSet;
@@ -85,10 +84,9 @@ public final class JapaneseHoliday{
 
     private static final int MONDAY = DayOfWeek.MONDAY.getValue();
 
-    private ImmutableSet<LocalDate> holidayDates;
 
-   /** HolidayType は、祝日タイプ→HolidayBundle class を紐付ける enum */
-   public enum HolidayType{
+    /** HolidayType は、祝日タイプ→HolidayBundle class を紐付ける enum */
+    public enum HolidayType{
       /** 元旦        ：１月１日            */  NEWYEAR_DAY             (NewYearDayBundle.class)
       /** 成人の日    ：１月の第２月曜日    */ ,COMING_OF_AGE_DAY       (ComingOfAgeDayBundle.class)
       /** 建国記念日  ：２月１１日          */ ,NATIONAL_FOUNDATION_DAY (NatinalFoundationBundle.class)
@@ -136,9 +134,9 @@ public final class JapaneseHoliday{
               }
               return holBand;
       }
-   }
-   // 月→HolidayBundle class 参照 enum
-   enum MonthBundle{
+    }
+    // 月→HolidayBundle class 参照 enum
+    enum MonthBundle{
       JANUARY       (NewYearDayBundle.class,ComingOfAgeDayBundle.class)
       ,FEBRUARY     (NatinalFoundationBundle.class)
       ,MARCH        (SpringEquinoxBundle.class)
@@ -167,9 +165,9 @@ public final class JapaneseHoliday{
       Constructor<?>[] getConstructors(){
          return this.constructors;
       }
-   }
-   /** 祝日Bundle抽象クラス */
-   public abstract class HolidayBundle{
+    }
+    /** 祝日Bundle抽象クラス */
+    public abstract class HolidayBundle{
       int year;
       private final LocalDate ld;
       public abstract int getDay();
