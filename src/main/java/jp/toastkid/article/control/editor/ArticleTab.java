@@ -3,21 +3,14 @@ package jp.toastkid.article.control.editor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.javafx.PlatformUtil;
 
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
@@ -26,9 +19,6 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.InputMethodTextRun;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -41,7 +31,6 @@ import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Article tab.
@@ -53,9 +42,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
 
-    /** WebView - Editor y pos. */
-    private static final double SCALE_FACTOR = 3.0d;
-
     /** Article HTML generator. */
     private final ArticleGenerator generator;
 
@@ -66,13 +52,10 @@ public class ArticleTab extends BaseWebTab implements Editable {
     private final Runnable onLoad;
 
     /** Content editor. */
-    private final CodeArea editor;
+    private final Editor editor;
 
     /** Splitter. */
     private final SplitPane split;
-
-    /** Editor's scroll bar. */
-    private final VirtualizedScrollPane<CodeArea> vsp;
 
     /** HTML content. */
     private String content;
@@ -82,15 +65,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
     /** Dir of article. */
     private final String articleDir;
-
-    /** Start of the text under input method composition. */
-    private int imstart;
-
-    /** Length of the text under input method composition. */
-    private int imlength;
-
-    /** Holds concrete attributes for the composition runs. */
-    private final List<Shape> imattrs = new ArrayList<Shape>();
 
     /**
      * {@link ArticleTab}'s builder.
@@ -172,13 +146,17 @@ public class ArticleTab extends BaseWebTab implements Editable {
         final WebView webView = getWebView();
         initWebView(webView,b.onOpenNewArticle, b.onOpenUrl);
 
-        this.editor = new CodeArea();
-        initEditor();
-        vsp = new VirtualizedScrollPane<>(editor);
-        vsp.estimatedScrollYProperty()
-            .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        vsp.setPrefHeight(700.0d);
-        split = new SplitPane(vsp, webView);
+        this.editor = new Editor(this.article.path);
+        editor.getScrollEmitter().subscribe(this::scrollTo);
+        editor.setModifiedListener((v, prev, next) -> {
+            if (v.getValue()) {
+                setText("* " + getTitle());
+                return;
+            }
+            setText(getTitle());
+        });
+
+        split = new SplitPane(editor.getNode(), webView);
         split.setDividerPositions(0.5);
 
         this.setContent(split);
@@ -188,15 +166,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         // 新規タブで開く場合
         this.loadUrl(article.toInternalUrl());
-    }
-
-    /**
-     * Convert to WebView y position.
-     * @param value
-     * @return
-     */
-    private double convertToWebViewY(double value) {
-        return value * SCALE_FACTOR;
     }
 
     /**
@@ -247,93 +216,9 @@ public class ArticleTab extends BaseWebTab implements Editable {
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
     }
 
-    /**
-     * Initialize editor.
-     */
-    private void initEditor() {
-        editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-        editor.setOnKeyPressed(event -> {
-            if (getText().startsWith("* ")) {
-                return;
-            }
-
-            if (event.isControlDown()) {
-                return;
-            }
-
-            if (!event.getCode().isLetterKey()
-                    && !event.getCode().isDigitKey()
-                    && !event.getCode().isWhitespaceKey()) {
-                return;
-            }
-            setText("* " + getText());
-        });
-
-        if (editor.getOnInputMethodTextChanged() == null) {
-            editor.setOnInputMethodTextChanged(this::handleInputMethodEvent);
-        }
-
-        editor.setInputMethodRequests(new EditorInputMethodRequests(editor));
-    }
-
-    /**
-     * Handle input method event.
-     * @param event
-     */
-    private void handleInputMethodEvent(final InputMethodEvent event) {
-        if (!editor.isEditable() || editor.isDisabled()) {
-            return;
-        }
-
-        // just replace the text on iOS
-        if (PlatformUtil.isIOS()) {
-           editor.replaceText(event.getCommitted());
-           return;
-        }
-
-        // remove previous input method text (if any) or selected text
-        if (imlength != 0) {
-            //removeHighlight(imattrs);
-            imattrs.clear();
-            editor.selectRange(imstart, imstart + imlength);
-        }
-
-        // Insert committed text
-        if (event.getCommitted().length() != 0) {
-            final String committed = event.getCommitted();
-            editor.replaceText(editor.getSelection(), committed);
-        }
-
-        // Replace composed text
-        imstart = editor.getSelection().getStart();
-        final StringBuilder composed = new StringBuilder();
-        for (final InputMethodTextRun run : event.getComposed()) {
-            composed.append(run.getText());
-        }
-        editor.replaceText(editor.getSelection(), composed.toString());
-        imlength = composed.length();
-        if (imlength == 0) {
-            return;
-        }
-        int pos = imstart;
-        for (final InputMethodTextRun run : event.getComposed()) {
-            final int endPos = pos + run.getText().length();
-            //createInputMethodAttributes(run.getHighlight(), pos, endPos);
-            pos = endPos;
-        }
-        //addHighlight(imattrs, imstart);
-
-        // Set caret position in composed text
-        final int caretPos = event.getCaretPosition();
-        if (caretPos >= 0 && caretPos < imlength) {
-            editor.selectRange(imstart + caretPos, imstart + caretPos);
-        }
-    }
-
     @Override
     public void setFont(final Font font) {
-        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
-                font.getFamily(), font.getSize()));
+        editor.setFont(font);
     }
 
     /**
@@ -343,17 +228,13 @@ public class ArticleTab extends BaseWebTab implements Editable {
         if (isNotEditorVisible()) {
             SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
             split.setDividerPositions(0.5);
-            vsp.setVisible(true);
-            vsp.setManaged(true);
-            editor.requestFocus();
-            editor.moveTo(0, 0);
+            editor.show();
             return;
         }
 
         yOffset = getYPosition();
         SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
-        vsp.setVisible(false);
-        vsp.setManaged(false);
+        editor.hide();
         split.setDividerPositions(0.0);
         reload();
     }
@@ -479,7 +360,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
             final String content = Files.readAllLines(openTarget)
                                         .stream()
                                         .collect(Collectors.joining(Strings.LINE_SEPARATOR));
-            editor.replaceText(content);
+            editor.setContent(content);
             switchEditorVisible();
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
@@ -495,12 +376,12 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
     @Override
     public String saveContent() {
-        try {
-            Files.write(article.path, editor.getText().getBytes(Defines.ARTICLE_ENCODE));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            return e.getMessage();
+
+        final String result = editor.saveContent();
+        if (!result.isEmpty()) {
+            return result;
         }
+
         reload();
         return String.format("Save to file 「%s」", article.title);
     }

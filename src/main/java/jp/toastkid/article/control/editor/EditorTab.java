@@ -6,9 +6,6 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +18,6 @@ import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Editor tab.
@@ -34,23 +30,14 @@ public class EditorTab extends BaseWebTab implements Editable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorTab.class);
 
-    /** WebView - Editor y pos. */
-    private static final double SCALE_FACTOR = 3.0d;
-
     /** Article HTML generator. */
     private final ArticleGenerator generator;
-
-    /** Article. */
-    private final Path path;
-
-    /** Content editor. */
-    private final CodeArea editor;
 
     /** Splitter. */
     private final SplitPane split;
 
-    /** Editor's scroll bar. */
-    private final VirtualizedScrollPane<CodeArea> vsp;
+    /** Markdown editor. */
+    private final Editor editor;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -92,51 +79,23 @@ public class EditorTab extends BaseWebTab implements Editable {
      */
     private EditorTab(final Builder b) {
         super(b.path.getFileName().toString(), null, b.closeAction);
-        this.path = b.path;
         this.generator = new ArticleGenerator(b.conf);
 
-        this.editor = new CodeArea();
-        initEditor();
-        vsp = new VirtualizedScrollPane<>(editor);
-        vsp.estimatedScrollYProperty()
-            .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        split = new SplitPane(vsp, getWebView());
+        this.editor = new Editor(b.path);
+        editor.getScrollEmitter().subscribe(this::scrollTo);
+        editor.setModifiedListener((v, prev, next) -> {
+            if (v.getValue()) {
+                setText("* " + getTitle());
+                return;
+            }
+            setText(getTitle());
+        });
+
+        split = new SplitPane(editor.getNode(), getWebView());
         split.setDividerPositions(0.5);
 
         this.setContent(split);
         switchEditorVisible();
-    }
-
-    /**
-     * Convert to WebView y position.
-     * @param value
-     * @return
-     */
-    private double convertToWebViewY(double value) {
-        return value * SCALE_FACTOR;
-    }
-
-    /**
-     * Initialize editor.
-     */
-    private void initEditor() {
-        editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-        editor.setOnKeyPressed(event -> {
-            if (getText().startsWith("* ")) {
-                return;
-            }
-
-            if (event.isControlDown()) {
-                return;
-            }
-
-            if (!event.getCode().isLetterKey()
-                    && !event.getCode().isDigitKey()
-                    && !event.getCode().isWhitespaceKey()) {
-                return;
-            }
-            setText("* " + getText());
-        });
     }
 
     /**
@@ -146,17 +105,13 @@ public class EditorTab extends BaseWebTab implements Editable {
         if (isNotEditorVisible()) {
             SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
             split.setDividerPositions(0.5);
-            vsp.setVisible(true);
-            vsp.setManaged(true);
-            editor.requestFocus();
-            editor.moveTo(0, 0);
+            editor.show();
             reload();
             return;
         }
 
         SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
-        vsp.setVisible(false);
-        vsp.setManaged(false);
+        editor.hide();
         split.setDividerPositions(0.0);
         reload();
     }
@@ -185,7 +140,7 @@ public class EditorTab extends BaseWebTab implements Editable {
     @Override
     public void reload() {
         final WebEngine engine = getWebView().getEngine();
-        engine.loadContent(this.generator.decorate("Open file", path));
+        engine.loadContent(this.generator.decorate("Open file", editor.getPath()));
     }
 
     /**
@@ -194,17 +149,17 @@ public class EditorTab extends BaseWebTab implements Editable {
      */
     @Override
     public String getTitle() {
-        return path.getFileName().toString();
+        return editor.getPath().getFileName().toString();
     }
 
     @Override
     public String htmlSource() {
-        return editor.getText();
+        return editor.getContent();
     }
 
     @Override
     public String edit() {
-        final Path openTarget = path;
+        final Path openTarget = editor.getPath();
         if (!Files.exists(openTarget)){
             return "File not exists.";
         }
@@ -213,7 +168,7 @@ public class EditorTab extends BaseWebTab implements Editable {
             final String content = Files.readAllLines(openTarget)
                                         .stream()
                                         .collect(Collectors.joining(Strings.LINE_SEPARATOR));
-            editor.replaceText(content);
+            editor.setContent(content);
             switchEditorVisible();
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
@@ -229,25 +184,24 @@ public class EditorTab extends BaseWebTab implements Editable {
 
     @Override
     public String saveContent() {
-        try {
-            Files.write(path, editor.getText().getBytes(Defines.ARTICLE_ENCODE));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            return e.getMessage();
+
+        final String result = editor.saveContent();
+        if (!result.isEmpty()) {
+            return result;
         }
+
         reload();
         return String.format("Save to file 「%s」", getTitle());
     }
 
     @Override
     public String getUrl() {
-        return path.toUri().toString();
+        return editor.getPath().toUri().toString();
     }
 
     @Override
     public void setFont(final Font font) {
-        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
-                font.getFamily(), font.getSize()));
+        editor.setFont(font);
     }
 
 }
