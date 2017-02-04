@@ -16,7 +16,6 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.text.Font;
@@ -27,7 +26,6 @@ import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
@@ -42,7 +40,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
 
-    /** Article HTML generator. */
+    /** Article generator. */
     private final ArticleGenerator generator;
 
     /** Article. */
@@ -53,9 +51,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
     /** Content editor. */
     private final Editor editor;
-
-    /** Splitter. */
-    private final SplitPane split;
 
     /** HTML content. */
     private String content;
@@ -138,16 +133,15 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
-        this.article = b.article;
-        this.generator = new ArticleGenerator(b.conf);
+        this.article    = b.article;
+        this.onLoad     = b.onLoad;
         this.articleDir = b.conf.get(Key.ARTICLE_DIR);
-        this.onLoad = b.onLoad;
+        this.generator  = new ArticleGenerator(b.conf);
 
         final WebView webView = getWebView();
         initWebView(webView,b.onOpenNewArticle, b.onOpenUrl);
 
-        this.editor = new Editor(this.article.path);
-        editor.getScrollEmitter().subscribe(this::scrollTo);
+        this.editor = new Editor(this.article.path, webView);
         editor.setModifiedListener((v, prev, next) -> {
             if (v.getValue()) {
                 setText("* " + getTitle());
@@ -156,11 +150,8 @@ public class ArticleTab extends BaseWebTab implements Editable {
             setText(getTitle());
         });
 
-        split = new SplitPane(editor.getNode(), webView);
-        split.setDividerPositions(0.5);
-
-        this.setContent(split);
-        switchEditorVisible();
+        this.setContent(editor.getNode());
+        editor.switchEditorVisible();
 
         Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
 
@@ -208,7 +199,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
                     if (State.SUCCEEDED.equals(observable.getValue())) {
                         onLoad.run();
                         if (yOffset != 0) {
-                            scrollTo(yOffset);
+                            editor.scrollTo(yOffset);
                         }
                         return;
                     }
@@ -216,43 +207,12 @@ public class ArticleTab extends BaseWebTab implements Editable {
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
     }
 
-    @Override
-    public void setFont(final Font font) {
-        editor.setFont(font);
-    }
-
-    /**
-     * Switch editor's visibility.
-     */
-    private void switchEditorVisible() {
-        if (isNotEditorVisible()) {
-            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
-            split.setDividerPositions(0.5);
-            editor.show();
-            return;
-        }
-
-        yOffset = getYPosition();
-        SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
-        editor.hide();
-        split.setDividerPositions(0.0);
-        reload();
-    }
-
     /**
      * Return is visible of editor.
      * @return
      */
     private boolean isEditorVisible() {
-        return !isNotEditorVisible();
-    }
-
-    /**
-     * Return isn't visible of editor.
-     * @return
-     */
-    private boolean isNotEditorVisible() {
-        return split.getDividerPositions()[0] < 0.1d;
+        return !editor.isNotEditorVisible();
     }
 
     /**
@@ -289,7 +249,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
      * @param isReload
      */
     public void loadUrl(final String url, final boolean isReload) {
-        yOffset = isReload ? getYPosition() : 0;
+        yOffset = isReload ? editor.getYPosition() : 0;
         loadArticle();
     }
 
@@ -306,7 +266,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         final String processed  = post.process(generator.convertToHtml(this.article));
         final String subheading = post.generateSubheadings();
-        content = generator.decorate(this.article.title, processed, subheading);
+        content = generator.decorate(getTitle(), processed, subheading);
 
         final WebEngine engine = getWebView().getEngine();
         engine.loadContent(content);
@@ -349,6 +309,11 @@ public class ArticleTab extends BaseWebTab implements Editable {
     }
 
     @Override
+    public void setFont(final Font font) {
+        editor.setFont(font);
+    }
+
+    @Override
     public String edit() {
         final Path openTarget = article.path;
         if (!Files.exists(openTarget)){
@@ -361,7 +326,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
                                         .stream()
                                         .collect(Collectors.joining(Strings.LINE_SEPARATOR));
             editor.setContent(content);
-            switchEditorVisible();
+            editor.switchEditorVisible();
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
             return e.getMessage();

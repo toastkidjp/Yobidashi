@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -18,12 +19,16 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.InputMethodTextRun;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
+import jp.toastkid.libs.utils.MathUtil;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.publisher.Flux;
 
 /**
  * Markdown editor.
@@ -37,10 +42,13 @@ public class Editor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
     /** WebView - Editor y pos. */
-    private static final double SCALE_FACTOR = 3.0d;
+    private static final double SCALE_FACTOR = 2.2d;
 
     /** File Path. */
     private final Path path;
+
+    /** Splitter. */
+    private final SplitPane split;
 
     /** Content editor. */
     private final CodeArea area;
@@ -57,27 +65,31 @@ public class Editor {
     /** Holds concrete attributes for the composition runs. */
     private final List<Shape> imattrs = new ArrayList<Shape>();
 
-    /** Emit scroll value. */
-    private final Flux<Double> scroll;
-
     /** Modified value. */
     private final BooleanProperty isModified;
+
+    /** WebView engine. */
+    private final WebEngine engine;
 
     /**
      * Initialize with path.
      * @param path
      */
-    Editor(final Path path) {
-        this.path = path;
+    Editor(final Path path, final WebView webView) {
+        this.path      = path;
+        this.engine    = webView.getEngine();
+        this.area      = new CodeArea();
 
-        this.area = new CodeArea();
         initEditor();
+
         vsp = new VirtualizedScrollPane<>(area);
-        scroll = Flux.<Double>create(emitter ->
-            vsp.estimatedScrollYProperty().addListener(
-                    (value, prev, next) -> emitter.next(convertToWebViewY(value.getValue().doubleValue())))
-        );
+        vsp.estimatedScrollYProperty().addListener(
+                (value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
         vsp.setPrefHeight(700.0d);
+
+        split = new SplitPane(vsp, webView);
+        split.setDividerPositions(0.5);
+
         isModified = new SimpleBooleanProperty(false);
     }
 
@@ -162,6 +174,33 @@ public class Editor {
     }
 
     /**
+     * Switch editor's visibility.
+     */
+    void switchEditorVisible() {
+        if (isNotEditorVisible()) {
+            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
+            split.setDividerPositions(0.5);
+            show();
+            return;
+        }
+
+        //yOffset = getYPosition();
+        SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
+        hide();
+        split.setDividerPositions(0.0);
+        //reload();
+    }
+
+    /**
+     * Return current yPosition.
+     * @return yPosition(yOffest)
+     */
+    int getYPosition() {
+        final Object script = engine.executeScript("window.pageYOffset;");
+        return MathUtil.parseOrZero(Optional.ofNullable(script).orElse("0").toString());
+    }
+
+    /**
      * Convert to WebView y position.
      * @param value
      * @return
@@ -175,7 +214,7 @@ public class Editor {
      * @return Node
      */
     Node getNode() {
-        return vsp;
+        return split;
     }
 
     /**
@@ -230,14 +269,6 @@ public class Editor {
     }
 
     /**
-     * Emitter of scroll value.
-     * @return
-     */
-    Flux<Double> getScrollEmitter() {
-        return scroll;
-    }
-
-    /**
      * Set modified listener.
      * @param listener
      */
@@ -257,6 +288,22 @@ public class Editor {
             LOGGER.error("Error", e);
         }
         return "";
+    }
+
+    /**
+     * Return isn't visible of editor.
+     * @return
+     */
+    boolean isNotEditorVisible() {
+        return split.getDividerPositions()[0] < 0.1d;
+    }
+
+    /**
+     * Scroll to specified y position.
+     * @param scrollTo
+     */
+    void scrollTo(final double scrollTo) {
+        engine.executeScript(String.format("window.scrollTo(0, %f);", scrollTo));
     }
 
 }

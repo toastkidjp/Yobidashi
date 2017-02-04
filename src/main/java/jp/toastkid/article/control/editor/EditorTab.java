@@ -9,13 +9,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.control.BaseWebTab;
-import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
 
@@ -30,14 +28,11 @@ public class EditorTab extends BaseWebTab implements Editable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorTab.class);
 
-    /** Article HTML generator. */
-    private final ArticleGenerator generator;
-
-    /** Splitter. */
-    private final SplitPane split;
-
     /** Markdown editor. */
     private final Editor editor;
+
+    /** Article generator. */
+    private final ArticleGenerator generator;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -79,10 +74,10 @@ public class EditorTab extends BaseWebTab implements Editable {
      */
     private EditorTab(final Builder b) {
         super(b.path.getFileName().toString(), null, b.closeAction);
-        this.generator = new ArticleGenerator(b.conf);
 
-        this.editor = new Editor(b.path);
-        editor.getScrollEmitter().subscribe(this::scrollTo);
+        this.generator  = new ArticleGenerator(b.conf);
+
+        this.editor = new Editor(b.path, getWebView());
         editor.setModifiedListener((v, prev, next) -> {
             if (v.getValue()) {
                 setText("* " + getTitle());
@@ -91,29 +86,8 @@ public class EditorTab extends BaseWebTab implements Editable {
             setText(getTitle());
         });
 
-        split = new SplitPane(editor.getNode(), getWebView());
-        split.setDividerPositions(0.5);
-
-        this.setContent(split);
-        switchEditorVisible();
-    }
-
-    /**
-     * Switch editor's visibility.
-     */
-    private void switchEditorVisible() {
-        if (isNotEditorVisible()) {
-            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
-            split.setDividerPositions(0.5);
-            editor.show();
-            reload();
-            return;
-        }
-
-        SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
-        editor.hide();
-        split.setDividerPositions(0.0);
-        reload();
+        this.setContent(editor.getNode());
+        editor.switchEditorVisible();
     }
 
     /**
@@ -121,15 +95,7 @@ public class EditorTab extends BaseWebTab implements Editable {
      * @return
      */
     private boolean isEditorVisible() {
-        return !isNotEditorVisible();
-    }
-
-    /**
-     * Return isn't visible of editor.
-     * @return
-     */
-    private boolean isNotEditorVisible() {
-        return split.getDividerPositions()[0] < 0.1d;
+        return !editor.isNotEditorVisible();
     }
 
     @Override
@@ -169,7 +135,7 @@ public class EditorTab extends BaseWebTab implements Editable {
                                         .stream()
                                         .collect(Collectors.joining(Strings.LINE_SEPARATOR));
             editor.setContent(content);
-            switchEditorVisible();
+            editor.switchEditorVisible();
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
             return e.getMessage();
