@@ -18,6 +18,7 @@ import com.sun.javafx.PlatformUtil;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Worker.State;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
@@ -41,8 +42,11 @@ public class Editor {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
+    /** Default scale factor. */
+    private static final double DEFAULT_SCALE_FACTOR = 2.2d;
+
     /** WebView - Editor y pos. */
-    private static final double SCALE_FACTOR = 2.2d;
+    private double scaleFactor = DEFAULT_SCALE_FACTOR;
 
     /** File Path. */
     private final Path path;
@@ -71,6 +75,9 @@ public class Editor {
     /** WebView engine. */
     private final WebEngine engine;
 
+    /** Preview's html height. */
+    private double previewHeight;
+
     /**
      * Initialize with path.
      * @param path
@@ -80,7 +87,15 @@ public class Editor {
         this.engine    = webView.getEngine();
         this.area      = new CodeArea();
 
-        initEditor();
+        initArea();
+
+        engine.getLoadWorker().stateProperty().addListener((observable, prev, next) -> {
+            if (!State.SUCCEEDED.equals(observable.getValue())) {
+                return;
+            }
+            previewHeight
+                = Double.parseDouble(engine.executeScript("document.body.scrollHeight").toString());
+        });
 
         vsp = new VirtualizedScrollPane<>(area);
         vsp.estimatedScrollYProperty().addListener(
@@ -94,9 +109,9 @@ public class Editor {
     }
 
     /**
-     * Initialize editor.
+     * Initialize text area.
      */
-    private void initEditor() {
+    private void initArea() {
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
 
@@ -117,6 +132,15 @@ public class Editor {
         }
 
         area.setInputMethodRequests(new EditorInputMethodRequests(area));
+        area.totalHeightEstimateProperty().addListener((value, prev, next) -> {
+            if (next == null) {
+                return;
+            }
+            final double newValue = previewHeight / next;
+            scaleFactor = 0 < newValue
+                    ? newValue * 1.2d
+                    : DEFAULT_SCALE_FACTOR;
+        });
     }
 
     /**
@@ -184,11 +208,9 @@ public class Editor {
             return;
         }
 
-        //yOffset = getYPosition();
         SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
         hide();
         split.setDividerPositions(0.0);
-        //reload();
     }
 
     /**
@@ -206,7 +228,7 @@ public class Editor {
      * @return
      */
     private double convertToWebViewY(double value) {
-        return value * SCALE_FACTOR;
+        return value * scaleFactor;
     }
 
     /**

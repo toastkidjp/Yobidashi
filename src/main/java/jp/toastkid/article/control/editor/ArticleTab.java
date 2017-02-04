@@ -172,8 +172,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
             ) {
         final WebEngine engine = webView.getEngine();
         final Worker<Void> loadWorker = engine.getLoadWorker();
-        loadWorker.stateProperty().addListener(
-                (observable, prev, next) -> {
+        loadWorker.stateProperty().addListener((observable, prev, next) -> {
                     final String url = engine.getLocation();
 
                     if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
