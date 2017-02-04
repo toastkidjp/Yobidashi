@@ -4,10 +4,11 @@ import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
 
+import com.sun.javafx.scene.input.ExtendedInputMethodRequests;
+
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.IndexRange;
-import javafx.scene.input.InputMethodRequests;
 
 /**
  * Implement for multi-byte text input.
@@ -15,7 +16,7 @@ import javafx.scene.input.InputMethodRequests;
  * @author Toast kid
  *
  */
-public class EditorInputMethodRequests implements InputMethodRequests {
+public class EditorInputMethodRequests implements ExtendedInputMethodRequests {
 
     /** Editor. */
     private final CodeArea editor;
@@ -51,7 +52,23 @@ public class EditorInputMethodRequests implements InputMethodRequests {
     @Override
     public String getSelectedText() {
         final IndexRange selection = editor.getSelection();
-
         return editor.getText(selection.getStart(), selection.getEnd());
+    }
+
+    @Override
+    public int getInsertPositionOffset() {
+        // TODO 自動生成されたメソッド・スタブ
+        return 0;
+    }
+
+    @Override
+    public String getCommittedText(final int begin, final int end) {
+        System.out.println(editor.getText(begin, end));
+        return editor.getText(begin, end);
+    }
+
+    @Override
+    public int getCommittedTextLength() {
+        return 0;
     }
 }

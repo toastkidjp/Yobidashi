@@ -22,9 +22,16 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.InputMethodHighlight;
 import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.PathElement;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
@@ -47,6 +54,20 @@ public class Editor {
 
     /** WebView - Editor y pos. */
     private double scaleFactor = DEFAULT_SCALE_FACTOR;
+
+    /**
+     * This group contains the text, caret, and selection rectangle.
+     * It is clipped. The textNode, selectionHighlightPath, and
+     * caret are each translated individually when horizontal
+     * translation is needed to keep the caretPosition visible.
+     */
+    private final Pane textGroup = new Pane();
+
+    /**
+     * The clip, applied to the textGroup. This makes sure that any
+     * text / selection wandering off the text box is clipped
+     */
+    private final Rectangle clip = new Rectangle();
 
     /** File Path. */
     private final Path path;
@@ -141,6 +162,21 @@ public class Editor {
                     ? newValue * 1.2d
                     : DEFAULT_SCALE_FACTOR;
         });
+        // Once this was crucial for performance, not sure now.
+        clip.setSmooth(false);
+        clip.setX(0);
+        clip.widthProperty().bind(textGroup.widthProperty());
+        clip.heightProperty().bind(textGroup.heightProperty());
+
+
+        // Add content
+        textGroup.setClip(clip);
+        textGroup.setStyle("-fx-background: red;");
+        // Hack to defeat the fact that otherwise when the caret blinks the parent group
+        // bounds are completely invalidated and therefore the dirty region is much
+        // larger than necessary.
+        textGroup.getChildren().addAll(area);
+
     }
 
     /**
@@ -160,7 +196,7 @@ public class Editor {
 
         // remove previous input method text (if any) or selected text
         if (imlength != 0) {
-            //removeHighlight(imattrs);
+            removeHighlight(imattrs);
             imattrs.clear();
             area.selectRange(imstart, imstart + imlength);
         }
@@ -174,9 +210,9 @@ public class Editor {
         // Replace composed text
         imstart = area.getSelection().getStart();
         final StringBuilder composed = new StringBuilder();
-        for (final InputMethodTextRun run : event.getComposed()) {
-            composed.append(run.getText());
-        }
+        event.getComposed().stream()
+             .map(InputMethodTextRun::getText)
+             .forEach(composed::append);
         area.replaceText(area.getSelection(), composed.toString());
         imlength = composed.length();
         if (imlength == 0) {
@@ -185,16 +221,63 @@ public class Editor {
         int pos = imstart;
         for (final InputMethodTextRun run : event.getComposed()) {
             final int endPos = pos + run.getText().length();
-            //createInputMethodAttributes(run.getHighlight(), pos, endPos);
+            createInputMethodAttributes(run.getHighlight(), pos, endPos);
             pos = endPos;
         }
-        //addHighlight(imattrs, imstart);
+        addHighlight(imattrs);
 
         // Set caret position in composed text
         final int caretPos = event.getCaretPosition();
         if (caretPos >= 0 && caretPos < imlength) {
             area.selectRange(imstart + caretPos, imstart + caretPos);
         }
+    }
+
+    /**
+     * Add highlights.
+     * @param nodes
+     */
+    private void addHighlight(final List<? extends Node> nodes) {
+        textGroup.getChildren().addAll(nodes);
+    }
+
+    /**
+     * Remove highlights.
+     * @param nodes
+     */
+    private void removeHighlight(final List<? extends Node> nodes) {
+        textGroup.getChildren().removeAll(nodes);
+    }
+
+    private void createInputMethodAttributes(
+            final InputMethodHighlight highlight, final int start, final int end) {
+
+        final Text text = new Text(area.getText(start, end));
+        final PathElement elements[] = getUnderlineShape(text, start, end);
+        for (int i = 0; i < elements.length; i++) {
+            final PathElement pe = elements[i];
+
+            // Don't assume that shapes are ended with ClosePath.
+            if (!(pe instanceof ClosePath ||
+                    i == elements.length - 1 ||
+                    (i < elements.length - 1 && elements[i+1] instanceof MoveTo))) {
+                continue;
+            }
+
+            // Now, create the attribute.
+            final Shape attr = AttrFactory.make(pe, text, highlight);
+
+            if (attr == null) {
+                continue;
+            }
+            //attr.setManaged(false);
+            imattrs.add(attr);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    protected PathElement[] getUnderlineShape(Text text, int start, int end) {
+        return text.impl_getUnderlineShape(start, end);
     }
 
     /**
