@@ -693,7 +693,7 @@ public final class MarkdownConverter {
                 generatedLink.append(link);
                 generatedLink.append("\"");
                 if (openLinkBrank) {
-                    //generatedLink.append(" target=_brank ");
+                    generatedLink.append(" target=_brank ");
                 }
                 generatedLink.append(">");
                 generatedLink.append(alt);

@@ -143,7 +143,7 @@ public class ArticleTabTest extends ApplicationTest {
                 .setOnLoad(() -> assertTrue(true))
                 .setOnContextMenuRequested(e -> assertTrue(true))
                 .setOnOpenNewArticle(article -> assertTrue(true))
-                .setOnOpenUrl((title, url) -> assertTrue(true))
+                .setPopupHandler(params -> new WebView().getEngine())
                 .build();
     }
 

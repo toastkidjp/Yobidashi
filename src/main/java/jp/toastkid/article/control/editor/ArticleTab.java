@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -19,8 +18,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.text.Font;
+import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.converter.PostProcessor;
@@ -78,9 +79,9 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         private Consumer<Article> onOpenNewArticle;
 
-        private BiConsumer<String, String> onOpenUrl;
-
         private Config conf;
+
+        private Callback<PopupFeatures, WebEngine> popupHandler;
 
         public Node makeContent() {
             return null;
@@ -111,18 +112,18 @@ public class ArticleTab extends BaseWebTab implements Editable {
             return this;
         }
 
-        public ArticleTab build() {
-            return new ArticleTab(this);
-        }
-
         public Builder setOnOpenNewArticle(final Consumer<Article> onOpenNewArticle) {
             this.onOpenNewArticle = onOpenNewArticle;
             return this;
         }
 
-        public Builder setOnOpenUrl(final BiConsumer<String, String> onOpenUrl) {
-            this.onOpenUrl = onOpenUrl;
+        public Builder setPopupHandler(final Callback<PopupFeatures, WebEngine> popupHandler) {
+            this.popupHandler = popupHandler;
             return this;
+        }
+
+        public ArticleTab build() {
+            return new ArticleTab(this);
         }
 
     }
@@ -139,7 +140,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
         this.generator  = new ArticleGenerator(b.conf);
 
         final WebView webView = getWebView();
-        initWebView(webView,b.onOpenNewArticle, b.onOpenUrl);
+        initWebView(webView,b.onOpenNewArticle, b.popupHandler);
 
         this.editor = new Editor(this.article.path, webView);
         editor.setModifiedListener((v, prev, next) -> {
@@ -163,46 +164,30 @@ public class ArticleTab extends BaseWebTab implements Editable {
      * Initialize WebView.
      * @param webView
      * @param onOpenNewArticle
-     * @param onOpenUrl
+     * @param popupHandler
      */
     private void initWebView(
             final WebView webView,
             final Consumer<Article> onOpenNewArticle,
-            final BiConsumer<String, String> onOpenUrl
+            final Callback<PopupFeatures, WebEngine> popupHandler
             ) {
         final WebEngine engine = webView.getEngine();
+        engine.setCreatePopupHandler(popupHandler);
         final Worker<Void> loadWorker = engine.getLoadWorker();
         loadWorker.stateProperty().addListener((observable, prev, next) -> {
-                    final String url = engine.getLocation();
-
-                    if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
+                    if (!State.SUCCEEDED.equals(observable.getValue())) {
                         return;
                     }
-
-                    if (url.startsWith("http")) {
-                        if (State.SCHEDULED.equals(observable.getValue())) {
-                            onOpenUrl.accept(LOADING, url);
-                            reload();
-                            return;
-                        }
-                        return;
-                    }
-
-                    if (State.SCHEDULED.equals(observable.getValue())) {
-                        loadWorker.cancel();
-                        openNewTab(url, onOpenNewArticle, onOpenUrl);
-                        setText(article.title);
-                        return;
-                    }
-
-                    if (State.SUCCEEDED.equals(observable.getValue())) {
-                        onLoad.run();
-                        if (yOffset != 0) {
-                            editor.scrollTo(yOffset);
-                        }
-                        return;
+                    onLoad.run();
+                    if (yOffset != 0) {
+                        editor.scrollTo(yOffset);
                     }
                 });
+        engine.locationProperty().addListener((value, prev, next) -> {
+            final String url = value.getValue();
+            openNewTab(url, onOpenNewArticle);
+            setText(article.title);
+        });
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
     }
 
@@ -222,8 +207,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private void openNewTab(
             final String url,
-            final Consumer<Article> onOpenNewArticle,
-            final BiConsumer<String, String> onOpenUrl
+            final Consumer<Article> onOpenNewArticle
             ) {
 
         if (StringUtils.isBlank(url)) {
@@ -232,9 +216,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         if (Articles.isInternalLink(url)) {
             onOpenNewArticle.accept(Articles.findByUrl(url));
-            return;
         }
-        onOpenUrl.accept(LOADING, url);
     }
 
     @Override

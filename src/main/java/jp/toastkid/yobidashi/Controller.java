@@ -817,7 +817,7 @@ public final class Controller implements Initializable {
                 .setOnClose(this::closeTab)
                 .setOnContextMenuRequested(event -> showContextMenu())
                 .setOnOpenNewArticle(this::openArticleTab)
-                .setOnOpenUrl(this::openWebTab)
+                .setPopupHandler(param -> openWebTab("", "").getWebView().getEngine())
                 .setOnLoad(() -> {
                     urlText.setText(article.toInternalUrl());
                     Platform.runLater(() -> setTitleOnToolbar(article.title));
@@ -853,8 +853,14 @@ public final class Controller implements Initializable {
      * @param title
      * @param url
      */
-    private void openWebTab(final String title, final String url) {
-        openTab(new WebTab.Builder().setTitle(title).setUrl(url).setOnClose(this::closeTab).build());
+    private WebTab openWebTab(final String title, final String url) {
+        final WebTab webTab = new WebTab.Builder()
+                .setTitle(title)
+                .setUrl(url)
+                .setOnClose(this::closeTab)
+                .build();
+        openTab(webTab);
+        return webTab;
     }
 
     /**
