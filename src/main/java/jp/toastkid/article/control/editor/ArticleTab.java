@@ -3,45 +3,33 @@ package jp.toastkid.article.control.editor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.javafx.PlatformUtil;
 
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.InputMethodTextRun;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
+import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.Callback;
 import jp.toastkid.article.ArticleGenerator;
 import jp.toastkid.article.control.BaseWebTab;
 import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Article tab.
@@ -53,10 +41,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleTab.class);
 
-    /** WebView - Editor y pos. */
-    private static final double SCALE_FACTOR = 3.0d;
-
-    /** Article HTML generator. */
+    /** Article generator. */
     private final ArticleGenerator generator;
 
     /** Article. */
@@ -66,13 +51,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
     private final Runnable onLoad;
 
     /** Content editor. */
-    private final CodeArea editor;
-
-    /** Splitter. */
-    private final SplitPane split;
-
-    /** Editor's scroll bar. */
-    private final VirtualizedScrollPane<CodeArea> vsp;
+    private final Editor editor;
 
     /** HTML content. */
     private String content;
@@ -82,15 +61,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
     /** Dir of article. */
     private final String articleDir;
-
-    /** Start of the text under input method composition. */
-    private int imstart;
-
-    /** Length of the text under input method composition. */
-    private int imlength;
-
-    /** Holds concrete attributes for the composition runs. */
-    private final List<Shape> imattrs = new ArrayList<Shape>();
 
     /**
      * {@link ArticleTab}'s builder.
@@ -109,9 +79,9 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         private Consumer<Article> onOpenNewArticle;
 
-        private BiConsumer<String, String> onOpenUrl;
-
         private Config conf;
+
+        private Callback<PopupFeatures, WebEngine> popupHandler;
 
         public Node makeContent() {
             return null;
@@ -142,18 +112,18 @@ public class ArticleTab extends BaseWebTab implements Editable {
             return this;
         }
 
-        public ArticleTab build() {
-            return new ArticleTab(this);
-        }
-
         public Builder setOnOpenNewArticle(final Consumer<Article> onOpenNewArticle) {
             this.onOpenNewArticle = onOpenNewArticle;
             return this;
         }
 
-        public Builder setOnOpenUrl(final BiConsumer<String, String> onOpenUrl) {
-            this.onOpenUrl = onOpenUrl;
+        public Builder setPopupHandler(final Callback<PopupFeatures, WebEngine> popupHandler) {
+            this.popupHandler = popupHandler;
             return this;
+        }
+
+        public ArticleTab build() {
+            return new ArticleTab(this);
         }
 
     }
@@ -164,25 +134,25 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private ArticleTab(final Builder b) {
         super(b.article.title, b.makeContent(), b.closeAction);
-        this.article = b.article;
-        this.generator = new ArticleGenerator(b.conf);
+        this.article    = b.article;
+        this.onLoad     = b.onLoad;
         this.articleDir = b.conf.get(Key.ARTICLE_DIR);
-        this.onLoad = b.onLoad;
+        this.generator  = new ArticleGenerator(b.conf);
 
         final WebView webView = getWebView();
-        initWebView(webView,b.onOpenNewArticle, b.onOpenUrl);
+        initWebView(webView,b.onOpenNewArticle, b.popupHandler);
 
-        this.editor = new CodeArea();
-        initEditor();
-        vsp = new VirtualizedScrollPane<>(editor);
-        vsp.estimatedScrollYProperty()
-            .addListener((value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        vsp.setPrefHeight(700.0d);
-        split = new SplitPane(vsp, webView);
-        split.setDividerPositions(0.5);
+        this.editor = new Editor(this.article.path, webView);
+        editor.setModifiedListener((v, prev, next) -> {
+            if (v.getValue()) {
+                setText("* " + getTitle());
+                return;
+            }
+            setText(getTitle());
+        });
 
-        this.setContent(split);
-        switchEditorVisible();
+        this.setContent(editor.getNode());
+        editor.switchEditorVisible();
 
         Optional.ofNullable(b.onContextMenuRequested).ifPresent(webView::setOnContextMenuRequested);
 
@@ -191,171 +161,34 @@ public class ArticleTab extends BaseWebTab implements Editable {
     }
 
     /**
-     * Convert to WebView y position.
-     * @param value
-     * @return
-     */
-    private double convertToWebViewY(double value) {
-        return value * SCALE_FACTOR;
-    }
-
-    /**
      * Initialize WebView.
      * @param webView
      * @param onOpenNewArticle
-     * @param onOpenUrl
+     * @param popupHandler
      */
     private void initWebView(
             final WebView webView,
             final Consumer<Article> onOpenNewArticle,
-            final BiConsumer<String, String> onOpenUrl
+            final Callback<PopupFeatures, WebEngine> popupHandler
             ) {
         final WebEngine engine = webView.getEngine();
+        engine.setCreatePopupHandler(popupHandler);
         final Worker<Void> loadWorker = engine.getLoadWorker();
-        loadWorker.stateProperty().addListener(
-                (observable, prev, next) -> {
-                    final String url = engine.getLocation();
-
-                    if (StringUtils.isEmpty(url) && !State.SUCCEEDED.equals(observable.getValue())) {
+        loadWorker.stateProperty().addListener((observable, prev, next) -> {
+                    if (!State.SUCCEEDED.equals(observable.getValue())) {
                         return;
                     }
-
-                    if (url.startsWith("http")) {
-                        if (State.SCHEDULED.equals(observable.getValue())) {
-                            onOpenUrl.accept(LOADING, url);
-                            reload();
-                            return;
-                        }
-                        return;
-                    }
-
-                    if (State.SCHEDULED.equals(observable.getValue())) {
-                        loadWorker.cancel();
-                        openNewTab(url, onOpenNewArticle, onOpenUrl);
-                        setText(article.title);
-                        return;
-                    }
-
-                    if (State.SUCCEEDED.equals(observable.getValue())) {
-                        onLoad.run();
-                        if (yOffset != 0) {
-                            scrollTo(yOffset);
-                        }
-                        return;
+                    onLoad.run();
+                    if (yOffset != 0) {
+                        editor.scrollTo(yOffset);
                     }
                 });
-        engine.setOnAlert(e -> LOGGER.info(e.getData()));
-    }
-
-    /**
-     * Initialize editor.
-     */
-    private void initEditor() {
-        editor.setParagraphGraphicFactory(LineNumberFactory.get(editor));
-        editor.setOnKeyPressed(event -> {
-            if (getText().startsWith("* ")) {
-                return;
-            }
-
-            if (event.isControlDown()) {
-                return;
-            }
-
-            if (!event.getCode().isLetterKey()
-                    && !event.getCode().isDigitKey()
-                    && !event.getCode().isWhitespaceKey()) {
-                return;
-            }
-            setText("* " + getText());
+        engine.locationProperty().addListener((value, prev, next) -> {
+            final String url = value.getValue();
+            openNewTab(url, onOpenNewArticle);
+            setText(article.title);
         });
-
-        if (editor.getOnInputMethodTextChanged() == null) {
-            editor.setOnInputMethodTextChanged(this::handleInputMethodEvent);
-        }
-
-        editor.setInputMethodRequests(new EditorInputMethodRequests(editor));
-    }
-
-    /**
-     * Handle input method event.
-     * @param event
-     */
-    private void handleInputMethodEvent(final InputMethodEvent event) {
-        if (!editor.isEditable() || editor.isDisabled()) {
-            return;
-        }
-
-        // just replace the text on iOS
-        if (PlatformUtil.isIOS()) {
-           editor.replaceText(event.getCommitted());
-           return;
-        }
-
-        // remove previous input method text (if any) or selected text
-        if (imlength != 0) {
-            //removeHighlight(imattrs);
-            imattrs.clear();
-            editor.selectRange(imstart, imstart + imlength);
-        }
-
-        // Insert committed text
-        if (event.getCommitted().length() != 0) {
-            final String committed = event.getCommitted();
-            editor.replaceText(editor.getSelection(), committed);
-        }
-
-        // Replace composed text
-        imstart = editor.getSelection().getStart();
-        final StringBuilder composed = new StringBuilder();
-        for (final InputMethodTextRun run : event.getComposed()) {
-            composed.append(run.getText());
-        }
-        editor.replaceText(editor.getSelection(), composed.toString());
-        imlength = composed.length();
-        if (imlength == 0) {
-            return;
-        }
-        int pos = imstart;
-        for (final InputMethodTextRun run : event.getComposed()) {
-            final int endPos = pos + run.getText().length();
-            //createInputMethodAttributes(run.getHighlight(), pos, endPos);
-            pos = endPos;
-        }
-        //addHighlight(imattrs, imstart);
-
-        // Set caret position in composed text
-        final int caretPos = event.getCaretPosition();
-        if (caretPos >= 0 && caretPos < imlength) {
-            editor.selectRange(imstart + caretPos, imstart + caretPos);
-        }
-    }
-
-    @Override
-    public void setFont(final Font font) {
-        editor.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
-                font.getFamily(), font.getSize()));
-    }
-
-    /**
-     * Switch editor's visibility.
-     */
-    private void switchEditorVisible() {
-        if (isNotEditorVisible()) {
-            SplitterTransitionFactory.makeHorizontalSlide(split, 0.5d, 1.0d).play();
-            split.setDividerPositions(0.5);
-            vsp.setVisible(true);
-            vsp.setManaged(true);
-            editor.requestFocus();
-            editor.moveTo(0, 0);
-            return;
-        }
-
-        yOffset = getYPosition();
-        SplitterTransitionFactory.makeHorizontalSlide(split, 0.0d, 1.0d).play();
-        vsp.setVisible(false);
-        vsp.setManaged(false);
-        split.setDividerPositions(0.0);
-        reload();
+        engine.setOnAlert(e -> LOGGER.info(e.getData()));
     }
 
     /**
@@ -363,15 +196,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
      * @return
      */
     private boolean isEditorVisible() {
-        return !isNotEditorVisible();
-    }
-
-    /**
-     * Return isn't visible of editor.
-     * @return
-     */
-    private boolean isNotEditorVisible() {
-        return split.getDividerPositions()[0] < 0.1d;
+        return !editor.isNotEditorVisible();
     }
 
     /**
@@ -382,8 +207,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private void openNewTab(
             final String url,
-            final Consumer<Article> onOpenNewArticle,
-            final BiConsumer<String, String> onOpenUrl
+            final Consumer<Article> onOpenNewArticle
             ) {
 
         if (StringUtils.isBlank(url)) {
@@ -392,9 +216,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         if (Articles.isInternalLink(url)) {
             onOpenNewArticle.accept(Articles.findByUrl(url));
-            return;
         }
-        onOpenUrl.accept(LOADING, url);
     }
 
     @Override
@@ -408,7 +230,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
      * @param isReload
      */
     public void loadUrl(final String url, final boolean isReload) {
-        yOffset = isReload ? getYPosition() : 0;
+        yOffset = isReload ? editor.getYPosition() : 0;
         loadArticle();
     }
 
@@ -425,7 +247,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         final String processed  = post.process(generator.convertToHtml(this.article));
         final String subheading = post.generateSubheadings();
-        content = generator.decorate(this.article.title, processed, subheading);
+        content = generator.decorate(getTitle(), processed, subheading);
 
         final WebEngine engine = getWebView().getEngine();
         engine.loadContent(content);
@@ -468,6 +290,11 @@ public class ArticleTab extends BaseWebTab implements Editable {
     }
 
     @Override
+    public void setFont(final Font font) {
+        editor.setFont(font);
+    }
+
+    @Override
     public String edit() {
         final Path openTarget = article.path;
         if (!Files.exists(openTarget)){
@@ -479,8 +306,8 @@ public class ArticleTab extends BaseWebTab implements Editable {
             final String content = Files.readAllLines(openTarget)
                                         .stream()
                                         .collect(Collectors.joining(Strings.LINE_SEPARATOR));
-            editor.replaceText(content);
-            switchEditorVisible();
+            editor.setContent(content);
+            editor.switchEditorVisible();
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
             return e.getMessage();
@@ -495,12 +322,12 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
     @Override
     public String saveContent() {
-        try {
-            Files.write(article.path, editor.getText().getBytes(Defines.ARTICLE_ENCODE));
-        } catch (final IOException e) {
-            LOGGER.error("Error", e);
-            return e.getMessage();
+
+        final String result = editor.saveContent();
+        if (!result.isEmpty()) {
+            return result;
         }
+
         reload();
         return String.format("Save to file 「%s」", article.title);
     }

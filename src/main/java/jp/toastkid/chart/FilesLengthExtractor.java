@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.models.Defines;
@@ -65,7 +66,7 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
                 }
                 // 文字数集計.
                 final int fileCharacterValue
-                    = FileUtil.countCharacters(path, Defines.ARTICLE_ENCODE);
+                    = FileUtil.countCharacters(path, Article.ENCODE);
                 resultMap.put(putKey, fileCharacterValue);
                 overall = overall + fileCharacterValue;
             }

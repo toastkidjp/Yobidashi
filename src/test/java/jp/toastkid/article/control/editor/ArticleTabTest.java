@@ -18,7 +18,6 @@ import javafx.application.Platform;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import jp.toastkid.article.control.editor.ArticleTab;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
@@ -142,6 +141,9 @@ public class ArticleTabTest extends ApplicationTest {
                 .setConfig(ConfigTest.makeConfig())
                 .setOnClose(t -> assertTrue(true))
                 .setOnLoad(() -> assertTrue(true))
+                .setOnContextMenuRequested(e -> assertTrue(true))
+                .setOnOpenNewArticle(article -> assertTrue(true))
+                .setPopupHandler(params -> new WebView().getEngine())
                 .build();
     }
 

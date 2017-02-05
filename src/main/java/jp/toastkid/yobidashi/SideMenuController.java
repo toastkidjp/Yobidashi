@@ -42,7 +42,6 @@ import jp.toastkid.article.models.ContentType;
 import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.dialog.ProgressDialog;
 import jp.toastkid.jfx.common.control.MenuLabel;
-import jp.toastkid.libs.archiver.ZipArchiver;
 import jp.toastkid.libs.lambda.Filters;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -128,28 +127,28 @@ public class SideMenuController implements Initializable {
                 new ProgressDialog.Builder()
                         .setScene(parent.getScene())
                         .setCommand(new Task<Integer>() {
+
                             private String sArchivePath;
+
                             private long end;
+
                             @Override
                             protected Integer call() throws Exception {
                                 final long start = System.currentTimeMillis();
                                 sArchivePath = conf.get(Config.Key.ARTICLE_DIR);
-                                try {
-                                    new ZipArchiver().doDirectory(sArchivePath);
-                                    //new ZipArchiver().doDirectory(iArchivePath);
-                                } catch (final IOException e) {
-                                    LOGGER.error("Error", e);;
-                                }
+                                new Archiver().simpleBackup(Paths.get(sArchivePath), 0L);
                                 end = System.currentTimeMillis() - start;
                                 return 100;
                             }
+
                             @Override
                             protected void succeeded() {
                                 sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                                        .concat(ZipArchiver.EXTENSION_ZIP);
-                                final String message
-                                    = String.format("バックアップを完了しました。：%s%s%d[ms]",
-                                        sArchivePath, System.lineSeparator(), end);
+                                        + "zip";
+                                final String message = String.format(
+                                        "バックアップを完了しました。：%s%s%d[ms]",
+                                        sArchivePath, System.lineSeparator(), end
+                                        );
                                 AlertDialog.showMessage(parent, "バックアップ完了", message);
                             }
                         })
@@ -519,7 +518,7 @@ public class SideMenuController implements Initializable {
                 }
                 final long epochDay = CalendarUtil.zoneDateTime2long(
                         value.atStartOfDay().atZone(ZoneId.systemDefault()));
-                new Archiver().simpleBackup(conf.get(Config.Key.ARTICLE_DIR), epochDay);
+                new Archiver().simpleBackup(Paths.get(conf.get(Config.Key.ARTICLE_DIR)), epochDay);
             }).build().showAndWait()
         );
     }

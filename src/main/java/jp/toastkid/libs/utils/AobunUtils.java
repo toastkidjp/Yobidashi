@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 青空文庫に関する便利クラス
@@ -42,7 +42,7 @@ public final class AobunUtils {
      */
     public static final void docToTxt(final Path source, final Path outputTo) {
         final String        bookTitle  = getTitleFromPath(source);
-        final List<String>  list       = FileUtil.readLines(source, Defines.ARTICLE_ENCODE);
+        final List<String>  list       = FileUtil.readLines(source, Article.ENCODE);
         final List<String>  output     = convert(bookTitle, list);
         outputFile(output, bookTitle, outputTo);
     }

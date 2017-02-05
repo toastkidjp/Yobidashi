@@ -13,7 +13,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Article model.
@@ -22,11 +21,14 @@ import jp.toastkid.yobidashi.models.Defines;
  */
 public class Article implements Comparable<Article> {
 
-    /** 左のリストで中心をいくつずらすか. */
-    private static final int FOCUS_MARGIN = 10;
+    /** Article file's encoding. */
+    public static final String ENCODE            = "UTF-8";
 
     /** Internal link's protocol. */
     public static final String INTERNAL_PROTOCOL = "file:///internal/";
+
+    /** 左のリストで中心をいくつずらすか. */
+    private static final int FOCUS_MARGIN = 10;
 
     /** Internal link's format. */
     private static final String INTERNAL_LINK_FORMAT = INTERNAL_PROTOCOL + "/%s/%s%s";
@@ -184,7 +186,7 @@ public class Article implements Comparable<Article> {
         try {
             return new StringBuilder()
                 .append(title).append(" は ")
-                .append(FileUtil.countCharacters(path, Defines.ARTICLE_ENCODE))
+                .append(FileUtil.countCharacters(path, Article.ENCODE))
                 .append(" 字です。").append(System.lineSeparator())
                 .append(Files.size(path) / 1024L).append("[KB]").toString();
         } catch (final IOException e) {

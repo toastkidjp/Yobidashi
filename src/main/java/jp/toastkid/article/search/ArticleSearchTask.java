@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.Interval;
 
+import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * ファイル単位での検索をする.
@@ -60,7 +60,7 @@ public final class ArticleSearchTask implements Runnable {
      */
     private void strSearchFromFile() {
         final List<String> contents
-            = FileUtil.readLines(result.filePath, Defines.ARTICLE_ENCODE);
+            = FileUtil.readLines(result.filePath, Article.ENCODE);
 
         Interval.zeroTo(contents.size()).each(i -> {
             final String content = contents.get(i);

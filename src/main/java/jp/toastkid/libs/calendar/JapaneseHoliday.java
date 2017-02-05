@@ -9,18 +9,15 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.primitive.IntSet;
 import org.eclipse.collections.api.set.primitive.MutableIntSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import jp.toastkid.libs.utils.CalendarUtil;
 
@@ -87,42 +84,9 @@ public final class JapaneseHoliday{
 
     private static final int MONDAY = DayOfWeek.MONDAY.getValue();
 
-    private ImmutableSet<LocalDate> holidayDates;
 
-   /**
-    * デフォルトコンストラクタ.
-    * 現在日の年で、Holiday(int year) コンストラクタを呼び出すのと同じ効果です.
-    */
-   public JapaneseHoliday(){
-      this.init(LocalDate.now().getYear());
-   }
-
-   /**
-    * 対象年 指定コンストラクタ.
-    * @param year 西暦４桁
-    */
-   public JapaneseHoliday(final int year){
-      this.init(year);
-   }
-
-   /**
-    * init instance.
-    * @param year
-    */
-   private void init(final int year){
-      final MutableSet<LocalDate> set = Sets.mutable.empty();
-      ArrayIterate.collect(HolidayType.values(), type -> type.getBundle(year))
-          .select(hb -> hb != null)
-          .each(hb -> {
-              set.add(hb.getDate());
-              Optional.ofNullable(hb.getChangeDate()).ifPresent(set::add);
-          });
-      set.addAll(getNationalHoliday(year).toList());
-      this.holidayDates = set.toImmutable();
-   }
-
-   /** HolidayType は、祝日タイプ→HolidayBundle class を紐付ける enum */
-   public enum HolidayType{
+    /** HolidayType は、祝日タイプ→HolidayBundle class を紐付ける enum */
+    public enum HolidayType{
       /** 元旦        ：１月１日            */  NEWYEAR_DAY             (NewYearDayBundle.class)
       /** 成人の日    ：１月の第２月曜日    */ ,COMING_OF_AGE_DAY       (ComingOfAgeDayBundle.class)
       /** 建国記念日  ：２月１１日          */ ,NATIONAL_FOUNDATION_DAY (NatinalFoundationBundle.class)
@@ -141,7 +105,7 @@ public final class JapaneseHoliday{
       /** 天皇誕生日  ：１２月２３日        */ ,TENNO_BIRTHDAY          (EmperorBirthDayBundle.class)
       ;
 
-      private Class<? extends HolidayBundle> cls;
+      private final Class<? extends HolidayBundle> cls;
 
       private HolidayType(final Class<? extends HolidayBundle> cls){
          this.cls = cls;
@@ -170,9 +134,9 @@ public final class JapaneseHoliday{
               }
               return holBand;
       }
-   }
-   // 月→HolidayBundle class 参照 enum
-   enum MonthBundle{
+    }
+    // 月→HolidayBundle class 参照 enum
+    enum MonthBundle{
       JANUARY       (NewYearDayBundle.class,ComingOfAgeDayBundle.class)
       ,FEBRUARY     (NatinalFoundationBundle.class)
       ,MARCH        (SpringEquinoxBundle.class)
@@ -201,9 +165,9 @@ public final class JapaneseHoliday{
       Constructor<?>[] getConstructors(){
          return this.constructors;
       }
-   }
-   /** 祝日Bundle抽象クラス */
-   public abstract class HolidayBundle{
+    }
+    /** 祝日Bundle抽象クラス */
+    public abstract class HolidayBundle{
       int year;
       private final LocalDate ld;
       public abstract int getDay();
@@ -248,11 +212,12 @@ public final class JapaneseHoliday{
       }
    }
 
-   /** 祝日、振替休日を含んで、Date配列で返す.*/
-   public ImmutableSet<LocalDate> listHoliDays(){
-      return this.holidayDates;
-   }
-
+   /**
+    * Return specified year and month' holiday dates.
+    * @param year
+    * @param month
+    * @return
+    */
    public static IntSet findHolidays(final int year, final int month) {
        return listHolidays(year, month);
    }

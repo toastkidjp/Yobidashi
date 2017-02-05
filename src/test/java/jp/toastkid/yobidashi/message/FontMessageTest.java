@@ -1,6 +1,7 @@
 package jp.toastkid.yobidashi.message;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
@@ -23,6 +24,7 @@ public class FontMessageTest extends ApplicationTest {
     public void testMake() {
         final FontMessage fe = FontMessage.make(Font.getDefault(), 10);
         assertEquals(10, fe.getSize());
+        assertNotNull(fe.getFont().toString());
     }
 
     /**

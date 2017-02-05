@@ -115,25 +115,6 @@ public class BaseWebTabTest extends ApplicationTest {
     }
 
     /**
-     * Test of {@link BaseWebTab#scrollTo(double)}.
-     */
-    @Test
-    public void testScrollTo() {
-        Platform.runLater(() -> tab.scrollTo(200d));
-    }
-
-    /**
-     * Test of {@link BaseWebTab#getYPosition()}.
-     */
-    @Test
-    public void testGetYPosition() {
-        Platform.runLater(() -> {
-            tab.scrollTo(200d);
-            System.out.println(tab.getYPosition());
-        });
-    }
-
-    /**
      * Test of {@link BaseWebTab#htmlSource()}.
      */
     @Test
