@@ -1,0 +1,9 @@
+[submodule "javafx_css_generator"]
+	path = javafx_css_generator
+	url = git@github.com:toastkidjp/javafx_css_generator.git
+[submodule "slide_show"]
+	path = slide_show
+	url = git@github.com:toastkidjp/slide_show.git
+[submodule "script_runner"]
+	path = script_runner
+	url = git@github.com:toastkidjp/script_runner.git

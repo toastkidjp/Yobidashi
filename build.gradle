@@ -46,6 +46,9 @@ dependencies {
 
     providedCompile files("${javafxHome}/jre/lib/ext/jfxrt.jar")
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile project('javafx_css_generator')
+    compile project('slide_show')
+    compile project('script_runner')
 
     compile 'org.eclipse.collections:eclipse-collections:8.0.0'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
