@@ -64,11 +64,14 @@ public final class Config {
     /** Message in properties file. */
     private static final String MESSAGE = "Tool's Property.";
 
-    /** Configrations. */
+    /** Configurations. */
     private final Properties config = new Properties();
 
     /** path/to/userDir.  */
     private final Path path;
+
+    /** Configuration file's encode. */
+    public static final String ENCODE        = "UTF-8";
 
     /**
      * Initialize with path.

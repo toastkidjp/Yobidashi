@@ -42,14 +42,8 @@ public final class Defines {
     /** 設定ファイルフォルダのパス. */
     public static final Path   CONFIG           = Paths.get(USER_DIR + "/conf/config.properties");
 
-    /** 設定ファイルの文字コード. */
-    public static final String CONF_ENCODE        = "UTF-8";
-
     /** タイトルの文字コード. */
     public static final String TITLE_ENCODE       = "EUC-JP";
-
-    /** 記事ファイルの文字コード. */
-    public static final String ARTICLE_ENCODE     = "UTF-8";
 
     /** ePub生成レシピの置き場所. */
     public static final String EPUB_RECIPE_DIR    = USER_DIR + "/res/epub/";

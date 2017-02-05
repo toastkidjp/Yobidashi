@@ -511,7 +511,7 @@ public final class Controller implements Initializable {
                 }
                 openWebTabWithContent(
                         f.getAbsolutePath(),
-                        FileUtil.readLines(f.toPath(), Defines.ARTICLE_ENCODE).makeString(System.lineSeparator()),
+                        FileUtil.readLines(f.toPath(), Article.ENCODE).makeString(System.lineSeparator()),
                         ContentType.TEXT
                     );
             });

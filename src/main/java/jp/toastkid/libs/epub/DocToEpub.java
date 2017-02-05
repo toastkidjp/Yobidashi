@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jp.toastkid.article.converter.MarkdownConverter;
+import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -155,7 +156,7 @@ public final class DocToEpub {
             final List<Path> recursiveFiles = new ArrayList<>();
             targets.forEach(path ->{
                 recursiveFiles.add(path);
-                final List<String> contents = FileUtil.readLines(path, Defines.ARTICLE_ENCODE);
+                final List<String> contents = FileUtil.readLines(path, Article.ENCODE);
                 contents.stream()
                     .filter(content -> content.contains("[[") && content.contains("]]"))
                     .map(   content -> HYPERLINK_PAT.matcher(content))
@@ -207,7 +208,7 @@ public final class DocToEpub {
             final ContentMetaData cmeta = new ContentMetaData();
             final String content = converter.convert(
                         path.toAbsolutePath().toString(),
-                        Defines.ARTICLE_ENCODE
+                        Article.ENCODE
                     );
             final String title = Articles.convertTitle(path.getFileName().toString());
             String baseName = path.getFileName().toString();

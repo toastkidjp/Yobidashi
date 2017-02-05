@@ -134,13 +134,13 @@ public final class ArticleGenerator {
         final String absolutePath = path.toAbsolutePath().toString();
         try {
             final long ms = Files.getLastModifiedTime(path).toMillis();
-            return converter.convert(absolutePath , Defines.ARTICLE_ENCODE) + "<hr/>Last Modified： "
+            return converter.convert(absolutePath , Article.ENCODE) + "<hr/>Last Modified： "
                     + CalendarUtil.longToStr(ms, MarkdownConverter.STANDARD_DATE_FORMAT);
         } catch (final IOException e) {
             e.printStackTrace();
             LOGGER.error("Error!", e);
         }
-        return converter.convert(absolutePath , Defines.ARTICLE_ENCODE);
+        return converter.convert(absolutePath , Article.ENCODE);
     }
 
     /**

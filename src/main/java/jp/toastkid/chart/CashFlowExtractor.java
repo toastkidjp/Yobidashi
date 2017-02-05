@@ -17,9 +17,9 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * 日記から家計簿の部分を取り出し、計算する。
@@ -97,7 +97,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
             final String date = Articles.convertTitle(item).replace("日記", "");
             String str = "";
             try (final BufferedReader fileReader
-                   = FileUtil.makeFileReader(readTarget, Defines.ARTICLE_ENCODE); ) {
+                   = FileUtil.makeFileReader(readTarget, Article.ENCODE); ) {
                 str = fileReader.readLine();
                 while (str != null) {
                     if ((str.startsWith("*") || str.startsWith("#")) && str.endsWith("家計簿")) {

@@ -15,9 +15,9 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.tinysegmenter.TinySegmenter;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Utility of word cloud for JavaFX.
@@ -108,7 +108,7 @@ public final class FxWordCloud {
         ts.isAllowHiragana = false;
         ts.isAllowNum      = false;
         final MutableMap<String, Integer> map = Maps.mutable.empty();
-        FileUtil.readLines(path, Defines.ARTICLE_ENCODE)
+        FileUtil.readLines(path, Article.ENCODE)
             .stream()
             .filter(StringUtils::isNotEmpty)
             .forEach(str -> {

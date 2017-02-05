@@ -187,7 +187,7 @@ public final class Articles {
      */
     private static byte[] makeNewContent(final Article article) {
         try {
-            return newMarkdown(article.title).getBytes(Defines.ARTICLE_ENCODE);
+            return newMarkdown(article.title).getBytes(Article.ENCODE);
         } catch (final UnsupportedEncodingException e) {
             LOGGER.error("Caught error.", e);
         }
@@ -246,7 +246,7 @@ public final class Articles {
      * @return パラメータをセットしたテンプレートの文字列表現
      */
     public static final String bindArgs(final String pathToTemplate, final Map<String, String> params) {
-        return bindArgsInternal(FileUtil.readLinesFromStream(pathToTemplate, Defines.ARTICLE_ENCODE), params);
+        return bindArgsInternal(FileUtil.readLinesFromStream(pathToTemplate, Article.ENCODE), params);
     }
 
     /**

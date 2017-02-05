@@ -27,9 +27,9 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import jp.toastkid.article.models.Article;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.MathUtil;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Markdown editor.
@@ -114,7 +114,7 @@ public class Editor {
     private void initArea() {
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
-
+            System.out.println(event.toString());
             if (event.isControlDown()) {
                 return;
             }
@@ -138,7 +138,7 @@ public class Editor {
             }
             final double newValue = previewHeight / next;
             scaleFactor = 0 < newValue
-                    ? newValue * 1.2d
+                    ? 1 < newValue ? newValue * 1.2d : newValue * 0.8d
                     : DEFAULT_SCALE_FACTOR;
         });
     }
@@ -304,7 +304,7 @@ public class Editor {
      */
     String saveContent() {
         try {
-            Files.write(getPath(), getContent().getBytes(Defines.ARTICLE_ENCODE));
+            Files.write(getPath(), getContent().getBytes(Article.ENCODE));
             isModified.set(false);
         } catch (final IOException e) {
             LOGGER.error("Error", e);

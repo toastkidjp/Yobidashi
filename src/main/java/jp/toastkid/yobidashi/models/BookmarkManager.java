@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.stage.Window;
+import jp.toastkid.article.models.Article;
 import jp.toastkid.dialog.AlertDialog;
 
 /**
@@ -69,7 +70,7 @@ public class BookmarkManager {
      */
     private void store(final String newContent) {
         try {
-            Files.write(path, newContent.getBytes(Defines.ARTICLE_ENCODE));
+            Files.write(path, newContent.getBytes(Article.ENCODE));
         } catch (final IOException e) {
             e.printStackTrace();
         }
