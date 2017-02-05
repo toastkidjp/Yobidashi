@@ -104,6 +104,7 @@ public class ArticlesTest {
                 put("title", "タイトルでござい");
                 put("content", "こんてんと");
                 put("jarPath", "jar:");
+                put("installDir", "installed:");
                 put("bodyAdditional", "");
                 put("subheadings", "");
             }}

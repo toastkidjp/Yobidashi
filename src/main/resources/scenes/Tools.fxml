@@ -69,7 +69,7 @@
                    showTickLabels="true" showTickMarks="true" value="1.0">
                     <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
                   </JFXSlider>
-                  <JFXTextField fx:id="zoomInput" onAction="#setZoom" labelFloat="true"
+                  <JFXTextField fx:id="zoomInput" labelFloat="true"
                     promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
                     <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
                   </JFXTextField>
