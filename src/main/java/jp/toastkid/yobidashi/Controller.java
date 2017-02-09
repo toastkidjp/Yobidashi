@@ -701,7 +701,7 @@ public final class Controller implements Initializable {
      * カレンダーを呼び出し、選択された日付の日記を表示する.
      */
     @FXML
-    public final void callCalendar() {
+    private final void callCalendar() {
         calendar.show();
         final LocalDate value = calendar.getValue();
         if (value == null) {
@@ -1503,7 +1503,7 @@ public final class Controller implements Initializable {
      * Open urlText's value.
      */
     @FXML
-    public final void readUrlText() {
+    private final void readUrlText() {
         openWebTab("", urlText.getText());
     }
 
@@ -1514,7 +1514,7 @@ public final class Controller implements Initializable {
      * 続・JavaFX8の印刷機能によるHTMLのPDF変換</a>
      */
     @FXML
-    public final void callPrinterJob() {
+    private final void callPrinterJob() {
         new AlertDialog.Builder(getParent())
             .setTitle("PDF印刷").setMessage("PDFへの印刷を実行しますか？")
             .setOnPositive("OK", () -> {
@@ -1552,7 +1552,7 @@ public final class Controller implements Initializable {
      * apply stylesheet.
      */
     @FXML
-    public void callApplyStyle() {
+    private void callApplyStyle() {
         final String styleName = style.getItems().get(style.getSelectionModel().getSelectedIndex())
                 .toString();
         if (StringUtils.isEmpty(styleName)) {
@@ -1580,7 +1580,7 @@ public final class Controller implements Initializable {
      * Set passed stage on this object.
      * @param stage
      */
-    public final void setStage(final Stage stage) {
+    protected final void setStage(final Stage stage) {
         this.stage = stage;
         stage.setTitle(conf.get(Config.Key.APP_TITLE));
     }
@@ -1618,7 +1618,7 @@ public final class Controller implements Initializable {
      * Set width and height to Controller.
      * @param height 縦幅
      */
-    public final void setSize(final double width, final double height) {
+    protected final void setSize(final double width, final double height) {
         this.width  = width;
         this.height = height;
     }
@@ -1629,7 +1629,7 @@ public final class Controller implements Initializable {
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
         final Cancellation cancellation
-            = sideMenuController.getProcessor().subscribe(this::processMessage);
+            = sideMenuController.getMessenger().subscribe(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
         sideMenuController.setConfig(conf);
     }

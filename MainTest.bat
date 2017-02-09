@@ -1,0 +1,1 @@
+gradle :test :jacocoTestReport -a

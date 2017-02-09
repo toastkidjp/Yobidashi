@@ -58,7 +58,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.0'
 
     compile 'org.fxmisc.richtext:richtextfx:1.0.0-SNAPSHOT'
-    compile 'com.jfoenix:jfoenix:1.0.0'
+    compile 'com.jfoenix:jfoenix:1.1.0'
 
     // Logger
     compile 'org.slf4j:slf4j-api:1.7.21'
