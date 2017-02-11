@@ -28,6 +28,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import jp.toastkid.article.models.ContentType;
 import jp.toastkid.jfx.common.control.MenuLabel;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
@@ -35,6 +36,8 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
+import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
 import reactor.core.publisher.TopicProcessor;
 
@@ -64,7 +67,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_quit() {
         Platform.runLater(() -> {
-            subsdribe(m -> {
+            subscribe(m -> {
                 final ApplicationMessage am = (ApplicationMessage) m;
                 assertEquals(ApplicationMessage.Command.QUIT, am.getCommand());
             });
@@ -89,6 +92,21 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
+     * Test of {@link SideMenuController#reload()}.
+     */
+    @Test
+    public void test_reload() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.RELOAD, tm.getCommand());
+            });
+            selectTab(3);
+            fireLabel("Reload", "F5");
+        });
+    }
+
+    /**
      * Test of {@link SideMenuController#callApplicationState()}.
      */
     @Test
@@ -102,6 +120,83 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
+     * Test of {@link SideMenuController#callHtmlSource()}.
+     */
+    @Test
+    public void test_callHtmlSource() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.PREVIEW, tm.getCommand());
+            });
+            selectTab(1);
+            fireLabel("HTML source", "Ctrl+U");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#closeAllTabs()}.
+     */
+    @Test
+    public void test_closeAllTabs() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.CLOSE_ALL, tm.getCommand());
+            });
+            selectTab(0);
+            fireLabel("Close all tabs", "Alt+W");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#closeTab()}.
+     */
+    @Test
+    public void test_closeTab() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.CLOSE, tm.getCommand());
+            });
+            selectTab(0);
+            fireLabel("Close tab", "Ctrl+W");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#openSpeedDialTab()}.
+     */
+    @Test
+    public void test_openSpeedDialTab() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.OPEN, tm.getCommand());
+            });
+            selectTab(0);
+            fireLabel("Open new tab", "Ctrl+T");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#license()}.
+     */
+    @Test
+    public void test_license() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final WebTabMessage wm = (WebTabMessage) m;
+                assertEquals("License", wm.getTitle());
+                assertNotNull(wm.getContent());
+                assertEquals(ContentType.TEXT, wm.getContentType());
+            });
+            selectTab(4);
+            fireLabel("License");
+        });
+    }
+
+    /**
      * Test of {@link SideMenuController#callConvertAobun}.
      */
     @Test
@@ -111,7 +206,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_AOBUN, am.getCommand());
             };
-            subsdribe(consumer);
+            subscribe(consumer);
             selectTab(2);
             fireLabel("Convert current article to AozoraBunko Text");
         });
@@ -127,9 +222,24 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_EPUB, am.getCommand());
             };
-            subsdribe(consumer);
+            subscribe(consumer);
             selectTab(2);
             fireLabel("Convert current article to ePub");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#callWordCloud}.
+     */
+    @Test
+    public void test_callWordCloud() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ArticleMessage am = (ArticleMessage) m;
+                assertEquals(ArticleMessage.Command.WORD_CLOUD, am.getCommand());
+            });
+            selectTab(2);
+            fireLabel("Word cloud", "Shift+W");
         });
     }
 
@@ -143,7 +253,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.LENGTH, am.getCommand());
             };
-            subsdribe(consumer);
+            subscribe(consumer);
             selectTab(1);
             fireLabel("Article length counter	|	Ctrl+L");
         });
@@ -155,7 +265,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_callSearch() {
         Platform.runLater(() -> {
-            subsdribe(m -> {
+            subscribe(m -> {
                 final ShowSearchDialog am = (ShowSearchDialog) m;
                 assertNotNull(am);
             });
@@ -165,12 +275,102 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
+     * Test of {@link SideMenuController#saveArticle}.
+     */
+    @Test
+    public void test_saveArticle() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final TabMessage tm = (TabMessage) m;
+                assertEquals(TabMessage.Command.SAVE, tm.getCommand());
+            });
+            selectTab(1);
+            fireLabel("Save article", "Ctrl+S");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#makeArticle}.
+     */
+    @Test
+    public void test_makeArticle() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ArticleMessage am = (ArticleMessage) m;
+                assertEquals(ArticleMessage.Command.MAKE, am.getCommand());
+            });
+            selectTab(1);
+            fireLabel("Make new article");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#callCopy}.
+     */
+    @Test
+    public void test_callCopy() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ArticleMessage am = (ArticleMessage) m;
+                assertEquals(ArticleMessage.Command.COPY, am.getCommand());
+            });
+            selectTab(1);
+            fireLabel("Copy article");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#callRename}.
+     */
+    @Test
+    public void test_callRename() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ArticleMessage am = (ArticleMessage) m;
+                assertEquals(ArticleMessage.Command.RENAME, am.getCommand());
+            });
+            selectTab(1);
+            fireLabel("Rename article");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#callDelete}.
+     */
+    @Test
+    public void test_callDelete() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ArticleMessage am = (ArticleMessage) m;
+                assertEquals(ArticleMessage.Command.DELETE, am.getCommand());
+            });
+            selectTab(1);
+            fireLabel("Delete article");
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#saveArticle}.
+     */
+    @Test
+    public void test_openTools() {
+        Platform.runLater(() -> {
+            subscribe(m -> {
+                final ToolsDrawerMessage tm = (ToolsDrawerMessage) m;
+                assertNotNull(tm);
+            });
+            selectTab(2);
+            fireLabel("Open tools");
+        });
+    }
+
+    /**
      * Test of {@link SideMenuController#slideShow}.
      */
     @Test
     public void test_slideShow() {
         Platform.runLater(() -> {
-            subsdribe(m -> {
+            subscribe(m -> {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.SLIDE_SHOW, am.getCommand());
             });
@@ -185,7 +385,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_callEditor() {
         Platform.runLater(() -> {
-            subsdribe(m -> {
+            subscribe(m -> {
                 final TabMessage am = (TabMessage) m;
                 assertEquals(TabMessage.Command.EDIT, am.getCommand());
             });
@@ -200,7 +400,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_callGC() {
         Platform.runLater(() -> {
-            subsdribe(m -> {
+            subscribe(m -> {
                 final SnackbarMessage am = (SnackbarMessage) m;
                 assertEquals("Called garbage collection.", am.getText());
             });
@@ -258,8 +458,8 @@ public class SideMenuControllerTest extends ApplicationTest {
      * Subscribe passed consumer.
      * @param consumer
      */
-    private void subsdribe(final Consumer<? super Message> consumer) {
-        messenger.subscribe(consumer);
+    private void subscribe(final Consumer<? super Message> consumer) {
+        messenger.subscribe(consumer, e -> fail(e.getMessage()));
     }
 
     @Override

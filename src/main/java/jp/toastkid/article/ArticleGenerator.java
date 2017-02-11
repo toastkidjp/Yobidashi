@@ -49,7 +49,6 @@ public final class ArticleGenerator {
      * @param conf
      */
     public ArticleGenerator(final Config config) {
-        final long start = System.currentTimeMillis();
         this.config = config;
         this.converter = Mono.<MarkdownConverter>create(
                 emitter -> emitter.success(new MarkdownConverter(config))
@@ -57,10 +56,7 @@ public final class ArticleGenerator {
             .subscribeOn(Schedulers.elastic())
             .block();
         this.converter.openLinkBrank = true;
-        LOGGER.info("ended init converter. {}[ms]", System.currentTimeMillis() - start);
-
         chooser = new ImageChooser(USER_BACKGROUND);
-        LOGGER.info("ended init ImageChooser. {}[ms]", System.currentTimeMillis() - start);
     }
 
     /**

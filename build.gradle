@@ -24,8 +24,6 @@ def javafxHome      = System.getenv('JAVA_HOME')
 
 [compileJava, compileTestJava]*.options*.encoding = defaultEncoding
 
-test.maxParallelForks = 4
-
 repositories {
     mavenCentral()
     maven {

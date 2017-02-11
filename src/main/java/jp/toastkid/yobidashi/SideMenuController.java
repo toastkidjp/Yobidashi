@@ -201,7 +201,7 @@ public class SideMenuController implements Initializable {
      * @param event ActionEvent
      */
     @FXML
-    private final void callConfig(final ActionEvent event) {
+    private final void callConfig() {
         final Optional<Window> parent = getParent();
         if (!parent.isPresent()) {
             return;
