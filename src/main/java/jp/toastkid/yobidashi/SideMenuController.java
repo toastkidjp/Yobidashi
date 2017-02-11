@@ -184,7 +184,7 @@ public class SideMenuController implements Initializable {
      * Show file length.
      */
     @FXML
-    protected final void callFileLength() {
+    private final void callFileLength() {
         messenger.onNext(ArticleMessage.makeLength());
     }
 
@@ -193,10 +193,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void fullScreen() {
-        if (stage == null) {
-            return;
-        }
-        stage.setFullScreen(!stage.fullScreenProperty().get());
+        stage.setFullScreen(!stage.isFullScreen());
     }
 
     /**
@@ -232,7 +229,7 @@ public class SideMenuController implements Initializable {
      * Call method of converting to Aozora-Bunko style text.
      */
     @FXML
-    public final void callConvertAobun() {
+    private final void callConvertAobun() {
         messenger.onNext(ArticleMessage.makeConvertAobun());
     }
 
@@ -316,9 +313,7 @@ public class SideMenuController implements Initializable {
      * @return Optional&lt;Window&gt;.
      */
     private Optional<Window> getParent() {
-        return Optional.of(
-                Optional.of(stage.getScene()).map(scene -> scene.getWindow()).orElse(null)
-                );
+        return Optional.of(stage);
     }
 
     /**
@@ -549,7 +544,7 @@ public class SideMenuController implements Initializable {
      * Call method of converting to ePub.
      */
     @FXML
-    public final void callConvertEpub() {
+    private final void callConvertEpub() {
         messenger.onNext(ArticleMessage.makeConvertEpub());
     }
 
@@ -606,7 +601,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void openTools() {
-        getProcessor().onNext(ToolsDrawerMessage.make());
+        getMessenger().onNext(ToolsDrawerMessage.make());
     }
 
     /**
@@ -742,7 +737,7 @@ public class SideMenuController implements Initializable {
      * Getter of messenger.
      * @return messenger
      */
-    public TopicProcessor<Message> getProcessor() {
+    protected TopicProcessor<Message> getMessenger() {
         return messenger;
     }
 
@@ -750,7 +745,7 @@ public class SideMenuController implements Initializable {
      * Pass {@link Config} object.
      * @param conf
      */
-    public void setConfig(final Config conf) {
+    protected void setConfig(final Config conf) {
         this.conf = conf;
         this.articleGenerator = new ArticleGenerator(conf);
         this.ePubGenerator    = new EpubGenerator(conf);

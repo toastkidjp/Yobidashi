@@ -114,7 +114,6 @@ public class Editor {
     private void initArea() {
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
-            System.out.println(event.toString());
             if (event.isControlDown()) {
                 return;
             }

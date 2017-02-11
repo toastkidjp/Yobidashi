@@ -47,7 +47,6 @@ This software contains following open source softwares. Thanks a lot. :bow:
 | [jackson-databind](https://github.com/FasterXML/jackson-databind) | Apache License Version 2.0 | convert string to POJO.
 | [slf4j-api](http://www.slf4j.org/) | [MIT license](http://www.slf4j.org/license.html) | Logging
 | [Groovy](http://www.groovy-lang.org/) | [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt) | Use at ScriptRunner.
-| [Clojure](http://clojure.org/) | Eclipse Public License ver 1.0 | Use at ScriptRunner.
 
 ### HTML & JavaScript
 

@@ -1,8 +1,5 @@
 package jp.toastkid.yobidashi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -24,6 +21,7 @@ import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
+import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
@@ -34,9 +32,6 @@ import reactor.core.scheduler.Schedulers;
  *
  */
 public class ToolsController {
-
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToolsController.class);
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -50,26 +45,30 @@ public class ToolsController {
     private static final KeyCombination DRAW_CHART
         = new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
 
+    /** Root pane. */
+    @FXML
+    private Pane root;
+
     /** グラフ種別セレクタ. */
     @SuppressWarnings("rawtypes")
     @FXML
-    public ComboBox graphKind;
+    private ComboBox graphKind;
 
     /** 月セレクタ. */
     @FXML
-    public ComboBox<String> month;
+    private ComboBox<String> month;
 
     /** Zoom Controller. */
     @FXML
-    public Slider zoom;
+    private Slider zoom;
 
     /** Specify zoom rate. */
     @FXML
-    public TextField zoomInput;
+    private TextField zoomInput;
 
     /** Font family */
     @FXML
-    public ComboBox<String> fontFamily;
+    private ComboBox<String> fontFamily;
 
     /** Font size. */
     @FXML
@@ -93,19 +92,6 @@ public class ToolsController {
                 "日記" + month.getSelectionModel().getSelectedItem().toString()
                 );
         messenger.onNext(ContentTabMessage.make(title, content));
-    }
-
-    /**
-     * Set zoom rate with specified value.
-     */
-    @FXML
-    private final void setZoom() {
-        try {
-            final double ratio = Double.parseDouble(zoomInput.getText());
-            zoom.setValue(ratio);
-        } catch (final Exception e) {
-            LOGGER.error("Error", e);
-        }
     }
 
     /**
@@ -167,11 +153,12 @@ public class ToolsController {
      * @param zoomPublisher
      */
     public void setFlux(final Flux<DoubleProperty> zoomPublisher) {
-        zoomPublisher.subscribeOn(Schedulers.elastic())
+        final Cancellation subscribe = zoomPublisher.subscribeOn(Schedulers.elastic())
             .subscribe(z -> {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
             });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> subscribe.dispose()));
     }
 
     /**
@@ -192,6 +179,14 @@ public class ToolsController {
         this.fontFamily.getItems().addAll(Font.getFamilies());
         final int index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
         this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
+    }
+
+    /**
+     * Return root pane,
+     * @return
+     */
+    protected Pane getRoot() {
+        return root;
     }
 
 }
