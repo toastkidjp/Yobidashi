@@ -1,7 +1,9 @@
 package jp.toastkid.article.converter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,6 +103,14 @@ public final class MarkdownConverter {
 
     /** yukiwiki's header pattern. */
     private static final Pattern HEADER_PATTERN = Pattern.compile(".\\#*");
+
+    /** RegEx of place foot note. */
+    private static final Pattern FOOTNOTE_PLACE_PATTERN
+        = Pattern.compile("\\[\\^(.+?)\\]", Pattern.DOTALL);
+
+    /** RegEx of display foot note. */
+    private static final Pattern FOOTNOTE_DISPLAY_PATTERN
+        = Pattern.compile("^\\[\\^(.+?)\\]\\:(.+?)$", Pattern.DOTALL);
 
     /** 段落の頭に p タグを許容するタグ. (130727) */
     private static final String[] ALLOW_P_TAGS = {
@@ -219,6 +229,9 @@ public final class MarkdownConverter {
 
         Formation formation = null;
         List<Footballer> team = new ArrayList<>(11);
+
+        final Map<String, Integer> footnote = new HashMap<>();
+
         int uLTagDepth  = 0;
         int oLTagDepth  = 0;
         /** 何番目の expand か */
@@ -554,6 +567,29 @@ public final class MarkdownConverter {
                 }
                 str = "";
             }
+
+            if (str.startsWith("[^")) {
+                matcher = FOOTNOTE_DISPLAY_PATTERN.matcher(str);
+                if (matcher.find()) {
+                    final String key  = matcher.group(1);
+                    final String text = matcher.group(2);
+                    str = "<a id=\"fn-" + key + "\" href=\"#fn-back-" + key + "\">"
+                            + "["  + key + "]</a>"+ text;
+                    final int index = footnote.get(key);
+                    final String line = contents.get(index);
+                    contents.set(index, line.replace("＜TITLE＞", text));
+                    footnote.remove(key);
+                }
+            } else if (str.contains("[^")) {
+                matcher = FOOTNOTE_PLACE_PATTERN.matcher(str);
+                if (matcher.find()) {
+                    final String key = matcher.group(1);
+                    str = matcher.replaceFirst("<a id=\"fn-back-" + key + "\""
+                            + " href=\"#fn-" + key + "\" title=\"＜TITLE＞\">[" + key + "]</a>");
+                    footnote.put(key, contents.size());
+                }
+            }
+
             if (str.indexOf("<p></p>") != -1) {
                 str = str.replaceAll("<p></p>", "<p>");
                 isInP = true;
