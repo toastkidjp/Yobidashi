@@ -72,6 +72,10 @@ run {
     classpath += configurations.provided
 }
 
+test {
+    classpath += configurations.provided
+}
+
 eclipse {
     classpath.defaultOutputDir = file('build_e')
     classpath {
