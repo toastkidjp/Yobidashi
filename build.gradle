@@ -17,7 +17,7 @@ sourceCompatibility = 1.8
 
 version = '0.0.1'
 
-mainClassName   = 'jp.toastkid.yobidashi.Main'
+mainClassName       = 'jp.toastkid.yobidashi.Main'
 def defaultEncoding = 'UTF-8'
 def jdkVersion      = '1.8'
 def javafxHome      = System.getenv('JAVA_HOME')
@@ -33,60 +33,52 @@ repositories {
     }
 }
 
-
-//this one works with file dependencies. If you prefer
-
 configurations {
-    //we do not want to have jfxrt.jar in the classpath when creating the jar,
-    //therefore a seperate configuration is required
-    providedCompile
+    provided
+    forJar
 }
 
 dependencies {
-
-    providedCompile files("${javafxHome}/jre/lib/ext/jfxrt.jar")
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile project('javafx_css_generator')
-    compile project('slide_show')
-    compile project('script_runner')
+    provided project('javafx_css_generator')
+    provided project('slide_show')
+    provided project('script_runner')
+    forJar fileTree(dir: 'script_runner', include: '*.jar')
+    forJar fileTree(dir: 'javafx_css_generator', include: '*.jar')
+    forJar fileTree(dir: 'slide_show', include: '*.jar')
 
     compile 'org.eclipse.collections:eclipse-collections:8.0.0'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
-    compile 'org.apache.commons:commons-lang3:3.4'
-
-    // Markdown parser.
+    compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.0'
-
     compile 'org.fxmisc.richtext:richtextfx:1.0.0-SNAPSHOT'
-    compile 'com.jfoenix:jfoenix:1.1.0'
+    compile 'com.jfoenix:jfoenix:1.0.0'
 
     // Logger
     compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'org.slf4j:slf4j-log4j12:1.7.21'
 
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile group: 'org.testfx', name: 'testfx-junit', version: '4.0.5-alpha'
 }
 
 compileJava {
-    //add required JavaFX libs to compile classpath
-    sourceSets.main.compileClasspath += configurations.providedCompile
-    sourceSets.main.compileClasspath += configurations.runtime
+    sourceSets.main.compileClasspath += configurations.provided
     sourceSets.main.compileClasspath += configurations.testCompile
 }
 
 run {
-    //add required JavaFX libs to runtime classpath
-    classpath += configurations.providedCompile
-    classpath += configurations.runtime
+    classpath += configurations.provided
 }
+
 eclipse {
-    classpath.defaultOutputDir = file('build')
+    classpath.defaultOutputDir = file('build_e')
+    classpath {
+        plusConfigurations += [ configurations.provided ]
+    }
 }
 
-
-//clear existing task actions and call ant task
 jar {
     manifest {
         attributes 'Main-Class' : mainClassName
@@ -94,9 +86,9 @@ jar {
     destinationDir = projectDir
     // version = version + "_" + revHash()
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    from configurations.forJar.collect  { it.isDirectory() ? it : zipTree(it) }
 }
 
-//create some smarter looking start scripts
 startScripts {
     doLast {
         unixScript.text = "java -jar ../libs/$jar.archiveName"

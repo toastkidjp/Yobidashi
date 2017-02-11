@@ -1635,10 +1635,33 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Set up Tool Menu.
+     */
+    protected void setupToolMenu() {
+        toolsController.init(this.stage);
+        final Cancellation cancellation
+            = toolsController.getMessenger().subscribe(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
+        toolsController.setConfig(conf);
+        toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
+            tabPane.getSelectionModel().selectedItemProperty()
+                .addListener((a, prevTab, nextTab) -> {
+                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
+                        final WebView prev = (WebView) prevTab.getContent();
+                        prev.zoomProperty().unbind();
+                    }
+                    Optional.ofNullable(getCurrentTab())
+                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
+                })
+        ));
+    }
+
+    /**
      * Process processor's event.
      * @param message Processor's event
      */
     private void processMessage(final Message message) {
+
         if (message instanceof ToolsDrawerMessage) {
             Platform.runLater(this::switchRightDrawer);
             return;
@@ -1864,28 +1887,6 @@ public final class Controller implements Initializable {
             default:
                 return;
         }
-    }
-
-    /**
-     * Set up Tool Menu.
-     */
-    protected void setupToolMenu() {
-        toolsController.init(this.stage);
-        final Cancellation cancellation
-            = toolsController.getMessenger().subscribe(this::processMessage);
-        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
-        toolsController.setConfig(conf);
-        toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
-            tabPane.getSelectionModel().selectedItemProperty()
-                .addListener((a, prevTab, nextTab) -> {
-                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
-                        final WebView prev = (WebView) prevTab.getContent();
-                        prev.zoomProperty().unbind();
-                    }
-                    Optional.ofNullable(getCurrentTab())
-                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
-                })
-        ));
     }
 
     /**
