@@ -30,6 +30,7 @@ import javafx.scene.web.WebView;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.MathUtil;
+import jp.toastkid.libs.utils.Strings;
 
 /**
  * Markdown editor.
@@ -252,7 +253,7 @@ public class Editor {
      * @param content text
      */
     void setContent(final String content) {
-        area.replaceText(content);
+        area.appendText(content);
     }
 
     /**
@@ -260,7 +261,7 @@ public class Editor {
      * @return content text
      */
     String getContent() {
-        return area.getText();
+        return area.getText() + Strings.LINE_SEPARATOR;
     }
 
     /**

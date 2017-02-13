@@ -58,11 +58,12 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.9.5'
-    testCompile group: 'org.testfx', name: 'testfx-junit', version: '4.0.5-alpha'
+    testCompile 'org.testfx:testfx-junit:4.0.5-alpha'
 }
 
 compileJava {
     sourceSets.main.compileClasspath += configurations.provided
+    sourceSets.test.compileClasspath += configurations.provided
     sourceSets.main.compileClasspath += configurations.testCompile
 }
 
