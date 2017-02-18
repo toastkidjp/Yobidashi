@@ -62,7 +62,7 @@ import javafx.util.Duration;
  * @since   2016-05-24
  *
  */
-public class JFXMasonryPane2 extends Pane {
+public class MasonryPane extends Pane {
 
     /***************************************************************************
      *                                                                         *
@@ -87,7 +87,7 @@ public class JFXMasonryPane2 extends Pane {
     /**
      * Constructs a new JFXMasonryPane
      */
-    public JFXMasonryPane2() {
+    public MasonryPane() {
         this.widthProperty().addListener((o,oldVal,newVal)->{valid = false;});
         this.heightProperty().addListener((o,oldVal,newVal)->{valid = false;});
         final ChangeListener<? super Number> layoutListener = (o,oldVal,newVal)->{

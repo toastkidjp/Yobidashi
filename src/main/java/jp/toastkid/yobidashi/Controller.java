@@ -102,7 +102,7 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wordcloud.FxWordCloud;
-import jp.toastkid.wordcloud.JFXMasonryPane2;
+import jp.toastkid.wordcloud.MasonryPane;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
@@ -1884,7 +1884,7 @@ public final class Controller implements Initializable {
                 Platform.runLater(this::convertEpub);
                 return;
             case WORD_CLOUD:
-                final JFXMasonryPane2 pane = new JFXMasonryPane2();
+                final MasonryPane pane = new MasonryPane();
                 final ScrollPane value = new ScrollPane(pane);
                 value.setFitToHeight(true);
                 value.setFitToWidth(true);
@@ -1894,8 +1894,7 @@ public final class Controller implements Initializable {
                     return;
                 }
 
-                wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
-                                .setMinFontSize(8.0).build();
+                wordCloud = new FxWordCloud.Builder().setMaxFontSize(120.0).setMinFontSize(8.0).build();
                 final Article article = optional.get();
                 wordCloud.draw(pane, article.path.toString());
                 Platform.runLater(() -> openContentTab(article.title + "'s word cloud", pane));

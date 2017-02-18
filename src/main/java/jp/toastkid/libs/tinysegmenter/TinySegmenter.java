@@ -149,8 +149,6 @@ public final class TinySegmenter {
             if (0 < score ) {
                 if (isAllowWord(word.toString().trim())){
                     result.add(word.toString());
-                } else {
-                    System.out.println("Drop: " + word);
                 }
                 word.delete(0, word.length());
                 p = "B";
