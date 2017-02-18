@@ -127,16 +127,15 @@ public final class ArticleGenerator {
      * @return 変換後の HTML 文字列
      */
     public String convertToHtml(final Path path) {
-        final String absolutePath = path.toAbsolutePath().toString();
         try {
             final long ms = Files.getLastModifiedTime(path).toMillis();
-            return converter.convert(absolutePath , Article.ENCODE) + "<hr/>Last Modified： "
+            return converter.convert(path, Article.ENCODE) + "<hr/>Last Modified： "
                     + CalendarUtil.longToStr(ms, MarkdownConverter.STANDARD_DATE_FORMAT);
         } catch (final IOException e) {
             e.printStackTrace();
             LOGGER.error("Error!", e);
         }
-        return converter.convert(absolutePath , Article.ENCODE);
+        return converter.convert(path , Article.ENCODE);
     }
 
     /**

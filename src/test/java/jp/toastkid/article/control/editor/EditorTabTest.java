@@ -120,6 +120,6 @@ public class EditorTabTest extends ApplicationTest {
      */
     private Path testPath() throws URISyntaxException {
         return Paths.get(getClass().getClassLoader()
-                .getResource("article/C6FCB5AD323031332D30382D333128C5DA29.md").toURI());
+                .getResource("article/editor/C6FCB5AD323031332D30382D333128C5DA29.md").toURI());
     }
 }

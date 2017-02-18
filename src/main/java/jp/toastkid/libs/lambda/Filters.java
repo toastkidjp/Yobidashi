@@ -5,7 +5,7 @@ package jp.toastkid.libs.lambda;
  *
  * @author Toast kid
  */
-public class Filters {
+public final class Filters {
 
     /**
      * Deny make instance.

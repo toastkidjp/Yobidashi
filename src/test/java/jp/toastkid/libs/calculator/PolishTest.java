@@ -1,7 +1,6 @@
 package jp.toastkid.libs.calculator;
 
-import static org.junit.Assert.*;
-import jp.toastkid.libs.calculator.Polish;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ import org.junit.Test;
 public class PolishTest {
 
     /**
-     * test calculate.
+     * Test of {@link Polish#calculate}.
      */
     @Test
     public final void testCalculate() {
@@ -22,12 +21,28 @@ public class PolishTest {
     }
 
     /**
-     * test calculate.
+     * Test of {@link Polish#calculate}.
      */
     @Test
     public final void testCalculateArray() {
         assertEquals(3, Polish.calculate("+", "1", "2"));
         assertEquals(30, Polish.calculate("*", "+", "1", "5", "+", "2", "3"));
+    }
+
+    /**
+     * Test of {@link Polish#calculate}.
+     */
+    @Test
+    public final void testDivide() {
+        assertEquals(6, Polish.calculate("/", "2", "12"));
+    }
+
+    /**
+     * Test of {@link Polish#calculate}.
+     */
+    @Test
+    public final void testMinus() {
+        assertEquals(-2, Polish.calculate("-", "4", "2"));
     }
 
 }

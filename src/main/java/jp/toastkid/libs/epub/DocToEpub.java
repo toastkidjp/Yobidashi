@@ -206,10 +206,7 @@ public final class DocToEpub {
         converter.containsMenubar = false;
         targets.forEach(path -> {
             final ContentMetaData cmeta = new ContentMetaData();
-            final String content = converter.convert(
-                        path.toAbsolutePath().toString(),
-                        Article.ENCODE
-                    );
+            final String content = converter.convert(path, Article.ENCODE);
             final String title = Articles.convertTitle(path.getFileName().toString());
             String baseName = path.getFileName().toString();
             baseName = baseName.substring(0, baseName.length() - 4);

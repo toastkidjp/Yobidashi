@@ -31,14 +31,9 @@ public final class MarkdownConverterTest {
     @Test
     public void test_convert() throws URISyntaxException {
         final MarkdownConverter converter = new MarkdownConverter(ConfigTest.makeConfig());
-        final String content = converter.convert(testPath().toAbsolutePath().toString(), RESOURCE_ENCODE)
+        final String content = converter.convert(testPath(), RESOURCE_ENCODE)
                                 .replaceAll("class=\"redLink\"", "");
-        System.out.println(content);
         assertNotNull(content);
-        // FIXME Avoid cryptic failure on Gradle test.
-        if (content.isEmpty()) {
-            return;
-        }
         assertTrue(content.contains(
                 "ふっとのーと<a id=\"fn-back-1\" href=\"#fn-1\" title=\" ここに飛ぶ\">[1]</a>"));
         assertTrue(content.contains("<a id=\"fn-1\" href=\"#fn-back-1\">[1]</a> ここに飛ぶ"));

@@ -1,6 +1,7 @@
 package jp.toastkid.article.models;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -23,15 +24,15 @@ import jp.toastkid.article.models.Article.Extension;
  */
 public class ArticleTest {
 
-    /** test resource Path. */
+    /** Test resource Path. */
     private static final Path PATH
         = Paths.get("src/test/resources/article/C6FCB5AD323031332D30382D333128C5DA29.md");
 
-    /** testing object. */
+    /** Testing object. */
     private Article a;
 
     /**
-     * initialize before each test.
+     * Initialize before each test.
      */
     @Before
     public void setUp() {
@@ -39,7 +40,7 @@ public class ArticleTest {
     }
 
     /**
-     * check disallow null object.
+     * Check disallow null object.
      */
     @Test(expected=IllegalArgumentException.class)
     public void checkNotNullable() {
@@ -47,7 +48,7 @@ public class ArticleTest {
     }
 
     /**
-     * check constructor.
+     * Check constructor.
      */
     @Test
     public final void testInitialize() {
@@ -57,7 +58,7 @@ public class ArticleTest {
     }
 
     /**
-     * check {@link Article#extention()}.
+     * Check {@link Article#extention()}.
      */
     @Test
     public final void testExtension() {
@@ -65,7 +66,7 @@ public class ArticleTest {
     }
 
     /**
-     * check {@link Article#toInternalUrl()}.
+     * Check {@link Article#toInternalUrl()}.
      */
     @Test
     public final void testToInternalUrl() {
@@ -73,7 +74,7 @@ public class ArticleTest {
     }
 
     /**
-     * check {@link Article#replace(File)()}.
+     * Check {@link Article#replace(File)()}.
      */
     @Test
     public final void testReplace() {
@@ -86,7 +87,7 @@ public class ArticleTest {
     }
 
     /**
-     * check {@link Article#lastModified()}.
+     * Check {@link Article#lastModified()}.
      * @throws IOException
      */
     @Test
@@ -95,7 +96,7 @@ public class ArticleTest {
     }
 
     /**
-     * check {@link Article#lastModifiedText()}.
+     * Check {@link Article#lastModifiedText()}.
      */
     @Test
     public final void testLastModifiedText() {
@@ -103,7 +104,7 @@ public class ArticleTest {
     }
 
     /**
-     * check compareTo.
+     * Check compareTo.
      */
     @Test
     public void testCompareTo() {
@@ -114,7 +115,7 @@ public class ArticleTest {
     }
 
     /**
-     * check enable deep copy.
+     * Check enable deep copy.
      */
     @Test
     public void testClone() {
@@ -137,6 +138,14 @@ public class ArticleTest {
     @Test
     public void test_toString() {
         assertNotNull(a.toString());
+    }
+
+    /**
+     * Check {@link Article#equals()}.
+     */
+    @Test
+    public void test_equals() {
+        assertFalse(a.equals(""));
     }
 
     /**
@@ -163,23 +172,23 @@ public class ArticleTest {
      */
     @Test
     public void test_text() {
-    	assertEquals(".md", Extension.MD.text());
-	}
+        assertEquals(".md", Extension.MD.text());
+    }
 
     /**
      * Check {@link Article.Extension#values()}.
      */
     @Test
-    public void test_() {
-    	assertEquals(Extension.valueOf("MD"), Extension.MD);
-	}
+    public void test_valueOf() {
+        assertEquals(Extension.valueOf("MD"), Extension.MD);
+    }
 
     /**
      * Check {@link Article.Extension#values()}.
      */
     @Test
-    public void test() {
-		assertTrue(Extension.values().length != 0);
-	}
+    public void test_values() {
+        assertTrue(Extension.values().length != 0);
+    }
 
 }

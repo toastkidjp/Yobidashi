@@ -10,17 +10,16 @@ import java.util.Deque;
  * Javaで逆ポーランド記法（計算編）</a>
  * @see <a href="https://ja.wikipedia.org/wiki/逆ポーランド記法">逆ポーランド記法</a>
  */
-public class ReversePolish {
+public final class ReversePolish {
 
     /** space splitter. */
     private static final String SPACE_SPLITTER = "\\s";
 
     /**
-     * main method.
-     * @param args
+     * Private constructor.
      */
-    public static void main(final String args[]) {
-        System.out.println(calculate("1 2 3 - +"));
+    private ReversePolish() {
+        // NOP.
     }
 
     /**

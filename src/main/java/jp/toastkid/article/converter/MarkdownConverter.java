@@ -1,5 +1,6 @@
 package jp.toastkid.article.converter;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,34 +160,19 @@ public final class MarkdownConverter {
      * @param isContainsMenubar メニューバーを含めるか否か
      * @return txtFilePath の中身を Wiki 変換した文字列
      */
-    public String convert(final String filePath, final String fileEncode) {
+    public String convert(final Path filePath, final String fileEncode) {
         return convertToLines(filePath, fileEncode).makeString(Strings.LINE_SEPARATOR);
     }
 
     /**
-     * テキストファイルの中身を読み込み Wiki 変換する.
+     * テキストファイルの中身を読み込み Markdown 変換する.
      * @param filePath テキストファイルのパス
      * @param fileEncode テキストファイルの文字コード
      * @return Wiki 変換された行を入れた List
      */
-    public MutableList<String> convertToLines(final String filePath, final String fileEncode) {
+    public MutableList<String> convertToLines(final Path filePath, final String fileEncode) {
         this.latestImagePaths = Sets.mutable.empty();
         MutableList<String> strs = FileUtil.readLines(filePath, fileEncode);
-
-        // ソースディレクトリパスの取り出し
-        final StringBuilder dirBuf = new StringBuilder(filePath.length());
-        final String dirSeparator = "/";
-        // (111229) 以下、フォルダ区切り文字により柔軟な対応を実装
-        String temp = filePath;
-        if (temp.indexOf("\\") != -1) {
-            temp = temp.replace("\\", dirSeparator);
-        }
-        final String[] splited = temp.split(dirSeparator);
-        for (int i = 0; i < splited.length - 1; i++) {
-            dirBuf.append(splited[i]);
-            dirBuf.append(dirSeparator);
-        }
-
         try {
             strs = wikiConvert(strs, true);
         } catch (final Exception e) {
