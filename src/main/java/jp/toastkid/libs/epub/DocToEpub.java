@@ -21,8 +21,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jp.toastkid.article.converter.MarkdownConverter;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
@@ -88,9 +86,9 @@ public final class DocToEpub {
      */
     public static void run(final Iterable<String> args) {
         args.forEach(Procedures.throwing(json ->
-            Files.readAllLines(Paths.get(json))
-                 .stream()
-                 .collect(Collectors.joining(Strings.LINE_SEPARATOR))
+            run(Files.readAllLines(Paths.get(json))
+                    .stream()
+                    .collect(Collectors.joining(Strings.LINE_SEPARATOR)))
             )
         );
         clean();
@@ -110,34 +108,28 @@ public final class DocToEpub {
      * @param json 設定ファイル
      */
     private static void generate(final String json) {
-        try {
-            final EpubMetaData meta = new ObjectMapper().readValue(
-                    json,
-                    EpubMetaData.class
-                    );
-            /*
-             * 処理の流れ
-             * プレフィックス回収
-             * 指定回収
-             * 指定静的コンテンツ回収
-             */
-            final EpubMaker eMaker = new EpubMaker(meta);
-            final List<ContentMetaData> targetContents = new ArrayList<>();
-            if (StringUtils.isNotEmpty(meta.targetPrefix)) {
-                targetContents.addAll(
-                        getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
-                    );
-            }
-            if (meta.targets != null && meta.targets.size() != 0) {
-                targetContents.addAll(
-                        getTargetContents(getTargets(meta.targets), meta.layout)
-                    );
-            }
-            eMaker.setContentPairs(targetContents);
-            eMaker.generateEpub();
-        } catch (final IOException e) {
-            e.printStackTrace();
+        final EpubMetaData meta = EpubMetaData.readJson(json);
+
+        /*
+         * 処理の流れ
+         * プレフィックス回収
+         * 指定回収
+         * 指定静的コンテンツ回収
+         */
+        final EpubMaker eMaker = new EpubMaker(meta);
+        final List<ContentMetaData> targetContents = new ArrayList<>();
+        if (StringUtils.isNotEmpty(meta.targetPrefix)) {
+            targetContents.addAll(
+                    getTargetContents(selectTargetsByPrefix(meta.targetPrefix, meta.recursive), meta.layout)
+                );
         }
+        if (meta.targets != null && meta.targets.size() != 0) {
+            targetContents.addAll(
+                    getTargetContents(getTargets(meta.targets), meta.layout)
+                );
+        }
+        eMaker.setContentPairs(targetContents);
+        eMaker.generateEpub();
     }
 
     /**

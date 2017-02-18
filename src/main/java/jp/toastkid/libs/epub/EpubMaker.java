@@ -19,13 +19,14 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.toastkid.article.models.Articles;
-import jp.toastkid.libs.Pair;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
@@ -62,14 +63,14 @@ public final class EpubMaker {
     /** epub に必ず含めるメタファイル名とその参照元の組一覧. */
     private static final ImmutableList<Pair<String, String>> REQUIRED_METAFILE_PAIRS
         = Lists.immutable.with(
-                new Pair<>(Resource.MIMETYPE, ""),
-                new Pair<>(Resource.CONTAINER_XML, META_DIR),
-                new Pair<>(Resource.STYLESHEET, CONTENT_DIR),
-                new Pair<>(Resource.STYLESHEET_VERTICAL, CONTENT_DIR),
-                new Pair<>("navdoc.html", CONTENT_DIR),
-                new Pair<>("toc.ncx", CONTENT_DIR),
-                new Pair<>("content.opf", CONTENT_DIR),
-                new Pair<>("title_page.xhtml", CONTENT_DIR)
+                Tuples.pair(Resource.MIMETYPE, ""),
+                Tuples.pair(Resource.CONTAINER_XML, META_DIR),
+                Tuples.pair(Resource.STYLESHEET, CONTENT_DIR),
+                Tuples.pair(Resource.STYLESHEET_VERTICAL, CONTENT_DIR),
+                Tuples.pair("navdoc.html", CONTENT_DIR),
+                Tuples.pair("toc.ncx", CONTENT_DIR),
+                Tuples.pair("content.opf", CONTENT_DIR),
+                Tuples.pair("title_page.xhtml", CONTENT_DIR)
             );
 
     /**
@@ -125,7 +126,7 @@ public final class EpubMaker {
             if (StringUtils.isNotEmpty(path.dest.toString())) {
                 parent = parent.concat(path.dest.toString());
             }
-            pairs.add(new Pair<>(path.source.toString(), parent));
+            pairs.add(Tuples.pair(path.source.toString(), parent));
         });
         // navdoc.html
         generateNavdoc(contentPaths);
@@ -273,12 +274,12 @@ public final class EpubMaker {
             final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(meta.zipFilePath));
             // ファイル圧縮処理
             for (final Pair<String, String> pair : files) {
-                final String path  = pair.right;
-                final Path p = Paths.get(pair.left);
+                final String path  = pair.getTwo();
+                final Path p = Paths.get(pair.getOne());
                 if (Files.isDirectory(p)) {
                     putEntryDirectory(out, p);
                 } else {
-                    putEntryFile(out, pair.left, path);
+                    putEntryFile(out, pair.getOne(), path);
                 }
             }
             // 出力ストリームを閉じる

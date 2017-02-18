@@ -531,7 +531,12 @@ public class SideMenuController implements Initializable {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    ePubGenerator.runEpubGenerator();
+                                    try {
+                                        ePubGenerator.runEpubGenerator();
+                                    } catch (final Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    succeeded();
                                     return 100;
                                 }
                             })
