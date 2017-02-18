@@ -42,12 +42,31 @@
           </TitledPane>
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="WebView">
             <content>
-              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+              <VBox alignment="CENTER" prefHeight="50.0" prefWidth="450.0">
                 <children>
-                  <Label text="User Agent: "/>
-                  <JFXComboBox fx:id="ua" minWidth="160.0" prefWidth="160.0" onAction="#changeUserAgent"/>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+                    <children>
+                      <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="250.0"
+                       showTickLabels="true" showTickMarks="true" value="1.0">
+                        <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
+                      </JFXSlider>
+                      <JFXTextField fx:id="zoomInput" labelFloat="true"
+                        promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
+                        <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
+                      </JFXTextField>
+                      <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+                        <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
+                      </JFXButton>
+                    </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+                    <children>
+                      <Label text="User Agent: "/>
+                      <JFXComboBox fx:id="ua" minWidth="160.0" prefWidth="160.0" onAction="#changeUserAgent"/>
+                    </children>
+                  </HBox>
                 </children>
-              </HBox>
+              </VBox>
             </content>
           </TitledPane>
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Chart tools">
@@ -67,25 +86,6 @@
                   <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
                   <JFXButton minWidth="70.0" buttonType="RAISED" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
                     <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
-                  </JFXButton>
-                </children>
-              </HBox>
-            </content>
-          </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Zoom">
-            <content>
-              <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
-                <children>
-                  <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="250.0"
-                   showTickLabels="true" showTickMarks="true" value="1.0">
-                    <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
-                  </JFXSlider>
-                  <JFXTextField fx:id="zoomInput" labelFloat="true"
-                    promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
-                    <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
-                  </JFXTextField>
-                  <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
-                    <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
                   </JFXButton>
                 </children>
               </HBox>
