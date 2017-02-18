@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 
 <?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
@@ -35,6 +36,16 @@
                   <NumberTextField fx:id="fontSize" onAction="#applyFontSettings" minWidth="50.0"
                     promptText="Input editor's font size" labelFloat="true"/>
                   <JFXButton onAction="#applyFontSettings" minWidth="70.0" text="Apply" />
+                </children>
+              </HBox>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="WebView">
+            <content>
+              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+                <children>
+                  <Label text="User Agent: "/>
+                  <JFXComboBox fx:id="ua" minWidth="160.0" prefWidth="160.0" onAction="#changeUserAgent"/>
                 </children>
               </HBox>
             </content>

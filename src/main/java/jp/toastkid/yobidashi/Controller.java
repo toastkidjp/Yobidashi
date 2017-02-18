@@ -114,6 +114,7 @@ import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.BookmarkManager;
@@ -1461,8 +1462,17 @@ public final class Controller implements Initializable {
      * @return Optional&lt;Editable&gt;.
      */
     private final Optional<Editable> editableOr() {
-        final ReloadableTab tab = getCurrentTab();
-        return Optional.ofNullable(tab).filter(t -> t instanceof Editable).map(Editable.class::cast);
+        return Optional.ofNullable(getCurrentTab())
+                .filter(t -> t instanceof Editable).map(Editable.class::cast);
+    }
+
+    /**
+     * Return current tab.
+     * @return current tab.
+     */
+    private final Optional<BaseWebTab> wwbTabOr() {
+        return Optional.ofNullable(getCurrentTab())
+                .filter(t -> t instanceof BaseWebTab).map(BaseWebTab.class::cast);
     }
 
     /**
@@ -1728,6 +1738,12 @@ public final class Controller implements Initializable {
                     Key.FONT_FAMILY.text(), fontEvent.getFont().getFamily()
                     ));
             applyFontToEditor();
+            return;
+        }
+
+        if (message instanceof UserAgentMessage) {
+            wwbTabOr().ifPresent(tab ->
+                Platform.runLater(() ->tab.setUserAgent(((UserAgentMessage) message).getUserAgent())));
             return;
         }
     }
