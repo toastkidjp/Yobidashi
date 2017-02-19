@@ -1047,11 +1047,7 @@ public final class Controller implements Initializable {
      */
     private final void closeTab(final Tab tab) {
         final ObservableList<Tab> tabs = tabPane.getTabs();
-        if (1 < tabs.size()) {
-            tabs.remove(tab);
-            return;
-        }
-        showSnackbar("Can't close tab when current tabs count 1.");
+        tabs.remove(tab);
     }
 
     /**

@@ -3,9 +3,6 @@ package jp.toastkid.article.control;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jfoenix.controls.JFXButton;
 
 import javafx.beans.property.DoubleProperty;
@@ -22,14 +19,8 @@ import javafx.scene.control.Tab;
  */
 public abstract class ReloadableTab extends Tab {
 
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReloadableTab.class);
-
     /** Default loading tab title. */
     protected static final String LOADING = "Now Loading...";
-
-    /** Default tab title. */
-    protected static final String DEFAULT_TAB_TITLE = "New tab";
 
     /** Closing action. */
     private Consumer<Tab> closeAction;
@@ -54,11 +45,6 @@ public abstract class ReloadableTab extends Tab {
      * @param action
      */
     public void close(final Consumer<Tab> action) {
-        if (this.getText().startsWith("* ")) {
-            // TODO snackbar 通知
-            LOGGER.info("can't close");
-            return;
-        }
         action.accept(this);
     }
 
