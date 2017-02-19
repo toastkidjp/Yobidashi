@@ -21,6 +21,7 @@
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXSnackbar?>
+<?import com.jfoenix.controls.JFXTabPane?>
 <?import com.jfoenix.controls.JFXToolbar?>
 <?import com.jfoenix.controls.JFXRippler?>
 <?import com.jfoenix.controls.JFXHamburger?>
@@ -102,7 +103,7 @@
                         </Tab>
                       </tabs>
                     </TabPane>
-                    <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
+                    <JFXTabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
                   </items>
                 </SplitPane>
               </content>

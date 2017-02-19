@@ -200,3 +200,6 @@
     -fx-focus-color: #4059A9;
     -fx-unfocus-color: #4d4d4d;
 }
+.arc{
+    -fx-stroke:  #ffd600;
+}
