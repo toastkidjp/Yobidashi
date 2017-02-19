@@ -31,7 +31,6 @@ public abstract class HtmlCalendar {
     /**
      * HTML 表現のカレンダーを返す.
      * <HR>
-     * TODO 後で月移動をAJAX対応させておくこと
      * (121027) 作成<BR>
      */
     public static String makeOneMonth(final LocalDate ld){

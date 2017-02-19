@@ -88,6 +88,7 @@ public class ToolsControllerTest extends ApplicationTest {
     @Test
     public void test_ua() {
         Platform.runLater(() -> {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
             final ComboBox<UserAgent> draw = (ComboBox) lookup("#ua").query();
             messenger.subscribe(m -> {
                 final UserAgentMessage um = (UserAgentMessage) m;

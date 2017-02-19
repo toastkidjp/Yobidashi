@@ -22,19 +22,19 @@ public class ControllerTest extends ApplicationTest {
     /** FXML. */
     private static final String FXML = "scenes/YobidashiMain.fxml";
 
-    /** Test stage. */
-    private Stage stage;
-
     /** Test object. */
     private Controller controller;
 
+    /**
+     * NOP.
+     */
     @Test
     public void test() {
+        // NOP.
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
-        this.stage = stage;
+    public void start(final Stage stage) throws Exception {
         final FXMLLoader loader
             = new FXMLLoader(getClass().getClassLoader().getResource(FXML));
         try {

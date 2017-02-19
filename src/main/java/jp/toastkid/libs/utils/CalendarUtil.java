@@ -22,12 +22,6 @@ public final class CalendarUtil {
     private static final DateTimeFormatter UNI_DF_HOLDER
         = DateTimeFormatter.ofPattern("yyyy/M/dd(E) HH:mm:ss");
 
-    /**
-     * 書式 = yyyy-MM-dd(E).
-     */
-    private static final DateTimeFormatter HIFUN_COMBINED_HOLDER
-        = DateTimeFormatter.ofPattern("yyyy-MM-dd(E)");
-
     /** ISO DATE format. It's used in ePub generator. */
     private static final DateTimeFormatter ISO_DATE
         = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
