@@ -661,6 +661,14 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Iconified window state.
+     */
+    @FXML
+    private void setIconified() {
+        stage.setIconified(true);
+    }
+
+    /**
      * for use shortcut when start-up.
      */
     private void putAccerelator() {

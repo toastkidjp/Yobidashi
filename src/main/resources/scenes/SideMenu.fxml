@@ -89,6 +89,7 @@
           <content>
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
               <MenuLabel accelerator="F11" mnemonicParsing="true" onAction="#fullScreen" text="Full screen" />
+              <MenuLabel accelerator="Ctrl+Down" mnemonicParsing="true" onAction="#setIconified" text="Iconified window" />
               <MenuLabel accelerator="F5" mnemonicParsing="true" onAction="#reload" text="Reload" />
               <MenuLabel onAction="#callConfig" text="Config" />
             </JFXListView>

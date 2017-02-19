@@ -70,7 +70,7 @@ public final class Main extends Application {
             stage.setScene(scene);
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
-            stage.initStyle(StageStyle.DECORATED);
+            stage.initStyle(StageStyle.TRANSPARENT);
             final Screen screen = Screen.getScreens().get(0);
             final Rectangle2D bounds = screen.getVisualBounds();
             final BoundingBox maximizedBox = new BoundingBox(
