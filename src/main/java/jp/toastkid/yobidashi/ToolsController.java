@@ -1,5 +1,7 @@
 package jp.toastkid.yobidashi;
 
+import org.eclipse.collections.impl.utility.ArrayIterate;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -11,14 +13,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import jp.toastkid.article.control.UserAgent;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
-import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
-import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
+import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import reactor.core.Cancellation;
@@ -66,13 +67,9 @@ public class ToolsController {
     @FXML
     private TextField zoomInput;
 
-    /** Font family */
+    /** UserAgent's selector. */
     @FXML
-    private ComboBox<String> fontFamily;
-
-    /** Font size. */
-    @FXML
-    private NumberTextField fontSize;
+    private ComboBox<UserAgent> ua;
 
     /** Message sender. */
     private final TopicProcessor<Message> messenger = TopicProcessor.create();
@@ -136,16 +133,15 @@ public class ToolsController {
     }
 
     /**
-     * Apply font settings.
+     * Change current WebView's user agent.
      */
     @FXML
-    private void applyFontSettings() {
-        final int size = fontSize.intValue();
-        if (size < 0) {
-            return;
+    private void changeUserAgent() {
+        if (ua == null || ua.getItems().isEmpty()) {
+            ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+            ua.getSelectionModel().select(0);
         }
-        final String item = fontFamily.getSelectionModel().getSelectedItem();
-        messenger.onNext(FontMessage.make(Font.font(item), size));
+        messenger.onNext(UserAgentMessage.make(ua.getValue()));
     }
 
     /**
@@ -175,10 +171,8 @@ public class ToolsController {
      */
     public void setConfig(Config conf) {
         this.conf = conf;
-        this.fontSize.setText(conf.get(Key.FONT_SIZE));
-        this.fontFamily.getItems().addAll(Font.getFamilies());
-        final int index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
-        this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
+        ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+        ua.getSelectionModel().select(0);
     }
 
     /**

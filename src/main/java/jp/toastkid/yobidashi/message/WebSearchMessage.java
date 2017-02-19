@@ -4,7 +4,6 @@ import jp.toastkid.libs.WebServiceHelper;
 import jp.toastkid.libs.WebServiceHelper.Type;
 
 /**
- * TODO write test.
  * Web search event's message.
  *
  * @author Toast kid

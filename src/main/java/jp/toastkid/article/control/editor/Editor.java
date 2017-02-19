@@ -7,29 +7,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.collections.impl.factory.Maps;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.sun.javafx.PlatformUtil;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker.State;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.jfx.common.FontFactory;
+import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.jfx.common.transition.SplitterTransitionFactory;
 import jp.toastkid.libs.utils.MathUtil;
+import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
+import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Markdown editor.
@@ -42,8 +57,14 @@ public class Editor {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
+    /** Editor label's class. */
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL = "editor-label";
+
     /** Default scale factor. */
     private static final double DEFAULT_SCALE_FACTOR = 2.2d;
+
+    /** Config file's path. */
+    private static final Path CONFIG_PATH = Defines.CONFIG;
 
     /** WebView - Editor y pos. */
     private double scaleFactor = DEFAULT_SCALE_FACTOR;
@@ -78,6 +99,21 @@ public class Editor {
     /** Preview's html height. */
     private double previewHeight;
 
+    /** Editor pane. */
+    private final BorderPane editorBox;
+
+    /** Editor's head label. */
+    private Label label;
+
+    /** Font family */
+    private ComboBox<String> fontFamily;
+
+    /** Font size. */
+    private NumberTextField fontSize;
+
+    /** Use for control font. */
+    private Config conf;
+
     /**
      * Initialize with path.
      * @param path
@@ -100,12 +136,40 @@ public class Editor {
         vsp = new VirtualizedScrollPane<>(area);
         vsp.estimatedScrollYProperty().addListener(
                 (value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        vsp.setPrefHeight(700.0d);
 
-        split = new SplitPane(vsp, webView);
+        conf = new Config(CONFIG_PATH);
+
+        editorBox = new BorderPane();
+        editorBox.setTop(makeHeader());
+        editorBox.setCenter(vsp);
+
+        split = new SplitPane(editorBox, webView);
         split.setDividerPositions(0.5);
 
         isModified = new SimpleBooleanProperty(false);
+    }
+
+    /**
+     * Make editor's header.
+     * @return header
+     */
+    private HBox makeHeader() {
+        this.label = new Label();
+        this.label.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_LABEL);
+        this.label.setStyle("-fx-font-size: 14pt;");
+
+        this.fontFamily = new JFXComboBox<>();
+        this.fontFamily.getItems().addAll(Font.getFamilies());
+
+        this.fontSize = new NumberTextField();
+        this.fontSize.setOnAction(event -> applyFontSettings());
+
+        final Button button = new JFXButton("Apply");
+        button.setOnAction(event -> applyFontSettings());
+
+        final HBox header = new HBox(label, fontFamily, fontSize, button);
+        header.setAlignment(Pos.CENTER);
+        return header;
     }
 
     /**
@@ -124,6 +188,10 @@ public class Editor {
                 return;
             }
             isModified.set(true);
+        });
+
+        area.textProperty().addListener((value, prev, next) -> {
+            label.setText(String.format("文字数: %,d字", value.getValue().length()));
         });
 
         if (area.getOnInputMethodTextChanged() == null) {
@@ -239,12 +307,39 @@ public class Editor {
     }
 
     /**
+     * Apply font settings.
+     */
+    private void applyFontSettings() {
+        final int size = fontSize.intValue();
+        if (size < 0) {
+            return;
+        }
+        final String item = fontFamily.getSelectionModel().getSelectedItem();
+        conf.store(Maps.mutable.of(
+                Key.FONT_SIZE.text(),   Integer.toString(size),
+                Key.FONT_FAMILY.text(), item
+                ));
+        setFont(FontFactory.make(item, size));
+    }
+
+    /**
      * Set font.
      * @param font
      */
     void setFont(final Font font) {
         area.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
                 font.getFamily(), font.getSize()));
+        setFontStatus();
+    }
+
+    /**
+     * Set font size and font family.
+     */
+    private void setFontStatus() {
+        conf.reload();
+        final int    index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
+        this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
+        this.fontSize.setText(conf.get(Key.FONT_SIZE));
     }
 
     /**
@@ -260,23 +355,23 @@ public class Editor {
      * @return content text
      */
     String getContent() {
-        return area.getText();
+        return area.getText() + Strings.LINE_SEPARATOR;
     }
 
     /**
      * Hide node.
      */
     void hide() {
-        vsp.setVisible(false);
-        vsp.setManaged(false);
+        editorBox.setVisible(false);
+        editorBox.setManaged(false);
     }
 
     /**
      * Show node.
      */
     void show() {
-        vsp.setVisible(true);
-        vsp.setManaged(true);
+        editorBox.setVisible(true);
+        editorBox.setManaged(true);
         area.requestFocus();
         area.moveTo(0, 0);
     }

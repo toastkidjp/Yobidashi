@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
 /**
@@ -30,16 +29,14 @@ public final class MarkdownConverterTest {
      * @throws URISyntaxException
      */
     @Test
-    public void testGetConvertedTXT() throws URISyntaxException {
+    public void test_convert() throws URISyntaxException {
         final MarkdownConverter converter = new MarkdownConverter(ConfigTest.makeConfig());
-        final String content = converter.convert(testPath().toAbsolutePath().toString(), RESOURCE_ENCODE)
+        final String content = converter.convert(testPath(), RESOURCE_ENCODE)
                                 .replaceAll("class=\"redLink\"", "");
-        final StringBuilder converted = new StringBuilder(3000);
-        converted.append(content);
-        converted.append(Strings.LINE_SEPARATOR);
-        System.out.println(converted.toString());
-        assertNotNull(converted);
-        assertTrue(0 < converted.length());
+        assertNotNull(content);
+        assertTrue(content.contains(
+                "ふっとのーと<a id=\"fn-back-1\" href=\"#fn-1\" title=\" ここに飛ぶ\">[1]</a>"));
+        assertTrue(content.contains("<a id=\"fn-1\" href=\"#fn-back-1\">[1]</a> ここに飛ぶ"));
     }
 
     /**

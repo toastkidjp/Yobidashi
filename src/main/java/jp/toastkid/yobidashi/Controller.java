@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,18 +101,18 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.wordcloud.FxWordCloud;
-import jp.toastkid.wordcloud.JFXMasonryPane2;
+import jp.toastkid.wordcloud.MasonryPane;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.EditorTabMessage;
-import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
+import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.BookmarkManager;
@@ -534,8 +533,12 @@ public final class Controller implements Initializable {
 
                     setTitleOnToolbar(tab.getTitle());
 
+                    if (tab instanceof Editable) {
+                        ((Editable) tab).setFont(readFont());
+                    }
+
                     final String tabUrl = tab.getUrl();
-                    if (!StringUtils.isEmpty(tabUrl)){
+                    if (StringUtils.isNotEmpty(tabUrl)){
                         urlText.setText(tabUrl);
                         focusOn();
                         return;
@@ -939,7 +942,7 @@ public final class Controller implements Initializable {
             final ObservableList<Node> itemContainer = cmc.getItemsContainer().getChildren();
             itemContainer.addAll(
                     makeContextMenuItemContainerWithAction(
-                            cmc, "文字数計測", event -> processArticleMessage(ArticleMessage.makeLength())),
+                            cmc, "Word Cloud", event -> processArticleMessage(ArticleMessage.makeWordCloud())),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Full Screen", event -> stage.setFullScreen(true)),
                     makeContextMenuItemContainerWithAction(
@@ -1044,11 +1047,7 @@ public final class Controller implements Initializable {
      */
     private final void closeTab(final Tab tab) {
         final ObservableList<Tab> tabs = tabPane.getTabs();
-        if (1 < tabs.size()) {
-            tabs.remove(tab);
-            return;
-        }
-        showSnackbar("Can't close tab when current tabs count 1.");
+        tabs.remove(tab);
     }
 
     /**
@@ -1461,8 +1460,17 @@ public final class Controller implements Initializable {
      * @return Optional&lt;Editable&gt;.
      */
     private final Optional<Editable> editableOr() {
-        final ReloadableTab tab = getCurrentTab();
-        return Optional.ofNullable(tab).filter(t -> t instanceof Editable).map(Editable.class::cast);
+        return Optional.ofNullable(getCurrentTab())
+                .filter(t -> t instanceof Editable).map(Editable.class::cast);
+    }
+
+    /**
+     * Return current tab.
+     * @return current tab.
+     */
+    private final Optional<BaseWebTab> wwbTabOr() {
+        return Optional.ofNullable(getCurrentTab())
+                .filter(t -> t instanceof BaseWebTab).map(BaseWebTab.class::cast);
     }
 
     /**
@@ -1720,27 +1728,11 @@ public final class Controller implements Initializable {
             return;
         }
 
-        if (message instanceof FontMessage) {
-            final FontMessage fontEvent = (FontMessage) message;
-            final int size = fontEvent.getSize();
-            conf.store(Maps.mutable.of(
-                    Key.FONT_SIZE.text(),   Integer.toString(size),
-                    Key.FONT_FAMILY.text(), fontEvent.getFont().getFamily()
-                    ));
-            applyFontToEditor();
+        if (message instanceof UserAgentMessage) {
+            wwbTabOr().ifPresent(tab ->
+                Platform.runLater(() ->tab.setUserAgent(((UserAgentMessage) message).getUserAgent())));
             return;
         }
-    }
-
-    /**
-     * Apply current font to editor tab.
-     */
-    private void applyFontToEditor() {
-        final Font font = readFont();
-        tabPane.getTabs().stream()
-            .filter(Editable.class::isInstance)
-            .map(Editable.class::cast)
-            .forEach(tab -> Platform.runLater(() -> tab.setFont(font)));
     }
 
     /**
@@ -1748,6 +1740,7 @@ public final class Controller implements Initializable {
      * @return Font
      */
     private Font readFont() {
+        conf.reload();
         return FontFactory.make(conf.get(Key.FONT_FAMILY), conf.getInt(Key.FONT_SIZE, 16));
     }
 
@@ -1834,14 +1827,6 @@ public final class Controller implements Initializable {
             case MAKE:
                 Platform.runLater(this::makeMarkdown);
                 return;
-            case LENGTH:
-                if (!optional.isPresent()) {
-                    snackbar.fireEvent(new SnackbarEvent("現在表示できません。"));
-                    return;
-                }
-                Platform.runLater(() -> AlertDialog.showMessage(
-                        getParent(), "文字数計測", optional.get().makeCharCountResult()));
-                return;
             case COPY:
                 Platform.runLater(this::copyArticle);
                 return;
@@ -1868,7 +1853,7 @@ public final class Controller implements Initializable {
                 Platform.runLater(this::convertEpub);
                 return;
             case WORD_CLOUD:
-                final JFXMasonryPane2 pane = new JFXMasonryPane2();
+                final MasonryPane pane = new MasonryPane();
                 final ScrollPane value = new ScrollPane(pane);
                 value.setFitToHeight(true);
                 value.setFitToWidth(true);
@@ -1878,8 +1863,7 @@ public final class Controller implements Initializable {
                     return;
                 }
 
-                wordCloud = new FxWordCloud.Builder().setNumOfWords(200).setMaxFontSize(120.0)
-                                .setMinFontSize(8.0).build();
+                wordCloud = new FxWordCloud.Builder().setMaxFontSize(120.0).setMinFontSize(8.0).build();
                 final Article article = optional.get();
                 wordCloud.draw(pane, article.path.toString());
                 Platform.runLater(() -> openContentTab(article.title + "'s word cloud", pane));

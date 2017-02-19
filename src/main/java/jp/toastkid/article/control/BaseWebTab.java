@@ -195,4 +195,16 @@ public abstract class BaseWebTab extends ReloadableTab {
         spinner.setManaged(false);
     }
 
+    /**
+     * Set user agent.
+     * @param ua
+     */
+    public void setUserAgent(final UserAgent ua) {
+        if (ua.text() == null) {
+            return;
+        }
+        getWebView().getEngine().setUserAgent(ua.text());
+        reload();
+    }
+
 }

@@ -17,6 +17,13 @@ public class Polish {
     private static final String SPACE_SPLITTER = "\\s";
 
     /**
+     * Private constructor.
+     */
+    private Polish() {
+        // NOP.
+    }
+
+    /**
      * Calculate by reverse polish notation use String input.
      * @param input string array. ex: "1 2 3 - +"
      * @return integer. ex: input "1 2 3 - +", return 0.

@@ -42,9 +42,6 @@ public class Article implements Comparable<Article> {
     /** article title. */
     public String title;
 
-    /** number of article characters. */
-    public long byteLength;
-
     /**
      * Article's extension.
      * @author Toast kid
@@ -176,23 +173,6 @@ public class Article implements Comparable<Article> {
             return false;
         }
         return EXTENSIONS.contains(ext.get());
-    }
-
-    /**
-     * ファイルの字数計測結果を文字列にまとめて返す.
-     * @return ファイルの字数計測結果(文字列)
-     */
-    public final String makeCharCountResult() {
-        try {
-            return new StringBuilder()
-                .append(title).append(" は ")
-                .append(FileUtil.countCharacters(path, Article.ENCODE))
-                .append(" 字です。").append(System.lineSeparator())
-                .append(Files.size(path) / 1024L).append("[KB]").toString();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**

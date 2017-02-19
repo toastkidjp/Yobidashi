@@ -58,11 +58,12 @@ import javafx.util.Duration;
  *
  * <b>Note:</b> childs that doesn't fit in the grid will be hidden.
  * @author  Shadi Shaheen
+ * @author  Toast kid
  * @version 1.0
  * @since   2016-05-24
  *
  */
-public class JFXMasonryPane2 extends Pane {
+public class MasonryPane extends Pane {
 
     /***************************************************************************
      *                                                                         *
@@ -87,7 +88,7 @@ public class JFXMasonryPane2 extends Pane {
     /**
      * Constructs a new JFXMasonryPane
      */
-    public JFXMasonryPane2() {
+    public MasonryPane() {
         this.widthProperty().addListener((o,oldVal,newVal)->{valid = false;});
         this.heightProperty().addListener((o,oldVal,newVal)->{valid = false;});
         final ChangeListener<? super Number> layoutListener = (o,oldVal,newVal)->{
@@ -101,6 +102,7 @@ public class JFXMasonryPane2 extends Pane {
         this.limitColumnProperty().addListener(layoutListener);
         this.limitRowProperty().addListener(layoutListener);
     }
+
     /***************************************************************************
      *                                                                         *
      * Override/Inherited methods                                              *
@@ -203,35 +205,8 @@ public class JFXMasonryPane2 extends Pane {
             newTransition.getChildren().addAll(animationMap.values());
             newTransition.play();
             trans = newTransition;
-
-
-            // FOR DEGBBUGING
-
-//                      root.getChildren().clear();
-//                      for(int y = 0; y < matrix.length; y++){
-//                          for(int x = 0; x < matrix[0].length; x++){
-//
-//                              // Create a new TextField in each Iteration
-//                              Label tf = new Label();
-//                              tf.setStyle(matrix[y][x] == 0 ? colors[0] : colors[matrix[y][x]%4+1]);
-//                              tf.setMinWidth(getCellWidth());
-//                              tf.setMinHeight(getCellHeight());
-//                              tf.setAlignment(Pos.CENTER);
-//                              tf.setText(matrix[y][x] + "");
-//                              // Iterate the Index using the loops
-//                              root.setRowIndex(tf,y);
-//                              root.setColumnIndex(tf,x);
-//                              root.setMargin(tf, new Insets(getVSpacing(),getHSpacing(),getVSpacing(),getHSpacing()));
-//                              root.getChildren().add(tf);
-//                          }
-//                      }
             valid = true;
         }
-
-        // FOR DEGBBUGING
-//              if(!getChildren().contains(root)) getChildren().add(root);
-//              root.resizeRelocate(0, 0, this.getWidth(), this.getHeight());
-
         performingLayout = false;
 
     }
@@ -423,11 +398,6 @@ public class JFXMasonryPane2 extends Pane {
             Layout layout = new MasonryLayout();
             @Override
             Layout impl() { return layout; }
-        },
-        BIN_PACKING {
-            Layout layout = new BinPackingLayout();
-            @Override
-            Layout impl() { return layout; }
         };
         Layout impl() { return new MasonryLayout(); }
     }
@@ -557,7 +527,16 @@ public class JFXMasonryPane2 extends Pane {
 
     private static class MasonryLayout implements Layout {
         @Override
-        public List<BoundingBox> fillGrid(int[][] matrix, final List<Region> children,  final double cellWidth, final double cellHeight, final int limitRow, final int limitCol, final double gutterX, final double gutterY) {
+        public List<BoundingBox> fillGrid(
+                int[][] matrix,
+                final List<Region> children,
+                final double cellWidth,
+                final double cellHeight,
+                final int limitRow,
+                final int limitCol,
+                final double gutterX,
+                final double gutterY
+                ) {
             final int row = matrix.length;
             if(row <= 0) {
                 return null;
@@ -608,50 +587,4 @@ public class JFXMasonryPane2 extends Pane {
             return boxes;
         }
     }
-
-    /***************************************************************************
-     *                                                                         *
-     * Bin Packing Layout                                                      *
-     *                                                                         *
-     **************************************************************************/
-    private static class BinPackingLayout implements Layout {
-        @Override
-        public List<BoundingBox> fillGrid(int[][] matrix, final List<Region> children, final double cellWidth, final double cellHeight, final int limitRow, final int limitCol, final double gutterX, final double gutterY) {
-            final int row = matrix.length;
-            if(row <= 0) {
-                return null;
-            }
-            final int col = matrix[0].length;
-            final List<BoundingBox> boxes = new ArrayList<>();
-
-            for (int b = 0; b < children.size(); b++) {
-                final Region block = children.get(b);
-//                              if(!(block instanceof GridPane)){
-                for (int i = 0; i < row;i++) {
-                    final int old = boxes.size();
-                    for(int j = 0 ; j < col; j++){
-                        if(matrix[i][j] != 0) {
-                            continue;
-                        }
-                        final BoundingBox box = getFreeArea(matrix, i, j, block, cellWidth, cellHeight, limitRow, limitCol, gutterX, gutterY);
-                        if(!validWidth(box, block, cellWidth, gutterX, gutterY) || !validHeight(box,block, cellHeight, gutterX, gutterY)) {
-                            continue;
-                        }
-                        matrix = fillMatrix(matrix, b+1, box.getMinX(), box.getMinY(), box.getWidth(), box.getHeight());
-                        boxes.add(box);
-                        break;
-                    }
-                    if(boxes.size()!=old) {
-                        break;
-                    }
-                    if(i == row - 1){
-                        boxes.add(null);
-                    }
-                }
-//                              }
-            }
-            return boxes;
-        }
-    }
-
 }

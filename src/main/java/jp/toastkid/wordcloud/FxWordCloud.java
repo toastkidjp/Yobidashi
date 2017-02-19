@@ -2,7 +2,6 @@ package jp.toastkid.wordcloud;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.RichIterable;
@@ -39,29 +38,25 @@ public final class FxWordCloud {
     /** default maximum font size, */
     public static final double MAX_FONT_SIZE = 96.0;
 
-    /** number of words in drawing. */
-    private final int    numOfWords;
-
     /** minimum font size./ */
     private final double minFontSize;
 
     /** maximum font size, */
     private final double maxFontSize;
 
+    /**
+     * Builder of {@link FxWordCloud}.
+     *
+     * @author Toast kid
+     *
+     */
     public static class Builder {
-        /** number of words in drawing. */
-        private int    numOfWords  = NUMBER_OF_WORDS;
 
         /** minimum font size./ */
         private double minFontSize = MIN_FONT_SIZE;
 
         /** maximum font size, */
         private double maxFontSize = MAX_FONT_SIZE;
-
-        public Builder setNumOfWords(final int numOfWords) {
-            this.numOfWords = numOfWords;
-            return this;
-        }
 
         public Builder setMinFontSize(final double minFontSize) {
             this.minFontSize = minFontSize;
@@ -79,17 +74,16 @@ public final class FxWordCloud {
     }
 
     /**
-     * call from only internal.
+     * Call from only internal Builder.
      * @param b Builder
      */
     private FxWordCloud(final Builder b) {
-        this.numOfWords  = b.numOfWords  < 1 ? NUMBER_OF_WORDS : b.numOfWords;
         this.minFontSize = b.minFontSize < 1.0 ? MIN_FONT_SIZE : b.minFontSize;
         this.maxFontSize = b.maxFontSize < 1.0 ? MAX_FONT_SIZE : b.maxFontSize;
     }
 
     /**
-     * draw Word Cloud on passed Pane.
+     * Draw Word Cloud on passed Pane.
      * @param canvas
      * @param pathToFile path/to/file
      */
@@ -98,7 +92,7 @@ public final class FxWordCloud {
     }
 
     /**
-     * draw Word Cloud on passed Pane.
+     * Draw Word Cloud on passed Pane.
      * @param canvas
      * @param path Path
      */
@@ -121,22 +115,15 @@ public final class FxWordCloud {
     }
 
     /**
-     * draw Word Cloud on passed Pane.
-     * @param canvas
-     * @param path file
-     */
-    public void draw(final Pane canvas, final Map<String, Integer> map) {
-        final MutableMap<String, Integer> m = Maps.mutable.empty();
-        m.putAll(map);
-        placeTexts(canvas, m);
-    }
-
-    /**
-     * place texts to passed pane.
+     * Place texts to passed pane.
      * @param canvas pane
      * @param map map
      */
     private void placeTexts(final Pane canvas, final MutableMap<String, Integer> map) {
+        if (map.isEmpty()) {
+            System.out.println("Map is empty.");
+            return;
+        }
         final RichIterable<Pair<String, Integer>> iter = map.keyValuesView()
             .toSortedMap((t1, t2) ->
                 Integer.compare(t1.getTwo(), t2.getTwo()), key -> key, value -> value)
@@ -148,7 +135,7 @@ public final class FxWordCloud {
     }
 
     /**
-     * make Label object with Tooltip.
+     * Make Label object with Tooltip.
      * @param max max value
      * @param pair word and count.
      * @return Label

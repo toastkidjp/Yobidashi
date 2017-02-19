@@ -11,7 +11,6 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Simple Zip archiving.
- * TODO write test.
  *
  * @author Toast kid
  */

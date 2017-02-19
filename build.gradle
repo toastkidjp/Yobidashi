@@ -24,8 +24,6 @@ def javafxHome      = System.getenv('JAVA_HOME')
 
 [compileJava, compileTestJava]*.options*.encoding = defaultEncoding
 
-test.maxParallelForks = 4
-
 repositories {
     mavenCentral()
     maven {
@@ -50,7 +48,7 @@ dependencies {
     compile 'org.eclipse.collections:eclipse-collections:8.0.0'
     compile 'io.projectreactor:reactor-core:3.0.2.RELEASE'
     compile 'org.apache.commons:commons-lang3:3.5'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.0'
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
     compile 'org.fxmisc.richtext:richtextfx:1.0.0-SNAPSHOT'
     compile 'com.jfoenix:jfoenix:1.0.0'
 
@@ -60,15 +58,20 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.9.5'
-    testCompile group: 'org.testfx', name: 'testfx-junit', version: '4.0.5-alpha'
+    testCompile 'org.testfx:testfx-junit:4.0.5-alpha'
 }
 
 compileJava {
     sourceSets.main.compileClasspath += configurations.provided
+    sourceSets.test.compileClasspath += configurations.provided
     sourceSets.main.compileClasspath += configurations.testCompile
 }
 
 run {
+    classpath += configurations.provided
+}
+
+test {
     classpath += configurations.provided
 }
 

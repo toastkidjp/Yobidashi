@@ -49,7 +49,6 @@ public final class ArticleGenerator {
      * @param conf
      */
     public ArticleGenerator(final Config config) {
-        final long start = System.currentTimeMillis();
         this.config = config;
         this.converter = Mono.<MarkdownConverter>create(
                 emitter -> emitter.success(new MarkdownConverter(config))
@@ -57,10 +56,7 @@ public final class ArticleGenerator {
             .subscribeOn(Schedulers.elastic())
             .block();
         this.converter.openLinkBrank = true;
-        LOGGER.info("ended init converter. {}[ms]", System.currentTimeMillis() - start);
-
         chooser = new ImageChooser(USER_BACKGROUND);
-        LOGGER.info("ended init ImageChooser. {}[ms]", System.currentTimeMillis() - start);
     }
 
     /**
@@ -131,16 +127,15 @@ public final class ArticleGenerator {
      * @return 変換後の HTML 文字列
      */
     public String convertToHtml(final Path path) {
-        final String absolutePath = path.toAbsolutePath().toString();
         try {
             final long ms = Files.getLastModifiedTime(path).toMillis();
-            return converter.convert(absolutePath , Article.ENCODE) + "<hr/>Last Modified： "
+            return converter.convert(path, Article.ENCODE) + "<hr/>Last Modified： "
                     + CalendarUtil.longToStr(ms, MarkdownConverter.STANDARD_DATE_FORMAT);
         } catch (final IOException e) {
             e.printStackTrace();
             LOGGER.error("Error!", e);
         }
-        return converter.convert(absolutePath , Article.ENCODE);
+        return converter.convert(path , Article.ENCODE);
     }
 
     /**

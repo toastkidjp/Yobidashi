@@ -1,7 +1,10 @@
 package jp.toastkid.article.converter;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,6 +105,14 @@ public final class MarkdownConverter {
     /** yukiwiki's header pattern. */
     private static final Pattern HEADER_PATTERN = Pattern.compile(".\\#*");
 
+    /** RegEx of place foot note. */
+    private static final Pattern FOOTNOTE_PLACE_PATTERN
+        = Pattern.compile("\\[\\^(.+?)\\]", Pattern.DOTALL);
+
+    /** RegEx of display foot note. */
+    private static final Pattern FOOTNOTE_DISPLAY_PATTERN
+        = Pattern.compile("^\\[\\^(.+?)\\]\\:(.+?)$", Pattern.DOTALL);
+
     /** 段落の頭に p タグを許容するタグ. (130727) */
     private static final String[] ALLOW_P_TAGS = {
         "<a ",
@@ -149,34 +160,19 @@ public final class MarkdownConverter {
      * @param isContainsMenubar メニューバーを含めるか否か
      * @return txtFilePath の中身を Wiki 変換した文字列
      */
-    public String convert(final String filePath, final String fileEncode) {
+    public String convert(final Path filePath, final String fileEncode) {
         return convertToLines(filePath, fileEncode).makeString(Strings.LINE_SEPARATOR);
     }
 
     /**
-     * テキストファイルの中身を読み込み Wiki 変換する.
+     * テキストファイルの中身を読み込み Markdown 変換する.
      * @param filePath テキストファイルのパス
      * @param fileEncode テキストファイルの文字コード
      * @return Wiki 変換された行を入れた List
      */
-    public MutableList<String> convertToLines(final String filePath, final String fileEncode) {
+    public MutableList<String> convertToLines(final Path filePath, final String fileEncode) {
         this.latestImagePaths = Sets.mutable.empty();
         MutableList<String> strs = FileUtil.readLines(filePath, fileEncode);
-
-        // ソースディレクトリパスの取り出し
-        final StringBuilder dirBuf = new StringBuilder(filePath.length());
-        final String dirSeparator = "/";
-        // (111229) 以下、フォルダ区切り文字により柔軟な対応を実装
-        String temp = filePath;
-        if (temp.indexOf("\\") != -1) {
-            temp = temp.replace("\\", dirSeparator);
-        }
-        final String[] splited = temp.split(dirSeparator);
-        for (int i = 0; i < splited.length - 1; i++) {
-            dirBuf.append(splited[i]);
-            dirBuf.append(dirSeparator);
-        }
-
         try {
             strs = wikiConvert(strs, true);
         } catch (final Exception e) {
@@ -219,6 +215,9 @@ public final class MarkdownConverter {
 
         Formation formation = null;
         List<Footballer> team = new ArrayList<>(11);
+
+        final Map<String, Integer> footnote = new HashMap<>();
+
         int uLTagDepth  = 0;
         int oLTagDepth  = 0;
         /** 何番目の expand か */
@@ -554,6 +553,29 @@ public final class MarkdownConverter {
                 }
                 str = "";
             }
+
+            if (str.startsWith("[^")) {
+                matcher = FOOTNOTE_DISPLAY_PATTERN.matcher(str);
+                if (matcher.find()) {
+                    final String key  = matcher.group(1);
+                    final String text = matcher.group(2);
+                    str = "<a id=\"fn-" + key + "\" href=\"#fn-back-" + key + "\">"
+                            + "["  + key + "]</a>"+ text;
+                    final int index = footnote.get(key);
+                    final String line = contents.get(index);
+                    contents.set(index, line.replace("＜TITLE＞", text));
+                    footnote.remove(key);
+                }
+            } else if (str.contains("[^")) {
+                matcher = FOOTNOTE_PLACE_PATTERN.matcher(str);
+                if (matcher.find()) {
+                    final String key = matcher.group(1);
+                    str = matcher.replaceFirst("<a id=\"fn-back-" + key + "\""
+                            + " href=\"#fn-" + key + "\" title=\"＜TITLE＞\">[" + key + "]</a>");
+                    footnote.put(key, contents.size());
+                }
+            }
+
             if (str.indexOf("<p></p>") != -1) {
                 str = str.replaceAll("<p></p>", "<p>");
                 isInP = true;

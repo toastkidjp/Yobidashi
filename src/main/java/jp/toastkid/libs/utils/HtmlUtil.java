@@ -17,10 +17,6 @@ import org.eclipse.collections.impl.factory.Lists;
  */
 public final class HtmlUtil {
 
-    /** RDFへのリンクを抜き出す正規表現. */
-    private static final Pattern RDF_PATTERN
-        = Pattern.compile("http://(.+?)\\.(rdf|xml)",  Pattern.DOTALL);
-
     /** body の中身を抜き出す正規表現. */
     private static final Pattern BODY_PATTERN
         = Pattern.compile("<[B|b]ody>(.+?)</[B|b]ody>", Pattern.DOTALL);

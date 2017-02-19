@@ -181,14 +181,6 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Show file length.
-     */
-    @FXML
-    private final void callFileLength() {
-        messenger.onNext(ArticleMessage.makeLength());
-    }
-
-    /**
      * Switch Full screen mode.
      */
     @FXML
@@ -201,7 +193,7 @@ public class SideMenuController implements Initializable {
      * @param event ActionEvent
      */
     @FXML
-    private final void callConfig(final ActionEvent event) {
+    private final void callConfig() {
         final Optional<Window> parent = getParent();
         if (!parent.isPresent()) {
             return;
@@ -531,7 +523,12 @@ public class SideMenuController implements Initializable {
                             .setCommand(new Task<Integer>() {
                                 @Override
                                 protected Integer call() throws Exception {
-                                    ePubGenerator.runEpubGenerator();
+                                    try {
+                                        ePubGenerator.runEpubGenerator();
+                                    } catch (final Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    succeeded();
                                     return 100;
                                 }
                             })
@@ -661,6 +658,14 @@ public class SideMenuController implements Initializable {
     private void callGC() {
         System.gc();
         messenger.onNext(SnackbarMessage.make("Called garbage collection."));
+    }
+
+    /**
+     * Iconified window state.
+     */
+    @FXML
+    private void setIconified() {
+        stage.setIconified(true);
     }
 
     /**

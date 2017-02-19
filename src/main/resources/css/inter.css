@@ -169,6 +169,10 @@
     -fx-text-fill: #FFFFFF;
 }
 
+.editor-label {
+    -fx-text-fill: white;
+}
+
 .jfx-tool-bar{
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
@@ -195,4 +199,7 @@
     -fx-pref-width:300.0;
     -fx-focus-color: #4059A9;
     -fx-unfocus-color: #4d4d4d;
+}
+.arc{
+    -fx-stroke:  #ffd600;
 }
