@@ -22,6 +22,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker.State;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -57,7 +58,7 @@ public class Editor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
     /** Editor label's class. */
-    private static final String STYLE_CLASS_EDITOR_LABEL = "editor-label";
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL = "editor-label";
 
     /** Default scale factor. */
     private static final double DEFAULT_SCALE_FACTOR = 2.2d;
@@ -154,20 +155,21 @@ public class Editor {
      */
     private HBox makeHeader() {
         this.label = new Label();
-        this.label.getStyleClass().add(STYLE_CLASS_EDITOR_LABEL);
-        this.label.setStyle("-fx-text-fill: white;-fx-font-size: 14pt;");
+        this.label.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_LABEL);
+        this.label.setStyle("-fx-font-size: 14pt;");
 
         this.fontFamily = new JFXComboBox<>();
         this.fontFamily.getItems().addAll(Font.getFamilies());
 
         this.fontSize = new NumberTextField();
-        this.fontSize.setMaxWidth(25.0d);
         this.fontSize.setOnAction(event -> applyFontSettings());
 
         final Button button = new JFXButton("Apply");
         button.setOnAction(event -> applyFontSettings());
 
-        return new HBox(label, fontFamily, fontSize, button);
+        final HBox header = new HBox(label, fontFamily, fontSize, button);
+        header.setAlignment(Pos.CENTER);
+        return header;
     }
 
     /**

@@ -169,6 +169,10 @@
     -fx-text-fill: #FFFFFF;
 }
 
+.editor-label {
+    -fx-text-fill: white;
+}
+
 .jfx-tool-bar{
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
