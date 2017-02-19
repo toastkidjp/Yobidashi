@@ -20,9 +20,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker.State;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
@@ -42,6 +44,9 @@ public class Editor {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
+
+    /** Editor label's class. */
+    private static final String STYLE_CLASS_EDITOR_LABEL = "editor-label";
 
     /** Default scale factor. */
     private static final double DEFAULT_SCALE_FACTOR = 2.2d;
@@ -79,6 +84,12 @@ public class Editor {
     /** Preview's html height. */
     private double previewHeight;
 
+    /** Editor pane. */
+    private final BorderPane editorBox;
+
+    /** Editor's head label. */
+    private final Label label;
+
     /**
      * Initialize with path.
      * @param path
@@ -101,9 +112,16 @@ public class Editor {
         vsp = new VirtualizedScrollPane<>(area);
         vsp.estimatedScrollYProperty().addListener(
                 (value, prev, next) -> scrollTo(convertToWebViewY(value.getValue().doubleValue())));
-        vsp.setPrefHeight(700.0d);
 
-        split = new SplitPane(vsp, webView);
+        label = new Label();
+        label.getStyleClass().add(STYLE_CLASS_EDITOR_LABEL);
+        label.setStyle("-fx-text-fill: white;-fx-font-size: 14pt;");
+
+        editorBox = new BorderPane();
+        editorBox.setTop(label);
+        editorBox.setCenter(vsp);
+
+        split = new SplitPane(editorBox, webView);
         split.setDividerPositions(0.5);
 
         isModified = new SimpleBooleanProperty(false);
@@ -125,6 +143,10 @@ public class Editor {
                 return;
             }
             isModified.set(true);
+        });
+
+        area.textProperty().addListener((value, prev, next) -> {
+            label.setText(String.format("文字数: %,d字", value.getValue().length()));
         });
 
         if (area.getOnInputMethodTextChanged() == null) {
@@ -268,16 +290,16 @@ public class Editor {
      * Hide node.
      */
     void hide() {
-        vsp.setVisible(false);
-        vsp.setManaged(false);
+        editorBox.setVisible(false);
+        editorBox.setManaged(false);
     }
 
     /**
      * Show node.
      */
     void show() {
-        vsp.setVisible(true);
-        vsp.setManaged(true);
+        editorBox.setVisible(true);
+        editorBox.setManaged(true);
         area.requestFocus();
         area.moveTo(0, 0);
     }
