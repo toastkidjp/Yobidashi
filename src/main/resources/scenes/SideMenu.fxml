@@ -50,7 +50,6 @@
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
               <MenuLabel onAction="#makeArticle" text="Make new article" />
               <MenuLabel accelerator="Ctrl+S" mnemonicParsing="true" onAction="#saveArticle" text="Save article" />
-              <MenuLabel accelerator="Ctrl+L" mnemonicParsing="true" onAction="#callFileLength" text="Article length counter" />
               <MenuLabel onAction="#callCopy" text="Copy article" />
               <MenuLabel onAction="#callRename" text="Rename article" />
               <MenuLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />

@@ -15,15 +15,6 @@ import jp.toastkid.yobidashi.message.ArticleMessage.Command;
 public class ArticleMessageTest {
 
     /**
-     * Check {@link ArticleMessage#makeLength()}.
-     */
-    @Test
-    public void testMakeLength() {
-        final ArticleMessage length = ArticleMessage.makeLength();
-        assertEquals(Command.LENGTH, length.getCommand());
-    }
-
-    /**
      * Check {@link ArticleMessage#makeSlideShow()}.
      */
     @Test

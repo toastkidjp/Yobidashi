@@ -14,7 +14,7 @@ public class ArticleMessage implements Message {
      *
      */
     public enum Command {
-        MAKE, LENGTH, COPY, RENAME, SLIDE_SHOW, DELETE,
+        MAKE, COPY, RENAME, SLIDE_SHOW, DELETE,
         CONVERT_AOBUN, CONVERT_EPUB, WORD_CLOUD
     }
 
@@ -35,14 +35,6 @@ public class ArticleMessage implements Message {
      */
     public Command getCommand() {
         return command;
-    }
-
-    /**
-     * Make length message.
-     * @return LENGTH message
-     */
-    public static ArticleMessage makeLength() {
-        return new ArticleMessage(Command.LENGTH);
     }
 
     /**

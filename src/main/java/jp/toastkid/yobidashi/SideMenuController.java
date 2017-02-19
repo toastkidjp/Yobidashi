@@ -181,14 +181,6 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Show file length.
-     */
-    @FXML
-    private final void callFileLength() {
-        messenger.onNext(ArticleMessage.makeLength());
-    }
-
-    /**
      * Switch Full screen mode.
      */
     @FXML

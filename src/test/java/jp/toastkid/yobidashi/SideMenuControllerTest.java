@@ -244,22 +244,6 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
-     * Test of {@link SideMenuController#callFileLength()}.
-     */
-    @Test
-    public void testCallFileLength() {
-        Platform.runLater(() -> {
-            final Consumer<? super Message> consumer = m -> {
-                final ArticleMessage am = (ArticleMessage) m;
-                assertEquals(ArticleMessage.Command.LENGTH, am.getCommand());
-            };
-            subscribe(consumer);
-            selectTab(1);
-            fireLabel("Article length counter	|	Ctrl+L");
-        });
-    }
-
-    /**
      * Test of {@link SideMenuController#callSearch}.
      */
     @Test

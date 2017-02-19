@@ -54,7 +54,6 @@ public class ArticleTest {
     public final void testInitialize() {
         assertEquals("日記2013-08-31(土)", a.title);
         assertEquals(".md", a.extention());
-        assertEquals(0, a.byteLength);
     }
 
     /**
@@ -154,17 +153,6 @@ public class ArticleTest {
     @Test
     public void test_hashCode() {
         assertEquals(1660617097L, a.hashCode());
-    }
-
-    /**
-     * Check {@link Article#makeCharCountResult()}.
-     */
-    @Test
-    public void test_makeCharCountResult() {
-        //System.out.println(a.makeCharCountResult());
-        assertTrue(a.makeCharCountResult().contains("日記2013-08-31(土) "));
-        assertTrue(a.makeCharCountResult().contains(" 字です。"));
-        assertTrue(a.makeCharCountResult().contains("2[KB]"));
     }
 
     /**

@@ -940,7 +940,7 @@ public final class Controller implements Initializable {
             final ObservableList<Node> itemContainer = cmc.getItemsContainer().getChildren();
             itemContainer.addAll(
                     makeContextMenuItemContainerWithAction(
-                            cmc, "文字数計測", event -> processArticleMessage(ArticleMessage.makeLength())),
+                            cmc, "Word Cloud", event -> processArticleMessage(ArticleMessage.makeWordCloud())),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Full Screen", event -> stage.setFullScreen(true)),
                     makeContextMenuItemContainerWithAction(
@@ -1849,14 +1849,6 @@ public final class Controller implements Initializable {
                 return;
             case MAKE:
                 Platform.runLater(this::makeMarkdown);
-                return;
-            case LENGTH:
-                if (!optional.isPresent()) {
-                    snackbar.fireEvent(new SnackbarEvent("現在表示できません。"));
-                    return;
-                }
-                Platform.runLater(() -> AlertDialog.showMessage(
-                        getParent(), "文字数計測", optional.get().makeCharCountResult()));
                 return;
             case COPY:
                 Platform.runLater(this::copyArticle);
