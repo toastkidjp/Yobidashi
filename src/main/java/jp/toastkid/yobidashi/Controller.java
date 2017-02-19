@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +107,6 @@ import jp.toastkid.yobidashi.message.ArticleMessage;
 import jp.toastkid.yobidashi.message.ArticleSearchMessage;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.EditorTabMessage;
-import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
@@ -535,8 +533,12 @@ public final class Controller implements Initializable {
 
                     setTitleOnToolbar(tab.getTitle());
 
+                    if (tab instanceof Editable) {
+                        ((Editable) tab).setFont(readFont());
+                    }
+
                     final String tabUrl = tab.getUrl();
-                    if (!StringUtils.isEmpty(tabUrl)){
+                    if (StringUtils.isNotEmpty(tabUrl)){
                         urlText.setText(tabUrl);
                         focusOn();
                         return;
@@ -1730,17 +1732,6 @@ public final class Controller implements Initializable {
             return;
         }
 
-        if (message instanceof FontMessage) {
-            final FontMessage fontEvent = (FontMessage) message;
-            final int size = fontEvent.getSize();
-            conf.store(Maps.mutable.of(
-                    Key.FONT_SIZE.text(),   Integer.toString(size),
-                    Key.FONT_FAMILY.text(), fontEvent.getFont().getFamily()
-                    ));
-            applyFontToEditor();
-            return;
-        }
-
         if (message instanceof UserAgentMessage) {
             wwbTabOr().ifPresent(tab ->
                 Platform.runLater(() ->tab.setUserAgent(((UserAgentMessage) message).getUserAgent())));
@@ -1749,21 +1740,11 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Apply current font to editor tab.
-     */
-    private void applyFontToEditor() {
-        final Font font = readFont();
-        tabPane.getTabs().stream()
-            .filter(Editable.class::isInstance)
-            .map(Editable.class::cast)
-            .forEach(tab -> Platform.runLater(() -> tab.setFont(font)));
-    }
-
-    /**
      * Read font form config.
      * @return Font
      */
     private Font readFont() {
+        conf.reload();
         return FontFactory.make(conf.get(Key.FONT_FAMILY), conf.getInt(Key.FONT_SIZE, 16));
     }
 

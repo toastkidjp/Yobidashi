@@ -13,14 +13,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jp.toastkid.article.control.UserAgent;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
-import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
-import jp.toastkid.yobidashi.message.FontMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
@@ -69,14 +66,6 @@ public class ToolsController {
     /** Specify zoom rate. */
     @FXML
     private TextField zoomInput;
-
-    /** Font family */
-    @FXML
-    private ComboBox<String> fontFamily;
-
-    /** Font size. */
-    @FXML
-    private NumberTextField fontSize;
 
     /** UserAgent's selector. */
     @FXML
@@ -156,19 +145,6 @@ public class ToolsController {
     }
 
     /**
-     * Apply font settings.
-     */
-    @FXML
-    private void applyFontSettings() {
-        final int size = fontSize.intValue();
-        if (size < 0) {
-            return;
-        }
-        final String item = fontFamily.getSelectionModel().getSelectedItem();
-        messenger.onNext(FontMessage.make(Font.font(item), size));
-    }
-
-    /**
      * Set current WebView publisher.
      * @param zoomPublisher
      */
@@ -195,11 +171,6 @@ public class ToolsController {
      */
     public void setConfig(Config conf) {
         this.conf = conf;
-        this.fontSize.setText(conf.get(Key.FONT_SIZE));
-        this.fontFamily.getItems().addAll(Font.getFamilies());
-        final int index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
-        this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
-
         ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
         ua.getSelectionModel().select(0);
     }

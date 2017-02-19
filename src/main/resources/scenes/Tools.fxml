@@ -18,9 +18,6 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXColorPicker?>
 
-<?import jp.toastkid.jfx.common.control.MenuLabel?>
-<?import jp.toastkid.jfx.common.control.NumberTextField?>
-
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
   fx:controller="jp.toastkid.yobidashi.ToolsController">
     <styleClass>
@@ -28,18 +25,6 @@
     </styleClass>
     <VBox prefHeight="200.0" prefWidth="200.0">
         <children>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Editor">
-            <content>
-              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
-                <children>
-                  <JFXComboBox fx:id="fontFamily" minWidth="160.0" prefWidth="160.0"/>
-                  <NumberTextField fx:id="fontSize" onAction="#applyFontSettings" minWidth="50.0"
-                    promptText="Input editor's font size" labelFloat="true"/>
-                  <JFXButton onAction="#applyFontSettings" minWidth="70.0" text="Apply" />
-                </children>
-              </HBox>
-            </content>
-          </TitledPane>
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="WebView">
             <content>
               <VBox alignment="CENTER" prefHeight="50.0" prefWidth="450.0">
