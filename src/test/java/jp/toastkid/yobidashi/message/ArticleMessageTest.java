@@ -101,7 +101,7 @@ public class ArticleMessageTest {
     @Test
     public void test_values() {
         final Command[] values = ArticleMessage.Command.values();
-        assertEquals(9, values.length);
+        assertEquals(8, values.length);
     }
 
 }

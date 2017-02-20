@@ -152,7 +152,7 @@ public class ArticleTest {
      */
     @Test
     public void test_hashCode() {
-        assertEquals(1660617097L, a.hashCode());
+        assertEquals(1786084501L, a.hashCode());
     }
 
     /**
