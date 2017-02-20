@@ -665,7 +665,7 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private void setIconified() {
-        stage.setIconified(true);
+        messenger.onNext(ApplicationMessage.makeMinimize());
     }
 
     /**

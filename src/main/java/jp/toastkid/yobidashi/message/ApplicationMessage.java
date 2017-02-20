@@ -10,7 +10,7 @@ public class ApplicationMessage implements Message {
 
     /** Command. */
     public enum Command {
-        QUIT
+        MINIMIZE, QUIT
     }
 
     /** This message's command. */
@@ -38,5 +38,13 @@ public class ApplicationMessage implements Message {
      */
     public static ApplicationMessage makeQuit() {
         return new ApplicationMessage(Command.QUIT);
+    }
+
+    /**
+     * Make MINIMIZE message.
+     * @return message object
+     */
+    public static ApplicationMessage makeMinimize() {
+        return new ApplicationMessage(Command.MINIMIZE);
     }
 }

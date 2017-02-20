@@ -119,6 +119,7 @@ import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
+import jp.toastkid.yobidashi.popup.HamburgerPopup;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -335,6 +336,8 @@ public final class Controller implements Initializable {
     /** ePub generator. */
     private EpubGenerator ePubGenerator;
 
+    private HamburgerPopup hPopup;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
@@ -441,7 +444,7 @@ public final class Controller implements Initializable {
                                     leftDrawer.close();
                                 }
                             });
-                            optionsBurger.setOnMouseClicked(e->switchRightDrawer());
+                            optionsBurger.setOnMouseClicked(e -> switchHamburgerPopup());
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize drawer. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -557,22 +560,19 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Switch right drawer's state.
+     * Switch right HamburgerPopup's state.
      */
-    private void switchRightDrawer() {
-        if (isRightDrawerClosing()) {
-            rightDrawer.open();
-            return;
-        }
-        rightDrawer.close();
-    }
+    private void switchHamburgerPopup() {
 
-    /**
-     * Return drawer hiding.
-     * @return
-     */
-    private boolean isRightDrawerClosing() {
-        return rightDrawer.isHidden() || rightDrawer.isHidding();
+        if (hPopup == null) {
+            hPopup = new HamburgerPopup.Builder()
+                        .setContainer(header)
+                        .setSource(optionsBurger)
+                        .setConsumer(this::processMessage)
+                        .build();
+        }
+
+        hPopup.show();
     }
 
     /**
@@ -963,11 +963,6 @@ public final class Controller implements Initializable {
                             cmc, "Go to bottom of this page", event -> moveToBottom()),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Search article", event -> showSearchDialog("", "")),
-                    makeContextMenuItemContainerWithAction(
-                            cmc,
-                            isRightDrawerClosing() ? "Open tools" : "Close tools",
-                            event -> switchRightDrawer()
-                            ),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Save article", event -> saveCurrentTab()),
                     cmc.new MenuItemContainer(
@@ -1671,7 +1666,7 @@ public final class Controller implements Initializable {
     private void processMessage(final Message message) {
 
         if (message instanceof ToolsDrawerMessage) {
-            Platform.runLater(this::switchRightDrawer);
+            Platform.runLater(this::switchHamburgerPopup);
             return;
         }
 
@@ -1778,6 +1773,9 @@ public final class Controller implements Initializable {
             case QUIT:
                 Platform.runLater(stage::close);
                 System.exit(0);
+                return;
+            case MINIMIZE:
+                Platform.runLater(() -> stage.setIconified(true));
                 return;
         }
     }

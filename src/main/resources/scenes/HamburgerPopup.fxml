@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXPopup?>
+<?import com.jfoenix.controls.JFXListView?>
+
+<?import jp.toastkid.jfx.common.control.MenuLabel?>
+
+<JFXPopup xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:id="popup"
+  fx:controller="jp.toastkid.yobidashi.popup.HamburgerPopupController"
+  prefHeight="100.0" prefWidth="100.0"
+  >
+  <content>
+    <JFXListView fx:id="popupList" styleClass="popup-list-view" prefHeight="100.0" prefWidth="100.0">
+      <MenuLabel onAction="#minimize" text="Minimize" />
+      <MenuLabel onAction="#quit"     text="Quit" />
+    </JFXListView>
+  </content>
+</JFXPopup>
