@@ -28,7 +28,6 @@ import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -70,7 +69,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -111,7 +109,6 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
-import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
@@ -326,16 +323,13 @@ public final class Controller implements Initializable {
     @FXML
     private SideMenuController sideMenuController;
 
-    /** Tools pane controller. */
-    @FXML
-    private ToolsController toolsController;
-
     /** Config. */
     private Config conf;
 
     /** ePub generator. */
     private EpubGenerator ePubGenerator;
 
+    /** Popup. */
     private HamburgerPopup hPopup;
 
     @Override
@@ -1631,32 +1625,15 @@ public final class Controller implements Initializable {
      */
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
-        final Cancellation cancellation
-            = sideMenuController.getMessenger().subscribe(this::processMessage);
-        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
         sideMenuController.setConfig(conf);
-    }
 
-    /**
-     * Set up Tool Menu.
-     */
-    protected void setupToolMenu() {
-        toolsController.init(this.stage);
         final Cancellation cancellation
-            = toolsController.getMessenger().subscribe(this::processMessage);
+            = sideMenuController.setSubscriber(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
-        toolsController.setConfig(conf);
-        toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
-            tabPane.getSelectionModel().selectedItemProperty()
-                .addListener((a, prevTab, nextTab) -> {
-                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
-                        final WebView prev = (WebView) prevTab.getContent();
-                        prev.zoomProperty().unbind();
-                    }
-                    Optional.ofNullable(getCurrentTab())
-                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
-                })
-        ));
+
+        final Cancellation tCancellation
+            = sideMenuController.setToolsSubscriber(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(tCancellation::dispose));
     }
 
     /**
@@ -1664,11 +1641,6 @@ public final class Controller implements Initializable {
      * @param message Processor's event
      */
     private void processMessage(final Message message) {
-
-        if (message instanceof ToolsDrawerMessage) {
-            Platform.runLater(this::switchHamburgerPopup);
-            return;
-        }
 
         if (message instanceof ArticleMessage) {
             processArticleMessage((ArticleMessage) message);

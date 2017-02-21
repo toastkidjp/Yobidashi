@@ -25,7 +25,8 @@
           <content>
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
               <MenuLabel onAction="#clearBackup" text="Delete backup" />
-              <MenuLabel accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="Backup article" />
+              <MenuLabel accelerator="Ctrl+B" mnemonicParsing="true" onAction="#callBackUp" text="Backup all articles" />
+              <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
               <MenuLabel onAction="#openExternalFile" text="Open external file" />
               <JFXListView fx:id="folders" styleClass="popup-list-view">
                 <groupnode>
@@ -55,17 +56,24 @@
               <MenuLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
               <MenuLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" />
               <MenuLabel accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="Article Search" />
+              <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
+              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
               <MenuLabel onAction="#callDelete" text="Delete article" />
             </JFXListView>
           </content>
         </Tab>
 
-        <Tab text="Tool">
+        <Tab text="Tools">
+          <content>
+            <fx:include fx:id="tools" source="Tools.fxml"/>
+          </content>
+        </Tab>
+
+        <Tab text="Other">
           <content>
             <JFXListView styleClass="left-tabs" VBox.vgrow="ALWAYS" >
               <MenuLabel accelerator="Ctrl+0" mnemonicParsing="true" onAction="#callCalc" text="Calculator" />
               <MenuLabel onAction="#callCmd" text="Command Prompt" />
-              <!--MenuLabel onAction="#callGallery" text="Gallery" /-->
               <MenuLabel accelerator="Shift+W" mnemonicParsing="true" onAction="#callWordCloud" text="Word cloud" />
               <MenuLabel accelerator="Shift+P" mnemonicParsing="true" onAction="#callCapture" text="Screen capture" />
               <MenuLabel onAction="#callRssFeeder" text="RSS Feeder" />
@@ -73,11 +81,7 @@
               <MenuLabel onAction="#openNoodleTimer" text="Noodle Timer" />
               <MenuLabel onAction="#openNameGenerator" text="Name Generator" />
               <MenuLabel onAction="#openCssGenerator" text="CSS Generator" />
-              <MenuLabel onAction="#callConvertAobun" text="Convert current article to AozoraBunko Text" />
-              <MenuLabel onAction="#callConvertEpub" text="Convert current article to ePub" />
-              <MenuLabel onAction="#callSimpleBachup" text="Simple article backup" />
               <MenuLabel onAction="#callGenerateEpubs" text="Generate ePub" />
-              <MenuLabel onAction="#openTools" text="Open tools" />
               <MenuLabel onAction="#callGC" text="Launch Garbage Collection" />
               <MenuLabel onAction="#callLogViewer" text="LogViewer" />
             </JFXListView>

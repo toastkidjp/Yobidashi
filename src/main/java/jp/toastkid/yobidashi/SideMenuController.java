@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,12 +58,12 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
-import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.ApplicationState;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Defines;
+import reactor.core.Cancellation;
 import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -89,6 +90,14 @@ public class SideMenuController implements Initializable {
     /** RSS取得対象のURLリスト. */
     private static final String PATH_RSS_TARGETS = Defines.USER_DIR + "/res/rss";
 
+    /** menu tabs. */
+    @FXML
+    private TabPane menuTabs;
+
+    /** Tools pane controller. */
+    @FXML
+    private ToolsController toolsController;
+
     /** Article Generator. */
     private ArticleGenerator articleGenerator;
 
@@ -103,10 +112,6 @@ public class SideMenuController implements Initializable {
 
     /** for controlling window. */
     private Stage stage;
-
-    /** menu tabs. */
-    @FXML
-    private TabPane menuTabs;
 
     /** Tool Drawer event processor. */
     private TopicProcessor<Message> messenger;
@@ -594,14 +599,6 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Open right Drawer.
-     */
-    @FXML
-    private void openTools() {
-        getMessenger().onNext(ToolsDrawerMessage.make());
-    }
-
-    /**
      * Open current folder.
      */
     @FXML
@@ -671,19 +668,22 @@ public class SideMenuController implements Initializable {
     /**
      * for use shortcut when start-up.
      */
+    @SuppressWarnings("unchecked")
     private void putAccerelator() {
         final ObservableMap<KeyCombination, Runnable> accelerators
             = this.stage.getScene().getAccelerators();
-        menuTabs.getTabs().forEach(tab -> {
-            @SuppressWarnings("unchecked")
-            final JFXListView<Node> items = (JFXListView<Node>) tab.getContent();
-            items.getItems().stream()
+        menuTabs.getTabs().stream()
+                .filter(tab -> tab.getContent() instanceof ListView)
+                .map(tab -> JFXListView.class.cast(tab.getContent()))
+                .forEach(lv -> {
+            ((JFXListView<Node>) lv).getItems().stream()
                  .flatMap(this::flattenListToLabel)
                  .map(this::extractAcceleratorPair)
                  .filter(Filters::isNotNull)
                  .forEach(item -> accelerators.put(
                          item.getT1(), () -> item.getT2().handle(new ActionEvent())));
         });
+        accelerators.putAll(toolsController.accelerators());
     }
 
     /**
@@ -720,7 +720,7 @@ public class SideMenuController implements Initializable {
      * @param stage
      */
     protected void setStage(final Stage stage) {
-        this.stage  = stage;
+        this.stage = stage;
         putAccerelator();
     }
 
@@ -742,8 +742,16 @@ public class SideMenuController implements Initializable {
      * Getter of messenger.
      * @return messenger
      */
-    protected TopicProcessor<Message> getMessenger() {
-        return messenger;
+    protected Cancellation setSubscriber(final Consumer<Message> c) {
+        return this.messenger.subscribe(c);
+    }
+
+    /**
+     * Getter of messenger.
+     * @return messenger
+     */
+    protected Cancellation setToolsSubscriber(final Consumer<Message> c) {
+        return this.toolsController.getMessenger().subscribe(c);
     }
 
     /**
@@ -754,6 +762,18 @@ public class SideMenuController implements Initializable {
         this.conf = conf;
         this.articleGenerator = new ArticleGenerator(conf);
         this.ePubGenerator    = new EpubGenerator(conf);
+
+        /*toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
+            tabPane.getSelectionModel().selectedItemProperty()
+                .addListener((a, prevTab, nextTab) -> {
+                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
+                        final WebView prev = (WebView) prevTab.getContent();
+                        prev.zoomProperty().unbind();
+                    }
+                    Optional.ofNullable(getCurrentTab())
+                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
+                })
+        ));*/
     }
 
 }

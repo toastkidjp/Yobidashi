@@ -1,11 +1,16 @@
 package jp.toastkid.yobidashi;
 
+import java.net.URL;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -13,7 +18,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import jp.toastkid.article.control.UserAgent;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
@@ -22,6 +26,7 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
+import jp.toastkid.yobidashi.models.Defines;
 import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.TopicProcessor;
@@ -32,7 +37,7 @@ import reactor.core.scheduler.Schedulers;
  * @author Toast kid
  *
  */
-public class ToolsController {
+public class ToolsController implements Initializable {
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -74,15 +79,13 @@ public class ToolsController {
     /** Message sender. */
     private final TopicProcessor<Message> messenger = TopicProcessor.create();
 
-    /** Config. */
-    private Config conf;
-
     /**
      * Draw chart.
      */
     @FXML
     private final void drawChart() {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
+        final Config conf = new Config(Defines.CONFIG);
         final Pane content = ChartPane.make(
                 conf.get(Key.ARTICLE_DIR),
                 Category.findByText(title),
@@ -115,21 +118,6 @@ public class ToolsController {
      */
     private void initZoom() {
         zoomInput.textProperty().bind(zoom.valueProperty().asString());
-    }
-
-    /**
-     * Set stage for controlling window.
-     * @param stage
-     * @param controller
-     */
-    protected void init(final Stage stage) {
-        final ObservableMap<KeyCombination, Runnable> accelerators
-            = stage.getScene().getAccelerators();
-        accelerators.put(DRAW_CHART,     this::drawChart);
-        accelerators.put(ZOOM_INCREMENT, zoom::increment);
-        accelerators.put(ZOOM_DECREMENT, zoom::decrement);
-        initChartTool();
-        initZoom();
     }
 
     /**
@@ -166,21 +154,31 @@ public class ToolsController {
     }
 
     /**
-     * Pass {@link Config} object.
-     * @param conf
-     */
-    public void setConfig(Config conf) {
-        this.conf = conf;
-        ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
-        ua.getSelectionModel().select(0);
-    }
-
-    /**
      * Return root pane,
      * @return
      */
     protected Pane getRoot() {
         return root;
+    }
+
+    /**
+     * Return accelerators.
+     * @return accelerators
+     */
+    Map<KeyCombination, Runnable> accelerators() {
+        return Maps.fixedSize.of(
+                DRAW_CHART,     this::drawChart,
+                ZOOM_INCREMENT, zoom::increment,
+                ZOOM_DECREMENT, zoom::decrement
+                );
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        initChartTool();
+        initZoom();
+        ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+        ua.getSelectionModel().select(0);
     }
 
 }

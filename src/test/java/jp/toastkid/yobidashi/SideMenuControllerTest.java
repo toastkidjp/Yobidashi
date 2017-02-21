@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.Test;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import com.jfoenix.controls.JFXTabPane;
@@ -36,7 +37,6 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
-import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
 import reactor.core.publisher.TopicProcessor;
@@ -82,7 +82,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_fullScreen() {
         Platform.runLater(() -> {
-            selectTab(3);
+            selectTab(4);
             final String labelText = "Full screen	|	F11";
             fireLabel(labelText);
             assertTrue(stage.isFullScreen());
@@ -101,7 +101,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final TabMessage tm = (TabMessage) m;
                 assertEquals(TabMessage.Command.RELOAD, tm.getCommand());
             });
-            selectTab(3);
+            selectTab(4);
             fireLabel("Reload", "F5");
         });
     }
@@ -112,7 +112,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_callApplicationState() {
         Platform.runLater(() -> {
-            selectTab(4);
+            selectTab(5);
             fireLabel("Application state");
             type(KeyCode.ESCAPE);
             System.out.println("typed");
@@ -191,7 +191,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 assertNotNull(wm.getContent());
                 assertEquals(ContentType.TEXT, wm.getContentType());
             });
-            selectTab(4);
+            selectTab(5);
             fireLabel("License");
         });
     }
@@ -207,7 +207,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 assertEquals(ArticleMessage.Command.CONVERT_AOBUN, am.getCommand());
             };
             subscribe(consumer);
-            selectTab(2);
+            selectTab(1);
             fireLabel("Convert current article to AozoraBunko Text");
         });
     }
@@ -223,7 +223,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 assertEquals(ArticleMessage.Command.CONVERT_EPUB, am.getCommand());
             };
             subscribe(consumer);
-            selectTab(2);
+            selectTab(1);
             fireLabel("Convert current article to ePub");
         });
     }
@@ -238,7 +238,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.WORD_CLOUD, am.getCommand());
             });
-            selectTab(2);
+            selectTab(3);
             fireLabel("Word cloud", "Shift+W");
         });
     }
@@ -334,21 +334,6 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
-     * Test of {@link SideMenuController#saveArticle}.
-     */
-    @Test
-    public void test_openTools() {
-        Platform.runLater(() -> {
-            subscribe(m -> {
-                final ToolsDrawerMessage tm = (ToolsDrawerMessage) m;
-                assertNotNull(tm);
-            });
-            selectTab(2);
-            fireLabel("Open tools");
-        });
-    }
-
-    /**
      * Test of {@link SideMenuController#slideShow}.
      */
     @Test
@@ -388,7 +373,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final SnackbarMessage am = (SnackbarMessage) m;
                 assertEquals("Called garbage collection.", am.getText());
             });
-            selectTab(2);
+            selectTab(3);
             fireLabel("Launch Garbage Collection");
         });
     }
@@ -429,13 +414,6 @@ public class SideMenuControllerTest extends ApplicationTest {
      */
     private void selectTab(final int index) {
         tabPane.getSelectionModel().select(index);
-
-//        @SuppressWarnings("unchecked")
-//        final ListView<MenuLabel> content
-//            = (ListView<MenuLabel>) tabPane.getSelectionModel().getSelectedItem().getContent();
-//        for (final Object item : content.getItems()) {
-//            System.out.println(item.getClass() + " " + item);
-//        }
     }
 
     /**
@@ -446,6 +424,7 @@ public class SideMenuControllerTest extends ApplicationTest {
         messenger.subscribe(consumer, e -> fail(e.getMessage()));
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void start(final Stage stage) throws Exception {
         this.stage = stage;
@@ -458,13 +437,11 @@ public class SideMenuControllerTest extends ApplicationTest {
             controller.setStage(stage);
             controller.setConfig(makeConfig());
             controller.initialize(null, null);
-            assertNotNull(controller.getMessenger());
         } catch (final IOException e) {
             e.printStackTrace();
             Platform.exit();
         }
-        messenger = controller.getMessenger();
-        assertNotNull(controller.getMessenger());
+        messenger = (TopicProcessor) Whitebox.getInternalState(controller, "messenger");
         stage.show();
 
         tabPane = (JFXTabPane) lookup("#menuTabs").query();
