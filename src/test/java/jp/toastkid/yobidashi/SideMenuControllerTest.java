@@ -13,8 +13,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import com.jfoenix.controls.JFXTabPane;
@@ -39,7 +39,7 @@ import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
-import reactor.core.publisher.TopicProcessor;
+import reactor.core.Cancellation;
 
 /**
  * {@link SideMenuController}'s test case.
@@ -52,14 +52,14 @@ public class SideMenuControllerTest extends ApplicationTest {
     /** Test object. */
     private SideMenuController controller;
 
-    /** Messenger. */
-    private TopicProcessor<Message> messenger;
-
     /** Tab pane. */
     private JFXTabPane tabPane;
 
     /** Test stage. */
     private Stage stage;
+
+    /** Cancellation. */
+    private Cancellation cancellation;
 
     /**
      * Test of {@link SideMenuController#quit}.
@@ -88,6 +88,20 @@ public class SideMenuControllerTest extends ApplicationTest {
             assertTrue(stage.isFullScreen());
             fireLabel(labelText);
             assertFalse(stage.isFullScreen());
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#minimizeWindow()}.
+     */
+    @Test
+    public void test_minimizeWindow() {
+        Platform.runLater(() -> {
+            selectTab(4);
+            subscribe(m ->
+                assertEquals(ApplicationMessage.Command.MINIMIZE, ((ApplicationMessage) m).getCommand())
+            );
+            fireLabel("Minimize window", "Ctrl+↓");
         });
     }
 
@@ -202,11 +216,10 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void testCallConvertAobun() {
         Platform.runLater(() -> {
-            final Consumer<? super Message> consumer = m -> {
+            subscribe(m -> {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_AOBUN, am.getCommand());
-            };
-            subscribe(consumer);
+            });
             selectTab(1);
             fireLabel("Convert current article to AozoraBunko Text");
         });
@@ -218,11 +231,10 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void testCallConvertEpub() {
         Platform.runLater(() -> {
-            final Consumer<? super Message> consumer = m -> {
+            subscribe(m -> {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_EPUB, am.getCommand());
-            };
-            subscribe(consumer);
+            });
             selectTab(1);
             fireLabel("Convert current article to ePub");
         });
@@ -420,11 +432,21 @@ public class SideMenuControllerTest extends ApplicationTest {
      * Subscribe passed consumer.
      * @param consumer
      */
-    private void subscribe(final Consumer<? super Message> consumer) {
-        messenger.subscribe(consumer, e -> fail(e.getMessage()));
+    private void subscribe(final Consumer<Message> consumer) {
+        cancellation = controller.setSubscriber(consumer);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    /**
+     * Cancellation dispose each test.
+     */
+    @After
+    public void tearDown() {
+        if (cancellation == null) {
+            return;
+        }
+        cancellation.dispose();
+    }
+
     @Override
     public void start(final Stage stage) throws Exception {
         this.stage = stage;
@@ -441,7 +463,6 @@ public class SideMenuControllerTest extends ApplicationTest {
             e.printStackTrace();
             Platform.exit();
         }
-        messenger = (TopicProcessor) Whitebox.getInternalState(controller, "messenger");
         stage.show();
 
         tabPane = (JFXTabPane) lookup("#menuTabs").query();

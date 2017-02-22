@@ -661,7 +661,7 @@ public class SideMenuController implements Initializable {
      * Iconified window state.
      */
     @FXML
-    private void setIconified() {
+    private void minimizeWindow() {
         messenger.onNext(ApplicationMessage.makeMinimize());
     }
 
