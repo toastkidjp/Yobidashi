@@ -101,7 +101,7 @@ public class SideMenuControllerTest extends ApplicationTest {
             subscribe(m ->
                 assertEquals(ApplicationMessage.Command.MINIMIZE, ((ApplicationMessage) m).getCommand())
             );
-            fireLabel("Minimize window", "Ctrl+↓");
+            fireLabel("Minimize window", "Ctrl+M");
         });
     }
 
