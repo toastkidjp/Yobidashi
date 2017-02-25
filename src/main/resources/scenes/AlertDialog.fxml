@@ -11,9 +11,12 @@
 <?import com.jfoenix.controls.JFXDialogLayout?>
 
 <JFXDialogLayout
+  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="jp.toastkid.dialog.AlertDialogController"
   maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  style="-fx-effect: dropshadow(three-pass-box, #000033, 10, 0, 0, 0);"
+  >
+
   <heading><Label fx:id="title">Dialog</Label></heading>
   <body>
     <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="TOP">

@@ -8,6 +8,7 @@
 <JFXPopup xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:id="popup"
   fx:controller="jp.toastkid.yobidashi.popup.HamburgerPopupController"
   prefHeight="100.0" prefWidth="100.0"
+  style="-fx-effect: dropshadow(three-pass-box, #000033, 10, 0, 0, 0);"
   >
   <content>
     <JFXListView fx:id="popupList" styleClass="popup-list-view" prefHeight="100.0" prefWidth="100.0">
