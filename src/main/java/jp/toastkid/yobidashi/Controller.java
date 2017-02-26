@@ -1191,7 +1191,7 @@ public final class Controller implements Initializable {
             })
             .subscribe(
                 empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
-                    .collect(Articles::findByTitle)
+                    .collect(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
                     .each(bookmarks::add)
                     );
     }
@@ -1256,7 +1256,7 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(newFileName)){
             return;
         }
-        openArticleTab(Articles.findByTitle(newFileName));
+        openArticleTab(Articles.findByTitle(conf.get(Key.ARTICLE_DIR), newFileName));
     }
 
     /**

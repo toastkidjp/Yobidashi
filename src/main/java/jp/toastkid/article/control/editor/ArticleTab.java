@@ -215,7 +215,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
         }
 
         if (Articles.isInternalLink(url)) {
-            onOpenNewArticle.accept(Articles.findByUrl(url));
+            onOpenNewArticle.accept(Articles.findByUrl(articleDir, url));
         }
     }
 

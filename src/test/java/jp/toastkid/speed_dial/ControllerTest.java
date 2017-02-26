@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.event.ActionEvent;
@@ -16,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * {@link Controller}'s test.

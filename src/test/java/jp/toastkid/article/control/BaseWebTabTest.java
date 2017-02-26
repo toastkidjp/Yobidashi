@@ -10,7 +10,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import com.jfoenix.controls.JFXSpinner;
@@ -19,6 +18,7 @@ import javafx.application.Platform;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * Test of {@link BaseWebTab}.

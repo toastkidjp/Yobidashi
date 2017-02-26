@@ -46,7 +46,7 @@ public class ArticlesTest {
      */
     @Test
     public void test_findByTitle() {
-        final Article article = Articles.findByTitle("日記_2017");
+        final Article article = Articles.findByTitle("", "日記_2017");
         assertEquals("日記_2017", article.title);
         assertEquals("file:///internal//md/C6FCB5AD5F32303137.md", article.toInternalUrl());
     }
@@ -56,7 +56,7 @@ public class ArticlesTest {
      */
     @Test
     public void test_findByUrl() {
-        final Article article = Articles.findByUrl("file:///internal//md/C6FCB5AD5F32303137.md");
+        final Article article = Articles.findByUrl("", "file:///internal//md/C6FCB5AD5F32303137.md");
         assertEquals("日記_2017", article.title);
         assertEquals("file:///internal//md/C6FCB5AD5F32303137.md", article.toInternalUrl());
     }

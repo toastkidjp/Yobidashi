@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.reactfx.value.Val;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -17,6 +16,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.stage.Stage;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * {@link EditorInputMethodRequests}'s test.
