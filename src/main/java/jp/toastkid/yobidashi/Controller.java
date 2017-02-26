@@ -117,7 +117,7 @@ import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 import jp.toastkid.yobidashi.popup.HamburgerPopup;
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -758,8 +758,8 @@ public final class Controller implements Initializable {
             controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
-            final Cancellation cancellation2 = controller.messenger().subscribe(this::processMessage);
-            Runtime.getRuntime().addShutdownHook(new Thread(cancellation2::dispose));
+            final Disposable disposable = controller.messenger().subscribe(this::processMessage);
+            Runtime.getRuntime().addShutdownHook(new Thread(disposable::dispose));
 
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
@@ -1627,11 +1627,11 @@ public final class Controller implements Initializable {
         sideMenuController.setStage(this.stage);
         sideMenuController.setConfig(conf);
 
-        final Cancellation cancellation
+        final Disposable cancellation
             = sideMenuController.setSubscriber(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
 
-        final Cancellation tCancellation
+        final Disposable tCancellation
             = sideMenuController.setToolsSubscriber(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(tCancellation::dispose));
     }

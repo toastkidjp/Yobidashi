@@ -130,7 +130,7 @@ public final class Config {
         }
 
         config.clear();
-        LOGGER.info(Thread.currentThread().getName() + " reload");
+        //LOGGER.info(Thread.currentThread().getName() + " reload");
         final Properties p = new Properties();
         try (final Reader reader = Files.newBufferedReader(path)) {
             p.load(reader);

@@ -63,7 +63,7 @@ import jp.toastkid.yobidashi.models.ApplicationState;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 import reactor.core.publisher.TopicProcessor;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -742,7 +742,7 @@ public class SideMenuController implements Initializable {
      * Getter of messenger.
      * @return messenger
      */
-    protected Cancellation setSubscriber(final Consumer<Message> c) {
+    protected Disposable setSubscriber(final Consumer<Message> c) {
         return this.messenger.subscribe(c);
     }
 
@@ -750,7 +750,7 @@ public class SideMenuController implements Initializable {
      * Getter of messenger.
      * @return messenger
      */
-    protected Cancellation setToolsSubscriber(final Consumer<Message> c) {
+    protected Disposable setToolsSubscriber(final Consumer<Message> c) {
         return this.toolsController.getMessenger().subscribe(c);
     }
 

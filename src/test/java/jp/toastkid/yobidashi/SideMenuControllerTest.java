@@ -39,7 +39,7 @@ import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 
 /**
  * {@link SideMenuController}'s test case.
@@ -59,7 +59,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     private Stage stage;
 
     /** Cancellation. */
-    private Cancellation cancellation;
+    private Disposable cancellation;
 
     /**
      * Test of {@link SideMenuController#quit}.

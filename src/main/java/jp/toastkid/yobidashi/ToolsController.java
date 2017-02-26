@@ -27,7 +27,7 @@ import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
@@ -137,7 +137,7 @@ public class ToolsController implements Initializable {
      * @param zoomPublisher
      */
     public void setFlux(final Flux<DoubleProperty> zoomPublisher) {
-        final Cancellation subscribe = zoomPublisher.subscribeOn(Schedulers.elastic())
+        final Disposable subscribe = zoomPublisher.subscribeOn(Schedulers.elastic())
             .subscribe(z -> {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
