@@ -1,11 +1,10 @@
 package jp.toastkid.yobidashi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +25,6 @@ import javafx.stage.Stage;
 import jp.toastkid.article.control.UserAgent;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
-import jp.toastkid.yobidashi.models.Config;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.TopicProcessor;
 
@@ -99,17 +97,6 @@ public class ToolsControllerTest extends ApplicationTest {
     }
 
     /**
-     * Test of {@link ToolsController#applyFontSetting}.
-     */
-    @Test
-    public void test_font() {
-        Platform.runLater(() -> {
-            final Button draw = (Button) lookup("Apply").query();
-            draw.fire();
-        });
-    }
-
-    /**
      * Test of {@link ToolsController} zoom.
      */
     @Test
@@ -130,6 +117,15 @@ public class ToolsControllerTest extends ApplicationTest {
         Platform.runLater(() -> lookup("Default").query().fireEvent(new ActionEvent()));
     }
 
+    /**
+     * Test of {@link ToolsController#accelerators()}.
+     */
+    @Test
+    public void test_accelerators() {
+        assertNotNull(controller.accelerators());
+        assertTrue(0 < controller.accelerators().size());
+    }
+
     @Override
     public void start(final Stage stage) throws Exception {
         this.stage = stage;
@@ -138,8 +134,6 @@ public class ToolsControllerTest extends ApplicationTest {
             loader.load();
             controller = (ToolsController) loader.getController();
             stage.setScene(new Scene(controller.getRoot()));
-            controller.init(stage);
-            controller.setConfig(makeConfig());
         } catch (final IOException e) {
             e.printStackTrace();
             Platform.exit();
@@ -147,14 +141,4 @@ public class ToolsControllerTest extends ApplicationTest {
         messenger = controller.getMessenger();
     }
 
-    /**
-     * Initialize {@link Config}.
-     * @return
-     * @throws URISyntaxException
-     */
-    public Config makeConfig() throws URISyntaxException {
-        final Path path = Paths.get(getClass().getClassLoader()
-                .getResource("conf/conf.properties").toURI());
-        return new Config(path);
-    }
 }

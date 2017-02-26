@@ -71,7 +71,7 @@ public final class Config {
     private final Path path;
 
     /** Configuration file's encode. */
-    public static final String ENCODE        = "UTF-8";
+    public static final String ENCODE = "UTF-8";
 
     /**
      * Initialize with path.
@@ -130,6 +130,7 @@ public final class Config {
         }
 
         config.clear();
+        //LOGGER.info(Thread.currentThread().getName() + " reload");
         final Properties p = new Properties();
         try (final Reader reader = Files.newBufferedReader(path)) {
             p.load(reader);

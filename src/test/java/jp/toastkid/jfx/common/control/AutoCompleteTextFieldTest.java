@@ -6,12 +6,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.stage.Stage;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * {@link AutoCompleteTextField}'s test case.

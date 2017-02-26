@@ -3,12 +3,12 @@ package jp.toastkid.dialog;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * {@link AlertDialog}'s test

@@ -26,6 +26,15 @@ public class ApplicationMessageTest {
     }
 
     /**
+     * {@link ApplicationMessage#makeMinimize()}
+     */
+    @Test
+    public void test_makeMinimize() {
+        final ApplicationMessage makeQuit = ApplicationMessage.makeMinimize();
+        assertEquals(ApplicationMessage.Command.MINIMIZE, makeQuit.getCommand());
+    }
+
+    /**
      * Test for coverage.
      */
     @Test
@@ -40,7 +49,7 @@ public class ApplicationMessageTest {
     @Test
     public void test_values() {
         final Command[] values = ApplicationMessage.Command.values();
-        assertEquals("[QUIT]", Arrays.deepToString(values));
+        assertEquals("[MINIMIZE, QUIT]", Arrays.deepToString(values));
     }
 
 }

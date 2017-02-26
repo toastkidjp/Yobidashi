@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
+import org.eclipse.collections.impl.collector.Collectors2;
 import org.eclipse.collections.impl.factory.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,6 @@ import org.slf4j.LoggerFactory;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import jp.toastkid.libs.utils.FileUtil;
-import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Config.Key;
-import jp.toastkid.yobidashi.models.Defines;
 
 /**
  * Utilities of {@link Article}.
@@ -43,12 +39,6 @@ public final class Articles {
 
     /** line separator. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
-
-    /** Config. */
-    private static Config config;
-    static {
-        config = new Config(Defines.CONFIG);
-    }
 
     /**
      * Private constructor.
@@ -69,13 +59,12 @@ public final class Articles {
             return Collections.emptyList();
         }
 
-        try (DirectoryStream<Path> directoryStream
-                = Files.newDirectoryStream(dir, Articles::isValidContentPath)){
-            return Lists.mutable.ofAll(directoryStream)
-                    .collect(Article::new)
-                    .select( a -> a.isValid())
-                    .asParallel(Executors.newFixedThreadPool(12), 12)
-                    .toList();
+
+        try {
+            return Files.list(dir)
+                    .map(Article::new)
+                    .filter( a -> a.isValid())
+                    .collect(Collectors2.toList());
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -132,8 +121,8 @@ public final class Articles {
      * @param newFileName ファイル名(パスではない)
      * @return Article オブジェクト
      */
-    public static Article findByTitle(final String newFileName) {
-        return find(titleToFileName(newFileName) + ".md");
+    public static Article findByTitle(final String articleDir, final String newFileName) {
+        return find(articleDir, titleToFileName(newFileName) + ".md");
     }
 
     /**
@@ -141,17 +130,18 @@ public final class Articles {
      * @param url URL
      * @return Article オブジェクト
      */
-    public static Article findByUrl(final String url) {
-        return find(findFileNameByUrl(url));
+    public static Article findByUrl(final String articleDir, final String url) {
+        return find(articleDir, findFileNameByUrl(url));
     }
 
     /**
      * fileName から Article オブジェクトを生成.
      * @param fileName ファイル名(パスではない)
+     * @param articleDir
      * @return Article オブジェクト
      */
-    private static Article find(final String fileName) {
-        return new Article(Paths.get(config.get(Key.ARTICLE_DIR), fileName));
+    private static Article find(final String articleDir, final String fileName) {
+        return new Article(Paths.get(articleDir, fileName));
     }
 
     /**

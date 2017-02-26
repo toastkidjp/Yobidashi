@@ -28,7 +28,6 @@ import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -70,7 +69,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -111,7 +109,6 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
-import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
@@ -119,7 +116,8 @@ import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Cancellation;
+import jp.toastkid.yobidashi.popup.HamburgerPopup;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -325,15 +323,14 @@ public final class Controller implements Initializable {
     @FXML
     private SideMenuController sideMenuController;
 
-    /** Tools pane controller. */
-    @FXML
-    private ToolsController toolsController;
-
     /** Config. */
     private Config conf;
 
     /** ePub generator. */
     private EpubGenerator ePubGenerator;
+
+    /** Popup. */
+    private HamburgerPopup hPopup;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -441,7 +438,7 @@ public final class Controller implements Initializable {
                                     leftDrawer.close();
                                 }
                             });
-                            optionsBurger.setOnMouseClicked(e->switchRightDrawer());
+                            optionsBurger.setOnMouseClicked(e -> switchHamburgerPopup());
                             final String message = Thread.currentThread().getName()
                                     + " Ended initialize drawer. "
                                     + (System.currentTimeMillis() - start) + "ms";
@@ -557,22 +554,19 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Switch right drawer's state.
+     * Switch right HamburgerPopup's state.
      */
-    private void switchRightDrawer() {
-        if (isRightDrawerClosing()) {
-            rightDrawer.open();
-            return;
-        }
-        rightDrawer.close();
-    }
+    private void switchHamburgerPopup() {
 
-    /**
-     * Return drawer hiding.
-     * @return
-     */
-    private boolean isRightDrawerClosing() {
-        return rightDrawer.isHidden() || rightDrawer.isHidding();
+        if (hPopup == null) {
+            hPopup = new HamburgerPopup.Builder()
+                        .setContainer(header)
+                        .setSource(optionsBurger)
+                        .setConsumer(this::processMessage)
+                        .build();
+        }
+
+        hPopup.show();
     }
 
     /**
@@ -764,8 +758,8 @@ public final class Controller implements Initializable {
             controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
-            final Cancellation cancellation2 = controller.messenger().subscribe(this::processMessage);
-            Runtime.getRuntime().addShutdownHook(new Thread(cancellation2::dispose));
+            final Disposable disposable = controller.messenger().subscribe(this::processMessage);
+            Runtime.getRuntime().addShutdownHook(new Thread(disposable::dispose));
 
             final Pane sdRoot = controller.getRoot();
             sdRoot.setPrefWidth(width * 0.8);
@@ -963,11 +957,6 @@ public final class Controller implements Initializable {
                             cmc, "Go to bottom of this page", event -> moveToBottom()),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Search article", event -> showSearchDialog("", "")),
-                    makeContextMenuItemContainerWithAction(
-                            cmc,
-                            isRightDrawerClosing() ? "Open tools" : "Close tools",
-                            event -> switchRightDrawer()
-                            ),
                     makeContextMenuItemContainerWithAction(
                             cmc, "Save article", event -> saveCurrentTab()),
                     cmc.new MenuItemContainer(
@@ -1202,7 +1191,7 @@ public final class Controller implements Initializable {
             })
             .subscribe(
                 empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
-                    .collect(Articles::findByTitle)
+                    .collect(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
                     .each(bookmarks::add)
                     );
     }
@@ -1267,7 +1256,7 @@ public final class Controller implements Initializable {
         if (StringUtils.isEmpty(newFileName)){
             return;
         }
-        openArticleTab(Articles.findByTitle(newFileName));
+        openArticleTab(Articles.findByTitle(conf.get(Key.ARTICLE_DIR), newFileName));
     }
 
     /**
@@ -1636,32 +1625,15 @@ public final class Controller implements Initializable {
      */
     protected void setupSideMenu() {
         sideMenuController.setStage(this.stage);
-        final Cancellation cancellation
-            = sideMenuController.getMessenger().subscribe(this::processMessage);
-        Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
         sideMenuController.setConfig(conf);
-    }
 
-    /**
-     * Set up Tool Menu.
-     */
-    protected void setupToolMenu() {
-        toolsController.init(this.stage);
-        final Cancellation cancellation
-            = toolsController.getMessenger().subscribe(this::processMessage);
+        final Disposable cancellation
+            = sideMenuController.setSubscriber(this::processMessage);
         Runtime.getRuntime().addShutdownHook(new Thread(cancellation::dispose));
-        toolsController.setConfig(conf);
-        toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
-            tabPane.getSelectionModel().selectedItemProperty()
-                .addListener((a, prevTab, nextTab) -> {
-                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
-                        final WebView prev = (WebView) prevTab.getContent();
-                        prev.zoomProperty().unbind();
-                    }
-                    Optional.ofNullable(getCurrentTab())
-                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
-                })
-        ));
+
+        final Disposable tCancellation
+            = sideMenuController.setToolsSubscriber(this::processMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(tCancellation::dispose));
     }
 
     /**
@@ -1669,11 +1641,6 @@ public final class Controller implements Initializable {
      * @param message Processor's event
      */
     private void processMessage(final Message message) {
-
-        if (message instanceof ToolsDrawerMessage) {
-            Platform.runLater(this::switchRightDrawer);
-            return;
-        }
 
         if (message instanceof ArticleMessage) {
             processArticleMessage((ArticleMessage) message);
@@ -1778,6 +1745,9 @@ public final class Controller implements Initializable {
             case QUIT:
                 Platform.runLater(stage::close);
                 System.exit(0);
+                return;
+            case MINIMIZE:
+                Platform.runLater(() -> stage.setIconified(true));
                 return;
         }
     }

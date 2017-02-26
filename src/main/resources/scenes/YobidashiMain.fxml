@@ -74,43 +74,33 @@
             <String fx:value="body" />
           </styleClass>
           <content>
-            <JFXDrawer fx:id="rightDrawer" defaultDrawerSize="400" direction="RIGHT">
-              <styleClass>
-                <String fx:value="body" />
-              </styleClass>
-              <content>
-                <SplitPane fx:id="splitter" dividerPositions="0.10022271714922049" VBox.vgrow="ALWAYS">
-                  <items>
-                    <TabPane fx:id="leftTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
-                      <tabs>
-                        <Tab text="Articles">
-                          <tooltip><Tooltip text="All articles" /></tooltip>
-                          <content>
-                            <ListView fx:id="articleList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
-                          </content>
-                        </Tab>
-                        <Tab text="History">
-                          <tooltip><Tooltip text="Viewed articles" /></tooltip>
-                          <content>
-                            <ListView fx:id="historyList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
-                          </content>
-                        </Tab>
-                        <Tab text="Bookmark">
-                          <tooltip><Tooltip text="Bookmark articles" /></tooltip>
-                          <content>
-                            <ListView fx:id="bookmarkList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
-                          </content>
-                        </Tab>
-                      </tabs>
-                    </TabPane>
-                    <JFXTabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
-                  </items>
-                </SplitPane>
-              </content>
-              <sidePane>
-                <fx:include fx:id="tools" source="Tools.fxml"/>
-              </sidePane>
-            </JFXDrawer>
+            <SplitPane fx:id="splitter" dividerPositions="0.10022271714922049" VBox.vgrow="ALWAYS">
+              <items>
+                <TabPane fx:id="leftTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
+                   <tabs>
+                     <Tab text="Articles">
+                       <tooltip><Tooltip text="All articles" /></tooltip>
+                       <content>
+                         <ListView fx:id="articleList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+                       </content>
+                     </Tab>
+                     <Tab text="History">
+                       <tooltip><Tooltip text="Viewed articles" /></tooltip>
+                       <content>
+                         <ListView fx:id="historyList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+                       </content>
+                     </Tab>
+                     <Tab text="Bookmark">
+                       <tooltip><Tooltip text="Bookmark articles" /></tooltip>
+                       <content>
+                         <ListView fx:id="bookmarkList" layoutX="0.0" layoutY="0.0" prefHeight="-1.0" styleClass="left-tabs" VBox.vgrow="ALWAYS" />
+                       </content>
+                     </Tab>
+                   </tabs>
+                 </TabPane>
+                 <JFXTabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
+               </items>
+             </SplitPane>
           </content>
           <sidePane>
             <fx:include fx:id="sideMenu" source="SideMenu.fxml"/>

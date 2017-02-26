@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -36,10 +37,9 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.ShowSearchDialog;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
-import jp.toastkid.yobidashi.message.ToolsDrawerMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
-import reactor.core.publisher.TopicProcessor;
+import reactor.core.Disposable;
 
 /**
  * {@link SideMenuController}'s test case.
@@ -52,14 +52,14 @@ public class SideMenuControllerTest extends ApplicationTest {
     /** Test object. */
     private SideMenuController controller;
 
-    /** Messenger. */
-    private TopicProcessor<Message> messenger;
-
     /** Tab pane. */
     private JFXTabPane tabPane;
 
     /** Test stage. */
     private Stage stage;
+
+    /** Cancellation. */
+    private Disposable cancellation;
 
     /**
      * Test of {@link SideMenuController#quit}.
@@ -82,12 +82,26 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_fullScreen() {
         Platform.runLater(() -> {
-            selectTab(3);
+            selectTab(4);
             final String labelText = "Full screen	|	F11";
             fireLabel(labelText);
             assertTrue(stage.isFullScreen());
             fireLabel(labelText);
             assertFalse(stage.isFullScreen());
+        });
+    }
+
+    /**
+     * Test of {@link SideMenuController#minimizeWindow()}.
+     */
+    @Test
+    public void test_minimizeWindow() {
+        Platform.runLater(() -> {
+            selectTab(4);
+            subscribe(m ->
+                assertEquals(ApplicationMessage.Command.MINIMIZE, ((ApplicationMessage) m).getCommand())
+            );
+            fireLabel("Minimize window", "Ctrl+M");
         });
     }
 
@@ -101,7 +115,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final TabMessage tm = (TabMessage) m;
                 assertEquals(TabMessage.Command.RELOAD, tm.getCommand());
             });
-            selectTab(3);
+            selectTab(4);
             fireLabel("Reload", "F5");
         });
     }
@@ -112,7 +126,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void test_callApplicationState() {
         Platform.runLater(() -> {
-            selectTab(4);
+            selectTab(5);
             fireLabel("Application state");
             type(KeyCode.ESCAPE);
             System.out.println("typed");
@@ -191,7 +205,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 assertNotNull(wm.getContent());
                 assertEquals(ContentType.TEXT, wm.getContentType());
             });
-            selectTab(4);
+            selectTab(5);
             fireLabel("License");
         });
     }
@@ -202,12 +216,11 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void testCallConvertAobun() {
         Platform.runLater(() -> {
-            final Consumer<? super Message> consumer = m -> {
+            subscribe(m -> {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_AOBUN, am.getCommand());
-            };
-            subscribe(consumer);
-            selectTab(2);
+            });
+            selectTab(1);
             fireLabel("Convert current article to AozoraBunko Text");
         });
     }
@@ -218,12 +231,11 @@ public class SideMenuControllerTest extends ApplicationTest {
     @Test
     public void testCallConvertEpub() {
         Platform.runLater(() -> {
-            final Consumer<? super Message> consumer = m -> {
+            subscribe(m -> {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.CONVERT_EPUB, am.getCommand());
-            };
-            subscribe(consumer);
-            selectTab(2);
+            });
+            selectTab(1);
             fireLabel("Convert current article to ePub");
         });
     }
@@ -238,7 +250,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final ArticleMessage am = (ArticleMessage) m;
                 assertEquals(ArticleMessage.Command.WORD_CLOUD, am.getCommand());
             });
-            selectTab(2);
+            selectTab(3);
             fireLabel("Word cloud", "Shift+W");
         });
     }
@@ -334,21 +346,6 @@ public class SideMenuControllerTest extends ApplicationTest {
     }
 
     /**
-     * Test of {@link SideMenuController#saveArticle}.
-     */
-    @Test
-    public void test_openTools() {
-        Platform.runLater(() -> {
-            subscribe(m -> {
-                final ToolsDrawerMessage tm = (ToolsDrawerMessage) m;
-                assertNotNull(tm);
-            });
-            selectTab(2);
-            fireLabel("Open tools");
-        });
-    }
-
-    /**
      * Test of {@link SideMenuController#slideShow}.
      */
     @Test
@@ -388,7 +385,7 @@ public class SideMenuControllerTest extends ApplicationTest {
                 final SnackbarMessage am = (SnackbarMessage) m;
                 assertEquals("Called garbage collection.", am.getText());
             });
-            selectTab(2);
+            selectTab(3);
             fireLabel("Launch Garbage Collection");
         });
     }
@@ -429,21 +426,25 @@ public class SideMenuControllerTest extends ApplicationTest {
      */
     private void selectTab(final int index) {
         tabPane.getSelectionModel().select(index);
-
-//        @SuppressWarnings("unchecked")
-//        final ListView<MenuLabel> content
-//            = (ListView<MenuLabel>) tabPane.getSelectionModel().getSelectedItem().getContent();
-//        for (final Object item : content.getItems()) {
-//            System.out.println(item.getClass() + " " + item);
-//        }
     }
 
     /**
      * Subscribe passed consumer.
      * @param consumer
      */
-    private void subscribe(final Consumer<? super Message> consumer) {
-        messenger.subscribe(consumer, e -> fail(e.getMessage()));
+    private void subscribe(final Consumer<Message> consumer) {
+        cancellation = controller.setSubscriber(consumer);
+    }
+
+    /**
+     * Cancellation dispose each test.
+     */
+    @After
+    public void tearDown() {
+        if (cancellation == null) {
+            return;
+        }
+        cancellation.dispose();
     }
 
     @Override
@@ -458,13 +459,10 @@ public class SideMenuControllerTest extends ApplicationTest {
             controller.setStage(stage);
             controller.setConfig(makeConfig());
             controller.initialize(null, null);
-            assertNotNull(controller.getMessenger());
         } catch (final IOException e) {
             e.printStackTrace();
             Platform.exit();
         }
-        messenger = controller.getMessenger();
-        assertNotNull(controller.getMessenger());
         stage.show();
 
         tabPane = (JFXTabPane) lookup("#menuTabs").query();

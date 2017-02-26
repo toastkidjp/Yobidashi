@@ -175,7 +175,7 @@ public final class AlertDialog extends Application {
             LOGGER.error("Error", e);;
         }
         controller = loader.getController();
-        stage = new Stage(StageStyle.TRANSPARENT);
+        stage = new Stage(StageStyle.UTILITY);
         stage.setScene(scene);
         if (window != null) {
             stage.initOwner(window);

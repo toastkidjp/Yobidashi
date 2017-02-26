@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.application.Platform;
@@ -15,6 +14,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import jp.toastkid.article.control.BaseWebTab;
+import jp.toastkid.libs.utils.Whitebox;
 
 /**
  * {@link Editor}'s test cases.
