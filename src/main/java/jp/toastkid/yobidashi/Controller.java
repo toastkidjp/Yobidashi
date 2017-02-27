@@ -363,12 +363,10 @@ public final class Controller implements Initializable {
                 }
 
                 private void setProgress(final String message) {
-                    Platform.runLater(() -> {
-                        final int i = done.incrementAndGet();
-                        updateProgress(i, tasks);
-                        updateMessage(message);
-                        LOGGER.info("Progress {}, {}/{}, {}", getProgress(), i, tasks, message);
-                    });
+                    final int i = done.incrementAndGet();
+                    updateProgress(i, tasks);
+                    updateMessage(message);
+                    //LOGGER.info("Progress {}, {}/{}, {}", getProgress(), i, tasks, message);
                 }
 
             })

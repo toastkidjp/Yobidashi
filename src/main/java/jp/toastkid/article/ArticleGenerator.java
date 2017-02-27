@@ -17,8 +17,6 @@ import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Article generator.
@@ -42,6 +40,7 @@ public final class ArticleGenerator {
     /** Image file chooser. */
     private final ImageChooser chooser;
 
+    /** Configuration object. */
     private final Config config;
 
     /**
@@ -50,11 +49,7 @@ public final class ArticleGenerator {
      */
     public ArticleGenerator(final Config config) {
         this.config = config;
-        this.converter = Mono.<MarkdownConverter>create(
-                emitter -> emitter.success(new MarkdownConverter(config))
-            )
-            .subscribeOn(Schedulers.elastic())
-            .block();
+        this.converter = new MarkdownConverter(config);
         this.converter.openLinkBrank = true;
         chooser = new ImageChooser(USER_BACKGROUND);
     }
