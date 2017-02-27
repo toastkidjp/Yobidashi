@@ -120,6 +120,7 @@ import jp.toastkid.yobidashi.popup.HamburgerPopup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
 
 /**
@@ -332,140 +333,32 @@ public final class Controller implements Initializable {
     /** Popup. */
     private HamburgerPopup hPopup;
 
+    /** Progress message and value sender. */
+    private TopicProcessor<String> progressSender;
+
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
-        // initialize parallel task.
-        final int availableProcessors = Runtime.getRuntime().availableProcessors();
-        final ExecutorService es = Executors.newFixedThreadPool(
-                availableProcessors + availableProcessors + availableProcessors);
-
         snackbar.registerSnackbarContainer(root);
-
-        initDragAndDrop();
-
         conf = new Config(Defines.CONFIG);
-
-        Mono.create(emitter -> emitter.success(
-                String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
-                )
-            )
-            .delaySubscriptionMillis(5000L)
-            .repeat()
-            .map(Object::toString)
-            .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
-            .subscribe(message -> setStatus(message, false));
+        progressSender = TopicProcessor.create(true);
 
         final ProgressDialog pd = new ProgressDialog.Builder()
             .setCommand(new Task<Integer>() {
-                final int tasks = 9;
+                final int tasks = 11;
                 final AtomicInteger done = new AtomicInteger(0);
 
                 @Override
                 public Integer call() {
                     // 長い時間のかかるタスク
                     try {
-                        setTitleOnToolbar("");
-                        setProgress("availableProcessors = " + availableProcessors);
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            articleGenerator = new ArticleGenerator(conf);
-                            Platform.runLater(Controller.this::callHome);
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize Articles. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            prepareArticleList();
-                            prepareBookmarks();
-                            leftTabs.getSelectionModel().select(2);
-
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended read article names. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            Platform.runLater( () -> {
-                                readStyleSheets();
-                                setStylesheet();
-                                splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
-                            });
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize stylesheets. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        // insert WebView to tabPane.
-                        es.execute(Controller.this::initTabPane);
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
-                            getCurrentTab().highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize tools. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        es.execute(() -> {
-                            final long start = System.currentTimeMillis();
-                            // init the title hamburger icon
-                            leftDrawer.setOnDrawerOpening(e -> {
-                                titleBurger.getAnimation().setRate(1);
-                                titleBurger.getAnimation().play();
-                            });
-                            leftDrawer.setOnDrawerClosing(e -> {
-                                titleBurger.getAnimation().setRate(-1);
-                                titleBurger.getAnimation().play();
-                            });
-                            titleBurgerContainer.setOnMouseClicked(e->{
-                                if (leftDrawer.isHidden() || leftDrawer.isHidding()) {
-                                    leftDrawer.open();
-                                } else {
-                                    leftDrawer.close();
-                                }
-                            });
-                            optionsBurger.setOnMouseClicked(e -> switchHamburgerPopup());
-                            final String message = Thread.currentThread().getName()
-                                    + " Ended initialize drawer. "
-                                    + (System.currentTimeMillis() - start) + "ms";
-                            setProgress(message);
-                            LOGGER.info(message);
-                        });
-
-                        es.execute(() -> {
-                            footer.setOnMousePressed(event -> moveToBottom());
-                            setProgress("Ended set footer action.");
-                        });
-
-                        es.execute(() -> {
-                            BACKUP.submit(FILE_WATCHER);
-                            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                                if (BACKUP != null) {
-                                    BACKUP.shutdownNow();
-                                }
-                            }));
-                            setProgress("Ended launching backup job.");
-                        });
-                        es.shutdown();
-                    } catch (final Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        updateProgress(100, 100);
+                        progressSender.subscribe(this::setProgress);
+                        initComponents();
+                    } catch (final Exception e) {
+                        e.printStackTrace();
+                        failed();
                     }
+                    succeeded();
                     return 0;
                 }
 
@@ -484,9 +377,103 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Initialize components.
+     */
+    private void initComponents() {
+        final int availableProcessors = Runtime.getRuntime().availableProcessors();
+        final ExecutorService es = Executors.newFixedThreadPool(
+                availableProcessors + availableProcessors + availableProcessors);
+
+        setTitleOnToolbar("");
+
+        progressSender.onNext("availableProcessors = " + availableProcessors);
+
+        es.execute(Controller.this::launchMemoryJob);
+        es.execute(Controller.this::launchBackupJob);
+        es.execute(Controller.this::initDragAndDrop);
+        es.execute(Controller.this::initArticleGenerator);
+        es.execute(Controller.this::prepareLeftTabs);
+        es.execute(Controller.this::initStyleSheets);
+        es.execute(Controller.this::initTabPane);
+        es.execute(Controller.this::initSearchInPage);
+        es.execute(Controller.this::initLeftDrawer);
+        es.execute(Controller.this::initFooterAction);
+
+        es.shutdown();
+    }
+
+    /**
+     * Launching memory job.
+     */
+    private void launchMemoryJob() {
+        final long start = System.currentTimeMillis();
+        Mono.create(emitter -> emitter.success(
+                String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
+                )
+            )
+            .delaySubscriptionMillis(5000L)
+            .repeat()
+            .map(Object::toString)
+            .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
+            .subscribe(message -> setStatus(message, false));
+
+        progressSender.onNext(
+                Thread.currentThread().getName()
+                    + " Ended launching memory job. "
+                    + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize ArticleGenerator.
+     */
+    private void initArticleGenerator() {
+        final long start = System.currentTimeMillis();
+        articleGenerator = new ArticleGenerator(conf);
+        Platform.runLater(Controller.this::callHome);
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + " Ended initialize Articles. "
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize left tabs.
+     */
+    private void prepareLeftTabs() {
+        final long start = System.currentTimeMillis();
+        prepareArticleList();
+        prepareBookmarks();
+        leftTabs.getSelectionModel().select(2);
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + " Ended read article names. "
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize style sheets.
+     */
+    private void initStyleSheets() {
+        final long start = System.currentTimeMillis();
+        Platform.runLater( () -> {
+            readStyleSheets();
+            setStylesheet();
+            splitter.setDividerPosition(0, DEFAULT_DIVIDER_POSITION);
+        });
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + " Ended initialize stylesheets. "
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
      * Initialize Drag and Drop Events.
      */
     private void initDragAndDrop() {
+        final long start = System.currentTimeMillis();
         root.setOnDragOver(event -> {
             final Dragboard board = event.getDragboard();
             if (!board.hasFiles()) {
@@ -513,10 +500,15 @@ public final class Controller implements Initializable {
             });
             event.setDropCompleted(true);
         });
+        progressSender.onNext(
+                Thread.currentThread().getName()
+                    + " Ended initialize drag and drop. "
+                    + (System.currentTimeMillis() - start) + "ms");
     }
 
     /**
      * Initialize tab pane.
+     * insert WebView to tabPane.
      */
     private void initTabPane() {
         final long start = System.currentTimeMillis();
@@ -546,11 +538,83 @@ public final class Controller implements Initializable {
                     bookmarkList.getSelectionModel().clearSelection();
                 }
             );
-        final String message = Thread.currentThread().getName()
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
                 + " Ended initialize right tabs. "
-                + (System.currentTimeMillis() - start) + "ms";
-        //TODO modify with rx : setProgress(message);
-        LOGGER.info(message);
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize search in page.
+     */
+    private void initSearchInPage() {
+        final long start = System.currentTimeMillis();
+        searcherInput.textProperty().addListener((observable, oldValue, newValue) ->
+        getCurrentTab().highlight(Optional.ofNullable(newValue), WINDOW_FIND_DOWN));
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + " Ended initialize tools. "
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize left drawer.
+     */
+    private void initLeftDrawer() {
+        final long start = System.currentTimeMillis();
+        // init the title hamburger icon
+        leftDrawer.setOnDrawerOpening(e -> {
+            titleBurger.getAnimation().setRate(1);
+            titleBurger.getAnimation().play();
+        });
+        leftDrawer.setOnDrawerClosing(e -> {
+            titleBurger.getAnimation().setRate(-1);
+            titleBurger.getAnimation().play();
+        });
+        titleBurgerContainer.setOnMouseClicked(e->{
+            if (leftDrawer.isHidden() || leftDrawer.isHidding()) {
+                leftDrawer.open();
+            } else {
+                leftDrawer.close();
+            }
+        });
+        optionsBurger.setOnMouseClicked(e -> switchHamburgerPopup());
+
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + " Ended initialize drawer. "
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Initialize footer action.
+     */
+    private void initFooterAction() {
+        final long start = System.currentTimeMillis();
+        footer.setOnMousePressed(event -> moveToBottom());
+        progressSender.onNext(
+            Thread.currentThread().getName()
+                + "Ended set footer action."
+                + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Launch backup job.
+     */
+    private void launchBackupJob() {
+        final long start = System.currentTimeMillis();
+        BACKUP.submit(FILE_WATCHER);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (BACKUP != null) {
+                BACKUP.shutdownNow();
+            }
+        }));
+        progressSender.onNext(
+                Thread.currentThread().getName()
+                    + "Ended launching backup job."
+                    + (System.currentTimeMillis() - start) + "ms");
     }
 
     /**
@@ -794,7 +858,6 @@ public final class Controller implements Initializable {
 
     /**
      * Open new tab having WebView with title.
-     * TODO
      * @param article tab's article
      */
     private void openArticleTab(final Article article) {
@@ -802,7 +865,6 @@ public final class Controller implements Initializable {
             .and(Mono.<Font>create(emitter -> emitter.success(readFont())))
             .publishOn(Schedulers.elastic())
             .subscribe(pair -> {
-                System.out.println(Thread.currentThread().getName() + " open tab.");
                 final ArticleTab tab = pair.getT1();
                 final Font font = pair.getT2();
                 pair.getT1().setFont(font);

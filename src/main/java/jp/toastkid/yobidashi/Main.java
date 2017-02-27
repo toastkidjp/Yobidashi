@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -62,7 +61,7 @@ public final class Main extends Application {
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
             emitter.success();
-            LOGGER.info("Ended set app icon.");
+            LOGGER.info("{} Ended set app icon.", Thread.currentThread().getName());
         })
         .subscribeOn(Schedulers.elastic()).subscribe();
 
@@ -71,17 +70,9 @@ public final class Main extends Application {
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             stage.initStyle(StageStyle.TRANSPARENT);
-            final Screen screen = Screen.getScreens().get(0);
-            final Rectangle2D bounds = screen.getVisualBounds();
-            final BoundingBox maximizedBox = new BoundingBox(
-                    bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-            // maximized the stage
-            stage.setX(maximizedBox.getMinX());
-            stage.setY(maximizedBox.getMinY());
-            stage.setWidth(maximizedBox.getWidth());
-            stage.setHeight(maximizedBox.getHeight());
+            stage.setMaximized(true);
             stage.show();
-            controller.setStatus("Complete - " + (System.currentTimeMillis() - start) + "[ms]");
+            LOGGER.info("{} Ended set stage size.", Thread.currentThread().getName());
         });
 
         Mono.create(emitter -> {
@@ -92,8 +83,8 @@ public final class Main extends Application {
             // setup searcher.
             controller.setupExpandables();
             controller.setupSideMenu();
+            controller.setStatus(" Complete - " + (System.currentTimeMillis() - start) + "[ms]");
             emitter.success();
-            LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
     }
 
@@ -113,7 +104,9 @@ public final class Main extends Application {
             LOGGER.error("Caught error.", e);
             Platform.exit();
         }
-        LOGGER.info("Ended loading scene graph. {}[ms]", System.currentTimeMillis() - start);
+        LOGGER.info("{} Ended loading scene graph. {}[ms]",
+                Thread.currentThread().getName(),
+                System.currentTimeMillis() - start);
         return Mono.just(new Scene(controller.root));
     }
 
