@@ -327,19 +327,12 @@ public class Editor {
      * @param font
      */
     void setFont(final Font font) {
-        area.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
-                font.getFamily(), font.getSize()));
-        setFontStatus();
-    }
-
-    /**
-     * Set font size and font family.
-     */
-    private void setFontStatus() {
-        conf.reload();
-        final int    index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
+        final String family = font.getFamily();
+        final double size   = font.getSize();
+        area.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;", family, size));
+        final int index = this.fontFamily.getItems().indexOf(family);
         this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
-        this.fontSize.setText(conf.get(Key.FONT_SIZE));
+        this.fontSize.setText(Integer.toString((int) size));
     }
 
     /**

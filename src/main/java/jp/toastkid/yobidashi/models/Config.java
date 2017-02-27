@@ -1,7 +1,7 @@
 package jp.toastkid.yobidashi.models;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -130,9 +130,8 @@ public final class Config {
         }
 
         config.clear();
-        //LOGGER.info(Thread.currentThread().getName() + " reload");
         final Properties p = new Properties();
-        try (final Reader reader = Files.newBufferedReader(path)) {
+        try (final InputStream reader = Files.newInputStream(path)) {
             p.load(reader);
         } catch (final IOException e) {
             LOGGER.error("Occurred error!", e);

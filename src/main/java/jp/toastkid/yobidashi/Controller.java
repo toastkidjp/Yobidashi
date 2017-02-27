@@ -794,12 +794,20 @@ public final class Controller implements Initializable {
 
     /**
      * Open new tab having WebView with title.
+     * TODO
      * @param article tab's article
      */
     private void openArticleTab(final Article article) {
-        final ArticleTab articleTab = makeArticleTab(article);
-        articleTab.setFont(readFont());
-        openTab(articleTab);
+        Mono.<ArticleTab>create(emitter -> emitter.success(makeArticleTab(article)))
+            .and(Mono.<Font>create(emitter -> emitter.success(readFont())))
+            .publishOn(Schedulers.elastic())
+            .subscribe(pair -> {
+                System.out.println(Thread.currentThread().getName() + " open tab.");
+                final ArticleTab tab = pair.getT1();
+                final Font font = pair.getT2();
+                pair.getT1().setFont(font);
+                Platform.runLater(() -> openTab(tab));
+        });
     }
 
     /**
