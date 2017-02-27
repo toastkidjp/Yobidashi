@@ -372,8 +372,9 @@ public class Editor {
     void show() {
         editorBox.setVisible(true);
         editorBox.setManaged(true);
-        area.requestFocus();
         area.moveTo(0, 0);
+        area.requestFocus();
+        area.setEstimatedScrollY(0.0d);
     }
 
     /**
