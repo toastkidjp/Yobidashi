@@ -57,8 +57,12 @@ public final class Main extends Application {
         } catch (final Throwable e) {
             LOGGER.error("Caught error.", e);
         } finally {
-            stageDisposable.dispose();
-            controllerDisposable.dispose();
+            if (stageDisposable != null) {
+                stageDisposable.dispose();
+            }
+            if (controllerDisposable != null) {
+                controllerDisposable.dispose();
+            }
         }
     }
 

@@ -37,7 +37,6 @@ public class MainTest extends ApplicationTest {
     @Override
     public void start(final Stage stage) throws Exception {
         main = new Main();
-        main.init();
         main.start(stage);
     }
 
