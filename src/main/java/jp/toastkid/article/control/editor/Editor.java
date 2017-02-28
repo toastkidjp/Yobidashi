@@ -57,8 +57,14 @@ public class Editor {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
+    /** Editor header's class. */
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_HEADER        = "editor-header";
+
     /** Editor label's class. */
-    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL = "editor-label";
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL         = "editor-label";
+
+    /** Editor button's class. */
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_APPLY_BUTTON  = "editor-button";
 
     /** Default scale factor. */
     private static final double DEFAULT_SCALE_FACTOR = 2.2d;
@@ -166,9 +172,11 @@ public class Editor {
 
         final Button button = new JFXButton("Apply");
         button.setOnAction(event -> applyFontSettings());
+        button.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_APPLY_BUTTON);
 
         final HBox header = new HBox(label, fontFamily, fontSize, button);
         header.setAlignment(Pos.CENTER);
+        header.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_HEADER);
         return header;
     }
 

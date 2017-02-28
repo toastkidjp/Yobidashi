@@ -217,6 +217,14 @@
   -fx-stroke:  #ffd600;
 }
 
+.editor-button {
+  -fx-base: rgba(100, 100, 150, 0.5);
+}
+
+.editor-header {
+  -fx-background-color: rgba(100, 100, 150, 0.5);
+}
+
 #status {
   -fx-text-fill: white;
 }
