@@ -98,6 +98,7 @@ import jp.toastkid.libs.utils.AobunUtils;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
+import jp.toastkid.slideshow.Slideshow;
 import jp.toastkid.wordcloud.FxWordCloud;
 import jp.toastkid.wordcloud.MasonryPane;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
@@ -1183,7 +1184,12 @@ public final class Controller implements Initializable {
             setStatus("This tab can't use slide show.");
             return;
         }
-        new jp.toastkid.slideshow.Main().show(this.stage, articleOr.get().path.toAbsolutePath().toString());
+        new Slideshow.Builder()
+            .setStage(stage)
+            .setSource(articleOr.get().path)
+            .setIsFullScreen(true)
+            .build()
+            .launch();
     }
 
     /**
