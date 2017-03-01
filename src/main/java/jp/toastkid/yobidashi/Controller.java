@@ -1185,7 +1185,7 @@ public final class Controller implements Initializable {
             return;
         }
         new Slideshow.Builder()
-            .setStage(stage)
+            .setOwner(stage)
             .setSource(articleOr.get().path)
             .setIsFullScreen(true)
             .build()
