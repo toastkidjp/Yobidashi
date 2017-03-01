@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -80,7 +81,7 @@ public final class Main extends Application {
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             stage.initStyle(StageStyle.TRANSPARENT);
-            stage.setMaximized(true);
+            //stage.setMaximized(true);
             stage.show();
             LOGGER.info("{} Ended set stage size. {}[ms]",
                     Thread.currentThread().getName(),
@@ -90,9 +91,8 @@ public final class Main extends Application {
 
         controllerDisposable = Mono.create(emitter -> {
             final Rectangle2D d = Screen.getPrimary().getVisualBounds();
-            stage.setWidth(d.getWidth());
-            stage.setHeight(d.getHeight());
             controller.setSize(d.getWidth(), d.getHeight());
+            maximizeStage(stage);
             // setup searcher.
             controller.setupExpandables();
             controller.setupSideMenu();
@@ -119,6 +119,20 @@ public final class Main extends Application {
                 Thread.currentThread().getName(),
                 System.currentTimeMillis() - start);
         return Mono.just(new Scene(controller.root));
+    }
+
+    /**
+     * Maximized the stage.
+     */
+    private void maximizeStage(final Stage stage) {
+        final Screen screen = Screen.getScreens().get(0);
+        final Rectangle2D bounds = screen.getVisualBounds();
+        final BoundingBox maximizedBox = new BoundingBox(
+                bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+        stage.setX(maximizedBox.getMinX());
+        stage.setY(maximizedBox.getMinY());
+        stage.setWidth(maximizedBox.getWidth());
+        stage.setHeight(maximizedBox.getHeight());
     }
 
     @Override
