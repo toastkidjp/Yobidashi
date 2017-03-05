@@ -13,13 +13,14 @@
 <?import com.jfoenix.controls.JFXPopup?>
 
 <?import jp.toastkid.jfx.common.control.MenuLabel?>
+<?import jp.toastkid.article.control.RippleTabPane?>
 
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
   fx:controller="jp.toastkid.yobidashi.SideMenuController">
     <styleClass>
         <String fx:value="side-menu" />
     </styleClass>
-    <JFXTabPane fx:id="menuTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
+    <RippleTabPane fx:id="menuTabs" layoutX="0.0" prefHeight="-1.0" tabClosingPolicy="UNAVAILABLE">
       <tabs>
         <Tab text="File">
           <content>
@@ -111,5 +112,5 @@
         </Tab>
 
       </tabs>
-    </JFXTabPane>
+    </RippleTabPane>
 </StackPane>

@@ -2,6 +2,10 @@
     -fx-background-color: rgba(0, 0, 100, 0.5);
 }
 
+.button {
+    -fx-text-fill: #FFFFFF;
+}
+
 .split-pane {
   -fx-base: #DDDDDE;
 }
@@ -173,10 +177,6 @@
     -fx-background-color: black, black;
 }
 
-.button {
-    -fx-text-fill: #FFFFFF;
-}
-
 .combo-box .list-cell {
     -fx-text-fill: #FFFFFF;
 }
@@ -223,6 +223,11 @@
 
 .editor-header {
   -fx-background-color: rgba(100, 100, 150, 0.5);
+}
+
+.tab-close-button {
+  -fx-background-color: rgba(255, 255, 255, 0.9);
+  -fx-text-fill: black;
 }
 
 #status {
