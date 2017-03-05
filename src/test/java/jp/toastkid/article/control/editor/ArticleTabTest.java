@@ -18,7 +18,11 @@ import javafx.application.Platform;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import jp.toastkid.article.ArticleGenerator;
+import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
+import jp.toastkid.yobidashi.models.Config;
+import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.ConfigTest;
 
 /**
@@ -136,9 +140,11 @@ public class ArticleTabTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) throws Exception {
+        final Config config = ConfigTest.makeConfig();
         tab = new ArticleTab.Builder()
                 .setArticle(TEST_ARTICLE)
-                .setConfig(ConfigTest.makeConfig())
+                .setArticleGenerator(new ArticleGenerator(config))
+                .serPostProcessor(new PostProcessor(config.get(Key.ARTICLE_DIR)))
                 .setOnClose(t -> assertTrue(true))
                 .setOnLoad(() -> assertTrue(true))
                 .setOnContextMenuRequested(e -> assertTrue(true))

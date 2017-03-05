@@ -82,6 +82,7 @@ import jp.toastkid.article.control.WebTab;
 import jp.toastkid.article.control.editor.ArticleTab;
 import jp.toastkid.article.control.editor.Editable;
 import jp.toastkid.article.control.editor.EditorTab;
+import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.article.models.ContentType;
@@ -264,8 +265,11 @@ public final class Controller implements Initializable {
     @FXML
     private DatePicker calendar;
 
-    /** functions class. */
+    /** Article generator. */
     private ArticleGenerator articleGenerator;
+
+    /** Article post processor. */
+    private PostProcessor postProcessor;
 
     /** Stage. */
     private Stage stage;
@@ -428,6 +432,7 @@ public final class Controller implements Initializable {
     private void initArticleGenerator() {
         final long start = System.currentTimeMillis();
         articleGenerator = new ArticleGenerator(conf);
+        postProcessor    = new PostProcessor(conf.get(Key.ARTICLE_DIR));
         Platform.runLater(Controller.this::callHome);
 
         progressSender.onNext(
@@ -528,6 +533,7 @@ public final class Controller implements Initializable {
                     final String tabUrl = tab.getUrl();
                     if (StringUtils.isNotEmpty(tabUrl)){
                         urlText.setText(tabUrl);
+                        // TODO
                         focusOn();
                         return;
                     }
@@ -544,6 +550,18 @@ public final class Controller implements Initializable {
                 + (System.currentTimeMillis() - start) + "ms");
     }
 
+    /**
+     * 現在選択中のファイルに ListView をフォーカスする.
+     */
+    private void focusOn() {
+        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
+        if (!articleOr.isPresent()) {
+            return;
+        }
+
+        articleOr.ifPresent(article -> Platform.runLater(() -> article.focus(articleList)));
+
+}
     /**
      * Initialize search in page.
      */
@@ -879,17 +897,28 @@ public final class Controller implements Initializable {
     private ArticleTab makeArticleTab(final Article article) {
         return new ArticleTab.Builder()
                 .setArticle(article)
-                .setConfig(conf)
+                .setArticleGenerator(articleGenerator)
+                .serPostProcessor(postProcessor)
                 .setOnClose(this::closeTab)
                 .setOnContextMenuRequested(event -> showContextMenu())
-                .setOnOpenNewArticle(this::openArticleTab)
+                .setOnOpenNewArticle(url -> Platform.runLater(
+                        () -> {
+                            final Article newArticle = Articles.findByUrl(conf.get(Key.ARTICLE_DIR), url);
+                            if (!Files.exists(newArticle.path)) {
+                                Articles.generateNewArticle(newArticle);
+                                final ObservableList<Article> items = articleList.getItems();
+                                if (!items.contains(article)) {
+                                    items.add(article);
+                                }
+                            }
+                            newArticle.focus(articleList);
+                        })
+                )
                 .setPopupHandler(param -> openWebTab("", "").getWebView().getEngine())
                 .setOnLoad(() -> {
+                    addHistory(article.clone());
                     urlText.setText(article.toInternalUrl());
                     Platform.runLater(() -> setTitleOnToolbar(article.title));
-                    // deep copy を渡す.
-                    addHistory(article.clone());
-                    focusOn();
                 })
                 .build();
     }
@@ -1106,6 +1135,9 @@ public final class Controller implements Initializable {
     private final void closeTab(final Tab tab) {
         final ObservableList<Tab> tabs = tabPane.getTabs();
         tabs.remove(tab);
+        if (tab instanceof ArticleTab) {
+            ((ArticleTab) tab).close();
+        }
     }
 
     /**
@@ -1224,20 +1256,21 @@ public final class Controller implements Initializable {
         listView.setCellFactory((lv) -> new ArticleListCell());
         final MultipleSelectionModel<Article> selectionModel = listView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
-        selectionModel.selectedItemProperty().addListener((property, oldVal, newVal) -> {
-            if (property.getValue() == null) {
+        selectionModel.selectedItemProperty().addListener((property, prev, next) -> {
+            final Article article = property.getValue();
+            if (article == null) {
                 return;
             }
-
-            final Optional<Tab> first = tabPane.getTabs().stream()
-                    .filter(tab -> (tab instanceof ArticleTab)
-                            && ((ArticleTab) tab).getArticle().equals(property.getValue()))
+            final Optional<ArticleTab> first = tabPane.getTabs().stream()
+                    .filter(ArticleTab.class::isInstance)
+                    .map(ArticleTab.class::cast)
+                    .filter(tab -> tab.getArticle().equals(article))
                     .findFirst();
             if (first.isPresent()) {
                 tabPane.getSelectionModel().select(first.get());
                 return;
             }
-            openArticleTab(property.getValue());
+            openArticleTab(article);
         });
     }
 
@@ -1250,7 +1283,6 @@ public final class Controller implements Initializable {
         items.removeAll();
         Flux.fromIterable(Articles.readAllArticleNames(conf.get(Key.ARTICLE_DIR)))
             .subscribeOn(Schedulers.newSingle("I/O"))
-            .doOnTerminate(this::focusOn)
             .subscribe(items::add);
     }
 
@@ -1268,23 +1300,6 @@ public final class Controller implements Initializable {
                     .collect(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
                     .each(bookmarks::add)
                     );
-    }
-
-    /**
-     * 現在選択中のファイルに ListView をフォーカスする.
-     */
-    private void focusOn() {
-        final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
-        if (!articleOr.isPresent()) {
-            return;
-        }
-
-        articleOr.ifPresent(article -> Platform.runLater(() -> {
-            article.focus(articleList);
-            article.focus(historyList);
-            article.focus(bookmarkList);
-        }));
-
     }
 
     /**

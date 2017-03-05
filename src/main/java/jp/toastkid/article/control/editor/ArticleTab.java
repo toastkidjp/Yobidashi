@@ -28,8 +28,8 @@ import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.Strings;
-import jp.toastkid.yobidashi.models.Config;
-import jp.toastkid.yobidashi.models.Config.Key;
+import reactor.core.Disposable;
+import reactor.core.publisher.TopicProcessor;
 
 /**
  * Article tab.
@@ -59,8 +59,14 @@ public class ArticleTab extends BaseWebTab implements Editable {
     /** WebView's y position. */
     private int yOffset;
 
-    /** Dir of article. */
-    private final String articleDir;
+    /** Messenger, */
+    private TopicProcessor<String> messenger;
+
+    /** Disposable of subscription. */
+    private Disposable disposable;
+
+    /** Article post processor. */
+    private PostProcessor post;
 
     /**
      * {@link ArticleTab}'s builder.
@@ -77,18 +83,20 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         private Runnable onLoad;
 
-        private Consumer<Article> onOpenNewArticle;
+        private Consumer<String> onOpenNewArticle;
 
-        private Config conf;
+        private ArticleGenerator generator;
 
         private Callback<PopupFeatures, WebEngine> popupHandler;
+
+        private PostProcessor postProcessor;
 
         public Node makeContent() {
             return null;
         }
 
-        public Builder setConfig(final Config conf) {
-            this.conf = conf;
+        public Builder setArticleGenerator(final ArticleGenerator generator) {
+            this.generator = generator;
             return this;
         }
 
@@ -112,8 +120,13 @@ public class ArticleTab extends BaseWebTab implements Editable {
             return this;
         }
 
-        public Builder setOnOpenNewArticle(final Consumer<Article> onOpenNewArticle) {
+        public Builder setOnOpenNewArticle(final Consumer<String> onOpenNewArticle) {
             this.onOpenNewArticle = onOpenNewArticle;
+            return this;
+        }
+
+        public Builder serPostProcessor(final PostProcessor postProcessor) {
+            this.postProcessor = postProcessor;
             return this;
         }
 
@@ -136,11 +149,12 @@ public class ArticleTab extends BaseWebTab implements Editable {
         super(b.article.title, b.makeContent(), b.closeAction);
         this.article    = b.article;
         this.onLoad     = b.onLoad;
-        this.articleDir = b.conf.get(Key.ARTICLE_DIR);
-        this.generator  = new ArticleGenerator(b.conf);
+        this.generator  = b.generator;
+        this.post       = b.postProcessor;
+        this.messenger  = TopicProcessor.create();
 
         final WebView webView = getWebView();
-        initWebView(webView,b.onOpenNewArticle, b.popupHandler);
+        initWebView(webView, b.popupHandler);
 
         this.editor = new Editor(this.article.path, webView);
         editor.setModifiedListener((v, prev, next) -> {
@@ -158,6 +172,11 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         // 新規タブで開く場合
         this.loadUrl(article.toInternalUrl());
+
+        disposable = messenger
+            .filter(StringUtils::isNotBlank)
+            .filter(Articles::isInternalLink)
+            .subscribe(b.onOpenNewArticle);
     }
 
     /**
@@ -168,7 +187,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private void initWebView(
             final WebView webView,
-            final Consumer<Article> onOpenNewArticle,
             final Callback<PopupFeatures, WebEngine> popupHandler
             ) {
         final WebEngine engine = webView.getEngine();
@@ -185,7 +203,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
                 });
         engine.locationProperty().addListener((value, prev, next) -> {
             final String url = value.getValue();
-            openNewTab(url, onOpenNewArticle);
+            messenger.onNext(url);
             setText(article.title);
         });
         engine.setOnAlert(e -> LOGGER.info(e.getData()));
@@ -197,26 +215,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
      */
     private boolean isEditorVisible() {
         return !editor.isNotEditorVisible();
-    }
-
-    /**
-     *
-     * @param url
-     * @param onOpenNewArticle
-     * @param onOpenUrl
-     */
-    private void openNewTab(
-            final String url,
-            final Consumer<Article> onOpenNewArticle
-            ) {
-
-        if (StringUtils.isBlank(url)) {
-            return;
-        }
-
-        if (Articles.isInternalLink(url)) {
-            onOpenNewArticle.accept(Articles.findByUrl(articleDir, url));
-        }
     }
 
     @Override
@@ -238,13 +236,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
      * Load specified article with options.
      */
     private void loadArticle() {
-        final PostProcessor post = new PostProcessor(articleDir);
-
-        final Path openTarget = this.article.path;
-        if (!Files.exists(openTarget)) {
-            Articles.generateNewArticle(article);
-        }
-
         final String processed  = post.process(generator.convertToHtml(this.article));
         final String subheading = post.generateSubheadings();
         content = generator.decorate(getTitle(), processed, subheading);
@@ -297,10 +288,6 @@ public class ArticleTab extends BaseWebTab implements Editable {
     @Override
     public String edit() {
         final Path openTarget = article.path;
-        if (!Files.exists(openTarget)){
-            // ファイルが存在しない場合は、ひな形を元に新規作成する。
-            Articles.generateNewArticle(article);
-        }
 
         try {
             final String content = Files.readAllLines(openTarget)
@@ -335,6 +322,13 @@ public class ArticleTab extends BaseWebTab implements Editable {
     @Override
     public String getUrl() {
         return article.toInternalUrl();
+    }
+
+    /**
+     * Dispose messenger's subscription.
+     */
+    public void close() {
+        disposable.dispose();
     }
 
 }
