@@ -22,6 +22,7 @@ package jp.toastkid.article.control;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXRippler.RipplerMask;
@@ -37,7 +38,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -78,7 +78,11 @@ import javafx.util.Duration;
  */
 public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
-    private final Color defaultColor = Color.valueOf("#00BCD4"), ripplerColor = Color.valueOf("FFFF8D"), selectedTabText = Color.WHITE;
+    private final Color defaultColor    = Color.valueOf("#00BCD4");
+
+    private final Color ripplerColor    = Color.valueOf("FFFF8D");
+
+    private final Color selectedTabText = Color.WHITE;
 
     private Color tempLabelColor = Color.WHITE;
 
@@ -183,16 +187,23 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
     }
 
     @Override
-    protected void handleControlPropertyChanged(String property) {
+    protected void handleControlPropertyChanged(final String property) {
         super.handleControlPropertyChanged(property);
-        if ("SELECTED_TAB".equals(property)) {
-            isSelectingTab = true;
-            selectedTab = getSkinnable().getSelectionModel().getSelectedItem();
-            getSkinnable().requestLayout();
-        } else if ("WIDTH".equals(property)) {
-            tabPaneClip.setWidth(getSkinnable().getWidth());
-        } else if ("HEIGHT".equals(property)) {
-            tabPaneClip.setHeight(getSkinnable().getHeight());
+
+        switch (property) {
+            case "SELECTED_TAB":
+                isSelectingTab = true;
+                selectedTab = getSkinnable().getSelectionModel().getSelectedItem();
+                getSkinnable().requestLayout();
+                break;
+            case "WIDTH":
+                tabPaneClip.setWidth(getSkinnable().getWidth());
+                break;
+            case "HEIGHT":
+                tabPaneClip.setHeight(getSkinnable().getHeight());
+                break;
+            default:
+                break;
         }
     }
 
@@ -203,7 +214,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                 tabHeaderContainer.isClosing = true;
                 removeTab(tab);
                 // if tabs list is empty hide the header container
-                if (getSkinnable().getTabs().isEmpty()) headerContainer.setVisible(false);
+                if (getSkinnable().getTabs().isEmpty()) {
+                    headerContainer.setVisible(false);
+                }
             }
         }
     }
@@ -215,7 +228,8 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
             if (!headerContainer.isVisible()) headerContainer.setVisible(true);
             headerContainer.addTab(tab, startIndex + i++, false);
             addTabContentHolder(tab);
-            final TabHeaderContainer tabHeaderContainer = headerContainer.getTabHeaderContainer(tab);
+            final TabHeaderContainer tabHeaderContainer
+                = headerContainer.getTabHeaderContainer(tab);
             if (tabHeaderContainer != null) {
                 tabHeaderContainer.setVisible(true);
                 tabHeaderContainer.inner.requestLayout();
@@ -246,7 +260,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
     private void removeTab(Tab tab) {
         final TabHeaderContainer tabHeaderContainer = headerContainer.getTabHeaderContainer(tab);
-        if (tabHeaderContainer != null) tabHeaderContainer.removeListeners(tab);
+        if (tabHeaderContainer != null) {
+            tabHeaderContainer.removeListeners(tab);
+        }
         headerContainer.removeTab(tab);
         removeTabContentHolder(tab);
         headerContainer.requestLayout();
@@ -254,16 +270,18 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
     @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        for (final TabContentHolder tabContentHolder : tabContentHolders)
+        for (final TabContentHolder tabContentHolder : tabContentHolders) {
             maxWidth = Math.max(maxWidth, snapSize(tabContentHolder.prefWidth(-1)));
+        }
         final double headerContainerWidth = snapSize(headerContainer.prefWidth(-1));
         final double prefWidth = Math.max(maxWidth, headerContainerWidth);
         return snapSize(prefWidth) + rightInset + leftInset;
     }
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        for (final TabContentHolder tabContentHolder : tabContentHolders)
+        for (final TabContentHolder tabContentHolder : tabContentHolders) {
             maxHeight = Math.max(maxHeight, snapSize(tabContentHolder.prefHeight(-1)));
+        }
         final double headerContainerHeight = snapSize(headerContainer.prefHeight(-1));
         final double prefHeight = maxHeight + snapSize(headerContainerHeight);
         return snapSize(prefHeight) + topInset + bottomInset;
@@ -317,7 +335,7 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                 if(index != i) {
                     tabsContainer.setTranslateX(-contentWidth*i);
                     diffTabsIndices = i - index;
-                }else{
+                } else {
                     // fix X translation after changing the tabs
                     if(diffTabsIndices!=0){
                         tabsContainer.setTranslateX(tabsContainer.getTranslateX() + contentWidth*diffTabsIndices);
@@ -325,12 +343,19 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                     }
                     // animate upon tab selection only otherwise just translate the selected tab
                     if(isSelectingTab) {
-                        new CachedTransition(tabsContainer, new Timeline(new KeyFrame(Duration.millis(1000), new KeyValue(tabsContainer.translateXProperty(), -contentWidth*index, Interpolator.EASE_BOTH)))){{
+                        new CachedTransition(
+                                tabsContainer,
+                                new Timeline(
+                                        new KeyFrame(Duration.millis(1000),
+                                        new KeyValue(tabsContainer.translateXProperty(),
+                                                -contentWidth*index, Interpolator.EASE_BOTH))))
+                        {{
                             setCycleDuration(Duration.seconds(0.320));
                             setDelay(Duration.seconds(0));
                         }}.play();
+                    } else {
+                        tabsContainer.setTranslateX(-contentWidth*index);
                     }
-                    else tabsContainer.setTranslateX(-contentWidth*index);
                 }
             }
             tabContentHolder.resize(contentWidth, contentHeight);
@@ -385,22 +410,28 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                     } else {
                         if (!removedTabsHeaders.isEmpty()) {
                             double offset = 0;
-                            final double w = headerContainer.getWidth() - snapSize(rightControlButton.prefWidth(-1)) - snapSize(leftControlButton.prefWidth(-1)) - snappedLeftInset() - SPACER;
+                            final double w = headerContainer.getWidth()
+                                    - snapSize(rightControlButton.prefWidth(-1))
+                                    - snapSize(leftControlButton.prefWidth(-1))
+                                    - snappedLeftInset() - SPACER;
                             final Iterator<Node> itr = getChildren().iterator();
                             while (itr.hasNext()) {
                                 final Node temp = itr.next();
-                                if(temp instanceof TabHeaderContainer){
-                                    final TabHeaderContainer tabHeaderContainer = (TabHeaderContainer) temp;
-                                    final double containerPrefWidth = snapSize(tabHeaderContainer.prefWidth(-1));
-                                    // if tab has been removed
-                                    if (removedTabsHeaders.contains(tabHeaderContainer)) {
-                                        if (offset < w) isSelectingTab = true;
-                                        itr.remove();
-                                        removedTabsHeaders.remove(tabHeaderContainer);
-                                        if (removedTabsHeaders.isEmpty()) break;
-                                    }
-                                    offset += containerPrefWidth;
+                                if (!(temp instanceof TabHeaderContainer)){
+                                    continue;
                                 }
+                                final TabHeaderContainer tabHeaderContainer
+                                    = (TabHeaderContainer) temp;
+                                final double containerPrefWidth
+                                    = snapSize(tabHeaderContainer.prefWidth(-1));
+                                // if tab has been removed
+                                if (removedTabsHeaders.contains(tabHeaderContainer)) {
+                                    if (offset < w) isSelectingTab = true;
+                                    itr.remove();
+                                    removedTabsHeaders.remove(tabHeaderContainer);
+                                    if (removedTabsHeaders.isEmpty()) break;
+                                }
+                                offset += containerPrefWidth;
                             }
                         }
                     }
@@ -451,7 +482,8 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
             headersRegion.setClip(headerClip);
 
             headerBackground = new StackPane();
-            headerBackground.setBackground(new Background(new BackgroundFill(defaultColor, CornerRadii.EMPTY, Insets.EMPTY)));
+            headerBackground.setBackground(
+                    new Background(new BackgroundFill(defaultColor, CornerRadii.EMPTY, Insets.EMPTY)));
             headerBackground.getStyleClass().setAll("tab-header-background");
 
             selectedTabLine = new Line();
@@ -460,7 +492,13 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
             selectedTabLine.setStrokeWidth(2);
             selectedTabLine.setStroke(ripplerColor);
             headersRegion.getChildren().add(selectedTabLine);
-            selectedTabLine.translateYProperty().bind(Bindings.createDoubleBinding(()-> headersRegion.getHeight() - selectedTabLine.getStrokeWidth() + 1, headersRegion.heightProperty(), selectedTabLine.strokeWidthProperty()));
+            selectedTabLine.translateYProperty()
+                .bind(Bindings.createDoubleBinding(
+                        ()-> headersRegion.getHeight() - selectedTabLine.getStrokeWidth() + 1,
+                        headersRegion.heightProperty(),
+                        selectedTabLine.strokeWidthProperty()
+                        )
+                    );
 
             rightControlButton = new HeaderControl(ArrowPosition.RIGHT);
             leftControlButton = new HeaderControl(ArrowPosition.LEFT);
@@ -493,7 +531,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
             final double headersPrefHeight = snapSize(headersRegion.prefHeight(-1));
 
             // Add the spacer if the control buttons are shown
-            if (controlPrefWidth > 0)  controlPrefWidth = controlPrefWidth + SPACER;
+            if (controlPrefWidth > 0) {
+                controlPrefWidth = controlPrefWidth + SPACER;
+            }
 
             maxWidth = snapSize(getWidth()) - controlPrefWidth - clipOffset;
             clipWidth = (headersPrefWidth < maxWidth ? headersPrefWidth : maxWidth);
@@ -516,24 +556,28 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
         private void removeTab(Tab tab) {
             final TabHeaderContainer tabHeaderContainer = getTabHeaderContainer(tab);
-            if (tabHeaderContainer != null) {
-                if (isTabsFitHeaderWidth()) {
-                    headersRegion.getChildren().remove(tabHeaderContainer);
-                } else {
-                    // we need to keep track of the removed tab headers
-                    // to compute scroll offset of the header
-                    removedTabsHeaders.add(tabHeaderContainer);
-                    tabHeaderContainer.removeListeners(tab);
-                }
+            if (tabHeaderContainer == null) {
+                return;
             }
+
+            if (isTabsFitHeaderWidth()) {
+                headersRegion.getChildren().remove(tabHeaderContainer);
+                return;
+            }
+
+            // we need to keep track of the removed tab headers
+            // to compute scroll offset of the header
+            removedTabsHeaders.add(tabHeaderContainer);
+            tabHeaderContainer.removeListeners(tab);
         }
 
         private TabHeaderContainer getTabHeaderContainer(Tab tab) {
-            for (final Node child : headersRegion.getChildren())
-                if(child instanceof TabHeaderContainer)
-                    if (((TabHeaderContainer) child).tab.equals(tab))
-                        return (TabHeaderContainer) child;
-            return null;
+            final Optional<TabHeaderContainer> thc = headersRegion.getChildren().stream()
+                .filter(TabHeaderContainer.class::isInstance)
+                .map(TabHeaderContainer.class::cast)
+                .filter(child -> child.tab.equals(tab))
+                .findFirst();
+            return thc.orElseGet(() -> null);
         }
 
         private boolean isTabsFitHeaderWidth() {
@@ -549,9 +593,8 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
             selectedTabLineOffset = newTransX;
             final double transDiff = newTransX - oldTransX;
-            Timeline timeline;
-            if(transDiff > 0) {
-                timeline = new Timeline(
+            final Timeline timeline = transDiff > 0
+                ? new Timeline(
                         new KeyFrame(
                                 Duration.ZERO,
                                 new KeyValue(selectedTabLine.endXProperty(), oldWidth, Interpolator.EASE_BOTH),
@@ -564,9 +607,8 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                                 Duration.seconds(0.33),
                                 new KeyValue(selectedTabLine.endXProperty(), newWidth, Interpolator.EASE_BOTH),
                                 new KeyValue(selectedTabLine.translateXProperty(), newTransX + offsetStart, Interpolator.EASE_BOTH))
-                        );
-            } else {
-                timeline = new Timeline(
+                        )
+                :  new Timeline(
                         new KeyFrame(
                                 Duration.ZERO,
                                 new KeyValue(selectedTabLine.endXProperty(), oldWidth, Interpolator.EASE_BOTH),
@@ -580,7 +622,6 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                                 new KeyValue(selectedTabLine.endXProperty(), newWidth, Interpolator.EASE_BOTH),
                                 new KeyValue(selectedTabLine.translateXProperty(), newTransX + offsetStart, Interpolator.EASE_BOTH))
                         );
-            }
             timeline.play();
         }
 
@@ -591,15 +632,20 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
             // compute all tabs headers width
             double offset = 0.0;
-            for (final Node node : headersRegion.getChildren())
+            for (final Node node : headersRegion.getChildren()) {
                 if(node instanceof TabHeaderContainer){
-                    final double tabHeaderPrefWidth = snapSize(((TabHeaderContainer) node).prefWidth(-1));
+                    final double tabHeaderPrefWidth
+                        = snapSize(((TabHeaderContainer) node).prefWidth(-1));
                     offset += tabHeaderPrefWidth;
                 }
+            }
 
             double actualOffset = newOffset;
-            if ((visibleWidth - newOffset) > offset && newOffset < 0)  actualOffset = visibleWidth - offset;
-            else if (newOffset > 0) actualOffset = 0;
+            if ((visibleWidth - newOffset) > offset && newOffset < 0) {
+                actualOffset = visibleWidth - offset;
+            } else if (newOffset > 0) {
+                actualOffset = 0;
+            }
 
             if (actualOffset != scrollOffset) {
                 scrollOffset = actualOffset;
@@ -610,7 +656,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
         @Override
         protected double computePrefWidth(double height) {
-            return snapSize(headersRegion.prefWidth(height)) + 2 * rightControlButton.prefWidth(height) + snappedLeftInset() + SPACER + snappedLeftInset() + snappedRightInset();
+            return snapSize(headersRegion.prefWidth(height))
+                    + 2 * rightControlButton.prefWidth(height)
+                    + snappedLeftInset() + SPACER + snappedLeftInset() + snappedRightInset();
         }
 
         @Override
@@ -661,30 +709,42 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
             controlStartX = w - btnWidth + leftInset;
             controlStartY = snapSize(getHeight()) - btnHeight - bottomInset;
 
-            if (headerBackground.isVisible()) positionInArea(headerBackground, 0, 0, snapSize(getWidth()), snapSize(getHeight()), 0, HPos.CENTER, VPos.CENTER);
+            if (headerBackground.isVisible()) {
+                positionInArea(
+                        headerBackground,
+                        0,
+                        0,
+                        snapSize(getWidth()),
+                        snapSize(getHeight()),
+                        0,
+                        HPos.CENTER,
+                        VPos.CENTER
+                        );
+            }
             positionInArea(headersRegion, startX + btnWidth, startY, w, h, 0, HPos.LEFT, VPos.CENTER);
             positionInArea(rightControlButton, controlStartX, controlStartY, btnWidth, btnHeight, 0, HPos.CENTER, VPos.CENTER);
             positionInArea(leftControlButton, 0, controlStartY, btnWidth, btnHeight, 0, HPos.CENTER, VPos.CENTER);
 
-            if (!initialized) {
-                double offset = 0.0;
-                double selectedTabOffset = 0.0;
-                double selectedTabWidth = 0.0;
-                for (final Node node : headersRegion.getChildren()) {
-                    if(node instanceof TabHeaderContainer){
-                        final TabHeaderContainer tabHeader = (TabHeaderContainer) node;
-                        final double tabHeaderPrefWidth = snapSize(tabHeader.prefWidth(-1));
-                        if (selectedTab != null && selectedTab.equals(tabHeader.tab)) {
-                            selectedTabOffset = offset;
-                            selectedTabWidth = tabHeaderPrefWidth;
-                        }
-                        offset += tabHeaderPrefWidth;
-                    }
-                }
-                final double selectedTabStartX = selectedTabOffset;
-                runTimeline(selectedTabStartX + 1, selectedTabWidth-2);
-                initialized = true;
+            if (initialized) {
+                return;
             }
+            double offset = 0.0;
+            double selectedTabOffset = 0.0;
+            double selectedTabWidth = 0.0;
+            for (final Node node : headersRegion.getChildren()) {
+                if(node instanceof TabHeaderContainer){
+                    final TabHeaderContainer tabHeader = (TabHeaderContainer) node;
+                    final double tabHeaderPrefWidth = snapSize(tabHeader.prefWidth(-1));
+                    if (selectedTab != null && selectedTab.equals(tabHeader.tab)) {
+                        selectedTabOffset = offset;
+                        selectedTabWidth = tabHeaderPrefWidth;
+                    }
+                    offset += tabHeaderPrefWidth;
+                }
+            }
+            final double selectedTabStartX = selectedTabOffset;
+            runTimeline(selectedTabStartX + 1, selectedTabWidth-2);
+            initialized = true;
         }
     }
 
@@ -705,13 +765,18 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
         private boolean systemChange = false;
         private boolean isClosing = false;
 
-        private final MultiplePropertyChangeListenerHandler listener = new MultiplePropertyChangeListenerHandler(param -> {
+        private final MultiplePropertyChangeListenerHandler listener
+            = new MultiplePropertyChangeListenerHandler(param -> {
             handlePropertyChanged(param);
             return null;
         });
 
-        private final ListChangeListener<String> styleClassListener = (Change<? extends String> change)-> getStyleClass().setAll(tab.getStyleClass());
-        private final WeakListChangeListener<String> weakStyleClassListener = new WeakListChangeListener<>(styleClassListener);
+        private final ListChangeListener<String> styleClassListener
+            = (Change<? extends String> change)-> getStyleClass().setAll(tab.getStyleClass());
+
+        private final WeakListChangeListener<String> weakStyleClassListener
+            = new WeakListChangeListener<>(styleClassListener);
+
         public TabHeaderContainer(final Tab tab) {
             this.tab = tab;
             getStyleClass().setAll(tab.getStyleClass());
@@ -877,8 +942,11 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
         }
     }
 
-    private static final PseudoClass SELECTED_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("selected");
-    private static final PseudoClass DISABLED_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("disabled");
+    private static final PseudoClass SELECTED_PSEUDOCLASS_STATE
+        = PseudoClass.getPseudoClass("selected");
+
+    private static final PseudoClass DISABLED_PSEUDOCLASS_STATE
+        = PseudoClass.getPseudoClass("disabled");
 
 
     /**************************************************************************
@@ -887,11 +955,14 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
      *																		  *
      **************************************************************************/
     protected class TabContentHolder extends StackPane {
+
         private Tab tab = null;
-        private final InvalidationListener tabContentListener = valueModel -> updateContent();
-        private final InvalidationListener tabSelectedListener = valueModel -> setVisible(tab.isSelected());
-        private final WeakInvalidationListener weakTabContentListener = new WeakInvalidationListener(tabContentListener);
-        private final WeakInvalidationListener weakTabSelectedListener = new WeakInvalidationListener(tabSelectedListener);
+
+        private final WeakInvalidationListener weakTabContentListener
+            = new WeakInvalidationListener(valueModel -> updateContent());
+
+        private final WeakInvalidationListener weakTabSelectedListener
+            = new WeakInvalidationListener(valueModel -> setVisible(tab.isSelected()));
 
         public TabContentHolder(Tab tab) {
             this.tab = tab;
@@ -929,7 +1000,7 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
         private boolean showControlButtons, isLeftArrow;
         private Timeline arrowAnimation;
         private SVGGlyph arrowButton;
-        private final SVGGlyph leftChevron = new SVGGlyph(0, "CHEVRON_LEFT", "M 742,-37 90,614 Q 53,651 53,704.5 53,758 90,795 l 652,651 q 37,37 90.5,37 53.5,0 90.5,-37 l 75,-75 q 37,-37 37,-90.5 0,-53.5 -37,-90.5 L 512,704 998,219 q 37,-38 37,-91 0,-53 -37,-90 L 923,-37 Q 886,-74 832.5,-74 779,-74 742,-37 z", Color.WHITE);
+        private final SVGGlyph leftChevron  = new SVGGlyph(0, "CHEVRON_LEFT", "M 742,-37 90,614 Q 53,651 53,704.5 53,758 90,795 l 652,651 q 37,37 90.5,37 53.5,0 90.5,-37 l 75,-75 q 37,-37 37,-90.5 0,-53.5 -37,-90.5 L 512,704 998,219 q 37,-38 37,-91 0,-53 -37,-90 L 923,-37 Q 886,-74 832.5,-74 779,-74 742,-37 z", Color.WHITE);
         private final SVGGlyph rightChevron = new SVGGlyph(0, "CHEVRON_RIGHT", "m 1099,704 q 0,-52 -37,-91 L 410,-38 q -37,-37 -90,-37 -53,0 -90,37 l -76,75 q -37,39 -37,91 0,53 37,90 l 486,486 -486,485 q -37,39 -37,91 0,53 37,90 l 76,75 q 36,38 90,38 54,0 90,-38 l 652,-651 q 37,-37 37,-90 z", Color.WHITE);
 
         public HeaderControl(ArrowPosition pos) {
@@ -1017,8 +1088,11 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
                 headerContainer.requestLayout();
             } else if (!showTabsHeaderControls && wasTabsMenuShowing) {
                 // hide control button
-                if (isControlButtonShown()) showControlButtons = true;
-                else setVisible(false);
+                if (isControlButtonShown()) {
+                    showControlButtons = true;
+                } else {
+                    setVisible(false);
+                }
                 requestLayout();
             }
         }
@@ -1036,7 +1110,8 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
         @Override
         protected double computePrefHeight(double width) {
-            return Math.max(getSkinnable().getTabMinHeight(), snapSize(inner.prefHeight(width))) + snappedTopInset() + snappedBottomInset();
+            return Math.max(getSkinnable().getTabMinHeight(), snapSize(inner.prefHeight(width)))
+                    + snappedTopInset() + snappedBottomInset();
         }
 
         @Override
