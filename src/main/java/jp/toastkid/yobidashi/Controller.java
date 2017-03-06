@@ -903,14 +903,19 @@ public final class Controller implements Initializable {
                 .setOnContextMenuRequested(event -> showContextMenu())
                 .setOnOpenNewArticle(url -> Platform.runLater(
                         () -> {
-                            final Article newArticle = Articles.findByUrl(conf.get(Key.ARTICLE_DIR), url);
-                            if (!Files.exists(newArticle.path)) {
-                                Articles.generateNewArticle(newArticle);
-                                final ObservableList<Article> items = articleList.getItems();
-                                if (!items.contains(article)) {
-                                    items.add(article);
-                                }
+                            final Article newArticle
+                                = Articles.findByUrl(conf.get(Key.ARTICLE_DIR), url);
+                            if (Files.exists(newArticle.path)) {
+                                newArticle.focus(articleList);
+                                return;
                             }
+
+                            Articles.generateNewArticle(newArticle);
+                            final ObservableList<Article> items = articleList.getItems();
+                            if (!items.contains(newArticle)) {
+                                items.add(newArticle);
+                            }
+                            articleList.refresh();
                             newArticle.focus(articleList);
                         })
                 )
