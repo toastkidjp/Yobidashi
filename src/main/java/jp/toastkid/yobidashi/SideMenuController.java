@@ -49,6 +49,7 @@ import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.RuntimeUtil;
 import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.rss.RssFeeder;
+import jp.toastkid.script.ScriptConsole;
 import jp.toastkid.yobidashi.dialog.ConfigDialog;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.ArticleMessage;
@@ -105,7 +106,7 @@ public class SideMenuController implements Initializable {
     private EpubGenerator ePubGenerator;
 
     /** JVM Language Script Runner. */
-    private jp.toastkid.script.Main scriptRunner;
+    private ScriptConsole scriptRunner;
 
     /** Name Generator. */
     private jp.toastkid.name.Main nameGenerator;
@@ -319,9 +320,9 @@ public class SideMenuController implements Initializable {
     @FXML
     private void openScripter() {
         if (scriptRunner == null) {
-            scriptRunner = new jp.toastkid.script.Main();
+            scriptRunner = new ScriptConsole.Builder().setOwner(stage).build();
         }
-        messenger.onNext(ContentTabMessage.make("Script Runner", scriptRunner.getRoot()));
+        messenger.onNext(ContentTabMessage.make("Script Runner", scriptRunner.getRoot(), scriptRunner::requestFocus));
     }
 
     /**

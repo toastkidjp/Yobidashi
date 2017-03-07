@@ -1827,7 +1827,10 @@ public final class Controller implements Initializable {
      * @param message ContentTabMessage
      */
     private void processContentTabMessage(final ContentTabMessage message) {
-        Platform.runLater(() -> openContentTab(message.getTitle(), message.getContent()));
+        Platform.runLater(() -> {
+            openContentTab(message.getTitle(), message.getContent());
+            message.doAfter();
+        });
     }
 
     /**
