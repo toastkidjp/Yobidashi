@@ -81,7 +81,6 @@ public final class Main extends Application {
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             stage.initStyle(StageStyle.TRANSPARENT);
-            //stage.setMaximized(true);
             stage.show();
             LOGGER.info("{} Ended set stage size. {}[ms]",
                     Thread.currentThread().getName(),
@@ -91,8 +90,8 @@ public final class Main extends Application {
 
         controllerDisposable = Mono.create(emitter -> {
             final Rectangle2D d = Screen.getPrimary().getVisualBounds();
-            controller.setSize(d.getWidth(), d.getHeight());
             maximizeStage(stage);
+            controller.setSize(d.getWidth(), d.getHeight());
             // setup searcher.
             controller.setupExpandables();
             controller.setupSideMenu();
