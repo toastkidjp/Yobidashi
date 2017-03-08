@@ -39,7 +39,7 @@
     <BorderPane fx:id="header">
       <top>
         <VBox spacing="20">
-          <JFXToolbar>
+          <JFXToolbar onMouseClicked="#moveToTop">
             <leftItems>
               <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
                 <StackPane fx:id="titleBurgerContainer">
@@ -48,11 +48,8 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <MenuLabel fx:id="title" prefHeight="40.0" prefWidth="800.0" onAction="#moveToTop">
+              <JFXTextField fx:id="title" prefHeight="40.0" minWidth="450.0" prefWidth="800.0" labelFloat="true" onAction="#readUrlText">
                 <tooltip><Tooltip fx:id="titleTooltip" /></tooltip>
-              </MenuLabel>
-              <JFXTextField fx:id="urlText" onAction="#readUrlText" prefHeight="40.0" prefWidth="500.0" labelFloat="true">
-                <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>
             </leftItems>
             <rightItems>
@@ -118,7 +115,7 @@
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
       </children>
     </HBox>
-    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER">
+    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER" onMouseClicked="#moveToBottom">
       <left>
         <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" BorderPane.alignment="CENTER">
           <font><Font size="14.0" /></font>

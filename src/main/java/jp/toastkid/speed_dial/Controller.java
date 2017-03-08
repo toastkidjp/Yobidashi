@@ -116,4 +116,11 @@ public class Controller {
         return messenger;
     }
 
+    /**
+     * Focus on input text field.
+     */
+    public void requestFocus() {
+        input.requestFocus();
+    }
+
 }

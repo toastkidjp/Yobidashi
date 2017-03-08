@@ -211,15 +211,14 @@ public final class Controller implements Initializable {
 
     /** title label. */
     @FXML
-    private Label title;
+    private TextField title;
 
     /** title's tooltip. */
     @FXML
     private Tooltip titleTooltip;
 
-    /** URL Input Area. */
-    @FXML
-    private TextField urlText;
+    /** URL holder. */
+    private String urlText;
 
     /** Left-side tabs area(Articles). */
     @FXML
@@ -350,7 +349,7 @@ public final class Controller implements Initializable {
 
         final ProgressDialog pd = new ProgressDialog.Builder()
             .setCommand(new Task<Integer>() {
-                final int tasks = 11;
+                final int tasks = 10;
                 final AtomicInteger done = new AtomicInteger(0);
 
                 @Override
@@ -400,7 +399,17 @@ public final class Controller implements Initializable {
         es.execute(Controller.this::initTabPane);
         es.execute(Controller.this::initSearchInPage);
         es.execute(Controller.this::initLeftDrawer);
-        es.execute(Controller.this::initFooterAction);
+        title.focusedProperty().addListener((prev, next, value) -> {
+            if (StringUtils.isBlank(urlText) || "about:blank".equals(urlText)) {
+                return;
+            }
+            if (value.booleanValue()) {
+                title.insertText(0, urlText);
+                title.setPromptText("");
+                return;
+            }
+            title.clear();;
+        });
 
         es.shutdown();
     }
@@ -532,7 +541,7 @@ public final class Controller implements Initializable {
 
                     final String tabUrl = tab.getUrl();
                     if (StringUtils.isNotEmpty(tabUrl)){
-                        urlText.setText(tabUrl);
+                        urlText = tabUrl;
                         // TODO
                         focusOn();
                         return;
@@ -606,18 +615,6 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Initialize footer action.
-     */
-    private void initFooterAction() {
-        final long start = System.currentTimeMillis();
-        footer.setOnMousePressed(event -> moveToBottom());
-        progressSender.onNext(
-            Thread.currentThread().getName()
-                + "Ended set footer action."
-                + (System.currentTimeMillis() - start) + "ms");
-    }
-
-    /**
      * Launch backup job.
      */
     private void launchBackupJob() {
@@ -658,7 +655,7 @@ public final class Controller implements Initializable {
         final String text = titleStr == null
                 ? conf.get(Config.Key.APP_TITLE)
                 : titleStr + " - " + conf.get(Config.Key.APP_TITLE);
-        title.setText(text);
+        title.setPromptText(text);
         titleTooltip.setText(text);
     }
 
@@ -771,6 +768,7 @@ public final class Controller implements Initializable {
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
+    @FXML
     private final void moveToBottom() {
         getCurrentTab().moveToBottom();
     }
@@ -839,6 +837,7 @@ public final class Controller implements Initializable {
             controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
+            controller.requestFocus();
             final Disposable disposable = controller.messenger().subscribe(this::processMessage);
             Runtime.getRuntime().addShutdownHook(new Thread(disposable::dispose));
 
@@ -922,7 +921,7 @@ public final class Controller implements Initializable {
                 .setPopupHandler(param -> openWebTab("", "").getWebView().getEngine())
                 .setOnLoad(() -> {
                     addHistory(article.clone());
-                    urlText.setText(article.toInternalUrl());
+                    urlText = article.toInternalUrl();
                     Platform.runLater(() -> setTitleOnToolbar(article.title));
                 })
                 .build();
@@ -1595,7 +1594,10 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void readUrlText() {
-        openWebTab("", urlText.getText());
+        if (StringUtils.isBlank(urlText)) {
+            return;
+        }
+        openWebTab("", urlText);
     }
 
     /**
