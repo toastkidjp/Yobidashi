@@ -408,9 +408,11 @@ public final class Controller implements Initializable {
                 title.setPromptText("");
                 return;
             }
-            title.clear();;
+            title.clear();
+            Optional.ofNullable(getCurrentTab())
+                    .map(ReloadableTab::getTitle)
+                    .ifPresent(this::setTitleOnToolbar);
         });
-
         es.shutdown();
     }
 
@@ -837,7 +839,6 @@ public final class Controller implements Initializable {
             controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
-            controller.requestFocus();
             final Disposable disposable = controller.messenger().subscribe(this::processMessage);
             Runtime.getRuntime().addShutdownHook(new Thread(disposable::dispose));
 
@@ -845,6 +846,7 @@ public final class Controller implements Initializable {
             sdRoot.setPrefWidth(width * 0.8);
             sdRoot.setPrefHeight(tabPane.getHeight());
             openTab(makeContentTab(TITLE_SPEED_DIAL, sdRoot));
+            controller.requestFocus();
         } catch (final IOException e) {
             e.printStackTrace();
         }

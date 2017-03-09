@@ -48,7 +48,7 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <JFXTextField fx:id="title" prefHeight="40.0" minWidth="450.0" prefWidth="800.0" labelFloat="true" onAction="#readUrlText">
+              <JFXTextField fx:id="title" prefHeight="40.0" minWidth="500.0"  onAction="#readUrlText">
                 <tooltip><Tooltip fx:id="titleTooltip" /></tooltip>
               </JFXTextField>
             </leftItems>
