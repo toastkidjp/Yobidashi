@@ -1,5 +1,7 @@
 package jp.toastkid.article.control.editor;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,6 +57,15 @@ public class EditorTest extends ApplicationTest {
             editor.scrollTo(200d);
             System.out.println(editor.getYPosition());
         });
+    }
+
+    /**
+     * Test of key event.
+     */
+    @Test
+    public void test_isWrapText() {
+        final CodeArea area = (CodeArea) Whitebox.getInternalState(editor, "area");
+        assertTrue(area.isWrapText());
     }
 
     /**

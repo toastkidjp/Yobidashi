@@ -184,6 +184,7 @@ public class Editor {
      * Initialize text area.
      */
     private void initArea() {
+        area.setWrapText(true);
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
             if (event.isControlDown()) {
