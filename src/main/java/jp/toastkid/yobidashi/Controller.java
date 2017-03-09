@@ -760,7 +760,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void moveToTop() {
-        getCurrentTab().moveToTop();
+        Optional.ofNullable(getCurrentTab()).ifPresent(ReloadableTab::moveToTop);
     }
 
     /**
@@ -770,7 +770,7 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void moveToBottom() {
-        getCurrentTab().moveToBottom();
+        Optional.ofNullable(getCurrentTab()).ifPresent(ReloadableTab::moveToBottom);
     }
 
     /**
