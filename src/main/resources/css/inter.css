@@ -207,8 +207,6 @@
   -fx-prompt-text-fill: WHITE;
   -fx-text-fill: WHITE;
   -fx-alignment: top-left ;
-  -fx-max-width: 300.0;
-  -fx-pref-width:300.0;
   -fx-focus-color: #4059A9;
   -fx-unfocus-color: #4d4d4d;
 }

@@ -404,7 +404,7 @@ public final class Controller implements Initializable {
                 return;
             }
             if (value.booleanValue()) {
-                title.insertText(0, urlText);
+                title.setText(urlText);
                 title.setPromptText("");
                 return;
             }
@@ -544,7 +544,6 @@ public final class Controller implements Initializable {
                     final String tabUrl = tab.getUrl();
                     if (StringUtils.isNotEmpty(tabUrl)){
                         urlText = tabUrl;
-                        // TODO
                         focusOn();
                         return;
                     }
