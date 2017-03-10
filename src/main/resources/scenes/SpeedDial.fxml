@@ -63,7 +63,7 @@
                     </FXCollections>
                   </items>
                 </JFXComboBox>
-                <JFXButton onAction="#search" prefWidth="180.0" text="Search!" />
+                <JFXButton fx:id="sdSearch" onAction="#search" prefWidth="180.0" text="Search!" />
               </children>
             </VBox>
           </children>

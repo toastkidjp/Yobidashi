@@ -1,29 +1,49 @@
 .root {
-    -fx-base: rgba(0, 0, 100, 0.2);
     -fx-background-color: rgba(0, 0, 100, 0.5);
 }
+
+.button {
+    -fx-text-fill: #FFFFFF;
+}
+
+.split-pane {
+  -fx-base: #DDDDDE;
+}
+
 .spinner-label {
-  -fx-base: rgba(160, 140, 190, 0.8);
   -fx-text-fill: white;
 }
 
-.week-number-cell {
-  -fx-base: rgba(160, 140, 190, 0.8);
+.combo-box {
+  -fx-base: rgba(0, 0, 100, 0.5);
   -fx-text-fill: white;
 }
 
-.day-name-cell {
-  -fx-base: rgba(160, 140, 190, 0.8);
+.titled-pane {
+  -fx-base: rgba(0, 0, 100, 0.5);
   -fx-text-fill: white;
 }
 
-.day-cell {
-  -fx-base: rgba(160, 140, 190, 0.8);
+.color-picker {
+  -fx-base: transparent;
+}
+
+.month-year-pane {
+  -fx-base: rgba(0, 0, 100, 0.5);
+  -fx-text-fill: white;
+}
+
+.date-picker {
+  -fx-text-fill: rgba(0, 0, 100, 0.5);
+}
+
+.today {
+  -fx-background-color: rgba(0, 0, 100, 0.5);
   -fx-text-fill: white;
 }
 
 .date-picker-display-node {
-  -fx-base: rgba(160, 140, 190, 0.8);
+  -fx-base: rgba(200, 200, 210, 0.8);
   -fx-text-fill: white;
 }
 
@@ -37,10 +57,6 @@
 
 .menu-item:focused .label {
     -fx-text-fill: black;
-}
-
-#status {
-  -fx-text-fill: white;
 }
 
 .text-field {
@@ -161,10 +177,6 @@
     -fx-background-color: black, black;
 }
 
-.button {
-    -fx-text-fill: #FFFFFF;
-}
-
 .combo-box .list-cell {
     -fx-text-fill: #FFFFFF;
 }
@@ -173,7 +185,7 @@
     -fx-text-fill: white;
 }
 
-.jfx-tool-bar{
+.jfx-tool-bar {
     -fx-font-size: 20.0;
     -fx-font-weight: BOLD;
     -fx-background-color: rgba(0, 0, 100, 0.5);
@@ -190,16 +202,41 @@
 }
 
 .jfx-text-field, .jfx-password-field, .jfx-text-area{
-    -fx-background-color: transparent ;
-    -fx-font-weight: BOLD;
-    -fx-prompt-text-fill: WHITE;
-    -fx-text-fill: WHITE;
-    -fx-alignment: top-left ;
-    -fx-max-width: 300.0;
-    -fx-pref-width:300.0;
-    -fx-focus-color: #4059A9;
-    -fx-unfocus-color: #4d4d4d;
+  -fx-background-color: transparent ;
+  -fx-font-weight: BOLD;
+  -fx-prompt-text-fill: WHITE;
+  -fx-text-fill: WHITE;
+  -fx-alignment: top-left ;
+  -fx-focus-color: #4059A9;
+  -fx-unfocus-color: #4d4d4d;
 }
+
 .arc{
-    -fx-stroke:  #ffd600;
+  -fx-stroke:  #ffd600;
+}
+
+.editor-button {
+  -fx-base: rgba(100, 100, 150, 0.5);
+}
+
+.editor-header {
+  -fx-background-color: rgba(100, 100, 150, 0.5);
+}
+
+.tab-close-button {
+  -fx-background-color: rgba(255, 255, 255, 0.9);
+  -fx-text-fill: black;
+}
+
+#status {
+  -fx-text-fill: white;
+}
+
+#sdSearch {
+  -fx-base: rgba(0, 0, 100, 0.5);
+  -fx-text-fill: white;
+}
+
+#title {
+  -fx-text-fill: white;
 }

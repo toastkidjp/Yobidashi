@@ -35,6 +35,7 @@ public abstract class ReloadableTab extends Tab {
         super(title, content);
         Optional.ofNullable(closeAction).ifPresent(action -> {
             final Button closeButton = new JFXButton("x");
+            closeButton.getStyleClass().add("tab-close-button");
             closeButton.setOnAction(e -> close(action));
             this.setGraphic(closeButton);
         });
@@ -102,5 +103,6 @@ public abstract class ReloadableTab extends Tab {
     protected void setCloseAction(Consumer<Tab> closeAction) {
         this.closeAction = closeAction;
     }
+
 
 }

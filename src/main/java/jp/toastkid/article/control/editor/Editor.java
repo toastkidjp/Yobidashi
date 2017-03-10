@@ -57,8 +57,14 @@ public class Editor {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
 
+    /** Editor header's class. */
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_HEADER        = "editor-header";
+
     /** Editor label's class. */
-    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL = "editor-label";
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_LABEL         = "editor-label";
+
+    /** Editor button's class. */
+    private static final String DEFAULT_STYLE_CLASS_EDITOR_APPLY_BUTTON  = "editor-button";
 
     /** Default scale factor. */
     private static final double DEFAULT_SCALE_FACTOR = 2.2d;
@@ -166,9 +172,11 @@ public class Editor {
 
         final Button button = new JFXButton("Apply");
         button.setOnAction(event -> applyFontSettings());
+        button.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_APPLY_BUTTON);
 
         final HBox header = new HBox(label, fontFamily, fontSize, button);
         header.setAlignment(Pos.CENTER);
+        header.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_HEADER);
         return header;
     }
 
@@ -176,6 +184,7 @@ public class Editor {
      * Initialize text area.
      */
     private void initArea() {
+        area.setWrapText(true);
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
             if (event.isControlDown()) {
@@ -327,19 +336,12 @@ public class Editor {
      * @param font
      */
     void setFont(final Font font) {
-        area.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;",
-                font.getFamily(), font.getSize()));
-        setFontStatus();
-    }
-
-    /**
-     * Set font size and font family.
-     */
-    private void setFontStatus() {
-        conf.reload();
-        final int    index = this.fontFamily.getItems().indexOf(conf.get(Key.FONT_FAMILY));
+        final String family = font.getFamily();
+        final double size   = font.getSize();
+        area.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %f;", family, size));
+        final int index = this.fontFamily.getItems().indexOf(family);
         this.fontFamily.getSelectionModel().select(index == -1 ? 0 : index);
-        this.fontSize.setText(conf.get(Key.FONT_SIZE));
+        this.fontSize.setText(Integer.toString((int) size));
     }
 
     /**
@@ -372,8 +374,9 @@ public class Editor {
     void show() {
         editorBox.setVisible(true);
         editorBox.setManaged(true);
-        area.requestFocus();
         area.moveTo(0, 0);
+        area.requestFocus();
+        area.setEstimatedScrollY(0.0d);
     }
 
     /**

@@ -21,7 +21,6 @@
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXSnackbar?>
-<?import com.jfoenix.controls.JFXTabPane?>
 <?import com.jfoenix.controls.JFXToolbar?>
 <?import com.jfoenix.controls.JFXRippler?>
 <?import com.jfoenix.controls.JFXHamburger?>
@@ -29,6 +28,7 @@
 <?import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition?>
 
 <?import jp.toastkid.jfx.common.control.MenuLabel?>
+<?import jp.toastkid.article.control.RippleTabPane?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="jp.toastkid.yobidashi.Controller"
@@ -39,7 +39,7 @@
     <BorderPane fx:id="header">
       <top>
         <VBox spacing="20">
-          <JFXToolbar>
+          <JFXToolbar onMouseClicked="#moveToTop">
             <leftItems>
               <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
                 <StackPane fx:id="titleBurgerContainer">
@@ -48,11 +48,8 @@
                   </JFXHamburger>
                 </StackPane>
               </JFXRippler>
-              <MenuLabel fx:id="title" prefHeight="40.0" prefWidth="800.0" onAction="#moveToTop">
+              <JFXTextField fx:id="title" prefHeight="40.0" prefWidth="1000.0" onAction="#readUrlText">
                 <tooltip><Tooltip fx:id="titleTooltip" /></tooltip>
-              </MenuLabel>
-              <JFXTextField fx:id="urlText" onAction="#readUrlText" prefHeight="40.0" prefWidth="500.0" labelFloat="true">
-                <tooltip><Tooltip text="URL" /></tooltip>
               </JFXTextField>
             </leftItems>
             <rightItems>
@@ -98,7 +95,7 @@
                      </Tab>
                    </tabs>
                  </TabPane>
-                 <JFXTabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" />
+                 <RippleTabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS" />
                </items>
              </SplitPane>
           </content>
@@ -118,7 +115,7 @@
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
       </children>
     </HBox>
-    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER">
+    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER" onMouseClicked="#moveToBottom">
       <left>
         <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" BorderPane.alignment="CENTER">
           <font><Font size="14.0" /></font>

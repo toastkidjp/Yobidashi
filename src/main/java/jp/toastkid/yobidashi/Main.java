@@ -16,7 +16,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jp.toastkid.yobidashi.models.Defines;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoProcessor;
 import reactor.core.scheduler.Schedulers;
 
 /**
@@ -38,8 +40,14 @@ public final class Main extends Application {
     /** Controller. */
     private Controller controller;
 
-    /** starting ms. */
+    /** Starting ms. */
     private long start;
+
+    /** Stage initializer disposable. */
+    private Disposable stageDisposable;
+
+    /** Controller initializer disposable. */
+    private MonoProcessor<Object> controllerDisposable;
 
     @Override
     public void start(final Stage stage) {
@@ -49,6 +57,13 @@ public final class Main extends Application {
             launch(stage);
         } catch (final Throwable e) {
             LOGGER.error("Caught error.", e);
+        } finally {
+            if (stageDisposable != null) {
+                stageDisposable.dispose();
+            }
+            if (controllerDisposable != null) {
+                controllerDisposable.dispose();
+            }
         }
     }
 
@@ -58,63 +73,65 @@ public final class Main extends Application {
      */
     private void launch(final Stage stage) {
 
-        Mono.create(emitter -> {
+        stageDisposable = readScene().subscribeOn(Schedulers.immediate()).subscribe(scene -> {
+            controller.setStage(stage);
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
-            emitter.success();
-            LOGGER.info("Ended set app icon.");
-        })
-        .subscribeOn(Schedulers.elastic()).subscribe();
-
-        readScene(stage).subscribeOn(Schedulers.immediate()).subscribe(scene -> {
             stage.setScene(scene);
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             stage.initStyle(StageStyle.TRANSPARENT);
-            final Screen screen = Screen.getScreens().get(0);
-            final Rectangle2D bounds = screen.getVisualBounds();
-            final BoundingBox maximizedBox = new BoundingBox(
-                    bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-            // maximized the stage
-            stage.setX(maximizedBox.getMinX());
-            stage.setY(maximizedBox.getMinY());
-            stage.setWidth(maximizedBox.getWidth());
-            stage.setHeight(maximizedBox.getHeight());
             stage.show();
-            controller.setStatus("Complete - " + (System.currentTimeMillis() - start) + "[ms]");
+            LOGGER.info("{} Ended set stage size. {}[ms]",
+                    Thread.currentThread().getName(),
+                    (System.currentTimeMillis() - start)
+                    );
         });
 
-        Mono.create(emitter -> {
+        controllerDisposable = Mono.create(emitter -> {
             final Rectangle2D d = Screen.getPrimary().getVisualBounds();
-            stage.setWidth(d.getWidth());
-            stage.setHeight(d.getHeight());
+            maximizeStage(stage);
             controller.setSize(d.getWidth(), d.getHeight());
             // setup searcher.
             controller.setupExpandables();
             controller.setupSideMenu();
+            controller.setStatus(" Complete - " + (System.currentTimeMillis() - start) + "[ms]");
             emitter.success();
-            LOGGER.info("Ended set stage size.");
         }).subscribeOn(Schedulers.elastic()).subscribe();
     }
 
     /**
      * コントローラに stage を渡し、シーンファイルを読み込む.
-     * @param stage Stage オブジェクト
      * @return Scene オブジェクト
      */
-    private final Mono<Scene> readScene(final Stage stage) {
+    private final Mono<Scene> readScene() {
         final long start = System.currentTimeMillis();
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             loader.load();
             controller = (Controller) loader.getController();
-            controller.setStage(stage);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
             Platform.exit();
         }
-        LOGGER.info("Ended loading scene graph. {}[ms]", System.currentTimeMillis() - start);
+        LOGGER.info("{} Ended loading scene graph. {}[ms]",
+                Thread.currentThread().getName(),
+                System.currentTimeMillis() - start);
         return Mono.just(new Scene(controller.root));
+    }
+
+    /**
+     * Maximized the stage.
+     */
+    private void maximizeStage(final Stage stage) {
+        final Screen screen = Screen.getScreens().get(0);
+        final Rectangle2D bounds = screen.getVisualBounds();
+        final BoundingBox maximizedBox = new BoundingBox(
+                bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+        stage.setX(maximizedBox.getMinX());
+        stage.setY(maximizedBox.getMinY());
+        stage.setWidth(maximizedBox.getWidth());
+        stage.setHeight(maximizedBox.getHeight());
     }
 
     @Override
