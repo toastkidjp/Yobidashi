@@ -168,6 +168,7 @@ public class Editor {
         this.fontFamily.getItems().addAll(Font.getFamilies());
 
         this.fontSize = new NumberTextField();
+        this.fontSize.setMaxWidth(50.0);
         this.fontSize.setOnAction(event -> applyFontSettings());
 
         final Button button = new JFXButton("Apply");
@@ -175,8 +176,9 @@ public class Editor {
         button.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_APPLY_BUTTON);
 
         final HBox header = new HBox(label, fontFamily, fontSize, button);
-        header.setAlignment(Pos.CENTER);
         header.getStyleClass().add(DEFAULT_STYLE_CLASS_EDITOR_HEADER);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setSpacing(10.0d);
         return header;
     }
 
@@ -200,7 +202,7 @@ public class Editor {
         });
 
         area.textProperty().addListener((value, prev, next) -> {
-            label.setText(String.format("文字数: %,d字", value.getValue().length()));
+            label.setText(String.format("  文字数: %,d字", value.getValue().length()));
         });
 
         if (area.getOnInputMethodTextChanged() == null) {
