@@ -211,7 +211,7 @@ public final class Controller implements Initializable {
 
     /** title label. */
     @FXML
-    private TextField title;
+    private TextField titleInput;
 
     /** title's tooltip. */
     @FXML
@@ -399,16 +399,16 @@ public final class Controller implements Initializable {
         es.execute(Controller.this::initTabPane);
         es.execute(Controller.this::initSearchInPage);
         es.execute(Controller.this::initLeftDrawer);
-        title.focusedProperty().addListener((prev, next, value) -> {
+        titleInput.focusedProperty().addListener((prev, next, value) -> {
             if (StringUtils.isBlank(urlText) || "about:blank".equals(urlText)) {
                 return;
             }
             if (value.booleanValue()) {
-                title.setText(urlText);
-                title.setPromptText("");
+                titleInput.setText(urlText);
+                titleInput.setPromptText("");
                 return;
             }
-            title.clear();
+            titleInput.clear();
             Optional.ofNullable(getCurrentTab())
                     .map(ReloadableTab::getTitle)
                     .ifPresent(this::setTitleOnToolbar);
@@ -656,7 +656,7 @@ public final class Controller implements Initializable {
         final String text = titleStr == null
                 ? conf.get(Config.Key.APP_TITLE)
                 : titleStr + " - " + conf.get(Config.Key.APP_TITLE);
-        title.setPromptText(text);
+        titleInput.setPromptText(text);
         titleTooltip.setText(text);
     }
 
@@ -1595,10 +1595,11 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void readUrlText() {
-        if (StringUtils.isBlank(urlText)) {
+        final String target = titleInput.getText();
+        if (StringUtils.isBlank(target)) {
             return;
         }
-        openWebTab("", urlText);
+        openWebTab("", target);
     }
 
     /**
