@@ -18,6 +18,8 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXColorPicker?>
 
+<?import jp.toastkid.jfx.common.control.NumberTextField?>
+
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
   fx:controller="jp.toastkid.yobidashi.ToolsController">
     <styleClass>
@@ -84,6 +86,20 @@
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
             <content>
               <AnchorPane><children><fx:include fx:id="bmi" source="Bmi.fxml"/></children></AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Temperature Converter">
+            <content>
+              <AnchorPane>
+                <children>
+                  <HBox prefHeight="35.0" spacing="15.0">
+                    <children>
+                      <NumberTextField fx:id="fahrenheit" prefWidth="100.0" onAction="#fToC" promptText="Fahrenheit [°F]" labelFloat="true"/>
+                      <NumberTextField fx:id="celsius"    prefWidth="100.0" onAction="#cToF" promptText="Celsius [℃]" labelFloat="true"/>
+                     </children>
+                  </HBox>
+                </children>
+              </AnchorPane>
             </content>
           </TitledPane>
           <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Color Picker">

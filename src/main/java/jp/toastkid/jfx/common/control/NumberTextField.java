@@ -38,4 +38,12 @@ public class NumberTextField extends JFXTextField {
         }
         return Integer.parseInt(text);
     }
+
+    public double doubleValue() {
+        final String text = getText();
+        if (StringUtils.isBlank(text)) {
+            return 0;
+        }
+        return Double.parseDouble(text);
+    }
 }
