@@ -29,7 +29,7 @@ public class ArticleListCellTest extends ApplicationTest {
         final ArticleListCell cell = new ArticleListCell();
         final Article article = new Article(Paths.get("src/test/resources/article/C6FCB5AD323031332D30382D333128C5DA29.md"));
         cell.updateItem(article, false);
-        assertTrue(cell.cellText().startsWith("md | 日記2013-08-31(土)"));
+        assertTrue(cell.cellText().startsWith("日記2013-08-31(土)"));
         assertNull(cell.getText());
 
         // for test coverage,

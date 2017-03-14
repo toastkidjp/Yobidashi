@@ -122,12 +122,15 @@ public class Article implements Comparable<Article> {
     }
 
     /**
-     * return last modified ms.
-     * @return last modified string.
+     * Return last modified time text.
+     * @return last modified text.
      */
     public String lastModifiedText() {
         try {
-            return CalendarUtil.toUniTypeDate(Files.getLastModifiedTime(path).toMillis());
+            return CalendarUtil.longToStr(
+                    Files.getLastModifiedTime(path).toMillis(),
+                    "yyyy/MM/dd(E) HH:mm:ss.SSS"
+                    );
         } catch (final IOException e) {
             e.printStackTrace();
         }
