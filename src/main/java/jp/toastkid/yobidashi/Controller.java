@@ -1528,7 +1528,10 @@ public final class Controller implements Initializable {
      * Save current tab's content.
      */
     private void saveCurrentTab() {
-        editableOr().map(Editable::saveContent).ifPresent(this::showSnackbar);
+        editableOr()
+            .filter(Editable::isEditing)
+            .map(Editable::saveContent)
+            .ifPresent(this::showSnackbar);
     }
 
     /**
@@ -1544,7 +1547,8 @@ public final class Controller implements Initializable {
      */
     private final Optional<Editable> editableOr() {
         return Optional.ofNullable(getCurrentTab())
-                .filter(t -> t instanceof Editable).map(Editable.class::cast);
+                .filter(Editable.class::isInstance)
+                .map(Editable.class::cast);
     }
 
     /**
