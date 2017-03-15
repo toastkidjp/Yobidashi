@@ -570,8 +570,13 @@ public final class MarkdownConverter {
                 matcher = FOOTNOTE_PLACE_PATTERN.matcher(str);
                 if (matcher.find()) {
                     final String key = matcher.group(1);
-                    str = matcher.replaceFirst("<a id=\"fn-back-" + key + "\""
-                            + " href=\"#fn-" + key + "\" title=\"＜TITLE＞\">[" + key + "]</a>");
+                    str = matcher.replaceFirst("<a id=\"fn-back-" + key + "\" class=\"tooltip\""
+                             + " href=\"#fn-" + key + "\">[" + key + "]"
+                             + "<span class=\"tooltipBody\">＜TITLE＞"
+                             +   "<span class=\"tooltipAngle\">"
+                             +     "<span class=\"tooltipAngleInner\" />"
+                             +   "</span>"
+                             + "</span></a>");
                     footnote.put(key, contents.size());
                 }
             }

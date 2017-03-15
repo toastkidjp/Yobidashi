@@ -61,14 +61,14 @@ div.body {
     position: relative;
 }
 .tooltip .tooltipBody {
-    border: solid 2px #f98325;
+    border: solid 2px #121255;
     position: absolute;
     left: 1em;
     top: -2.7em;
     text-decoration: none;
     visibility: hidden;
     padding: 3px 5px;
-    width: 200px;
+    width: 400px;
     zoom: 1;
 }
 .tooltip:hover ,
@@ -80,7 +80,7 @@ div.body {
 .tooltip .tooltipBody .tooltipAngle {
     border-right: solid 10px transparent;
     border-left-width: 0;
-    border-top: solid 10px #f98325;
+    border-top: solid 10px #121255;
     line-height: 0;
     position: absolute;
     left: 1em;
