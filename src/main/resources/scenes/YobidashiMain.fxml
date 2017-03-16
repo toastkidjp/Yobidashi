@@ -104,6 +104,7 @@
           </sidePane>
         </JFXDrawer>
       </center>
+      <bottom><JFXSnackbar fx:id="snackbar" prefWidth="900.0" /></bottom>
     </BorderPane>
     <HBox fx:id="searcherArea" prefHeight="0.0" spacing="5.0">
       <children>
@@ -142,7 +143,6 @@
           </children>
         </HBox>
       </right>
-      <bottom><JFXSnackbar fx:id="snackbar" prefWidth="300.0" /></bottom>
     </BorderPane>
   </children>
 </VBox>

@@ -343,7 +343,7 @@ public final class Controller implements Initializable {
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
-        snackbar.registerSnackbarContainer(root);
+        snackbar.registerSnackbarContainer(header);
         conf = new Config(Defines.CONFIG);
         progressSender = TopicProcessor.create(true);
 
@@ -798,7 +798,7 @@ public final class Controller implements Initializable {
                     .filter(item -> item.title.startsWith(prefix))
                     .findFirst();
             if (!opt.isPresent()) {
-                new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
+                showSnackbar(prefix + "'s diary is not exist.");;
                 return;
             }
             opt.ifPresent(this::openArticleTab);
