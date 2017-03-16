@@ -30,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.InputMethodTextRun;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Shape;
@@ -190,6 +191,14 @@ public class Editor {
         area.setParagraphGraphicFactory(LineNumberFactory.get(area));
         area.setOnKeyPressed(event -> {
             if (event.isControlDown()) {
+                if (KeyCode.UP.equals(event.getCode())) {
+                    moveToTop();
+                    return;
+                }
+                if (KeyCode.DOWN.equals(event.getCode())) {
+                    moveToBottom();
+                    return;
+                }
                 return;
             }
 
@@ -276,6 +285,47 @@ public class Editor {
     }
 
     /**
+     * Convert to WebView y position.
+     * @param value
+     * @return
+     */
+    private double convertToWebViewY(double value) {
+        return value * scaleFactor;
+    }
+
+    /**
+     * Move to top of editor.
+     */
+    private void moveToTop() {
+        area.moveTo(0, 0);
+        area.setEstimatedScrollY(0.0d);
+    }
+
+    /**
+     * Move to bottom of editor.
+     */
+    private void moveToBottom() {
+        area.moveTo(area.getParagraphs().size() - 1, 0);
+        area.setEstimatedScrollY(area.getTotalHeightEstimate());
+    }
+
+    /**
+     * Apply font settings.
+     */
+    private void applyFontSettings() {
+        final int size = fontSize.intValue();
+        if (size < 0) {
+            return;
+        }
+        final String item = fontFamily.getSelectionModel().getSelectedItem();
+        conf.store(Maps.mutable.of(
+                Key.FONT_SIZE.text(),   Integer.toString(size),
+                Key.FONT_FAMILY.text(), item
+                ));
+        setFont(FontFactory.make(item, size));
+    }
+
+    /**
      * Switch editor's visibility.
      */
     void switchEditorVisible() {
@@ -301,36 +351,11 @@ public class Editor {
     }
 
     /**
-     * Convert to WebView y position.
-     * @param value
-     * @return
-     */
-    private double convertToWebViewY(double value) {
-        return value * scaleFactor;
-    }
-
-    /**
      * Return Node.
      * @return Node
      */
     Node getNode() {
         return split;
-    }
-
-    /**
-     * Apply font settings.
-     */
-    private void applyFontSettings() {
-        final int size = fontSize.intValue();
-        if (size < 0) {
-            return;
-        }
-        final String item = fontFamily.getSelectionModel().getSelectedItem();
-        conf.store(Maps.mutable.of(
-                Key.FONT_SIZE.text(),   Integer.toString(size),
-                Key.FONT_FAMILY.text(), item
-                ));
-        setFont(FontFactory.make(item, size));
     }
 
     /**
@@ -376,9 +401,8 @@ public class Editor {
     void show() {
         editorBox.setVisible(true);
         editorBox.setManaged(true);
-        area.moveTo(0, 0);
+        moveToTop();
         area.requestFocus();
-        area.setEstimatedScrollY(0.0d);
     }
 
     /**
