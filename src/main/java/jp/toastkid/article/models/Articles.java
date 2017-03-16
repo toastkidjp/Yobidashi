@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
+import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
@@ -36,6 +37,9 @@ public final class Articles {
 
     /** Groovy template engine. */
     private static final TemplateEngine TEMPLATE_ENGINE = new SimpleTemplateEngine();
+
+    /** 左の ListView で中心をいくつずらすか. */
+    private static final int FOCUS_MARGIN = 10;
 
     /** line separator. */
     private static final String LINE_SEPARATOR = System.lineSeparator();
@@ -235,7 +239,8 @@ public final class Articles {
      * @param params パラメータ
      * @return パラメータをセットしたテンプレートの文字列表現
      */
-    public static final String bindArgs(final String pathToTemplate, final Map<String, String> params) {
+    public static final String bindArgs(
+            final String pathToTemplate, final Map<String, String> params) {
         return bindArgsInternal(FileUtil.readLinesFromStream(pathToTemplate, Article.ENCODE), params);
     }
 
@@ -245,7 +250,8 @@ public final class Articles {
      * @param params
      * @return
      */
-    private static final String bindArgsInternal(final List<String> strs, final Map<String, String> params) {
+    private static final String bindArgsInternal(
+            final List<String> strs, final Map<String, String> params) {
         try {
             return TEMPLATE_ENGINE.createTemplate(
                     Lists.immutable.ofAll(strs).makeString(LINE_SEPARATOR)).make(params).toString();
@@ -324,6 +330,20 @@ public final class Articles {
         }
         final ByteBuffer bybuf = ByteBuffer.wrap(b);
         return charset.decode(bybuf).toString();
+    }
+
+    /**
+     * Focus ListView on this item.
+     * @param listView
+     */
+    public static void focus(final Article article, final ListView<Article> listView) {
+        final int indexOf = listView.getItems().indexOf(article);
+        if (indexOf != -1){
+            listView.getSelectionModel().select(indexOf);
+            listView.scrollTo(indexOf - FOCUS_MARGIN);
+            return;
+        }
+        listView.getSelectionModel().clearSelection();
     }
 
 }

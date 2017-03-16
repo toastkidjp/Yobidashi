@@ -569,7 +569,7 @@ public final class Controller implements Initializable {
             return;
         }
 
-        articleOr.ifPresent(article -> Platform.runLater(() -> article.focus(articleList)));
+        articleOr.ifPresent(article -> Platform.runLater(() -> Articles.focus(article, articleList)));
 
 }
     /**
@@ -906,7 +906,7 @@ public final class Controller implements Initializable {
                             final Article newArticle
                                 = Articles.findByUrl(conf.get(Key.ARTICLE_DIR), url);
                             if (Files.exists(newArticle.path)) {
-                                newArticle.focus(articleList);
+                                Articles.focus(newArticle, articleList);
                                 return;
                             }
 
@@ -916,7 +916,7 @@ public final class Controller implements Initializable {
                                 items.add(newArticle);
                             }
                             articleList.refresh();
-                            newArticle.focus(articleList);
+                            Articles.focus(newArticle, articleList);
                         })
                 )
                 .setPopupHandler(param -> openWebTab("", "").getWebView().getEngine())
