@@ -87,3 +87,7 @@
 .tab:selected {
   -fx-background-color: #D9D9D9;
 }
+
+.option-popup {
+  -fx-font-size: 18pt;
+}
