@@ -15,6 +15,7 @@ import javafx.concurrent.Worker.State;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -56,6 +57,21 @@ public abstract class BaseWebTab extends ReloadableTab {
      * Set up WebView.
      */
     protected void initWebView() {
+
+        wv.setOnKeyPressed(event -> {
+            if (!event.isControlDown()) {
+                return;
+            }
+            if (KeyCode.UP.equals(event.getCode())) {
+                moveToTop();
+                return;
+            }
+            if (KeyCode.DOWN.equals(event.getCode())) {
+                moveToBottom();
+                return;
+            }
+        });
+
         final WebEngine engine = wv.getEngine();
         engine.getLoadWorker().stateProperty().addListener((value, prev, next) -> {
             final State state = value.getValue();
