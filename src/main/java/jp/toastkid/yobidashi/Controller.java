@@ -211,7 +211,7 @@ public final class Controller implements Initializable {
 
     /** title label. */
     @FXML
-    private TextField title;
+    private TextField titleInput;
 
     /** title's tooltip. */
     @FXML
@@ -343,7 +343,7 @@ public final class Controller implements Initializable {
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
 
-        snackbar.registerSnackbarContainer(root);
+        snackbar.registerSnackbarContainer(header);
         conf = new Config(Defines.CONFIG);
         progressSender = TopicProcessor.create(true);
 
@@ -399,16 +399,16 @@ public final class Controller implements Initializable {
         es.execute(Controller.this::initTabPane);
         es.execute(Controller.this::initSearchInPage);
         es.execute(Controller.this::initLeftDrawer);
-        title.focusedProperty().addListener((prev, next, value) -> {
+        titleInput.focusedProperty().addListener((prev, next, value) -> {
             if (StringUtils.isBlank(urlText) || "about:blank".equals(urlText)) {
                 return;
             }
             if (value.booleanValue()) {
-                title.setText(urlText);
-                title.setPromptText("");
+                titleInput.setText(urlText);
+                titleInput.setPromptText("");
                 return;
             }
-            title.clear();
+            titleInput.clear();
             Optional.ofNullable(getCurrentTab())
                     .map(ReloadableTab::getTitle)
                     .ifPresent(this::setTitleOnToolbar);
@@ -569,7 +569,7 @@ public final class Controller implements Initializable {
             return;
         }
 
-        articleOr.ifPresent(article -> Platform.runLater(() -> article.focus(articleList)));
+        articleOr.ifPresent(article -> Platform.runLater(() -> Articles.focus(article, articleList)));
 
 }
     /**
@@ -656,7 +656,7 @@ public final class Controller implements Initializable {
         final String text = titleStr == null
                 ? conf.get(Config.Key.APP_TITLE)
                 : titleStr + " - " + conf.get(Config.Key.APP_TITLE);
-        title.setPromptText(text);
+        titleInput.setPromptText(text);
         titleTooltip.setText(text);
     }
 
@@ -798,7 +798,7 @@ public final class Controller implements Initializable {
                     .filter(item -> item.title.startsWith(prefix))
                     .findFirst();
             if (!opt.isPresent()) {
-                new JFXSnackbar().show(prefix + "'s diary is not exist.", 4000L);
+                showSnackbar(prefix + "'s diary is not exist.");;
                 return;
             }
             opt.ifPresent(this::openArticleTab);
@@ -906,7 +906,7 @@ public final class Controller implements Initializable {
                             final Article newArticle
                                 = Articles.findByUrl(conf.get(Key.ARTICLE_DIR), url);
                             if (Files.exists(newArticle.path)) {
-                                newArticle.focus(articleList);
+                                Articles.focus(newArticle, articleList);
                                 return;
                             }
 
@@ -916,7 +916,7 @@ public final class Controller implements Initializable {
                                 items.add(newArticle);
                             }
                             articleList.refresh();
-                            newArticle.focus(articleList);
+                            Articles.focus(newArticle, articleList);
                         })
                 )
                 .setPopupHandler(param -> openWebTab("", "").getWebView().getEngine())
@@ -1528,7 +1528,10 @@ public final class Controller implements Initializable {
      * Save current tab's content.
      */
     private void saveCurrentTab() {
-        editableOr().map(Editable::saveContent).ifPresent(this::showSnackbar);
+        editableOr()
+            .filter(Editable::isEditing)
+            .map(Editable::saveContent)
+            .ifPresent(this::showSnackbar);
     }
 
     /**
@@ -1544,7 +1547,8 @@ public final class Controller implements Initializable {
      */
     private final Optional<Editable> editableOr() {
         return Optional.ofNullable(getCurrentTab())
-                .filter(t -> t instanceof Editable).map(Editable.class::cast);
+                .filter(Editable.class::isInstance)
+                .map(Editable.class::cast);
     }
 
     /**
@@ -1595,10 +1599,11 @@ public final class Controller implements Initializable {
      */
     @FXML
     private final void readUrlText() {
-        if (StringUtils.isBlank(urlText)) {
+        final String target = titleInput.getText();
+        if (StringUtils.isBlank(target)) {
             return;
         }
-        openWebTab("", urlText);
+        openWebTab("", target);
     }
 
     /**

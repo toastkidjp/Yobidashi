@@ -1,154 +1,166 @@
 .root {
-    -fx-base: rgba(200, 200, 0, 0.1);
-    -fx-background: #E9E9C5;
+  -fx-base: rgba(200, 200, 0, 0.5);
+  -fx-background: #E9E9C5;
 }
 
 .text {
-    -fx-font-family: 'Roboto';
+  -fx-font-family: 'Roboto';
 }
 
 .menu {
-    -fx-base: rgba(200, 170, 0, 0.5);
-    -fx-text-fill: white;
+  -fx-base: rgba(200, 170, 0, 0.5);
+  -fx-text-fill: white;
 }
 
 .menu-item:focused {
-    -fx-background-color: #777700;
+  -fx-background-color: #777700;
 }
 
 .menu-item:focused .label {
-    -fx-text-fill: white;
-}
-
-.text-field {
-    -fx-background: #555500;
-    -fx-prompt-text-fill: black;
-    -fx-text-fill: white;
-    -fx-opacity: 0.5;
-}
-
-.text-field:focused {
-    -fx-base: gray;
-    -fx-text-fill: #333300;
+  -fx-text-fill: white;
 }
 
 .text-area {
-    -fx-background: white;
+  -fx-background: white;
 }
 
 .text-area:focused {
-    -fx-base: gray;
+  -fx-base: gray;
 }
 
 .tab-pane {
-    -fx-text-fill: #555500;
-    -fx-background-color: rgba(150, 150, 0, 0.0);
+  -fx-text-fill: #555500;
+  -fx-background-color: rgba(150, 150, 0, 0.0);
 }
 
 .list-view {
-    -fx-background-color: rgba(100, 100, 0, 0.1);
+  -fx-background-color: rgba(100, 100, 0, 0.1);
 }
 
 .left-tabs .list-cell {
-    -fx-background-color: rgba(100, 100, 0, 0.15);
+  -fx-background-color: rgba(100, 100, 0, 0.15);
 }
 
 .left-tabs .list-cell:even {
-    -fx-background-color: rgba(160, 160, 0, 0.15);
+  -fx-background-color: rgba(160, 160, 0, 0.15);
 }
 
 .left-tabs .list-cell:hover {
-    -fx-text-fill: white;
-    -fx-background-color: #777700;
+  -fx-text-fill: white;
+  -fx-background-color: #777700;
 }
 
 .left-tabs .list-cell:selected {
-    -fx-text-fill: white;
-    -fx-background-color: #777700;
+  -fx-text-fill: white;
+  -fx-background-color: #777700;
 }
 
 .left-tabs .list-cell:hover .label {
-    -fx-text-fill: white;
+  -fx-text-fill: white;
 }
 
 .left-tabs .list-cell:selected .label {
-    -fx-text-fill: white;
+  -fx-text-fill: white;
 }
 
 .scroll-bar .thumb{
-    -fx-background-color: #E9E9C5;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
+  -fx-background-color: #E9E9C5;
+  -fx-background-insets: 0;
+  -fx-background-radius: 0;
 }
 .scroll-bar {
-    -fx-background-color: #F4F4C5;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
+  -fx-background-color: #F4F4C5;
+  -fx-background-insets: 0;
+  -fx-background-radius: 0;
 }
 
 .scroll-pane {
-    -fx-opacity: 0.5;
+  -fx-opacity: 0.5;
 }
 .scroll-bar:horizontal .increment-arrow {
-    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
-    -fx-shape: "M7.626,12.876L4.251,8.751H7.14L11,12.876L7.14,17H4.251L7.626,12.876z";
+  -fx-background-color: rgba(150, 150, 0, 0.5);
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+  -fx-shape: "M7.626,12.876L4.251,8.751H7.14L11,12.876L7.14,17H4.251L7.626,12.876z";
 }
 
 .scroll-bar:vertical .increment-arrow {
-    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
-    -fx-shape: "M8.124,13.625l4.125-3.375v2.889l-4.125,3.86L4,13.139V10.25L8.124,13.625z";
+  -fx-background-color: rgba(150, 150, 0, 0.5);
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+  -fx-shape: "M8.124,13.625l4.125-3.375v2.889l-4.125,3.86L4,13.139V10.25L8.124,13.625z";
 }
 .scroll-bar .increment-button:pressed .increment-arrow {
-    -fx-background-color: white, white;
+  -fx-background-color: white, white;
 }
 .scroll-bar:horizontal .decrement-arrow {
-    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
-    -fx-shape: "M11,17H8.111l-3.86-4.124l3.86-4.125H11l-3.375,4.125L11,17z";
+  -fx-background-color: rgba(150, 150, 0, 0.5);
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+  -fx-shape: "M11,17H8.111l-3.86-4.124l3.86-4.125H11l-3.375,4.125L11,17z";
 }
 
 .scroll-bar:vertical .decrement-arrow {
-    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
-    -fx-background-insets: 1 0 -1 0, 0;
-    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
-    -fx-shape: "M4,17v-2.889l4.124-3.86l4.125,3.86V17l-4.125-3.375L4,17z";
+  -fx-background-color: rgba(150, 150, 0, 0.5);
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+  -fx-shape: "M4,17v-2.889l4.124-3.86l4.125,3.86V17l-4.125-3.375L4,17z";
 }
 .scroll-bar .decrement-button:pressed .decrement-arrow {
-    -fx-background-color: white, white;
+  -fx-background-color: white, white;
 }
 
 .button {
-    -fx-text-fill: #555500;
+  -fx-text-fill: #555500;
 }
 
 .combo-box .list-cell {
-    -fx-text-fill: #555500;
+    -fx-text-fill: white;
 }
 
 .tab-label {
-    -fx-text-fill: #555500;
+  -fx-text-fill: #555500;
 }
 
 .jfx-tool-bar {
-    -fx-font-size: 20.0;
-    -fx-font-weight: BOLD;
-    -fx-background-color: #777700;
-    -fx-pref-width: 100.0%;
-    -fx-pref-height: 64.0px;
+  -fx-font-size: 20.0;
+  -fx-font-weight: BOLD;
+  -fx-background-color: #777700;
+  -fx-pref-width: 100.0%;
+  -fx-pref-height: 64.0px;
 }
 
-.jfx-tool-bar  .label {
-	-fx-text-fill: #FFFFFF;
-}
 .jfx-snackbar-content {
-    -fx-background-color: #777700;
+  -fx-background-color: #777700;
 }
 
 .jfx-snackbar-toast {
-    -fx-text-fill: WHITE;
+  -fx-text-fill: WHITE;
+}
+
+.code-area {
+  -fx-background-color: rgba(242, 242, 230, 0.5);
+}
+
+.jfx-tab-pane .tab-header-background{
+    -fx-background-color: rgba(150, 150, 0, 0.5);
+}
+
+.jfx-tab-pane .tab-label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.jfx-text-field, .jfx-password-field {
+  -fx-background-color: transparent;
+  -fx-font-weight: BOLD;
+  -fx-prompt-text-fill: WHITE;
+  -fx-text-fill: WHITE;
+  -fx-alignment: top-left ;
+  -fx-focus-color: WHITE;
+  -fx-unfocus-color: WHITE;
+}
+
+#sdSearch {
+  -fx-base: rgba(150, 150, 0, 0.5);
+  -fx-text-fill: rgba(10, 10, 0, 0.8);
 }

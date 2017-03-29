@@ -45,11 +45,11 @@ public class ArticleFocusTest extends ApplicationTest {
      */
     @Test
     public void test_focus() {
-        a.focus(listView);
+        Articles.focus(a, listView);
         assertEquals(-1, listView.getSelectionModel().getSelectedIndex());
 
         listView.getItems().add(a);
-        a.focus(listView);
+        Articles.focus(a, listView);
         assertEquals(0, listView.getSelectionModel().getSelectedIndex());
     }
 

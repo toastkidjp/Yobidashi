@@ -38,8 +38,7 @@ public class ArticleListCell extends JFXListCell<Article> {
             return;
         }
         final String text = new StringBuilder()
-                .append(article.extention().substring(1) ).append(" | ")
-                .append(article.title).append(System.lineSeparator()).append("最終更新：")
+                .append(article.title).append(System.lineSeparator()).append("Last modified：")
                 .append(article.lastModifiedText()).toString();
         ((Label) cellContent).setText(text);
     }

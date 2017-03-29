@@ -11,9 +11,9 @@
   style="-fx-effect: dropshadow(three-pass-box, #000033, 10, 0, 0, 0);"
   >
   <content>
-    <JFXListView fx:id="popupList" styleClass="popup-list-view" prefHeight="100.0" prefWidth="100.0">
-      <MenuLabel onAction="#minimize" text="Minimize" />
-      <MenuLabel onAction="#quit"     text="Quit" />
+    <JFXListView fx:id="popupList" styleClass="popup-list-view" prefHeight="120.0" prefWidth="200.0">
+      <MenuLabel onAction="#minimize" text="Minimize" styleClass="option-popup" />
+      <MenuLabel onAction="#quit"     text="Quit"     styleClass="option-popup" />
     </JFXListView>
   </content>
 </JFXPopup>

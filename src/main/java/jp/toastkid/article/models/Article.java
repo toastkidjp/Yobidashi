@@ -10,7 +10,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.collections.api.set.FixedSizeSet;
 import org.eclipse.collections.impl.factory.Sets;
 
-import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
 
@@ -26,9 +25,6 @@ public class Article implements Comparable<Article> {
 
     /** Internal link's protocol. */
     public static final String INTERNAL_PROTOCOL = "file:///internal/";
-
-    /** 左のリストで中心をいくつずらすか. */
-    private static final int FOCUS_MARGIN = 10;
 
     /** Internal link's format. */
     private static final String INTERNAL_LINK_FORMAT = INTERNAL_PROTOCOL + "/%s/%s%s";
@@ -122,12 +118,15 @@ public class Article implements Comparable<Article> {
     }
 
     /**
-     * return last modified ms.
-     * @return last modified string.
+     * Return last modified time text.
+     * @return last modified text.
      */
     public String lastModifiedText() {
         try {
-            return CalendarUtil.toUniTypeDate(Files.getLastModifiedTime(path).toMillis());
+            return CalendarUtil.longToStr(
+                    Files.getLastModifiedTime(path).toMillis(),
+                    "yyyy/MM/dd(E) HH:mm:ss.SSS"
+                    );
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -173,20 +172,6 @@ public class Article implements Comparable<Article> {
             return false;
         }
         return EXTENSIONS.contains(ext.get());
-    }
-
-    /**
-     * Focus ListView on this item.
-     * @param listView
-     */
-    public final void focus(final ListView<Article> listView) {
-        final int indexOf = listView.getItems().indexOf(this);
-        if (indexOf != -1){
-            listView.getSelectionModel().select(indexOf);
-            listView.scrollTo(indexOf - FOCUS_MARGIN);
-            return;
-        }
-        listView.getSelectionModel().clearSelection();
     }
 
 }

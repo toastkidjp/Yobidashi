@@ -69,6 +69,29 @@ public class NumberTextFieldTest extends ApplicationTest {
         assertEquals(-1, numberTextField.intValue());
     }
 
+    /**
+     * {@link NumberTextField#doubleValue()}.
+     */
+    @Test
+    public void test_doubleValue() {
+        numberTextField.setText(null);
+        assertEquals(0, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("");
+        assertEquals(0, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText(" ");
+        assertEquals(0, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("0");
+        assertEquals(0, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("1");
+        assertEquals(1, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("-1");
+        assertEquals(-1, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("1.1");
+        assertEquals(1.1, numberTextField.doubleValue(), 0.1d);
+        numberTextField.setText("-1.1");
+        assertEquals(-1.1, numberTextField.doubleValue(), 0.1d);
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         // NOP

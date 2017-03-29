@@ -21,6 +21,8 @@ import javafx.scene.layout.Pane;
 import jp.toastkid.article.control.UserAgent;
 import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
+import jp.toastkid.jfx.common.control.NumberTextField;
+import jp.toastkid.libs.temperature.TemperatureConverter;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
@@ -76,8 +78,17 @@ public class ToolsController implements Initializable {
     @FXML
     private ComboBox<UserAgent> ua;
 
+    /** Fahrenheit input. */
+    @FXML
+    private NumberTextField fahrenheit;
+
+    /** Celsius input. */
+    @FXML
+    private NumberTextField celsius;
+
     /** Message sender. */
     private final TopicProcessor<Message> messenger = TopicProcessor.create();
+
 
     /**
      * Draw chart.
@@ -171,6 +182,22 @@ public class ToolsController implements Initializable {
                 ZOOM_INCREMENT, zoom::increment,
                 ZOOM_DECREMENT, zoom::decrement
                 );
+    }
+
+    /**
+     * Convert celsius to fahrenheit.
+     */
+    @FXML
+    private void cToF() {
+        fahrenheit.setText(Double.toString(TemperatureConverter.cToF(celsius.doubleValue())));
+    }
+
+    /**
+     * Convert fahrenheit to celsius.
+     */
+    @FXML
+    private void fToC() {
+        celsius.setText(Double.toString(TemperatureConverter.fToC(fahrenheit.doubleValue())));
     }
 
     @Override

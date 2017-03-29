@@ -10,7 +10,6 @@ import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXPopup.PopupHPosition;
 import com.jfoenix.controls.JFXPopup.PopupVPosition;
 
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -107,7 +106,6 @@ public class HamburgerPopup {
             controller.getMessenger().subscribe(b.sub);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
-            Platform.exit();
         }
         LOGGER.info("Ended loading scene graph. {}[ms]", System.currentTimeMillis() - start);
     }
@@ -116,7 +114,7 @@ public class HamburgerPopup {
      * Show popup.
      */
     public void show() {
-        popup.show(PopupVPosition.TOP, PopupHPosition.LEFT);
+        popup.show(PopupVPosition.TOP, PopupHPosition.RIGHT);
     }
 
 }
