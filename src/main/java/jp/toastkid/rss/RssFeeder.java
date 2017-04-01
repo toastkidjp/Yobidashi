@@ -61,7 +61,7 @@ public final class RssFeeder {
      */
     private Rss fetch(final String url) {
         try {
-            return new RssParser().parse(new URI(url));
+            return new Parser().parse(new URI(url));
         } catch (final URISyntaxException e) {
             e.printStackTrace();
         }

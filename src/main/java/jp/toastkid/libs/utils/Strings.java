@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class Strings {
 
+    private static final String EMPTY = "";
+
     /** 半角カタカナの集合 */
     private static final String HALFSIZE_KATAKANA
         = "ｱｲｳｴｵｧｨｩｪｫｶｷｸｹｺｻｼｽｾｿﾀﾁﾂｯﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖｬｭｮﾗﾘﾙﾚﾛﾜｦﾝｰﾞﾟ､｡";
@@ -130,7 +132,7 @@ public final class Strings {
                                         final String y,
                                         final double lamda
                                         ){
-        String tmp = "";
+        String tmp = EMPTY;
         ArrayList<String> arrangeXY;
         arrangeXY = new ArrayList<String>();
         double xx = 0.0;
@@ -142,7 +144,7 @@ public final class Strings {
 
         for(int i = 0; i < x.length() - 1; i++){
             for(int j = i + 1; j < x.length(); j++){
-                tmp = "" + x.charAt(i) + x.charAt(j);
+                tmp = EMPTY + x.charAt(i) + x.charAt(j);
                 if(arrangeXY.contains(tmp) == false){
                         arrangeXY.add(tmp);
                 }
@@ -150,7 +152,7 @@ public final class Strings {
         }
         for(int i = 0; i < y.length() - 1; i++){
             for(int j = i + 1; j < y.length(); j++){
-                tmp = "" + y.charAt(i) + y.charAt(j);
+                tmp = EMPTY + y.charAt(i) + y.charAt(j);
                 if(arrangeXY.contains(tmp) == false){
                     arrangeXY.add(tmp);
                 }
@@ -159,18 +161,18 @@ public final class Strings {
         //int i = 0; i < arrangexy.size(); i++
         for(int i = 0; i < arrangeXY.size(); i++){
             for(int x1 = 0 ;x1 < x.length() - 1; x1++){
-                if(("" + x.charAt(x1)).equals("" + arrangeXY.get(i).charAt(0))){
+                if((EMPTY + x.charAt(x1)).equals(EMPTY + arrangeXY.get(i).charAt(0))){
                     for(int x2 = x1 + 1; x2 < x.length(); x2++){
-                        if((""+x.charAt(x2)).equals(""+arrangeXY.get(i).charAt(1))){
+                        if((EMPTY+x.charAt(x2)).equals(EMPTY+arrangeXY.get(i).charAt(1))){
                             tmpxx += Math.pow(lamda,(x2-x1+1));
                         }
                     }
                 }
             }
             for(int y1 = 0; y1 < y.length() - 1; y1++){
-                if( ("" + y.charAt(y1) ).equals("" + arrangeXY.get(i).charAt(0) ) ){
+                if( (EMPTY + y.charAt(y1) ).equals(EMPTY + arrangeXY.get(i).charAt(0) ) ){
                     for(int y2 = y1 + 1; y2 < y.length(); y2++){
-                        if( ("" + y.charAt(y2) ).equals( "" + arrangeXY.get(i).charAt(1) ) ){
+                        if( (EMPTY + y.charAt(y2) ).equals( EMPTY + arrangeXY.get(i).charAt(1) ) ){
                             tmpyy += Math.pow(
                                               lamda,
                                               ( y2 - y1 + 1 )
@@ -197,7 +199,7 @@ public final class Strings {
     public static ArrayList<String> getBiGrams(final String pStr){
         final ArrayList<String> resList = new ArrayList<String>();
         for(int i = 0; i < pStr.length() - 1; i++){
-            resList.add("" + pStr.charAt(i) + pStr.charAt(i + 1));
+            resList.add(EMPTY + pStr.charAt(i) + pStr.charAt(i + 1));
         }
         return resList;
     }
@@ -346,7 +348,7 @@ public final class Strings {
      * 110521作成
      */
     public static String removeQuote(final String str){
-        return str.replaceAll("\"", "");
+        return str.replaceAll("\"", EMPTY);
     }
 
     /**
@@ -422,8 +424,8 @@ public final class Strings {
     public static final String join(final String glue, final Object... pieces) {
         final StringBuilder joined = new StringBuilder();
         for (final Object piece : pieces) {
-            joined.append(joined.length() != 0 ? glue : "")
-                  .append(piece != null ? piece.toString() : "");
+            joined.append(joined.length() != 0 ? glue : EMPTY)
+                  .append(piece != null ? piece.toString() : EMPTY);
         }
         return joined.toString();
     }
@@ -558,7 +560,7 @@ public final class Strings {
         for (int i = 0; i < chars.length; i++) {
             final char c = chars[i];
             if (Character.isUpperCase(c)) {
-                sb.append(sb.length() != 0 ? '_' : "").append(Character.toLowerCase(c));
+                sb.append(sb.length() != 0 ? '_' : EMPTY).append(Character.toLowerCase(c));
             } else {
                 sb.append(Character.toLowerCase(c));
             }
@@ -579,7 +581,7 @@ public final class Strings {
         for (int i = 0; i < chars.length; i++) {
             final char c = chars[i];
             if (c == '_') {
-                sb.append((i + 1) < chars.length ? Character.toUpperCase(chars[++i]) : "");
+                sb.append((i + 1) < chars.length ? Character.toUpperCase(chars[++i]) : EMPTY);
             } else {
                 sb.append(sb.length() == 0 ? Character.toUpperCase(c) : Character.toLowerCase(c));
             }
@@ -639,5 +641,13 @@ public final class Strings {
      */
     public static StringBuilder builder(final int initialCapacity) {
         return new StringBuilder(initialCapacity);
+    }
+
+    /**
+     * Return empty string.
+     * @return empty string("")
+     */
+    public static String empty() {
+        return EMPTY;
     }
 }

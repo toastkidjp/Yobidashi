@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.collections.impl.factory.Maps;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -57,6 +56,9 @@ public class Editor {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Editor.class);
+
+    /** ZERO string. */
+    private static final String ZERO = "0";
 
     /** Editor header's class. */
     private static final String DEFAULT_STYLE_CLASS_EDITOR_HEADER        = "editor-header";
@@ -347,7 +349,7 @@ public class Editor {
      */
     int getYPosition() {
         final Object script = engine.executeScript("window.pageYOffset;");
-        return MathUtil.parseOrZero(Optional.ofNullable(script).orElse("0").toString());
+        return MathUtil.parseOrZero(script != null ? script.toString() : ZERO);
     }
 
     /**

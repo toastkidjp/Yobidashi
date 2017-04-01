@@ -12,6 +12,7 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.utils.Strings;
 
 /**
  * Article model.
@@ -71,7 +72,7 @@ public class Article implements Comparable<Article> {
 
         this.path      = path;
         this.title     = Articles.convertTitle(path.getFileName().toString());
-        this.extension = FileUtil.findExtension(path).orElse("");
+        this.extension = FileUtil.findExtension(path).orElseGet(Strings::empty);
     }
 
     /**
