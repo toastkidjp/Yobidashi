@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 文字列について様々な処理を行うユーティリティ・クラス<BR>
- * 計算式はカーネル法のものを用いている.<BR>
+ * {@link String} utilities.
  *
  * @author Toast kid
  */
 public final class Strings {
 
+    /** Empty string. */
     private static final String EMPTY = "";
 
     /** 半角カタカナの集合 */
@@ -42,11 +42,16 @@ public final class Strings {
     /** lamdaの設定がわからない時はこの値を使うといい(定数、0.9). */
     public static final double SAMPLE_LAMDA = 0.9;
 
-    /** 改行記号. */
+    /** Line separator. */
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
-     * ファイルパスのフォルダ区切り記号を取得し返す
+     * Deny make instance.
+     */
+    private Strings(){}
+
+    /**
+     * Return directory separator.
      */
     public static String getDirSeparator(){
         if (getOSName().indexOf("indow") != -1) {
@@ -64,11 +69,6 @@ public final class Strings {
     public static String getOSName() {
         return System.getProperty("os.name");
     }
-
-    /**
-     * deny make instance.
-     */
-    private Strings(){}
 
     /**
      * 四捨五入した類似度を返す
@@ -299,6 +299,7 @@ public final class Strings {
         x = tempBuf.toString();
         return x;
     }
+
     /**
      * カタカナ全角半角統一(全角に統一)
      * @param  x : 処理する文字列
@@ -309,11 +310,11 @@ public final class Strings {
         int idx;
         char ch;
         for (int i =0; i< x.length(); i++) {
-                ch = x.charAt(i);
-                if ((idx = HALFSIZE_KATAKANA.indexOf(ch)) >= 0) {
-                        ch = FULLSIZE_KATAKANA.charAt(idx);
-                }
-        tempBuf.append(ch);
+            ch = x.charAt(i);
+            if ((idx = HALFSIZE_KATAKANA.indexOf(ch)) >= 0) {
+                ch = FULLSIZE_KATAKANA.charAt(idx);
+            }
+            tempBuf.append(ch);
         }
         x = tempBuf.toString();
         return x;
@@ -450,21 +451,16 @@ public final class Strings {
      * What is a good 64bit hash function in Java for textual strings?</a>
      */
     public static long md5Hash(final String str) {
-        final long hash = 0;
-        MessageDigest md;
         try {
-            md = MessageDigest.getInstance("MD5");
+            final MessageDigest md = MessageDigest.getInstance("MD5");
             final byte[] data = str.getBytes();
             md.update(data);
             final byte[] digest = md.digest();
-            /*for (int i = 0; i < digest.length; i++) {
-                hash = hash + (digest[i] * 63);
-            }*/
             return new BigInteger(digest).longValue();
         } catch (final NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        return hash;
+        return 0L;
     }
 
     /**
@@ -536,7 +532,7 @@ public final class Strings {
         return builder.toString();
     }
     /**
-     * is started string http:// or https://
+     * Is started string http:// or https://
      * @param url URL string.
      * @return if url startswith http protocol.
      */
@@ -569,7 +565,7 @@ public final class Strings {
     }
 
     /**
-     * snake_case convert to CamelCase string.
+     * Snake_case convert to CamelCase string.
      * @param snake string
      */
     public static final String snakeToCamel(final String snake) {
@@ -590,7 +586,7 @@ public final class Strings {
     }
 
     /**
-     * extract string with passed regex and wrapped result.
+     * Extract string with passed regex and wrapped result.
      * @param target string
      * @param regex regex
      * @return string wrapped Optional.
@@ -600,7 +596,7 @@ public final class Strings {
     }
 
     /**
-     * extract string with passed regex.
+     * Extract string with passed regex.
      * @param target string
      * @param regex regex
      * @return string.
@@ -627,7 +623,7 @@ public final class Strings {
     }
 
     /**
-     * init StringBuilder.
+     * Initialize StringBuilder.
      * @return StringBuilder
      */
     public static StringBuilder builder() {
@@ -635,7 +631,7 @@ public final class Strings {
     }
 
     /**
-     * init StringBuilder with initialCapacity.
+     * Initialize StringBuilder with initialCapacity.
      * @param initialCapacity
      * @return StringBuilder
      */
