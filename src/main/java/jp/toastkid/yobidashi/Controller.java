@@ -507,7 +507,7 @@ public final class Controller implements Initializable {
                 return;
             }
             board.getFiles().stream().forEach(f -> {
-                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).get())) {
+                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).orElseGet(Strings::empty))) {
                     processEditorTabMessage(EditorTabMessage.make(Paths.get(f.getAbsolutePath())));
                     return;
                 }
@@ -1256,12 +1256,14 @@ public final class Controller implements Initializable {
             setStatus("This tab can't use slide show.");
             return;
         }
-        new Slideshow.Builder()
-            .setOwner(stage)
-            .setSource(articleOr.get().path)
-            .setIsFullScreen(true)
-            .build()
-            .launch();
+
+        articleOr.ifPresent(article -> new Slideshow.Builder()
+                .setOwner(stage)
+                .setSource(article.path)
+                .setIsFullScreen(true)
+                .build()
+                .launch()
+            );
     }
 
     /**

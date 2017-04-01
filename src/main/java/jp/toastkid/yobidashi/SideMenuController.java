@@ -125,41 +125,41 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callBackUp() {
-        final Window parent = getParent().get();
-        new AlertDialog.Builder(parent)
-            .setTitle("Backup")
-            .setMessage("この処理には時間がかかります。")
-            .setOnPositive("OK", () -> {
-                new ProgressDialog.Builder()
-                        .setScene(parent.getScene())
-                        .setCommand(new Task<Integer>() {
+        getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
+                .setTitle("Backup")
+                .setMessage("この処理には時間がかかります。")
+                .setOnPositive("OK", () -> {
+                    new ProgressDialog.Builder()
+                            .setScene(parent.getScene())
+                            .setCommand(new Task<Integer>() {
 
-                            private String sArchivePath;
+                                private String sArchivePath;
 
-                            private long end;
+                                private long end;
 
-                            @Override
-                            protected Integer call() throws Exception {
-                                final long start = System.currentTimeMillis();
-                                sArchivePath = conf.get(Config.Key.ARTICLE_DIR);
-                                new Archiver().simpleBackup(Paths.get(sArchivePath), 0L);
-                                end = System.currentTimeMillis() - start;
-                                return 100;
-                            }
+                                @Override
+                                protected Integer call() throws Exception {
+                                    final long start = System.currentTimeMillis();
+                                    sArchivePath = conf.get(Config.Key.ARTICLE_DIR);
+                                    new Archiver().simpleBackup(Paths.get(sArchivePath), 0L);
+                                    end = System.currentTimeMillis() - start;
+                                    return 100;
+                                }
 
-                            @Override
-                            protected void succeeded() {
-                                sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
-                                        + "zip";
-                                final String message = String.format(
-                                        "バックアップを完了しました。：%s%s%d[ms]",
-                                        sArchivePath, System.lineSeparator(), end
-                                        );
-                                AlertDialog.showMessage(parent, "バックアップ完了", message);
-                            }
-                        })
-                        .build();
-            }).build().showAndWait();
+                                @Override
+                                protected void succeeded() {
+                                    sArchivePath = sArchivePath.substring(0, sArchivePath.length() - 1)
+                                            + "zip";
+                                    final String message = String.format(
+                                            "バックアップを完了しました。：%s%s%d[ms]",
+                                            sArchivePath, System.lineSeparator(), end
+                                            );
+                                    AlertDialog.showMessage(parent, "バックアップ完了", message);
+                                }
+                            })
+                            .build();
+                }).build().showAndWait()
+            );
     }
 
     /**
@@ -200,13 +200,10 @@ public class SideMenuController implements Initializable {
      */
     @FXML
     private final void callConfig() {
-        final Optional<Window> parent = getParent();
-        if (!parent.isPresent()) {
-            return;
-        }
-
-        new ConfigDialog(parent.get()).showAndWait();
-        messenger.onNext(TabMessage.makeReload());
+        getParent().ifPresent(parent -> {
+            new ConfigDialog(parent).showAndWait();
+            messenger.onNext(TabMessage.makeReload());
+        });
     }
 
     /**

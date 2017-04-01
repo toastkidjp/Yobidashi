@@ -102,7 +102,7 @@ public class Article implements Comparable<Article> {
     public void replace(final Path dest) {
         this.path      = dest;
         this.title     = Articles.convertTitle(dest);
-        this.extension = FileUtil.findExtension(path).get();
+        this.extension = FileUtil.findExtension(path).orElseGet(Strings::empty);
     }
 
     /**
@@ -172,7 +172,7 @@ public class Article implements Comparable<Article> {
         if (!ext.isPresent()) {
             return false;
         }
-        return EXTENSIONS.contains(ext.get());
+        return EXTENSIONS.contains(ext.orElseGet(Strings::empty));
     }
 
 }

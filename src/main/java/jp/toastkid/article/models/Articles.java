@@ -24,6 +24,7 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import javafx.scene.control.ListView;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.utils.Strings;
 
 /**
  * Utilities of {@link Article}.
@@ -159,7 +160,7 @@ public final class Articles {
         if (!ext.isPresent()) {
             return false;
         }
-        return Article.EXTENSIONS.contains(ext.get());
+        return Article.EXTENSIONS.contains(ext.orElseGet(Strings::empty));
     }
 
     /**
