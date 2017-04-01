@@ -1,5 +1,6 @@
 package jp.toastkid.yobidashi;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -339,6 +340,9 @@ public final class Controller implements Initializable {
 
     /** Progress message and value sender. */
     private TopicProcessor<String> progressSender;
+
+    /** Use for opening article file with System default editor. */
+    private Desktop desktop;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -755,6 +759,28 @@ public final class Controller implements Initializable {
     }
 
     /**
+     * Open current tab's file.
+     */
+    @FXML
+    private void openCurrentFile() {
+        if (desktop == null) {
+            if (!Desktop.isDesktopSupported()) {
+                showSnackbar("This environment is not supported Desktop API.");
+                return;
+            }
+            desktop = Desktop.getDesktop();
+        }
+
+        getCurrentArticleOfNullable().ifPresent(article -> {
+            try {
+                desktop.open(article.path.toFile());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
      * move to top of current page.
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
@@ -1068,6 +1094,15 @@ public final class Controller implements Initializable {
                             : makeMenuItemWithAction("記事一覧を閉じる", event -> hideLeftPane())
                             )
                     );
+            if (Desktop.isDesktopSupported()) {
+                itemContainer.add(
+                    makeContextMenuItemContainerWithAction(
+                        cmc,
+                        "Open current file",
+                        event -> processArticleMessage(ArticleMessage.makeOpenByDefault())
+                        )
+                    );
+            }
             editableOr().ifPresent(editor -> itemContainer.add(cmc.new MenuItemContainer(
                     editor.isEditing()
                     ? makeMenuItemWithAction("Close editor",   event -> edit())
@@ -1942,6 +1977,9 @@ public final class Controller implements Initializable {
                 final Article article = optional.get();
                 wordCloud.draw(pane, article.path.toString());
                 Platform.runLater(() -> openContentTab(article.title + "'s word cloud", pane));
+                return;
+            case OPEN_BY_DEFAULT:
+                openCurrentFile();
                 return;
             default:
                 return;

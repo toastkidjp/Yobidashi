@@ -291,6 +291,14 @@ public class SideMenuController implements Initializable {
     }
 
     /**
+     * Open current file by default editor.
+     */
+    @FXML
+    private void openCurrentFileByDefault() {
+        messenger.onNext(ArticleMessage.makeOpenByDefault());
+    }
+
+    /**
      * Open static file with convert to html.
      * @param pathToFile
      * @param title

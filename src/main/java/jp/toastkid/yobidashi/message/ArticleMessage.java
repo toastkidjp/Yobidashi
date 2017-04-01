@@ -14,8 +14,8 @@ public class ArticleMessage implements Message {
      *
      */
     public enum Command {
-        MAKE, COPY, RENAME, SLIDE_SHOW, DELETE,
-        CONVERT_AOBUN, CONVERT_EPUB, WORD_CLOUD
+        MAKE, COPY, RENAME, SLIDE_SHOW, DELETE, CONVERT_AOBUN, CONVERT_EPUB, WORD_CLOUD,
+        OPEN_BY_DEFAULT
     }
 
     /** This instance's command. */
@@ -99,6 +99,14 @@ public class ArticleMessage implements Message {
      */
     public static ArticleMessage makeWordCloud() {
         return new ArticleMessage(Command.WORD_CLOUD);
+    }
+
+    /**
+     * Make OPEN_BY_DEFAULT message.
+     * @return OPEN_BY_DEFAULT message
+     */
+    public static ArticleMessage makeOpenByDefault() {
+        return new ArticleMessage(Command.OPEN_BY_DEFAULT);
     }
 
 }
