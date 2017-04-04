@@ -212,9 +212,9 @@ public class Editor {
             isModified.set(true);
         });
 
-        area.textProperty().addListener((value, prev, next) -> {
-            label.setText(String.format("  文字数: %,d字", value.getValue().length()));
-        });
+        area.textProperty().addListener((value, prev, next) ->
+            label.setText(String.format("  文字数: %,d字", Strings.countLength(next)))
+        );
 
         if (area.getOnInputMethodTextChanged() == null) {
             area.setOnInputMethodTextChanged(this::handleInputMethodEvent);

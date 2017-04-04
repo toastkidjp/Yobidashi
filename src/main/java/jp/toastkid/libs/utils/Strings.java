@@ -646,4 +646,13 @@ public final class Strings {
     public static String empty() {
         return EMPTY;
     }
+
+    /**
+     * Count character number.
+     * @param str
+     * @return character number.
+     */
+    public static long countLength(final String str) {
+        return str != null ? str.replaceAll("\\s", "").codePoints().count() : 0;
+    }
 }

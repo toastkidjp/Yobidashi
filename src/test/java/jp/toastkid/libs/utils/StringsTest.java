@@ -26,6 +26,7 @@ import org.junit.Test;
 
 /**
  * {@link jp.toastkid.libs.utils.Strings}'s test cases.
+ *
  * @author Toast kid
  *
  */
@@ -436,6 +437,20 @@ public final class StringsTest {
         assertSame(Strings.empty(), Strings.empty());
         assertEquals("", Strings.empty());
         assertEquals(Strings.empty(), Strings.empty());
+    }
+
+    /**
+     * Check of {@link Strings#countLength}.
+     */
+    @Test
+    public void test_countLength() {
+        assertEquals(0, Strings.countLength(""));
+        assertEquals(1, Strings.countLength("1"));
+        assertEquals(0, Strings.countLength(" "));
+        assertEquals(0, Strings.countLength("  "));
+        assertEquals(0, Strings.countLength(null));
+        assertEquals(1, Strings.countLength(" 1 "));
+        assertEquals(6, Strings.countLength("aaaaa 1 "));
     }
 
 }
