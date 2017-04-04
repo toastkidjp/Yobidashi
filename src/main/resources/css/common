@@ -89,5 +89,6 @@
 }
 
 .option-popup {
+  -fx-text-fill: black;
   -fx-font-size: 18pt;
 }

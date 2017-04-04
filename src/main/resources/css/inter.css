@@ -259,6 +259,11 @@
     -fx-text-fill: #FFFFFF;
 }
 
+.option-popup {
+  -fx-text-fill: rgba(0, 0, 80, 0.7);
+  -fx-font-size: 18pt;
+}
+
 #status {
   -fx-text-fill: white;
 }
