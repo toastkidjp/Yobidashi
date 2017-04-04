@@ -2,6 +2,14 @@
   -fx-background-color: rgba(0, 0, 80, 0.7);
 }
 
+.label {
+  -fx-text-fill: #FFFFFF;
+}
+
+.check-box {
+  -fx-text-fill: #FFFFFF;
+}
+
 .button {
   -fx-text-fill: #FFFFFF;
 }
