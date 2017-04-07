@@ -54,6 +54,7 @@
               <MenuLabel accelerator="Ctrl+S" mnemonicParsing="true" onAction="#saveArticle" text="Save article" />
               <MenuLabel onAction="#callCopy" text="Copy article" />
               <MenuLabel onAction="#callRename" text="Rename article" />
+              <MenuLabel accelerator="Ctrl+O" mnemonicParsing="true" onAction="#openCurrentFileByDefault" text="Open current file" />
               <MenuLabel accelerator="Ctrl+E" mnemonicParsing="true" onAction="#callEditor" text="Edit by editor" />
               <MenuLabel accelerator="Ctrl+U" mnemonicParsing="true" onAction="#callHtmlSource" text="HTML source" />
               <MenuLabel accelerator="Ctrl+Shift+F" mnemonicParsing="true" onAction="#callSearch" text="Article Search" />

@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.yobidashi.models.Defines;
@@ -33,13 +32,15 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
     /** 「月合計」のキー */
     public static final String TOTAL_KEY = "合計";
 
+    /** Target file's prefix. */
     private String prefix;
 
-    private int overall;
+    /** Overall score. */
+    private long overall;
 
     /**
      *
-     * @param pathToDir ソースファイルフォルダ
+     * @param pathToDir article file directory.
      * @param pPrefix (例) 日記2012-0
      * @return ファイル名とファイル内容の長さを対応させた Map
      */
@@ -54,22 +55,17 @@ public final class FilesLengthExtractor implements ChartDataExtractor {
         } catch (final IOException e) {
             LOGGER.info("Error!", e);
         }
-        int overall = 0;
+        long overall = 0;
         for (final Path path : list) {
             final String name = Articles.decodeBytedStr(
                     FileUtil.removeExtension(path.getFileName().toString()), Defines.TITLE_ENCODE);
-            if (name.startsWith(pPrefix)){
-                String putKey = name;
-                // (130503) 修正
-                if (StringUtils.isNotEmpty(pPrefix)){
-                    putKey = name.substring(2);
-                }
-                // 文字数集計.
-                final int fileCharacterValue
-                    = FileUtil.countCharacters(path, Article.ENCODE);
-                resultMap.put(putKey, fileCharacterValue);
-                overall = overall + fileCharacterValue;
+            if (!name.startsWith(pPrefix)){
+                continue;
             }
+            final String putKey = StringUtils.isNotEmpty(pPrefix) ? name.substring(2) : name;
+            final long fileCharacterValue = FileUtil.countCharacters(path);
+            resultMap.put(putKey, fileCharacterValue);
+            overall = overall + fileCharacterValue;
         }
         this.overall = overall;
         resultMap.put(TOTAL_KEY, overall);

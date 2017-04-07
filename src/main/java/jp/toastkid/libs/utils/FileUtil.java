@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,9 +34,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.list.primitive.MutableIntList;
+import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.primitive.IntLists;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 
 /**
  * ファイル操作に関するユーティリティクラス<BR>
@@ -230,29 +231,18 @@ public final class FileUtil {
      * 指定したファイルの文字数を計測して返す.
      *
      * @param path
-     * @param pEncode
      */
-    public static int countCharacters(final Path path, final String pEncode) {
-        return countCharacters(path.toAbsolutePath().toString(), pEncode);
-    }
-
-    /**
-     * 指定したファイルの文字数を計測して返す.
-     *
-     * @param pFileName
-     * @param pEncode
-     */
-    public static int countCharacters(final String pFileName, final String pEncode) {
-        final MutableIntList total = IntLists.mutable.empty();
+    public static long countCharacters(final Path path) {
+        final MutableLongList total = LongLists.mutable.empty();
         try {
-            Files.readAllLines(Paths.get(pFileName), Charset.forName(pEncode)).forEach(line -> {
-                total.add(line.replaceAll("\\s", "").length());
-            });
+            Files.readAllLines(path, StandardCharsets.UTF_8)
+                 .stream()
+                 .map(Strings::countLength)
+                 .forEach(total::add);
         } catch (final Exception e) {
-            //e.printStackTrace();
-            System.out.println(pFileName);
+            e.printStackTrace();
         }
-        return (int) total.sum();
+        return total.sum();
     }
 
     /**

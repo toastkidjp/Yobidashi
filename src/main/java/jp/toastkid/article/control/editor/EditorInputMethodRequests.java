@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
 
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.IndexRange;
 import javafx.scene.input.InputMethodRequests;
@@ -30,12 +29,9 @@ public class EditorInputMethodRequests implements InputMethodRequests {
 
     @Override
     public Point2D getTextLocation(final int offset) {
-        final Optional<Bounds> caretBoundsOr = editor.getCaretBounds();
-        if (caretBoundsOr.isPresent()) {
-            final Bounds bounds = caretBoundsOr.get();
-            return new Point2D(bounds.getMinX(), bounds.getMinY() + 20);
-        }
-        return null;
+        final Optional<Point2D> pointOr = editor.getCaretBounds()
+                .map(bounds -> new Point2D(bounds.getMinX(), bounds.getMinY() + 20));
+        return pointOr.isPresent() ? pointOr.get() : null;
     }
 
     @Override

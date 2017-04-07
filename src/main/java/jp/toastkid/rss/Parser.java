@@ -19,7 +19,7 @@ import jp.toastkid.rss.Rss.Item;
  * @author Toast kid
  *
  */
-public class RssParser {
+class Parser {
 
     /** pattern of description. */
     private static final Pattern DESCRIPTION_PATTERN
@@ -57,7 +57,7 @@ public class RssParser {
     /**
      * RSS parser.
      */
-    public RssParser() {
+    public Parser() {
         this.rss = new Rss();
     }
 
@@ -71,7 +71,7 @@ public class RssParser {
                 Http.GET.url(uri.toString())
                     .fetchOpt()
                     .map(response -> Arrays.asList(response.text().split(System.lineSeparator())))
-                    .orElse(Collections.emptyList())
+                    .orElseGet(Collections::emptyList)
                 );
     }
 

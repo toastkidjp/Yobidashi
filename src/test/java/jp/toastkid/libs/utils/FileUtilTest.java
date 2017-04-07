@@ -76,21 +76,13 @@ public class FileUtilTest {
     }
 
     /**
-     * {@link FileUtil#countCharacters(String, String)}.
-     */
-    @Test
-    public void testCountCharacters() {
-        assertEquals(6, FileUtil.countCharacters("src/test/resources/utils/file/a.txt", "UTF-8"));
-    }
-
-    /**
      * {@link FileUtil#countCharacters(Path, String)}.
      */
     @Test
     public void testCountCharacters_Path_String() {
         assertEquals(
-                6,
-                FileUtil.countCharacters(Paths.get("src/test/resources/utils/file/a.txt"), "UTF-8")
+                6L,
+                FileUtil.countCharacters(Paths.get("src/test/resources/utils/file/a.txt"))
                 );
     }
 

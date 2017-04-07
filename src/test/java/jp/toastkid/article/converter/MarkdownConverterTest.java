@@ -35,7 +35,7 @@ public final class MarkdownConverterTest {
                                 .replaceAll("class=\"redLink\"", "");
         assertNotNull(content);
         assertTrue(content.contains(
-                "ふっとのーと<a id=\"fn-back-1\" href=\"#fn-1\" title=\" ここに飛ぶ\">[1]</a>"));
+                "ふっとのーと<a id=\"fn-back-1\" class=\"tooltip\" href=\"#fn-1\">[1]<span class="));
         assertTrue(content.contains("<a id=\"fn-1\" href=\"#fn-back-1\">[1]</a> ここに飛ぶ"));
     }
 

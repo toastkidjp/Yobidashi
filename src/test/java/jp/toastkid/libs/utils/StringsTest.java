@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.junit.Test;
 
 /**
  * {@link jp.toastkid.libs.utils.Strings}'s test cases.
+ *
  * @author Toast kid
  *
  */
@@ -424,6 +426,31 @@ public final class StringsTest {
     @Test(expected=NullPointerException.class)
     public void test_removeQuote_not_nullable() {
         Strings.removeQuote(null);
+    }
+
+    /**
+     * Check of {@link Strings#empty()}.
+     */
+    @Test
+    public void test_empty() {
+        assertSame("", Strings.empty());
+        assertSame(Strings.empty(), Strings.empty());
+        assertEquals("", Strings.empty());
+        assertEquals(Strings.empty(), Strings.empty());
+    }
+
+    /**
+     * Check of {@link Strings#countLength}.
+     */
+    @Test
+    public void test_countLength() {
+        assertEquals(0, Strings.countLength(""));
+        assertEquals(1, Strings.countLength("1"));
+        assertEquals(0, Strings.countLength(" "));
+        assertEquals(0, Strings.countLength("  "));
+        assertEquals(0, Strings.countLength(null));
+        assertEquals(1, Strings.countLength(" 1 "));
+        assertEquals(6, Strings.countLength("aaaaa 1 "));
     }
 
 }

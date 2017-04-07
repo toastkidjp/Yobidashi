@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
 import jp.toastkid.libs.utils.FileUtil;
+import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Defines;
 
 /**
@@ -128,7 +129,7 @@ public class Style {
         if (!findExtension.isPresent()) {
             return false;
         }
-        return ".css".equals(findExtension.get());
+        return ".css".equals(findExtension.orElseGet(Strings::empty));
     }
 
     /**

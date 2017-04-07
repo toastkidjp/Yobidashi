@@ -18,14 +18,14 @@ import org.junit.Test;
 import jp.toastkid.rss.Rss.Item;
 
 /**
- * {@link RssParser}'s test.
+ * {@link Parser}'s test.
  * @author Toast kid
  *
  */
 public class RssParserTest {
 
     /**
-     * Test of {@link RssParser#parse(String)}.
+     * Test of {@link Parser#parse(String)}.
      * @throws IOException
      * @throws URISyntaxException
      */
@@ -34,7 +34,7 @@ public class RssParserTest {
         final Path path
             = Paths.get(getClass().getClassLoader().getResource("rss/sample.xml").toURI());
         final String rssText = new String(Files.readAllBytes(path), StandardCharsets.UTF_8.name());
-        final Rss rss = new RssParser().parse(rssText);
+        final Rss rss = new Parser().parse(rssText);
         assertNull(rss.expandTitle());
         assertNull(rss.getCreator());
         assertEquals("Sat, 21 Jan 2017 19:32:11 +0900", rss.getDate());
