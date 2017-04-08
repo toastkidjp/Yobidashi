@@ -26,7 +26,7 @@
     </ImageView>
     <VBox minHeight="25.0" prefWidth="400.0" spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
       <children>
-        <Label fx:id="message" textAlignment="LEFT" wrapText="true">
+        <Label fx:id="message" textAlignment="LEFT" wrapText="true" styleClass="dialog-message">
           <font>
             <Font name="System Bold" size="14.0" />
           </font>
