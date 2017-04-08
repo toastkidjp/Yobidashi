@@ -55,11 +55,13 @@ public final class MarkdownConverter {
     private static final Pattern COLOR_PATTERN
         = Pattern.compile("\\{color:(.+?)\\}(.+?)\\{color\\}", Pattern.DOTALL);
 
-    /**
-     * Markdown での取り消し線検出用正規表現.
-     */
-    private static final Pattern DELETE_MARKDOWN_PATTERN
-        = Pattern.compile("~~(.+?)~~", Pattern.DOTALL);
+    /** RegEx of bold. */
+    private static final Pattern BOLD_PATTERN
+        = Pattern.compile("\\*\\*(.+?)\\*\\*", Pattern.DOTALL);
+
+    /** RegEx of delete. */
+    private static final Pattern DELETE_PATTERN
+        = Pattern.compile("\\~\\~(.+?)\\~\\~", Pattern.DOTALL);
 
     /**
      * ひとりWiki の&ruby()プラグインを再現するための検出用正規表現.
@@ -67,9 +69,7 @@ public final class MarkdownConverter {
      */
     private static final Pattern RUBY_PAT = Pattern.compile("&ruby\\((.+?)\\)", Pattern.DOTALL);
 
-    /**
-     * RegEx of hyper link.
-     */
+    /** RegEx of hyper link. */
     private static final Pattern HYPER_LINK_PATTERN
         = Pattern.compile("\\[(.+?)\\]\\((.+?)\\)", Pattern.DOTALL);
 
@@ -662,11 +662,17 @@ public final class MarkdownConverter {
             str = str.replaceFirst("---*-", "<hr/>");
         }
 
+        if (str.contains("**")) {
+            matcher = BOLD_PATTERN.matcher(str);
+            while (matcher.find()) {
+                str = str.replaceAll(BOLD_PATTERN.pattern(), "<b>" + matcher.group(1) + "</b>");
+            }
+        }
 
         if (str.contains("~~")) {
-            matcher = DELETE_MARKDOWN_PATTERN.matcher(str);
+            matcher = DELETE_PATTERN.matcher(str);
             while (matcher.find()) {
-                str = str.replaceAll(DELETE_MARKDOWN_PATTERN.pattern(),
+                str = str.replaceAll(DELETE_PATTERN.pattern(),
                         "<del>" + matcher.group(1) + "</del>");
             }
         }
