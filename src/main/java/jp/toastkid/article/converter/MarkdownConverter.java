@@ -205,6 +205,7 @@ public final class MarkdownConverter {
         boolean isInBlockQuote = false;
         boolean isInP          = false;
         boolean isInTable      = false;
+        boolean isTableHeader  = false;
         boolean isInExpand     = false;
         boolean isInFormation  = false;
         boolean isInAA         = false;
@@ -259,6 +260,7 @@ public final class MarkdownConverter {
                 }
                 contents.add(getTableTag());
                 isInTable = true;
+                isTableHeader = true;
             }
             if (isInTable) {
                 //120503 追加
@@ -271,7 +273,10 @@ public final class MarkdownConverter {
                     continue;
                 }
 
-                str = str.replace("|", DUMMY_TD).replace(DUMMY_TD + DUMMY_TD, DUMMY_TH);
+                str = isTableHeader
+                        ? str.replace("|", DUMMY_TH)
+                        : str.replace("|", DUMMY_TD).replace(DUMMY_TD + DUMMY_TD, DUMMY_TH);
+                isTableHeader = false;
                 if (str.contains(DUMMY_TH) && str.contains(DUMMY_TD)) {
                     final String[] tableElems = str.split(SPLIT_REGEX);
                     buf.append("<th>");
