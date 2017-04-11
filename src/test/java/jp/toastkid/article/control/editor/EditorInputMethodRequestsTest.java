@@ -1,7 +1,6 @@
 package jp.toastkid.article.control.editor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -37,7 +36,7 @@ public class EditorInputMethodRequestsTest extends ApplicationTest {
      */
     @Test
     public void testGetTextLocation() {
-        assertNull(requests.getTextLocation(0));
+        assertEquals(new Point2D(0, 0), requests.getTextLocation(0));
     }
 
     /**

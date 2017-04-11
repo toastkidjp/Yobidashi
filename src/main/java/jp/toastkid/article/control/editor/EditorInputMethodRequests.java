@@ -1,7 +1,5 @@
 package jp.toastkid.article.control.editor;
 
-import java.util.Optional;
-
 import org.fxmisc.richtext.CodeArea;
 
 import javafx.geometry.Point2D;
@@ -29,9 +27,9 @@ public class EditorInputMethodRequests implements InputMethodRequests {
 
     @Override
     public Point2D getTextLocation(final int offset) {
-        final Optional<Point2D> pointOr = editor.getCaretBounds()
-                .map(bounds -> new Point2D(bounds.getMinX(), bounds.getMinY() + 20));
-        return pointOr.isPresent() ? pointOr.get() : null;
+        return editor.getCaretBounds()
+                .map(bounds -> new Point2D(bounds.getMinX(), bounds.getMinY() + 20))
+                .orElseGet(() -> new Point2D(0, 0));
     }
 
     @Override
