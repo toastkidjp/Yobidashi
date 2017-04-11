@@ -153,4 +153,10 @@ public class ArticleTabTest extends ApplicationTest {
                 .build();
     }
 
+    @Override
+    public void stop() throws Exception {
+        tab.close();
+        super.stop();
+    }
+
 }

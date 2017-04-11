@@ -87,6 +87,15 @@ public class ArticleMessageTest {
     }
 
     /**
+     * Check {@link ArticleMessage#makeOpenByDefault()}.
+     */
+    @Test
+    public void test_makeOpenByDefault() {
+        final ArticleMessage wordCloud = ArticleMessage.makeOpenByDefault();
+        assertEquals(Command.OPEN_BY_DEFAULT, wordCloud.getCommand());
+    }
+
+    /**
      * Test for coverage.
      */
     @Test
@@ -101,7 +110,7 @@ public class ArticleMessageTest {
     @Test
     public void test_values() {
         final Command[] values = ArticleMessage.Command.values();
-        assertEquals(8, values.length);
+        assertEquals(9, values.length);
     }
 
 }

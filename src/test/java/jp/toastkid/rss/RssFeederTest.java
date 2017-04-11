@@ -35,7 +35,7 @@ public class RssFeederTest {
      */
     @Test
     public void testRunWithEmpty() throws URISyntaxException {
-        final String content = rssFeeder.run(getPath("rss/empty"));
+        final String content = rssFeeder.run(getPath("rss/target/empty.txt"));
         assertEquals("", content);
     }
 

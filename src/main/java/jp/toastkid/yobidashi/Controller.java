@@ -1,5 +1,6 @@
 package jp.toastkid.yobidashi;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -60,8 +61,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -135,7 +134,7 @@ public final class Controller implements Initializable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
-    /** default divider's position. */
+    /** Default divider's position. */
     private static final double DEFAULT_DIVIDER_POSITION = 0.2;
 
     /** Speed Dial's title. */
@@ -149,76 +148,31 @@ public final class Controller implements Initializable {
     private static final String WINDOW_FIND_UP
         = "window.find(\"{0}\", false, true, true, false, true, false)";
 
-    /** searcher appear keyboard shortcut. */
-    private static final KeyCodeCombination APPEAR_SEARCHER
-        = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    /** For auto backup. */
+    private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
 
-    /** Show left pane. */
-    private static final KeyCodeCombination SHOW_LEFT_PANE
-        = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
+    /** File watcher. */
+    private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
-    /** Hide left pane. */
-    private static final KeyCodeCombination HIDE_LEFT_PANE
-        = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination FIRST_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination SECOND_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination THIRD_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination FOURTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination FIFTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination SIXTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination SEVENTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination EIGHTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.CONTROL_DOWN);
-
-    /** select tab. */
-    private static final KeyCodeCombination NINTH_TAB
-        = new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN);
-
-    /** root pane. */
+    /** Root pane. */
     @FXML
     protected Pane root;
 
-    /** header. */
+    /** Header pane. */
     @FXML
     private Pane header;
 
-    /** footer. */
+    /** Footer pane. */
     @FXML
     private Pane footer;
 
-    /** title label. */
+    /** Title label. */
     @FXML
     private TextField titleInput;
 
-    /** title's tooltip. */
+    /** Title's tooltip. */
     @FXML
     private Tooltip titleTooltip;
-
-    /** URL holder. */
-    private String urlText;
 
     /** Left-side tabs area(Articles). */
     @FXML
@@ -252,50 +206,21 @@ public final class Controller implements Initializable {
     @FXML
     private ComboBox<String> style;
 
-    /** in article searcher area. */
+    /** In article searcher area. */
     @FXML
     private HBox searcherArea;
 
-    /** in article searcher input box. */
+    /** In article searcher input box. */
     @FXML
     private TextField searcherInput;
 
-    /** calendar. */
+    /** Calendar picker. */
     @FXML
     private DatePicker calendar;
-
-    /** Article generator. */
-    private ArticleGenerator articleGenerator;
-
-    /** Article post processor. */
-    private PostProcessor postProcessor;
-
-    /** Stage. */
-    private Stage stage;
-
-    /** width. */
-    private double width;
-
-    /** height. */
-    private double height;
 
     /** BMI area's controller. */
     @FXML
     private jp.toastkid.bmi.Controller bmiController;
-
-    /** search history. */
-    private final TextField queryInput
-        = new AutoCompleteTextField(){{setPromptText("Input search keyword.");}};
-
-    /** filter input. */
-    private final TextField filterInput
-        = new AutoCompleteTextField(){{setPromptText("Input part of article name.");}};
-
-    /** for auto backup. */
-    private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
-
-    /** file watcher. */
-    private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
     /** Snackbar. */
     @FXML
@@ -305,7 +230,7 @@ public final class Controller implements Initializable {
     @FXML
     private StackPane titleBurgerContainer;
 
-    /** title hamburger. */
+    /** Title hamburger. */
     @FXML
     private JFXHamburger titleBurger;
 
@@ -321,12 +246,35 @@ public final class Controller implements Initializable {
     @FXML
     private JFXDrawer rightDrawer;
 
-    /** use for draw word-cloud. */
-    private FxWordCloud wordCloud;
-
     /** Side Menu pane controller. */
     @FXML
     private SideMenuController sideMenuController;
+
+    /** Article generator. */
+    private ArticleGenerator articleGenerator;
+
+    /** Article post processor. */
+    private PostProcessor postProcessor;
+
+    /** Stage. */
+    private Stage stage;
+
+    /** Width. */
+    private double width;
+
+    /** Height. */
+    private double height;
+
+    /** Search history. */
+    private final TextField queryInput
+        = new AutoCompleteTextField(){{setPromptText("Input search keyword.");}};
+
+    /** Filter input. */
+    private final TextField filterInput
+        = new AutoCompleteTextField(){{setPromptText("Input part of article name.");}};
+
+    /** URL holder. */
+    private String urlText;
 
     /** Config. */
     private Config conf;
@@ -339,6 +287,12 @@ public final class Controller implements Initializable {
 
     /** Progress message and value sender. */
     private TopicProcessor<String> progressSender;
+
+    /** Use for draw word-cloud. */
+    private FxWordCloud wordCloud;
+
+    /** Use for opening article file with System default editor. */
+    private Desktop desktop;
 
     @Override
     public final void initialize(final URL url, final ResourceBundle bundle) {
@@ -503,7 +457,7 @@ public final class Controller implements Initializable {
                 return;
             }
             board.getFiles().stream().forEach(f -> {
-                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).get())) {
+                if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).orElseGet(Strings::empty))) {
                     processEditorTabMessage(EditorTabMessage.make(Paths.get(f.getAbsolutePath())));
                     return;
                 }
@@ -561,7 +515,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在選択中のファイルに ListView をフォーカスする.
+     * Focus current ListView.
      */
     private void focusOn() {
         final Optional<Article> articleOr = Optional.ofNullable(getCurrentArticle());
@@ -667,18 +621,18 @@ public final class Controller implements Initializable {
         hideSearcher();
         final ObservableMap<KeyCombination, Runnable> accelerators
             = stage.getScene().getAccelerators();
-        accelerators.put(FIRST_TAB,   () -> selectTab(0));
-        accelerators.put(SECOND_TAB,  () -> selectTab(1));
-        accelerators.put(THIRD_TAB,   () -> selectTab(2));
-        accelerators.put(FOURTH_TAB,  () -> selectTab(3));
-        accelerators.put(FIFTH_TAB,   () -> selectTab(4));
-        accelerators.put(SIXTH_TAB,   () -> selectTab(5));
-        accelerators.put(SEVENTH_TAB, () -> selectTab(6));
-        accelerators.put(EIGHTH_TAB,  () -> selectTab(7));
-        accelerators.put(NINTH_TAB,   () -> selectTab(8));
-        accelerators.put(SHOW_LEFT_PANE, this::showLeftPane);
-        accelerators.put(HIDE_LEFT_PANE, this::hideLeftPane);
-        accelerators.put(APPEAR_SEARCHER, () -> {
+        accelerators.put(Shortcuts.FIRST_TAB,   () -> selectTab(0));
+        accelerators.put(Shortcuts.SECOND_TAB,  () -> selectTab(1));
+        accelerators.put(Shortcuts.THIRD_TAB,   () -> selectTab(2));
+        accelerators.put(Shortcuts.FOURTH_TAB,  () -> selectTab(3));
+        accelerators.put(Shortcuts.FIFTH_TAB,   () -> selectTab(4));
+        accelerators.put(Shortcuts.SIXTH_TAB,   () -> selectTab(5));
+        accelerators.put(Shortcuts.SEVENTH_TAB, () -> selectTab(6));
+        accelerators.put(Shortcuts.EIGHTH_TAB,  () -> selectTab(7));
+        accelerators.put(Shortcuts.NINTH_TAB,   () -> selectTab(8));
+        accelerators.put(Shortcuts.SHOW_LEFT_PANE, this::showLeftPane);
+        accelerators.put(Shortcuts.HIDE_LEFT_PANE, this::hideLeftPane);
+        accelerators.put(Shortcuts.APPEAR_SEARCHER, () -> {
             if (searcherArea.visibleProperty().getValue()) {
                 hideSearcher();
             } else {
@@ -690,7 +644,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * select specified index tab.
+     * Select specified index tab.
      * @param index
      */
     private void selectTab(final int index) {
@@ -702,7 +656,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * search backward.
+     * Search backward.
      */
     @FXML
     protected void searchUp() {
@@ -710,7 +664,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * search forward.
+     * Search forward.
      */
     @FXML
     protected void searchDown() {
@@ -718,7 +672,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * hide article search box area.
+     * Hide article search box area.
      * @see <a href="http://stackoverflow.com/questions/19923443/
      *javafx-fill-empty-space-when-component-is-not-visible">
      * JavaFX Fill empty space when component is not visible?</a>
@@ -730,7 +684,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * hide article search box area.
+     * Hide article search box area.
      */
     private void openSearcher() {
         searcherArea.setManaged(true);
@@ -739,14 +693,14 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * read stylesheets.
+     * Read stylesheets.
      */
     private void readStyleSheets() {
         style.getItems().addAll(Style.findFileNamesFromDir());
     }
 
     /**
-     * set stylesheet name in combobox.
+     * Set stylesheet name in combobox.
      */
     private void setStylesheet() {
         final String stylesheet = conf.get(Config.Key.STYLESHEET);
@@ -755,7 +709,29 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * move to top of current page.
+     * Open current tab's file.
+     */
+    @FXML
+    private void openCurrentFile() {
+        if (desktop == null) {
+            if (!Desktop.isDesktopSupported()) {
+                showSnackbar("This environment is not supported Desktop API.");
+                return;
+            }
+            desktop = Desktop.getDesktop();
+        }
+
+        getCurrentArticleOfNullable().ifPresent(article -> {
+            try {
+                desktop.open(article.path.toFile());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Move to top of current page.
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
@@ -765,7 +741,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * move to bottom of current page.
+     * Move to bottom of current page.
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
@@ -775,7 +751,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * カレンダーを呼び出し、選択された日付の日記を表示する.
+     * Display specified date's diary.
      */
     @FXML
     private final void callCalendar() {
@@ -852,7 +828,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * Init speed dial's controller.
+     * Initialize speed dial's controller.
      * @return Controller
      * @throws IOException
      */
@@ -1068,6 +1044,15 @@ public final class Controller implements Initializable {
                             : makeMenuItemWithAction("記事一覧を閉じる", event -> hideLeftPane())
                             )
                     );
+            if (Desktop.isDesktopSupported()) {
+                itemContainer.add(
+                    makeContextMenuItemContainerWithAction(
+                        cmc,
+                        "Open current file",
+                        event -> processArticleMessage(ArticleMessage.makeOpenByDefault())
+                        )
+                    );
+            }
             editableOr().ifPresent(editor -> itemContainer.add(cmc.new MenuItemContainer(
                     editor.isEditing()
                     ? makeMenuItemWithAction("Close editor",   event -> edit())
@@ -1118,7 +1103,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 左側を隠す.
+     * Hide left pane.
      */
     private void hideLeftPane() {
         SplitterTransitionFactory.makeHorizontalSlide(splitter, 0.0d, DEFAULT_DIVIDER_POSITION).play();
@@ -1134,7 +1119,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 引数で渡されたタブを閉じる.
+     * Close specified index' pane.
      * @param tab
      */
     private final void closeTab(final Tab tab) {
@@ -1163,23 +1148,22 @@ public final class Controller implements Initializable {
 
     /**
      * Show search order dialog.
-     * 再帰的に呼び出すためメソッドに切り出し.-
-     * @param q クエリ
--    * @param f 記事名フィルタ文字列
+     * @param q query
+-    * @param f filter query
      */
     private void showSearchDialog(final String q, final String f) {
         queryInput.setText(q);
         filterInput.setText(f);
-        final CheckBox isAnd       = new JFXCheckBox("AND Search"){{setSelected(true);}};
-        new AlertDialog.Builder(getParent())
-            .setTitle("All article search").setMessage("この操作の実行には時間がかかります。")
-            //"記事名のみを対象に検索"
-            .addControl(queryInput, new Label("Filter article name"), filterInput, isAnd)
+        final CheckBox isAnd = new JFXCheckBox("AND Search"){{setSelected(true);}};
+        final Label filterMessage = new Label("Filter article name");
+        filterMessage.getStyleClass().add("dialog-message");
+		new AlertDialog.Builder(getParent())
+            .setTitle("All article search").setMessage("This command spend many seconds.")
+            .addControl(queryInput, filterMessage, filterInput, isAnd)
             .setOnPositive("OK", () -> {
                 final String query = queryInput.getText().trim();
                 ((AutoCompleteTextField) queryInput).getEntries().add(query);
 
-                // 入っていない時もあるので.
                 final String filter = filterInput.getText();
                 if (StringUtils.isNotBlank(filter)) {
                     ((AutoCompleteTextField) filterInput).getEntries().add(filter);
@@ -1221,12 +1205,14 @@ public final class Controller implements Initializable {
             setStatus("This tab can't use slide show.");
             return;
         }
-        new Slideshow.Builder()
-            .setOwner(stage)
-            .setSource(articleOr.get().path)
-            .setIsFullScreen(true)
-            .build()
-            .launch();
+
+        articleOr.ifPresent(article -> new Slideshow.Builder()
+                .setOwner(stage)
+                .setSource(article.path)
+                .setIsFullScreen(true)
+                .build()
+                .launch()
+            );
     }
 
     /**
@@ -1254,7 +1240,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * ListView 共通の処理を返す.
+     * Initialize article ListView.
      * @param listView ListView
      */
     private void initArticleList(final ListView<Article> listView) {
@@ -1308,7 +1294,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 記事名をリストの先頭に追加する。
+     * Add article on the top of history, and register file-watcher.
      * @param article Article Object
      */
     private final void addHistory(final Article article) {
@@ -1355,9 +1341,6 @@ public final class Controller implements Initializable {
 
     /**
      * Call copy article。
-     * <HR>
-     * (130707) メッセージ変更<BR>
-     * (130512) 作成<BR>
      */
     @FXML
     private final void copyArticle() {
@@ -1366,9 +1349,6 @@ public final class Controller implements Initializable {
 
     /**
      * Call rename article。
-     * <HR>
-     * (130707) メッセージ変更<BR>
-     * (130512) 作成<BR>
      */
     @FXML
     private final void renameArticle() {
@@ -1377,10 +1357,8 @@ public final class Controller implements Initializable {
 
     /**
      * Rename article。
-     * <HR>
+     *
      * @param isCopy コピーをするか
-     * (130707) メッセージ変更<BR>
-     * (130512) 作成<BR>
      */
     private final void callRenameArticle(final boolean isCopy) {
         String prefix = "";
@@ -1454,12 +1432,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 現在選択している記事を削除する。
-     * <HR>
-     * (130317) ファイルが存在しない場合はダイアログを出して戻る<BR>
-     * (130309) 1つファイルを消すたびにファイル一覧を読み直すのは非効率的なので、
-     * ファイル一覧から削除するよう処理変更<BR>
-     * (130305) 作成<BR>
+     * Delete current article.
      */
     private final void deleteArticle() {
         // 削除対象のファイルオブジェクト
@@ -1503,8 +1476,8 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * 履歴リストから指定した記事名を削除する.
-     * @param deleteTarget 削除する Article
+     * Remove article history.
+     * @param deleteTarget remove target Article
      */
     private final void removeHistory(final Article deleteTarget) {
         removeItem(deleteTarget, articleList);
@@ -1555,9 +1528,10 @@ public final class Controller implements Initializable {
      * Return current tab.
      * @return current tab.
      */
-    private final Optional<BaseWebTab> wwbTabOr() {
+    private final Optional<BaseWebTab> webTabOr() {
         return Optional.ofNullable(getCurrentTab())
-                .filter(t -> t instanceof BaseWebTab).map(BaseWebTab.class::cast);
+                .filter(BaseWebTab.class::isInstance)
+                .map(BaseWebTab.class::cast);
     }
 
     /**
@@ -1578,7 +1552,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     *
+     * Get current tab's article with {@link Optional}.
      * @return
      */
     private final Optional<Article> getCurrentArticleOfNullable() {
@@ -1648,7 +1622,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * apply stylesheet.
+     * Apply stylesheet.
      */
     @FXML
     private void callApplyStyle() {
@@ -1798,7 +1772,7 @@ public final class Controller implements Initializable {
         }
 
         if (message instanceof UserAgentMessage) {
-            wwbTabOr().ifPresent(tab ->
+            webTabOr().ifPresent(tab ->
                 Platform.runLater(() ->tab.setUserAgent(((UserAgentMessage) message).getUserAgent())));
             return;
         }
@@ -1943,6 +1917,9 @@ public final class Controller implements Initializable {
                 wordCloud.draw(pane, article.path.toString());
                 Platform.runLater(() -> openContentTab(article.title + "'s word cloud", pane));
                 return;
+            case OPEN_BY_DEFAULT:
+                openCurrentFile();
+                return;
             default:
                 return;
         }
@@ -1986,7 +1963,7 @@ public final class Controller implements Initializable {
     }
 
     /**
-     * get parent window.
+     * Get parent window.
      * @return parent window.
      */
     private Window getParent() {
