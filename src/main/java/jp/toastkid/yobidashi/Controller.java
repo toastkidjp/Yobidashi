@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,12 @@ import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -118,11 +125,6 @@ import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 import jp.toastkid.yobidashi.popup.HamburgerPopup;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.TopicProcessor;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Yobidashi's primary Controller.
@@ -286,7 +288,7 @@ public final class Controller implements Initializable {
     private HamburgerPopup hPopup;
 
     /** Progress message and value sender. */
-    private TopicProcessor<String> progressSender;
+    private Subject<String> progressSender;
 
     /** Use for draw word-cloud. */
     private FxWordCloud wordCloud;
@@ -299,7 +301,7 @@ public final class Controller implements Initializable {
 
         snackbar.registerSnackbarContainer(header);
         conf = new Config(Defines.CONFIG);
-        progressSender = TopicProcessor.create(true);
+        progressSender = PublishSubject.create();
 
         final ProgressDialog pd = new ProgressDialog.Builder()
             .setCommand(new Task<Integer>() {
@@ -375,14 +377,14 @@ public final class Controller implements Initializable {
      */
     private void launchMemoryJob() {
         final long start = System.currentTimeMillis();
-        Mono.create(emitter -> emitter.success(
+        Single.create(emitter -> emitter.onSuccess(
                 String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
                 )
             )
-            .delaySubscriptionMillis(5000L)
+            .delaySubscription(5L, TimeUnit.SECONDS)
             .repeat()
             .map(Object::toString)
-            .subscribeOn(Schedulers.newElastic("MemoryWatcherDelay"))
+            .subscribeOn(Schedulers.newThread())
             .subscribe(message -> setStatus(message, false));
 
         progressSender.onNext(
@@ -814,7 +816,7 @@ public final class Controller implements Initializable {
             controller.setTitle(conf.get(Config.Key.APP_TITLE));
             controller.setZero();
             controller.setBackground(articleGenerator.getBackground());
-            final Disposable disposable = controller.messenger().subscribe(this::processMessage);
+            final Disposable disposable = controller.subscribe(this::processMessage);
             Runtime.getRuntime().addShutdownHook(new Thread(disposable::dispose));
 
             final Pane sdRoot = controller.getRoot();
@@ -854,13 +856,11 @@ public final class Controller implements Initializable {
      * @param article tab's article
      */
     private void openArticleTab(final Article article) {
-        Mono.<ArticleTab>create(emitter -> emitter.success(makeArticleTab(article)))
-            .and(Mono.<Font>create(emitter -> emitter.success(readFont())))
-            .publishOn(Schedulers.elastic())
-            .subscribe(pair -> {
-                final ArticleTab tab = pair.getT1();
-                final Font font = pair.getT2();
-                pair.getT1().setFont(font);
+        Single.<ArticleTab>create(emitter -> emitter.onSuccess(makeArticleTab(article)))
+            .observeOn(Schedulers.trampoline())
+            .subscribe(tab -> {
+                final Font font = readFont();
+                tab.setFont(font);
                 Platform.runLater(() -> openTab(tab));
         });
     }
@@ -1226,11 +1226,11 @@ public final class Controller implements Initializable {
      * Prepare common article list.
      */
     private void prepareArticleList() {
-        Mono.create(emitter -> {
+        Single.create(emitter -> {
             initArticleList(articleList);
-            emitter.success("");
+            emitter.onSuccess("");
         })
-        .subscribeOn(Schedulers.newSingle("I/O"))
+        .subscribeOn(Schedulers.io())
         .subscribe(empty -> {
             final long start = System.currentTimeMillis();
             loadArticleList();
@@ -1272,8 +1272,8 @@ public final class Controller implements Initializable {
     private void loadArticleList() {
         final ObservableList<Article> items = articleList.getItems();
         items.removeAll();
-        Flux.fromIterable(Articles.readAllArticleNames(conf.get(Key.ARTICLE_DIR)))
-            .subscribeOn(Schedulers.newSingle("I/O"))
+        Observable.fromIterable(Articles.readAllArticleNames(conf.get(Key.ARTICLE_DIR)))
+            .subscribeOn(Schedulers.io())
             .subscribe(items::add);
     }
 
@@ -1282,9 +1282,9 @@ public final class Controller implements Initializable {
      */
     private void prepareBookmarks() {
         final ObservableList<Article> bookmarks = bookmarkList.getItems();
-        Mono.create(emitter -> {
+        Single.create(emitter -> {
             initArticleList(bookmarkList);
-            emitter.success("");
+            emitter.onSuccess("");
             })
             .subscribe(
                 empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()

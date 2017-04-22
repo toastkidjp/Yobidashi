@@ -7,6 +7,12 @@ import java.util.ResourceBundle;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -29,10 +35,6 @@ import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.TopicProcessor;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Right side tools controller.
@@ -87,7 +89,7 @@ public class ToolsController implements Initializable {
     private NumberTextField celsius;
 
     /** Message sender. */
-    private final TopicProcessor<Message> messenger = TopicProcessor.create();
+    private final Subject<Message> messenger = PublishSubject.create();
 
 
     /**
@@ -147,8 +149,8 @@ public class ToolsController implements Initializable {
      * Set current WebView publisher.
      * @param zoomPublisher
      */
-    public void setFlux(final Flux<DoubleProperty> zoomPublisher) {
-        final Disposable subscribe = zoomPublisher.subscribeOn(Schedulers.elastic())
+    public void setFlux(final Observable<DoubleProperty> zoomPublisher) {
+        final Disposable subscribe = zoomPublisher.subscribeOn(Schedulers.newThread())
             .subscribe(z -> {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
@@ -157,11 +159,11 @@ public class ToolsController implements Initializable {
     }
 
     /**
-     * Return message senger.
-     * @return {@link TopicProcessor}
+     * Subscribe this messenger.
+     * @return {@link Disposable}
      */
-    public TopicProcessor<Message> getMessenger() {
-        return messenger;
+    public Disposable subscribe(final Consumer<Message> c) {
+        return messenger.subscribe(c);
     }
 
     /**

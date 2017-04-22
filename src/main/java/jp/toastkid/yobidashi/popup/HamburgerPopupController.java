@@ -2,10 +2,13 @@ package jp.toastkid.yobidashi.popup;
 
 import com.jfoenix.controls.JFXPopup;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.fxml.FXML;
 import jp.toastkid.yobidashi.message.ApplicationMessage;
 import jp.toastkid.yobidashi.message.Message;
-import reactor.core.publisher.TopicProcessor;
 
 /**
  * Hamburger popup's controller.
@@ -20,13 +23,13 @@ public class HamburgerPopupController {
     private JFXPopup popup;
 
     /** Message sender. */
-    private final TopicProcessor<Message> messenger;
+    private final Subject<Message> messenger;
 
     /**
      * Initialize messenger.
      */
     public HamburgerPopupController() {
-        messenger = TopicProcessor.create();
+        messenger = PublishSubject.create();
     }
 
     /**
@@ -34,7 +37,7 @@ public class HamburgerPopupController {
      */
     @FXML
     private void minimize() {
-        getMessenger().onNext(ApplicationMessage.makeMinimize());
+    	messenger.onNext(ApplicationMessage.makeMinimize());
     }
 
     /**
@@ -42,15 +45,15 @@ public class HamburgerPopupController {
      */
     @FXML
     private void quit() {
-        getMessenger().onNext(ApplicationMessage.makeQuit());
+        messenger.onNext(ApplicationMessage.makeQuit());
     }
 
     /**
-     * Return this controller's messenger.
-     * @return messenger
+     * Return this controller's subscription.
+     * @return messenger's subscription
      */
-    TopicProcessor<Message> getMessenger() {
-        return messenger;
+    Disposable subscribe(final Consumer<Message> c) {
+        return messenger.subscribe(c);
     }
 
     /**

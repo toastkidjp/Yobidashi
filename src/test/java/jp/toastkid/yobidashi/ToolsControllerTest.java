@@ -13,6 +13,7 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import com.jfoenix.controls.JFXSlider;
 
+import io.reactivex.Observable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
@@ -23,10 +24,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import jp.toastkid.article.control.UserAgent;
-import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.TopicProcessor;
 
 /**
  * {@link ToolsController}'s test case.
@@ -38,9 +36,6 @@ public class ToolsControllerTest extends ApplicationTest {
 
     /** Test object. */
     private ToolsController controller;
-
-    /** Test messenger. */
-    private TopicProcessor<Message> messenger;
 
     /** Stage. */
     private Stage stage;
@@ -66,7 +61,7 @@ public class ToolsControllerTest extends ApplicationTest {
      */
     @Test
     public void testSetFlux() {
-        controller.setFlux(Flux.just(new SimpleDoubleProperty(1.0d)));
+        controller.setFlux(Observable.just(new SimpleDoubleProperty(1.0d)));
     }
 
     /**
@@ -88,7 +83,7 @@ public class ToolsControllerTest extends ApplicationTest {
         Platform.runLater(() -> {
             @SuppressWarnings({ "unchecked", "rawtypes" })
             final ComboBox<UserAgent> draw = (ComboBox) lookup("#ua").query();
-            messenger.subscribe(m -> {
+            controller.subscribe(m -> {
                 final UserAgentMessage um = (UserAgentMessage) m;
                 assertEquals(draw.getSelectionModel().getSelectedItem(), um.getUserAgent());
             });
@@ -138,7 +133,6 @@ public class ToolsControllerTest extends ApplicationTest {
             e.printStackTrace();
             Platform.exit();
         }
-        messenger = controller.getMessenger();
     }
 
 }

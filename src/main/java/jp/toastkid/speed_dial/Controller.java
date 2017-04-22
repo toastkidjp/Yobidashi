@@ -4,6 +4,10 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -14,7 +18,6 @@ import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.WebSearchMessage;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.publisher.TopicProcessor;
 
 /**
  * Speed Dial's controller.
@@ -43,7 +46,7 @@ public class Controller {
     private ComboBox<String> type;
 
     /** Message sender. */
-    private final TopicProcessor<Message> messenger = TopicProcessor.create();
+    private final Subject<Message> messenger = PublishSubject.create();
 
     /**
      * Return root pane.
@@ -109,11 +112,11 @@ public class Controller {
     }
 
     /**
-     * Getter of message sender.
+     * Setter of messenger's subscriber.
      * @return messenger.
      */
-    public TopicProcessor<Message> messenger() {
-        return messenger;
+    public Disposable subscribe(final Consumer<Message> c) {
+        return messenger.subscribe(c);
     }
 
     /**
