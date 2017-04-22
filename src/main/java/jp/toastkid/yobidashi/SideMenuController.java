@@ -11,7 +11,6 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,6 +21,11 @@ import org.slf4j.LoggerFactory;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 
+import groovy.lang.Tuple2;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -64,10 +68,6 @@ import jp.toastkid.yobidashi.models.ApplicationState;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Disposable;
-import reactor.core.publisher.TopicProcessor;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 /**
  * Side menu's controller.
@@ -115,7 +115,7 @@ public class SideMenuController implements Initializable {
     private Stage stage;
 
     /** Tool Drawer event processor. */
-    private TopicProcessor<Message> messenger;
+    private Subject<Message> messenger;
 
     /** Config. */
     private Config conf;
@@ -687,7 +687,7 @@ public class SideMenuController implements Initializable {
                  .map(this::extractAcceleratorPair)
                  .filter(Filters::isNotNull)
                  .forEach(item -> accelerators.put(
-                         item.getT1(), () -> item.getT2().handle(new ActionEvent())));
+                         item.getFirst(), () -> item.getSecond().handle(new ActionEvent())));
         });
         accelerators.putAll(toolsController.accelerators());
     }
@@ -718,7 +718,7 @@ public class SideMenuController implements Initializable {
         if (label.getAccelerator() == null) {
             return null;
         }
-        return Tuples.of(label.getAccelerator(), label.getOnAction());
+        return new Tuple2<>(label.getAccelerator(), label.getOnAction());
     }
 
     /**
@@ -741,11 +741,11 @@ public class SideMenuController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        this.messenger = TopicProcessor.create();
+        this.messenger = PublishSubject.create();
     }
 
     /**
-     * Getter of messenger.
+     * Set subscriber to messenger.
      * @return messenger
      */
     protected Disposable setSubscriber(final Consumer<Message> c) {
@@ -753,11 +753,11 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * Getter of messenger.
+     * Set subscriber to Tools' messenger.
      * @return messenger
      */
     protected Disposable setToolsSubscriber(final Consumer<Message> c) {
-        return this.toolsController.getMessenger().subscribe(c);
+        return this.toolsController.subscribe(c);
     }
 
     /**

@@ -12,9 +12,9 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Watch file for auto backup.
@@ -26,12 +26,10 @@ public class FileWatcherJob implements Runnable {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(FileWatcherJob.class);
 
-    /** Backup interval. */
-    private static final long BACKUP_INTERVAL = TimeUnit.SECONDS.toMillis(30L);
-
     /** File watcher task list. */
     private final MutableMap<Path, Long> targets = Maps.mutable.empty();
 
+    /** Disposable. */
     private Disposable cancellation;
 
     @Override
@@ -45,15 +43,15 @@ public class FileWatcherJob implements Runnable {
                 LOGGER.error("Error", e);
             }
         }
-        cancellation = Flux.<Path>create(emitter -> {
+        cancellation = Observable.<Path>create(emitter -> {
             targets
                 .select(this::isTarget)
-                .forEachKeyValue((file, ms) -> emitter.next(file));
-            emitter.complete();
+                .forEachKeyValue((file, ms) -> emitter.onNext(file));
+            emitter.onComplete();
         })
-        .delaySubscriptionMillis(BACKUP_INTERVAL)
+        .delaySubscription(30L, TimeUnit.SECONDS)
         .repeat()
-        .subscribeOn(Schedulers.newElastic("FileWatcher"))
+        .subscribeOn(Schedulers.newThread())
         .subscribe(path -> {
             try {
                 final Path copy = Files.copy(

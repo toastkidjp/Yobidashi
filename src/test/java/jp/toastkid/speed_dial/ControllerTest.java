@@ -1,7 +1,6 @@
 package jp.toastkid.speed_dial;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
@@ -86,14 +85,6 @@ public class ControllerTest extends ApplicationTest {
                 + " -fx-background-size: cover;-fx-background-repeat: stretch;",
                 controller.getRoot().getStyle()
                 );
-    }
-
-    /**
-     * Only check not null.
-     */
-    @Test
-    public void testMessenger() {
-        assertNotNull(controller.messenger());
     }
 
     /**

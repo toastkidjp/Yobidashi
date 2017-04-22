@@ -1,7 +1,6 @@
 package jp.toastkid.yobidashi.popup;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +9,7 @@ import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXPopup.PopupHPosition;
 import com.jfoenix.controls.JFXPopup.PopupVPosition;
 
+import io.reactivex.functions.Consumer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -103,7 +103,7 @@ public class HamburgerPopup {
             popup = controller.getPopup();
             popup.setPopupContainer(b.container);
             popup.setSource(b.source);
-            controller.getMessenger().subscribe(b.sub);
+            controller.subscribe(b.sub);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
         }

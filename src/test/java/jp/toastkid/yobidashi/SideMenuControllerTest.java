@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.junit.After;
 import org.junit.Test;
@@ -19,6 +18,8 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import com.jfoenix.controls.JFXTabPane;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +40,6 @@ import jp.toastkid.yobidashi.message.SnackbarMessage;
 import jp.toastkid.yobidashi.message.TabMessage;
 import jp.toastkid.yobidashi.message.WebTabMessage;
 import jp.toastkid.yobidashi.models.Config;
-import reactor.core.Disposable;
 
 /**
  * {@link SideMenuController}'s test case.

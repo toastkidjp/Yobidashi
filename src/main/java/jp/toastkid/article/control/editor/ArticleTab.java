@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
@@ -28,8 +31,6 @@ import jp.toastkid.article.converter.PostProcessor;
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.Strings;
-import reactor.core.Disposable;
-import reactor.core.publisher.TopicProcessor;
 
 /**
  * Article tab.
@@ -60,7 +61,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
     private int yOffset;
 
     /** Messenger, */
-    private TopicProcessor<String> messenger;
+    private Subject<String> messenger;
 
     /** Disposable of subscription. */
     private Disposable disposable;
@@ -83,7 +84,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
 
         private Runnable onLoad;
 
-        private Consumer<String> onOpenNewArticle;
+        private io.reactivex.functions.Consumer<String> onOpenNewArticle;
 
         private ArticleGenerator generator;
 
@@ -120,7 +121,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
             return this;
         }
 
-        public Builder setOnOpenNewArticle(final Consumer<String> onOpenNewArticle) {
+        public Builder setOnOpenNewArticle(final io.reactivex.functions.Consumer<String> onOpenNewArticle) {
             this.onOpenNewArticle = onOpenNewArticle;
             return this;
         }
@@ -151,7 +152,7 @@ public class ArticleTab extends BaseWebTab implements Editable {
         this.onLoad     = b.onLoad;
         this.generator  = b.generator;
         this.post       = b.postProcessor;
-        this.messenger  = TopicProcessor.create();
+        this.messenger  = PublishSubject.create();
 
         final WebView webView = getWebView();
         initWebView(webView, b.popupHandler);

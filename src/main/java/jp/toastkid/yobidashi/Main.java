@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -16,10 +18,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jp.toastkid.yobidashi.models.Defines;
-import reactor.core.Disposable;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoProcessor;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * JavaFX Wiki-Client.
@@ -47,7 +45,7 @@ public final class Main extends Application {
     private Disposable stageDisposable;
 
     /** Controller initializer disposable. */
-    private MonoProcessor<Object> controllerDisposable;
+    private Disposable controllerDisposable;
 
     @Override
     public void start(final Stage stage) {
@@ -73,11 +71,20 @@ public final class Main extends Application {
      */
     private void launch(final Stage stage) {
 
-        stageDisposable = readScene().subscribeOn(Schedulers.immediate()).subscribe(scene -> {
+        stageDisposable = readScene().subscribe(scene -> {
             controller.setStage(stage);
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
             stage.setScene(scene);
+
+            final Rectangle2D d = Screen.getPrimary().getVisualBounds();
+            maximizeStage(stage);
+            controller.setSize(d.getWidth(), d.getHeight());
+            // setup searcher.
+            controller.setupExpandables();
+            controller.setupSideMenu();
+            controller.setStatus(" Complete - " + (System.currentTimeMillis() - start) + "[ms]");
+
             stage.setOnCloseRequest(event -> this.closeApplication(stage));
             stage.centerOnScreen();
             stage.initStyle(StageStyle.TRANSPARENT);
@@ -87,24 +94,13 @@ public final class Main extends Application {
                     (System.currentTimeMillis() - start)
                     );
         });
-
-        controllerDisposable = Mono.create(emitter -> {
-            final Rectangle2D d = Screen.getPrimary().getVisualBounds();
-            maximizeStage(stage);
-            controller.setSize(d.getWidth(), d.getHeight());
-            // setup searcher.
-            controller.setupExpandables();
-            controller.setupSideMenu();
-            controller.setStatus(" Complete - " + (System.currentTimeMillis() - start) + "[ms]");
-            emitter.success();
-        }).subscribeOn(Schedulers.elastic()).subscribe();
     }
 
     /**
      * コントローラに stage を渡し、シーンファイルを読み込む.
      * @return Scene オブジェクト
      */
-    private final Mono<Scene> readScene() {
+    private final Single<Scene> readScene() {
         final long start = System.currentTimeMillis();
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
@@ -117,7 +113,7 @@ public final class Main extends Application {
         LOGGER.info("{} Ended loading scene graph. {}[ms]",
                 Thread.currentThread().getName(),
                 System.currentTimeMillis() - start);
-        return Mono.just(new Scene(controller.root));
+        return Single.just(new Scene(controller.root));
     }
 
     /**
