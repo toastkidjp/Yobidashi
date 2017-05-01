@@ -92,3 +92,7 @@
   -fx-text-fill: black;
   -fx-font-size: 18pt;
 }
+
+.speed-dial-input {
+  -fx-background-color: rgba(25.0, 20.0, 50.0, 0.5);
+}

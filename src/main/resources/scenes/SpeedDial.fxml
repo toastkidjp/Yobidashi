@@ -37,9 +37,9 @@
           <children>
             <JFXTextField fx:id="input" onAction="#search"
               minWidth="400.0" promptText="Input query" labelFloat="true"
-              style="-fx-background-color: rgba(25.0, 20.0, 50.0, 0.5);
-                     -fx-font-size: 20pt;
+              style="-fx-font-size: 20pt;
                      -fx-effect: dropshadow(three-pass-box, #000033, 10, 0, 0, 0);"
+              styleClass="speed-dial-input"
               />
             <VBox>
               <children>
