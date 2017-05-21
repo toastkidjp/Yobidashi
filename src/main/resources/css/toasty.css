@@ -137,11 +137,11 @@
 }
 
 .left-tabs .list-cell:hover .label {
-  -fx-text-fill: white;
+  -fx-text-fill: gold;
 }
 
 .left-tabs .list-cell:selected .label {
-  -fx-text-fill: white;
+  -fx-text-fill: gold;
 }
 
 .left-tabs .label {
