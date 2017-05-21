@@ -94,7 +94,7 @@ public class PostProcessor {
             if (matcher.find()) {
                 final int depth = Integer.parseInt(matcher.group(1));
                 final String subheading   = matcher.group(2).trim();
-                final String subheadingId = extractSubHeading(subheading).replaceAll("[ \\.\"\\?\\']+", "_");
+                final String subheadingId = extractSubHeading(subheading).replaceAll("[ \\.\"\\?\\'\\(\\)]+", "_");
                 final String subheadTag = String.format(SUBHEAD_FORMAT, subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
                 subheadings.add(new Subheading(subheading, subheadingId, depth));

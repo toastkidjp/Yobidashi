@@ -1,0 +1,302 @@
+.root {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.jfx-snackbar-content {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.check-box {
+  -fx-text-fill: white;
+}
+
+.button {
+  -fx-base: transparent;
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.split-pane-divider {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.spinner-label {
+  -fx-text-fill: white;
+}
+
+.combo-box {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.titled-pane {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.color-picker {
+  -fx-base: transparent;
+  -fx-background: transparent;
+}
+
+.month-year-pane {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.date-picker {
+  -fx-text-fill: rgba(51, 25, 54, 0.7);
+}
+
+.today {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.today:hover {
+  -fx-background-color: rgba(180, 180, 200, 1.0);
+  -fx-text-fill: white;
+}
+
+.date-picker-display-node {
+  -fx-base: rgba(200, 200, 210, 0.8);
+  -fx-text-fill: white;
+}
+
+.spinner-label {
+  -fx-text-fill: rgba(51, 25, 54, 0.7);
+}
+
+.menu {
+  -fx-text-fill: white;
+}
+
+.menu-item:focused {
+  -fx-background-color: #005577;
+}
+
+.menu-item:focused .label {
+  -fx-text-fill: black;
+}
+
+.text-field {
+  -fx-background: white;
+  -fx-prompt-text-fill: gray;
+  -fx-text-fill: white;
+}
+
+.text-field:focused {
+  -fx-base: white;
+  -fx-text-fill: white;
+}
+
+.text-area {
+  -fx-background: gray;
+}
+
+.text-area:focused {
+  -fx-base: gray;
+}
+
+.tab-label {
+  -fx-text-fill: white;
+}
+
+.tab-pane {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.tab {
+  -fx-background-color: rgba(161, 102, 65, 1);
+}
+
+.tab:selected {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.list-view {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.left-tabs .list-cell {
+  -fx-text-fill: white;
+  -fx-background-color: rgba(161, 102, 65, 0.8)
+}
+
+.left-tabs .list-cell:even {
+  -fx-text-fill: white;
+  -fx-background-color: rgba(181, 142, 105, 0.8)
+}
+
+.left-tabs .list-cell:hover {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.left-tabs .list-cell:selected {
+  -fx-background-image: url('../images/toast.png');
+}
+
+.left-tabs .list-cell:hover .label {
+  -fx-text-fill: gold;
+}
+
+.left-tabs .list-cell:selected .label {
+  -fx-text-fill: gold;
+}
+
+.left-tabs .label {
+  -fx-text-fill: white;
+}
+
+.scroll-bar .thumb{
+  -fx-background-image: url('../images/toast.png');
+  -fx-background-insets: 0;
+  -fx-background-radius: 0;
+}
+
+.scroll-bar {
+  -fx-background-color: #F4F4F5;
+  -fx-background-insets: 0;
+  -fx-background-radius: 0;
+}
+
+.scroll-pane {
+  -fx-opacity: 0.5;
+}
+
+.scroll-bar:horizontal .increment-arrow {
+  -fx-background-image: url('../images/toast.png');
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+  -fx-shape: "M7.626,12.876L4.251,8.751H7.14L11,12.876L7.14,17H4.251L7.626,12.876z";
+}
+
+.scroll-bar:vertical .increment-arrow {
+  -fx-background-image: url('../images/toast.png');
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+  -fx-shape: "M8.124,13.625l4.125-3.375v2.889l-4.125,3.86L4,13.139V10.25L8.124,13.625z";
+}
+.scroll-bar .increment-button:pressed .increment-arrow {
+  -fx-background-color: black, black;
+}
+.scroll-bar:horizontal .decrement-arrow {
+  -fx-background-image: url('../images/toast.png');
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+  -fx-shape: "M11,17H8.111l-3.86-4.124l3.86-4.125H11l-3.375,4.125L11,17z";
+}
+
+.scroll-bar:vertical .decrement-arrow {
+  -fx-background-image: url('../images/toast.png');
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+  -fx-shape: "M4,17v-2.889l4.124-3.86l4.125,3.86V17l-4.125-3.375L4,17z";
+}
+
+.scroll-bar .decrement-button:pressed .decrement-arrow {
+  -fx-background-color: black, black;
+}
+
+.combo-box .list-cell {
+  -fx-text-fill: white;
+}
+
+.editor-label {
+  -fx-text-fill: white;
+}
+
+.jfx-tool-bar {
+  -fx-font-size: 20.0;
+  -fx-font-weight: BOLD;
+  -fx-background-image: url('../images/toast.png');
+  -fx-pref-width: 100.0%;
+  -fx-pref-height: 64.0px;
+}
+
+.jfx-snackbar-content {
+  -fx-background-color: rgba(51, 25, 54, 0.7);
+}
+
+.jfx-snackbar-toast {
+  -fx-text-fill: WHITE;
+}
+
+.jfx-text-field, .jfx-password-field, .jfx-text-area{
+  -fx-background-color: transparent ;
+  -fx-font-weight: BOLD;
+  -fx-prompt-text-fill: WHITE;
+  -fx-text-fill: WHITE;
+  -fx-alignment: top-left ;
+  -fx-focus-color: gold;
+  -fx-unfocus-color: #4d4d4d;
+}
+
+.arc{
+  -fx-stroke:  #ffd600;
+}
+
+.editor-button {
+  -fx-base: rgba(100, 100, 150, 0.5);
+}
+
+.editor-header {
+  -fx-background-color: rgba(161, 102, 65, 1);
+}
+
+.code-area {
+  -fx-background-color: rgba(240, 240, 240, 0.5);
+}
+
+.tab-close-button {
+  -fx-background-color: rgba(255, 255, 255, 0.9);
+  -fx-text-fill: black;
+}
+
+.jfx-tab-pane .tab-header-background{
+  -fx-background-color: rgba(161, 102, 65, 1);
+}
+
+.jfx-tab-pane .tab-label {
+    -fx-text-fill: white;
+}
+
+.option-popup {
+  -fx-text-fill: rgba(51, 25, 54, 0.7);
+  -fx-font-size: 18pt;
+}
+
+.dialog-message {
+  -fx-text-fill: white;
+}
+
+.titled-pane .title {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.titled-pane .content {
+  -fx-background-color: rgba(255, 255, 255, 0.3);
+}
+
+#status {
+  -fx-text-fill: white;
+}
+
+#sdSearch {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+#title {
+  -fx-text-fill: white;
+}
+
+.speed-dial-title {
+  -fx-background-image: url('../images/toast.png');
+  -fx-text-fill: white;
+}
+
+.speed-dial-input {
+  -fx-background-image: url('../images/toast.png');
+}
