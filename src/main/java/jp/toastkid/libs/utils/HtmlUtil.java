@@ -1,11 +1,11 @@
 package jp.toastkid.libs.utils;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Lists;
 
 
 /**
@@ -72,11 +72,9 @@ public final class HtmlUtil {
         if (StringUtils.isNotEmpty(header)){
             bld.append(header);
         }
-        Lists.immutable.ofAll(map.keySet())
+        new ArrayList<>(map.keySet())
             .subList(0, limit < 0 ? map.size() : limit)
-            .each(key -> {
-                bld.append("<tr>").append(td(key)).append(td(map.get(key).toString())).append("</tr>");
-            });
+            .forEach(key -> bld.append("<tr>").append(td(key)).append(td(map.get(key).toString())).append("</tr>"));
         bld.append("</table>");
         return bld.toString();
     }

@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public final class CashFlowExtractor implements ChartDataExtractor {
      * init with empty list.
      */
     public CashFlowExtractor() {
-        values = Lists.mutable.empty();
+        values = new ArrayList<>();
     }
 
 

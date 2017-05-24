@@ -3,16 +3,15 @@ package jp.toastkid.article.converter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +160,7 @@ public final class MarkdownConverter {
      * @return txtFilePath の中身を Wiki 変換した文字列
      */
     public String convert(final Path filePath, final String fileEncode) {
-        return convertToLines(filePath, fileEncode).makeString(Strings.LINE_SEPARATOR);
+        return convertToLines(filePath, fileEncode).stream().collect(Collectors.joining(Strings.LINE_SEPARATOR));
     }
 
     /**
@@ -170,9 +169,9 @@ public final class MarkdownConverter {
      * @param fileEncode テキストファイルの文字コード
      * @return Wiki 変換された行を入れた List
      */
-    public MutableList<String> convertToLines(final Path filePath, final String fileEncode) {
-        this.latestImagePaths = Sets.mutable.empty();
-        MutableList<String> strs = FileUtil.readLines(filePath, fileEncode);
+    public List<String> convertToLines(final Path filePath, final String fileEncode) {
+        this.latestImagePaths = new HashSet<>();
+        List<String> strs = FileUtil.readLines(filePath, fileEncode);
         try {
             strs = wikiConvert(strs, true);
         } catch (final Exception e) {
@@ -197,11 +196,11 @@ public final class MarkdownConverter {
      * @param sources .txt ファイルを読み込んだ List
      * @param isCount 文字数計測に含めるか否か
      */
-    public MutableList<String> wikiConvert(
-            final MutableList<String> sources,
+    public List<String> wikiConvert(
+            final List<String> sources,
             final boolean isCount
             ) {
-        final MutableList<String> contents = Lists.mutable.empty();
+        final List<String> contents = new ArrayList<>();
         boolean isInBlockQuote = false;
         boolean isInP          = false;
         boolean isInTable      = false;

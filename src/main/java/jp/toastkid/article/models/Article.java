@@ -7,8 +7,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.eclipse.collections.api.set.FixedSizeSet;
-import org.eclipse.collections.impl.factory.Sets;
 
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -57,9 +55,6 @@ public class Article implements Comparable<Article> {
             return text;
         }
     }
-
-    /** usable extensions. */
-    public static final FixedSizeSet<String> EXTENSIONS = Sets.fixedSize.of(Extension.MD.text);
 
     /**
      * initialize Article model.
@@ -172,7 +167,7 @@ public class Article implements Comparable<Article> {
         if (!ext.isPresent()) {
             return false;
         }
-        return EXTENSIONS.contains(ext.orElseGet(Strings::empty));
+        return Extension.MD.text().equals(ext.orElseGet(Strings::empty));
     }
 
 }

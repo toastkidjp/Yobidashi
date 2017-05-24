@@ -3,7 +3,8 @@ package jp.toastkid.article.converter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.collections.impl.factory.Lists;
+import java.util.Arrays;
+
 import org.junit.Test;
 
 /**
@@ -20,7 +21,7 @@ public class FormationTest {
     @Test
     public void testGetPitch() {
         final String pitch = Formation.getPitch(
-                Lists.mutable.of(
+                Arrays.asList(
                         Footballer.getFootballer("1 | GK | スポルティエッロ"),
                         Footballer.getFootballer("2 | RB | マヌエル・パブロ"),
                         Footballer.getFootballer("4 | CB | コロッチーニ"),

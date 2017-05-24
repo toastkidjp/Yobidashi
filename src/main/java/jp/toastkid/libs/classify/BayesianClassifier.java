@@ -1,10 +1,9 @@
 package jp.toastkid.libs.classify;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.collections.impl.factory.Sets;
 
 /**
  * ナイーブベイズ分類器による分類器
@@ -50,7 +49,7 @@ public final class BayesianClassifier {
      * @param str
      */
     private void learn(final String str){
-        final Set<String> appear = Sets.mutable.empty();
+        final Set<String> appear = new HashSet<>();
         final boolean isValidKind = "T".equals(str.split("\t")[0]);
         final String mat = str.split("\t")[1];
         for (int i = 0; i < (mat.length() - (gramCount - 1) ); ++i){
@@ -79,7 +78,7 @@ public final class BayesianClassifier {
     public final boolean trial(final String str) {
         double morningProb = 1;
         double normalProb  = 1;
-        final Set<String> appear = Sets.mutable.empty();
+        final Set<String> appear = new HashSet<>();
         final int length = str.length() - 1;
         for (int i = 0; i < length; ++i){
             final String bi = str.substring(i, i + gramCount);
@@ -111,7 +110,7 @@ public final class BayesianClassifier {
     public final double trialRetVal(final String str) {
         double prob = 1;
         //double normalProb = 1;
-        final Set<String> appear = Sets.mutable.empty();
+        final Set<String> appear = new HashSet<>();
         final int length = str.length() - 1;
         for (int i = 0; i < length; ++i){
             final String bi = str.substring(i, i + 2);

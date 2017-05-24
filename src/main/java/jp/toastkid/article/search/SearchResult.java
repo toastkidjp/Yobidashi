@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * 記事1件の検索結果.
@@ -37,7 +37,7 @@ public final class SearchResult {
      * @param pFilePath /path/to/file
      */
     public SearchResult(final String pFilePath) {
-        this.df           = Maps.mutable.withInitialCapacity(20);
+        this.df           = new HashMap<>(20);
         this.filePath     = pFilePath;
         try {
             this.lastModified = Files.getLastModifiedTime(Paths.get(pFilePath)).toMillis();

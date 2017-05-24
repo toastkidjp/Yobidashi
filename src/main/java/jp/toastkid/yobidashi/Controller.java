@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -465,7 +466,7 @@ public final class Controller implements Initializable {
                 }
                 openWebTabWithContent(
                         f.getAbsolutePath(),
-                        FileUtil.readLines(f.toPath(), Article.ENCODE).makeString(System.lineSeparator()),
+                        FileUtil.readLines(f.toPath(), Article.ENCODE).stream().collect(Collectors.joining(System.lineSeparator())),
                         ContentType.TEXT
                     );
             });
@@ -1287,9 +1288,11 @@ public final class Controller implements Initializable {
             emitter.onSuccess("");
             })
             .subscribe(
-                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
-                    .collect(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
-                    .each(bookmarks::add)
+                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK)
+                    .readLines()
+                    .stream()
+                    .map(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
+                    .forEach(bookmarks::add)
                     );
     }
 

@@ -1,12 +1,11 @@
 package jp.toastkid.article.search;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.Interval;
+import java.util.stream.IntStream;
 
 import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.utils.FileUtil;
@@ -62,14 +61,14 @@ public final class ArticleSearchTask implements Runnable {
         final List<String> contents
             = FileUtil.readLines(result.filePath, Article.ENCODE);
 
-        Interval.zeroTo(contents.size()).each(i -> {
+        IntStream.rangeClosed(0, contents.size()).forEach(i -> {
             final String content = contents.get(i);
             result.length = result.length + content.length();
             targetPatterns.forEach(pat -> {
                 final Matcher matcher = pat.matcher(content);
                 while (matcher.find()){
                     final List<String> founds
-                        = result.df.getOrDefault(pat.pattern(), Lists.mutable.empty());
+                        = result.df.getOrDefault(pat.pattern(), Collections.emptyList());
                     founds.add(i + " : " + matcher.group(0));
                     result.df.put(pat.pattern(), founds);
                 }

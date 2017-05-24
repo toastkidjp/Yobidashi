@@ -14,14 +14,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.eclipse.collections.api.set.FixedSizeSet;
-import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.junit.Test;
 
 /**
@@ -162,7 +162,7 @@ public final class StringsTest {
                 "しろねずみ》であることを半七はかねて知っていた。"
         };
         final List<String> actual = Strings.getFolderStrs(
-                ArrayIterate.makeString(target, ""),
+                Stream.of(target).collect(Collectors.joining()),
                 target[0].length()
             );
         assertEquals(Arrays.asList(target), actual);
@@ -185,28 +185,27 @@ public final class StringsTest {
      */
     @Test
     public void md5HashTest() {
-        final FixedSizeSet<Long> set = Sets.fixedSize.of(
-                Strings.md5Hash("トマト"),
-                Strings.md5Hash("トマト1"),
-                Strings.md5Hash("トマト2"),
-                Strings.md5Hash("トマト ")
-                );
-        assertTrue(set.allSatisfy(l -> {return l instanceof Long;}));
+        final Set<Long> set = makeSet();
+        assertTrue(set.stream().allMatch(l -> {return l instanceof Long;}));
         assertEquals(4, set.size());
     }
+
+	private Set<Long> makeSet() {
+		final Set<Long> set = new HashSet<>();
+        set.add(Strings.md5Hash("トマト"));
+        set.add(Strings.md5Hash("トマト1"));
+        set.add(Strings.md5Hash("トマト2"));
+        set.add(Strings.md5Hash("トマト "));
+		return set;
+	}
 
     /**
      * StringUtil#longHash 's test method.
      */
     @Test
     public void longHashTest() {
-        final FixedSizeSet<Long> set = Sets.fixedSize.of(
-                Strings.longHash("トマト"),
-                Strings.longHash("トマト1"),
-                Strings.longHash("トマト2"),
-                Strings.longHash("トマト ")
-                );
-        assertTrue(set.allSatisfy(l -> {return l instanceof Long;}));
+        final Set<Long> set = makeSet();
+        assertTrue(set.stream().allMatch(l -> {return l instanceof Long;}));
         assertEquals(4, set.size());
     }
 
@@ -247,7 +246,7 @@ public final class StringsTest {
         // nullnull する
         assertEquals(
                 "nullnull",
-                Strings.replace("aa", Maps.fixedSize.of('a', null))
+                Strings.replace("aa", new HashMap<Character, String>(){{put('a', null);}})
                 );
         // とりあえず止まらない
         assertEquals(

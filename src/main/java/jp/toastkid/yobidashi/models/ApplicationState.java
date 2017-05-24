@@ -1,9 +1,8 @@
 package jp.toastkid.yobidashi.models;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * 現在稼働中のアプリケーションの情報を表示する画面
@@ -32,7 +31,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     public static final Map<String, String> getConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(6);
+        final Map<String, String> configMap = new HashMap<>(6);
         configMap.putAll(getJavaConfigMap());
         configMap.putAll(getRuntimeConfigMap());
         return configMap;
@@ -44,7 +43,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     private static final Map<String, String> getJavaConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(2);
+        final Map<String, String> configMap = new HashMap<>(2);
         configMap.put("Java Version", System.getProperty("java.version"));
         configMap.put("Java Home",    System.getProperty("java.home"));
         return configMap;
@@ -57,7 +56,7 @@ public final class ApplicationState {
      * (121229) 作成<BR>
      */
     private static final Map<String, String> getRuntimeConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(4);
+        final Map<String, String> configMap = new HashMap<>(4);
         final Runtime runtime = Runtime.getRuntime();
         configMap.put("Max Memory",          getFormatNum(runtime.maxMemory() ));
         configMap.put("Free Memory",         getFormatNum(runtime.freeMemory() ));

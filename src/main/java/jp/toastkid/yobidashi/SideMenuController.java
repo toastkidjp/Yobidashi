@@ -281,7 +281,7 @@ public class SideMenuController implements Initializable {
         messenger.onNext(
             WebTabMessage.make(
                 "License",
-                FileUtil.readLines(PATH_LICENSE, "UTF-8").makeString(Strings.LINE_SEPARATOR),
+                FileUtil.readLines(PATH_LICENSE, "UTF-8").stream().collect(Collectors.joining(Strings.LINE_SEPARATOR)),
                 ContentType.TEXT
                 )
             );

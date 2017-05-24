@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 
-import org.eclipse.collections.impl.block.factory.Procedures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,13 @@ public class Archiver {
             final Zip backup = new Zip(pathToZip);
             Files.list(articleDir)
                 .filter(path -> isBackup(path, offsetMs))
-                .forEach(Procedures.throwing(path -> backup.entry(path.toAbsolutePath())));
+                .forEach(path -> {
+                    try {
+                        backup.entry(path.toAbsolutePath());
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             backup.doZip();
             return pathToZip;
         } catch (final IOException e) {

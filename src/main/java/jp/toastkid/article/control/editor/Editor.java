@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.collections.impl.factory.Maps;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -320,10 +321,10 @@ public class Editor {
             return;
         }
         final String item = fontFamily.getSelectionModel().getSelectedItem();
-        conf.store(Maps.mutable.of(
-                Key.FONT_SIZE.text(),   Integer.toString(size),
-                Key.FONT_FAMILY.text(), item
-                ));
+        final Map<String, String> map = new HashMap<>();
+        map.put(Key.FONT_SIZE.text(),   Integer.toString(size));
+        map.put(Key.FONT_FAMILY.text(), item);
+        conf.store(map);
         setFont(FontFactory.make(item, size));
     }
 

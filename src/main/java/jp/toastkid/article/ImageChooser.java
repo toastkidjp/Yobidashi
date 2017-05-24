@@ -1,15 +1,15 @@
 package jp.toastkid.article;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.block.factory.Functions;
-import org.eclipse.collections.impl.collector.Collectors2;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import jp.toastkid.libs.utils.FileUtil;
 
@@ -28,13 +28,21 @@ public class ImageChooser {
      * @param dirs
      */
     public ImageChooser(final String... dirs) {
-        images = ArrayAdapter.adapt(dirs)
-            .select(StringUtils::isNotBlank)
-            .collect(Paths::get)
-            .select(p -> Files.exists(p) && Files.isDirectory(p))
-            .flatCollect(Functions.throwing(f -> Files.list(f).collect(Collectors2.toList())))
-            .select(p -> FileUtil.isImageFile(p.getFileName().toString()))
-            .collect(Path::toUri);
+        images = Stream.of(dirs)
+            .filter(StringUtils::isNotBlank)
+            .map(Paths::get)
+            .filter(p -> Files.exists(p) && Files.isDirectory(p))
+            .flatMap(f -> {
+				try {
+					return Files.list(f);
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+				return Stream.empty();
+			})
+            .filter(p -> FileUtil.isImageFile(p.getFileName().toString()))
+            .map(Path::toUri)
+            .collect(Collectors.toList());
     }
 
     /**

@@ -5,10 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ public class FileWatcherJob implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileWatcherJob.class);
 
     /** File watcher task list. */
-    private final MutableMap<Path, Long> targets = Maps.mutable.empty();
+    private final Map<Path, Long> targets = new HashMap<>();
 
     /** Disposable. */
     private Disposable cancellation;
@@ -45,8 +45,10 @@ public class FileWatcherJob implements Runnable {
         }
         cancellation = Observable.<Path>create(emitter -> {
             targets
-                .select(this::isTarget)
-                .forEachKeyValue((file, ms) -> emitter.onNext(file));
+                .entrySet()
+                .stream()
+                .filter(entry -> isTarget(entry.getKey(), entry.getValue()))
+                .forEach(entry -> emitter.onNext(entry.getKey()));
             emitter.onComplete();
         })
         .delaySubscription(30L, TimeUnit.SECONDS)

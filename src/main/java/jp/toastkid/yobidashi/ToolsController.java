@@ -1,11 +1,10 @@
 package jp.toastkid.yobidashi;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.utility.ArrayIterate;
+import java.util.stream.Stream;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -139,7 +138,7 @@ public class ToolsController implements Initializable {
     @FXML
     private void changeUserAgent() {
         if (ua == null || ua.getItems().isEmpty()) {
-            ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+            Stream.of(UserAgent.values()).forEach(ua.getItems()::add);
             ua.getSelectionModel().select(0);
         }
         messenger.onNext(UserAgentMessage.make(ua.getValue()));
@@ -179,11 +178,11 @@ public class ToolsController implements Initializable {
      * @return accelerators
      */
     Map<KeyCombination, Runnable> accelerators() {
-        return Maps.fixedSize.of(
-                DRAW_CHART,     this::drawChart,
-                ZOOM_INCREMENT, zoom::increment,
-                ZOOM_DECREMENT, zoom::decrement
-                );
+    	final Map<KeyCombination, Runnable> map = new HashMap<>();
+    	map.put(DRAW_CHART,     this::drawChart);
+    	map.put(ZOOM_INCREMENT, zoom::increment);
+    	map.put(ZOOM_DECREMENT, zoom::decrement);
+        return map;
     }
 
     /**
@@ -206,7 +205,7 @@ public class ToolsController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         initChartTool();
         initZoom();
-        ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+        Stream.of(UserAgent.values()).forEach(ua.getItems()::add);
         ua.getSelectionModel().select(0);
     }
 

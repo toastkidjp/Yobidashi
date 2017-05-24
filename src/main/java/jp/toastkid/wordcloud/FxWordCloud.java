@@ -2,13 +2,17 @@ package jp.toastkid.wordcloud;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.RichIterable;
-import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.factory.Maps;
 
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
@@ -101,16 +105,14 @@ public final class FxWordCloud {
         ts.isAllowChar     = false;
         ts.isAllowHiragana = false;
         ts.isAllowNum      = false;
-        final MutableMap<String, Integer> map = Maps.mutable.empty();
+        final Map<String, Integer> map = new HashMap<>();
         FileUtil.readLines(path, Article.ENCODE)
-            .stream()
-            .filter(StringUtils::isNotEmpty)
-            .forEach(str -> {
-                ts.segment(str).stream()
-                    .map(seg -> seg.replace("\"", ""))
-                    .filter(StringUtils::isNotEmpty)
-                    .forEach(seg -> map.put(seg, map.getIfAbsentValue(seg, 0) + 1));
-        });
+        .stream()
+        .filter(StringUtils::isNotEmpty)
+        .forEach(str -> ts.segment(str).stream()
+                        .map(seg -> seg.replace("\"", ""))
+                        .filter(StringUtils::isNotEmpty)
+                        .forEach(seg -> map.put(seg, map.getOrDefault(seg, 0) + 1)));
         placeTexts(canvas, map);
     }
 
@@ -119,19 +121,17 @@ public final class FxWordCloud {
      * @param canvas pane
      * @param map map
      */
-    private void placeTexts(final Pane canvas, final MutableMap<String, Integer> map) {
+    private void placeTexts(final Pane canvas, final Map<String, Integer> map) {
         if (map.isEmpty()) {
             System.out.println("Map is empty.");
             return;
         }
-        final RichIterable<Pair<String, Integer>> iter = map.keyValuesView()
-            .toSortedMap((t1, t2) ->
-                Integer.compare(t1.getTwo(), t2.getTwo()), key -> key, value -> value)
-            ;//.drop(numOfWords);
-        final int max = iter.collectInt(Pair::getTwo).max();
-        // System.out.println(max + " " + iter.toList().toString());
-        canvas.getChildren().addAll(
-                iter.collect(pair -> makeLabel(max, pair)).toList().shuffleThis());
+
+        final int max = Collections.max(map.values());
+        final ObservableList<Node> labels = canvas.getChildren();
+        final List<Entry<String, Integer>> entries = new ArrayList<>(map.entrySet());
+        Collections.shuffle(entries);
+        entries.stream().map(pair -> makeLabel(max, pair)).forEach(labels::add);
     }
 
     /**
@@ -140,12 +140,11 @@ public final class FxWordCloud {
      * @param pair word and count.
      * @return Label
      */
-    private Label makeLabel(final int max, final Pair<String, Integer> pair) {
-        final String k = pair.getOne();
-        final int v = pair.getTwo();
+    private Label makeLabel(final int max, final Entry<String, Integer> pair) {
+        final String k = pair.getKey();
+        final int    v = pair.getValue();
         final Label text = new Label(k);
-        final Font font
-            = new Font("Roboto", Math.max(maxFontSize * ((double) v / (double) max), minFontSize));
+        final Font  font = new Font("Roboto", Math.max(maxFontSize * ((double) v / (double) max), minFontSize));
         text.setFont(font);
         text.setTextFill(Color.color(Math.random(), Math.random(), Math.random()));
         text.setStyle("fx-font-weight: bold;");

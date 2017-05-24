@@ -5,11 +5,12 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +144,7 @@ public final class Config {
      * store configurations to file.
      */
     public void store() {
-        store(Maps.fixedSize.empty());
+        store(Collections.emptyMap());
     }
 
     /**
@@ -165,7 +166,7 @@ public final class Config {
      * @param value
      */
     public void store(final Key key, final String value) {
-        store(Maps.fixedSize.of(key.text, value));
+        store(new HashMap<String, String>() {{put(key.text, value);}});
     }
 
 }
