@@ -81,16 +81,16 @@ public final class DocToEpub {
      * run generator.
      * @param fileNames names of json file
      */
-    public static void run(final Iterable<String> args) {
-        args.forEach(json -> {
-			try {
-				run(Files.readAllLines(Paths.get(json))
-				        .stream()
-				        .collect(Collectors.joining(Strings.LINE_SEPARATOR)));
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		});
+    public static void run(final Iterable<String> fileNames) {
+        fileNames.forEach(json -> {
+            try {
+                run(Files.readAllLines(Paths.get(json))
+                        .stream()
+                        .collect(Collectors.joining(Strings.LINE_SEPARATOR)));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        });
         clean();
     }
 
@@ -252,7 +252,6 @@ public final class DocToEpub {
 
     /**
      * 不要となった生成ファイルを削除する.
-     * @param pathList ファイルパスの一覧
      */
     private static final void clean() {
         cleanTargets.parallelStream()

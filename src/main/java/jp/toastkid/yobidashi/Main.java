@@ -2,6 +2,7 @@ package jp.toastkid.yobidashi;
 
 import java.io.IOException;
 
+import io.reactivex.disposables.CompositeDisposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,8 @@ import javafx.stage.StageStyle;
 import jp.toastkid.yobidashi.models.Defines;
 
 /**
- * JavaFX Wiki-Client.
+ * Main class of JavaFX Application.
+ *
  * @author Toast kid
  * @version 0.0.1
  */
@@ -41,26 +43,21 @@ public final class Main extends Application {
     /** Starting ms. */
     private long start;
 
-    /** Stage initializer disposable. */
-    private Disposable stageDisposable;
-
-    /** Controller initializer disposable. */
-    private Disposable controllerDisposable;
+    /** Stage and Controller initializer disposable. */
+    private CompositeDisposable closer;
 
     @Override
     public void start(final Stage stage) {
         start = System.currentTimeMillis();
+        closer = new CompositeDisposable();
 
         try {
             launch(stage);
         } catch (final Throwable e) {
             LOGGER.error("Caught error.", e);
         } finally {
-            if (stageDisposable != null) {
-                stageDisposable.dispose();
-            }
-            if (controllerDisposable != null) {
-                controllerDisposable.dispose();
+            if (closer != null) {
+                closer.dispose();
             }
         }
     }
@@ -71,7 +68,7 @@ public final class Main extends Application {
      */
     private void launch(final Stage stage) {
 
-        stageDisposable = readScene().subscribe(scene -> {
+        Disposable disposable = readScene().subscribe(scene -> {
             controller.setStage(stage);
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
@@ -94,13 +91,14 @@ public final class Main extends Application {
                     (System.currentTimeMillis() - start)
                     );
         });
+        closer.add(disposable);
     }
 
     /**
      * コントローラに stage を渡し、シーンファイルを読み込む.
      * @return Scene オブジェクト
      */
-    private final Single<Scene> readScene() {
+    private Single<Scene> readScene() {
         final long start = System.currentTimeMillis();
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
@@ -140,16 +138,16 @@ public final class Main extends Application {
      * Close this application.
      * @param stage
      */
-    public final void closeApplication(final Stage stage) {
+    void closeApplication(final Stage stage) {
         stage.close();
         Platform.exit();
         System.exit(0);
     }
 
     /**
+     * Launcher method.
      *
      * @param args
-     *
      */
     public static void main(final String[] args) {
         Application.launch(Main.class);

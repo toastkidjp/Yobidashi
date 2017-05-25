@@ -75,7 +75,7 @@ public class PostProcessor {
      * @return converted text.
      */
     private String convertLine(final String line) {
-        String str = new String(line.toString());
+        String str = line.intern();
         Matcher matcher;
         if (str.indexOf("[[") != -1) {
             matcher = INTERNAL_LINK_PATTERN.matcher(str);
