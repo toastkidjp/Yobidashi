@@ -213,7 +213,9 @@ public final class ArticleSearcher {
                     dirSearch(dirPath, pQuery);
                     // 検索にかかった時間
                     lastSearchTime   = System.currentTimeMillis() - start;
-                    makeResultTab(pQuery);
+                    if (!searchResultMap.isEmpty()) {
+                        makeResultTab(pQuery);
+                    }
                     final String message = "Done：" + lastSearchTime + "[ms]";
                     updateMessage(message);
                     successAction.accept(message);
@@ -235,13 +237,12 @@ public final class ArticleSearcher {
      * 再帰的に検索するためのメソッドをマルチスレッドで実装
      * <HR>
      * (140202) 作成
-     * @param dirPath フォルダパス
-     * @param pQuery  検索クエリ
-     * @param prog
+     * @param dirPath directory path
+     * @param query   search query
      */
-    private void dirSearch(final String dirPath, final String pQuery) {
+    private void dirSearch(final String dirPath, final String query) {
         final ExecutorService exs = Executors.newFixedThreadPool(getParallel());
-        final Set<Pattern> patterns = convertPatterns(pQuery);
+        final Set<Pattern> patterns = convertPatterns(query);
         final boolean isTitleOnly = patterns.isEmpty();
 
         final List<Path> paths = new ArrayList<>();
@@ -267,7 +268,7 @@ public final class ArticleSearcher {
         for (int i = 0; i < runnables.size(); i++) {
             final Path readingPath = paths.get(i);
             if (Files.isDirectory(readingPath)) {
-                dirSearch(readingPath.toAbsolutePath().toString(), pQuery);
+                dirSearch(readingPath.toAbsolutePath().toString(), query);
                 continue;
             }
             lastFilenum++;
@@ -296,26 +297,32 @@ public final class ArticleSearcher {
                 break;
             }
         }
-        final int size = patterns.size();
+        final int patternNum = patterns.size();
         runnables
             .stream()
-            .filter(invalidElement(size))
+            .filter(validElement(patternNum))
             .forEach(elem -> searchResultMap.put(elem.getFilePath(), elem.getResult()));
         if (searchResultMap.isEmpty()) {
             Platform.runLater(emptyAction::run);
-            return;
         }
     }
 
     /**
-     * Check invalid result.
+     * Check valid result.
      * @param size query num.
-     * @return If it's invalid result, true
+     * @return If it's valid result, true
      */
-    private Predicate<ArticleSearchTask> invalidElement(final int size) {
-        return elem -> elem.getResult().df.isEmpty()
-                && isAnd
-                && elem.getResult().df.size() < size;
+    private Predicate<ArticleSearchTask> validElement(final int size) {
+        return elem -> {
+            final SearchResult result = elem.getResult();
+            if (result.mapIsEmpty()) {
+                return false;
+            }
+            if (!isAnd) {
+                return true;
+            }
+            return result.size() <= size;
+        };
     }
 
     /**
@@ -340,7 +347,7 @@ public final class ArticleSearcher {
         initializer.accept(listView);
         listView.getItems().addAll(
                 searchResultMap.entrySet().stream()
-                    .map(entry -> new Article(Paths.get(entry.getValue().filePath)))
+                    .map(entry -> new Article(Paths.get(entry.getValue().filePath())))
                     .sorted()
                     .collect(Collectors.toList())
                 );

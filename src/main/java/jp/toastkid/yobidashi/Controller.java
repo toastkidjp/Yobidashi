@@ -1158,7 +1158,7 @@ public final class Controller implements Initializable {
         final CheckBox isAnd = new JFXCheckBox("AND Search"){{setSelected(true);}};
         final Label filterMessage = new Label("Filter article name");
         filterMessage.getStyleClass().add("dialog-message");
-		new AlertDialog.Builder(getParent())
+        new AlertDialog.Builder(getParent())
             .setTitle("All article search").setMessage("This command spend many seconds.")
             .addControl(queryInput, filterMessage, filterInput, isAnd)
             .setOnPositive("OK", () -> {

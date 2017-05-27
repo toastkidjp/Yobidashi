@@ -1,6 +1,5 @@
 package jp.toastkid.article.search;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -12,14 +11,15 @@ import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * ファイル単位での検索をする.
+ *
  * @author Toast kid
  */
 public final class ArticleSearchTask implements Runnable {
 
-    /** 検索パターンのセット */
+    /** Search pattern. */
     private final Set<Pattern> targetPatterns;
 
-    /** 検索結果 */
+    /** Search result. */
     private final SearchResult result;
 
     /**
@@ -33,7 +33,7 @@ public final class ArticleSearchTask implements Runnable {
      * @return filePath
      */
     public String getFilePath() {
-        return result.filePath;
+        return result.filePath();
     }
 
     /**
@@ -58,19 +58,17 @@ public final class ArticleSearchTask implements Runnable {
      * ファイル単位で文字列を検索する.
      */
     private void strSearchFromFile() {
-        final List<String> contents
-            = FileUtil.readLines(result.filePath, Article.ENCODE);
+        final List<String> contents = FileUtil.readLines(result.filePath(), Article.ENCODE);
 
         IntStream.rangeClosed(0, contents.size()).forEach(i -> {
             final String content = contents.get(i);
-            result.length = result.length + content.length();
+            result.addLength(content.length());
             targetPatterns.forEach(pat -> {
                 final Matcher matcher = pat.matcher(content);
                 while (matcher.find()){
-                    final List<String> founds
-                        = result.df.getOrDefault(pat.pattern(), Collections.emptyList());
+                    final List<String> founds = result.getOrEmpty(pat.pattern());
                     founds.add(i + " : " + matcher.group(0));
-                    result.df.put(pat.pattern(), founds);
+                    result.put(pat.pattern(), founds);
                 }
             });
         });
