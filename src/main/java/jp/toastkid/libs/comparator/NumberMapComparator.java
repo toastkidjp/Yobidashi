@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.libs.comparator;
 
 import java.util.Comparator;
 import java.util.Map;
+
 /**
  * Map の value でソートするための比較のクラス
  * @see <a href="http://www.mlab.im.dendai.ac.jp/~yamada/ir/Map/sort.html">引用元</a>
