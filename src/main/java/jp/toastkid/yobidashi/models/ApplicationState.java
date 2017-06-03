@@ -37,7 +37,7 @@ public final class ApplicationState {
      * <HR>
      * (121229) 作成<BR>
      */
-    public static final Map<String, String> getConfigMap() {
+    public static Map<String, String> getConfigMap() {
         final Map<String, String> configMap = new HashMap<>(6);
         configMap.putAll(getJavaConfigMap());
         configMap.putAll(getRuntimeConfigMap());
@@ -49,7 +49,7 @@ public final class ApplicationState {
      * <HR>
      * (121229) 作成<BR>
      */
-    private static final Map<String, String> getJavaConfigMap() {
+    private static Map<String, String> getJavaConfigMap() {
         final Map<String, String> configMap = new HashMap<>(2);
         configMap.put("Java Version", System.getProperty("java.version"));
         configMap.put("Java Home",    System.getProperty("java.home"));
@@ -62,7 +62,7 @@ public final class ApplicationState {
      * (130101) ユーザエージェント情報を追加<BR>
      * (121229) 作成<BR>
      */
-    private static final Map<String, String> getRuntimeConfigMap() {
+    private static Map<String, String> getRuntimeConfigMap() {
         final Map<String, String> configMap = new HashMap<>(4);
         final Runtime runtime = Runtime.getRuntime();
         configMap.put("Max Memory",          getFormatNum(runtime.maxMemory() ));
@@ -80,7 +80,7 @@ public final class ApplicationState {
      * @param l long 値
      * @return 整形済み long 値の文字列表現
      */
-    private static final String getFormatNum(final long l) {
+    private static String getFormatNum(final long l) {
         return NumberFormat.getInstance().format(l / MEGA_BYTE);
     }
 }

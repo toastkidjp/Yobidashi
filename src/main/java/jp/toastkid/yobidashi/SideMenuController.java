@@ -7,27 +7,8 @@
  */
 package jp.toastkid.yobidashi;
 
-import java.awt.Rectangle;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
-
 import groovy.lang.Tuple2;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -75,13 +56,30 @@ import jp.toastkid.yobidashi.models.ApplicationState;
 import jp.toastkid.yobidashi.models.BookmarkManager;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Defines;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Side menu's controller.
  *
  * @author Toast kid
  */
-public class SideMenuController implements Initializable {
+public final class SideMenuController implements Initializable {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SideMenuController.class);
@@ -131,7 +129,7 @@ public class SideMenuController implements Initializable {
      * Call back up method.
      */
     @FXML
-    private final void callBackUp() {
+    private void callBackUp() {
         getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
                 .setTitle("Backup")
                 .setMessage("この処理には時間がかかります。")
@@ -173,7 +171,7 @@ public class SideMenuController implements Initializable {
      * Delete backup files.
      */
     @FXML
-    private final void clearBackup() {
+    private void clearBackup() {
         new AlertDialog.Builder(stage)
             .setTitle("Clear History").setMessage("バックアップを削除します。")
             .setOnPositive("OK", () -> {
@@ -197,16 +195,15 @@ public class SideMenuController implements Initializable {
      * Switch Full screen mode.
      */
     @FXML
-    private final void fullScreen() {
+    private void fullScreen() {
         stage.setFullScreen(!stage.isFullScreen());
     }
 
     /**
      * Call configuration dialog.
-     * @param event ActionEvent
      */
     @FXML
-    private final void callConfig() {
+    private void callConfig() {
         getParent().ifPresent(parent -> {
             new ConfigDialog(parent).showAndWait();
             messenger.onNext(TabMessage.makeReload());
@@ -217,7 +214,7 @@ public class SideMenuController implements Initializable {
      * Show current application state.
      */
     @FXML
-    private final void callApplicationState() {
+    private void callApplicationState() {
         final Map<String, String> map = ApplicationState.getConfigMap();
         final StringBuilder bld = new StringBuilder();
         final String lineSeparator = System.lineSeparator();
@@ -231,7 +228,7 @@ public class SideMenuController implements Initializable {
      * Call method of converting to Aozora-Bunko style text.
      */
     @FXML
-    private final void callConvertAobun() {
+    private void callConvertAobun() {
         messenger.onNext(ArticleMessage.makeConvertAobun());
     }
 
@@ -239,7 +236,7 @@ public class SideMenuController implements Initializable {
      * Call word cloud.
      */
     @FXML
-    private final void callWordCloud() {
+    private void callWordCloud() {
         messenger.onNext(ArticleMessage.makeWordCloud());
     }
 
@@ -247,7 +244,7 @@ public class SideMenuController implements Initializable {
      * Open RSS Feeder．
      */
     @FXML
-    private final void callRssFeeder() {
+    private void callRssFeeder() {
         if (!Files.exists(Paths.get(PATH_RSS_TARGETS))) {
             messenger.onNext(SnackbarMessage.make("Can't read RSS targets."));
             return;
@@ -268,7 +265,7 @@ public class SideMenuController implements Initializable {
      * Call BookmarkManager.
      */
     @FXML
-    private final void editBookmark() {
+    private void editBookmark() {
         new BookmarkManager(Defines.PATH_TO_BOOKMARK).edit(stage);
     }
 
@@ -276,7 +273,7 @@ public class SideMenuController implements Initializable {
      * Call About.
      */
     @FXML
-    private final void about() {
+    private void about() {
         openStaticFileWithConverting(PATH_ABOUT_APP, "About");
     }
 
@@ -284,7 +281,7 @@ public class SideMenuController implements Initializable {
      * Call License.
      */
     @FXML
-    private final void license() {
+    private void license() {
         messenger.onNext(
             WebTabMessage.make(
                 "License",
@@ -352,7 +349,7 @@ public class SideMenuController implements Initializable {
      * open Noodle Timer.
      */
     @FXML
-    private final void openNoodleTimer() {
+    private void openNoodleTimer() {
         try {
             new jp.toastkid.gui.jfx.noodle_timer.Main().start(this.stage);
         } catch (final Exception e) {
@@ -364,7 +361,7 @@ public class SideMenuController implements Initializable {
      * open CSS Generator.
      */
     @FXML
-    private final void openCssGenerator() {
+    private void openCssGenerator() {
         try {
             new jp.toastkid.gui.jfx.cssgen.Main().start(this.stage);
         } catch (final Exception e) {
@@ -373,8 +370,7 @@ public class SideMenuController implements Initializable {
     }
 
     /**
-     * call capture.
-     * @param filename
+     * Call capture.
      */
     @FXML
     private void callCapture() {
@@ -398,7 +394,7 @@ public class SideMenuController implements Initializable {
      * Call system calculator.
      */
     @FXML
-    private final void callCalc() {
+    private void callCalc() {
         RuntimeUtil.callCalculator();
     }
 
@@ -406,7 +402,7 @@ public class SideMenuController implements Initializable {
      * Call command prompt.
      */
     @FXML
-    private final void callCmd() {
+    private void callCmd() {
         RuntimeUtil.callCmd();
     }
 
@@ -414,7 +410,7 @@ public class SideMenuController implements Initializable {
      * Call article search.
      */
     @FXML
-    private final void callSearch() {
+    private void callSearch() {
         messenger.onNext(ShowSearchDialog.make());
     }
 
@@ -422,7 +418,7 @@ public class SideMenuController implements Initializable {
      * Show slide show.
      */
     @FXML
-    private final void slideShow() {
+    private void slideShow() {
         messenger.onNext(ArticleMessage.makeSlideShow());
     }
 
@@ -430,7 +426,7 @@ public class SideMenuController implements Initializable {
      * Call editor.
      */
     @FXML
-    private final void callEditor() {
+    private void callEditor() {
         messenger.onNext(TabMessage.makeEdit());
     }
 
@@ -438,7 +434,7 @@ public class SideMenuController implements Initializable {
      * Open new tab.
      */
     @FXML
-    private final void openSpeedDialTab() {
+    private void openSpeedDialTab() {
         messenger.onNext(TabMessage.makeOpen());
     }
 
@@ -446,7 +442,7 @@ public class SideMenuController implements Initializable {
      * Close current tab.
      */
     @FXML
-    private final void closeTab() {
+    private void closeTab() {
         messenger.onNext(TabMessage.makeClose());
     }
 
@@ -454,7 +450,7 @@ public class SideMenuController implements Initializable {
      * Close all tabs.
      */
     @FXML
-    private final void closeAllTabs() {
+    private void closeAllTabs() {
         messenger.onNext(TabMessage.makeCloseAll());
     }
 
@@ -462,7 +458,7 @@ public class SideMenuController implements Initializable {
      * Reload current tab.
      */
     @FXML
-    private final void reload() {
+    private void reload() {
         messenger.onNext(TabMessage.makeReload());
     }
 
@@ -470,7 +466,7 @@ public class SideMenuController implements Initializable {
      * Preview HTML source.
      */
     @FXML
-    private final void callHtmlSource() {
+    private void callHtmlSource() {
         messenger.onNext(TabMessage.makePreview());
     }
 
@@ -508,7 +504,7 @@ public class SideMenuController implements Initializable {
      * call simple backup.
      */
     @FXML
-    private final void callSimpleBachup() {
+    private void callSimpleBachup() {
         final DatePicker datePicker = new JFXDatePicker();
         datePicker.show();
         datePicker.setShowWeekNumbers(true);
@@ -532,7 +528,7 @@ public class SideMenuController implements Initializable {
      * Jsonの設定値を基に ePub を生成するメソッドを呼び出す.
      */
     @FXML
-    private final void callGenerateEpubs() {
+    private void callGenerateEpubs() {
         getParent().ifPresent(parent -> new AlertDialog.Builder(parent)
                 .setTitle("ePub").setMessage("OK を押すと ePub を生成します。")
                 .setOnPositive("OK", () -> {
@@ -559,7 +555,7 @@ public class SideMenuController implements Initializable {
      * Call method of converting to ePub.
      */
     @FXML
-    private final void callConvertEpub() {
+    private void callConvertEpub() {
         messenger.onNext(ArticleMessage.makeConvertEpub());
     }
 
@@ -575,7 +571,7 @@ public class SideMenuController implements Initializable {
      * Make new article.
      */
     @FXML
-    private final void saveArticle() {
+    private void saveArticle() {
         messenger.onNext(TabMessage.makeSave());
     }
 
@@ -583,7 +579,7 @@ public class SideMenuController implements Initializable {
      * Make new article.
      */
     @FXML
-    private final void makeArticle() {
+    private void makeArticle() {
         messenger.onNext(ArticleMessage.makeNew());
     }
 
@@ -688,14 +684,12 @@ public class SideMenuController implements Initializable {
         menuTabs.getTabs().stream()
                 .filter(tab -> tab.getContent() instanceof ListView)
                 .map(tab -> JFXListView.class.cast(tab.getContent()))
-                .forEach(lv -> {
-            ((JFXListView<Node>) lv).getItems().stream()
-                 .flatMap(this::flattenListToLabel)
-                 .map(this::extractAcceleratorPair)
-                 .filter(Filters::isNotNull)
-                 .forEach(item -> accelerators.put(
-                         item.getFirst(), () -> item.getSecond().handle(new ActionEvent())));
-        });
+                .forEach(lv -> ((JFXListView<Node>) lv).getItems().stream()
+                     .flatMap(this::flattenListToLabel)
+                     .map(this::extractAcceleratorPair)
+                     .filter(Filters::isNotNull)
+                     .forEach(item -> accelerators.put(item.getFirst(), () -> item.getSecond().handle(new ActionEvent())))
+        );
         accelerators.putAll(toolsController.accelerators());
     }
 
@@ -755,7 +749,7 @@ public class SideMenuController implements Initializable {
      * Set subscriber to messenger.
      * @return messenger
      */
-    protected Disposable setSubscriber(final Consumer<Message> c) {
+    Disposable setSubscriber(final Consumer<Message> c) {
         return this.messenger.subscribe(c);
     }
 
@@ -763,7 +757,7 @@ public class SideMenuController implements Initializable {
      * Set subscriber to Tools' messenger.
      * @return messenger
      */
-    protected Disposable setToolsSubscriber(final Consumer<Message> c) {
+    Disposable setToolsSubscriber(final Consumer<Message> c) {
         return this.toolsController.subscribe(c);
     }
 
@@ -775,18 +769,6 @@ public class SideMenuController implements Initializable {
         this.conf = conf;
         this.articleGenerator = new ArticleGenerator(conf);
         this.ePubGenerator    = new EpubGenerator(conf);
-
-        /*toolsController.setFlux(Flux.<DoubleProperty>create(emitter ->
-            tabPane.getSelectionModel().selectedItemProperty()
-                .addListener((a, prevTab, nextTab) -> {
-                    if (prevTab != null && prevTab.getContent() instanceof WebView) {
-                        final WebView prev = (WebView) prevTab.getContent();
-                        prev.zoomProperty().unbind();
-                    }
-                    Optional.ofNullable(getCurrentTab())
-                            .ifPresent(tab -> emitter.next(tab.zoomProperty()));
-                })
-        ));*/
     }
 
 }

@@ -7,21 +7,20 @@
  */
 package jp.toastkid.yobidashi.popup;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXPopup.PopupHPosition;
 import com.jfoenix.controls.JFXPopup.PopupVPosition;
-
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.models.Defines;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Hamburger popup.
@@ -37,11 +36,11 @@ public class HamburgerPopup {
     /** FXML file. */
     private static final String FXML_PATH = Defines.SCENE_DIR + "/HamburgerPopup.fxml";
 
-    /** Controller. */
-    private HamburgerPopupController controller;
-
     /** Popup object. */
     private JFXPopup popup;
+
+    /** Disposer of subscription. */
+    private Disposable disposable;
 
     /**
      * {@link HamburgerPopup} builder.
@@ -106,11 +105,11 @@ public class HamburgerPopup {
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
             loader.load();
-            controller = (HamburgerPopupController) loader.getController();
+            final HamburgerPopupController controller = (HamburgerPopupController) loader.getController();
             popup = controller.getPopup();
             popup.setPopupContainer(b.container);
             popup.setSource(b.source);
-            controller.subscribe(b.sub);
+            disposable = controller.subscribe(b.sub);
         } catch (final IOException e) {
             LOGGER.error("Caught error.", e);
         }
@@ -122,6 +121,16 @@ public class HamburgerPopup {
      */
     public void show() {
         popup.show(PopupVPosition.TOP, PopupHPosition.RIGHT);
+    }
+
+    /**
+     * Dispose subscription.
+     */
+    public void close() {
+        if (disposable.isDisposed()) {
+            return;
+        }
+        disposable.dispose();
     }
 
 }

@@ -70,7 +70,7 @@ final class Shortcuts {
      * Deny make instance.
      */
     private Shortcuts() {
-        // NOP.
+        throw new IllegalAccessError("This constructor mustn't call.");
     }
 
 }

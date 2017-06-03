@@ -7,6 +7,10 @@
  */
 package jp.toastkid.yobidashi.models;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -16,10 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * config of Wiki client.
@@ -56,7 +56,7 @@ public final class Config {
          * Set text.
          * @param text
          */
-        private Key(final String text) {
+        Key(final String text) {
             this.text = text;
         }
 

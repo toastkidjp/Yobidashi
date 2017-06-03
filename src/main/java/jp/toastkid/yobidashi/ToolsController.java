@@ -7,12 +7,6 @@
  */
 package jp.toastkid.yobidashi;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.stream.Stream;
-
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -42,12 +36,18 @@ import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
+
 /**
  * Right side tools controller.
- * @author Toast kid
  *
+ * @author Toast kid
  */
-public class ToolsController implements Initializable {
+public final class ToolsController implements Initializable {
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -102,7 +102,7 @@ public class ToolsController implements Initializable {
      * Draw chart.
      */
     @FXML
-    private final void drawChart() {
+    private void drawChart() {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
         final Config conf = new Config(Defines.CONFIG);
         final Pane content = ChartPane.make(
@@ -117,14 +117,14 @@ public class ToolsController implements Initializable {
      * Set zoom rate 1.
      */
     @FXML
-    private final void callDefaultZoom() {
+    private void callDefaultZoom() {
         zoom.setValue(1.0);;
     }
 
     /**
      * Initialize chart tool.
      */
-    private final void initChartTool() {
+    private void initChartTool() {
         @SuppressWarnings("unused")
         final ObservableList<String> items = month.<String>getItems();
         items.addAll(ChartPane.readMonths());
@@ -155,13 +155,13 @@ public class ToolsController implements Initializable {
      * Set current WebView publisher.
      * @param zoomPublisher
      */
-    public void setFlux(final Observable<DoubleProperty> zoomPublisher) {
+    void setFlux(final Observable<DoubleProperty> zoomPublisher) {
         final Disposable subscribe = zoomPublisher.subscribeOn(Schedulers.newThread())
             .subscribe(z -> {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
             });
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> subscribe.dispose()));
+        Runtime.getRuntime().addShutdownHook(new Thread(subscribe::dispose));
     }
 
     /**
@@ -209,7 +209,7 @@ public class ToolsController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(final URL location, final ResourceBundle resources) {
         initChartTool();
         initZoom();
         Stream.of(UserAgent.values()).forEach(ua.getItems()::add);

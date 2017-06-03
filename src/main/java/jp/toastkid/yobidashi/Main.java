@@ -7,13 +7,8 @@
  */
 package jp.toastkid.yobidashi;
 
-import java.io.IOException;
-
-import io.reactivex.disposables.CompositeDisposable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -26,6 +21,10 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jp.toastkid.yobidashi.models.Defines;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Main class of JavaFX Application.
@@ -41,7 +40,7 @@ public final class Main extends Application {
     /** Path to icon of this app. */
     private static final String PATH_IMG_ICON = "images/Icon.png";
 
-    /** fxml file. */
+    /** Scene file. */
     private static final String FXML_PATH = Defines.SCENE_DIR + "/YobidashiMain.fxml";
 
     /** Controller. */
@@ -70,12 +69,12 @@ public final class Main extends Application {
     }
 
     /**
-     * initialize method.
+     * Initialize method.
      * @param stage
      */
     private void launch(final Stage stage) {
 
-        Disposable disposable = readScene().subscribe(scene -> {
+        final Disposable disposable = readScene().subscribe(scene -> {
             controller.setStage(stage);
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
@@ -102,8 +101,8 @@ public final class Main extends Application {
     }
 
     /**
-     * コントローラに stage を渡し、シーンファイルを読み込む.
-     * @return Scene オブジェクト
+     * Read scene file.
+     * @return Scene object
      */
     private Single<Scene> readScene() {
         final long start = System.currentTimeMillis();
