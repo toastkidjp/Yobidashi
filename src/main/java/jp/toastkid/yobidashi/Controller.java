@@ -156,9 +156,6 @@ public final class Controller implements Initializable {
     private static final String WINDOW_FIND_UP
         = "window.find(\"{0}\", false, true, true, false, true, false)";
 
-    /** For auto backup. */
-    private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
-
     /** File watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
 
@@ -581,8 +578,7 @@ public final class Controller implements Initializable {
      */
     private void launchBackupJob() {
         final long start = System.currentTimeMillis();
-        BACKUP.submit(FILE_WATCHER);
-        Runtime.getRuntime().addShutdownHook(new Thread(BACKUP::shutdownNow));
+        FILE_WATCHER.start();
         progressSender.onNext(
                 Thread.currentThread().getName()
                     + "Ended launching backup job."
@@ -1971,4 +1967,10 @@ public final class Controller implements Initializable {
         return stage.getScene().getWindow();
     }
 
+    /**
+     * Explicit closing method.
+     */
+    void dispose() {
+        FILE_WATCHER.stop();
+    }
 }

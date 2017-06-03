@@ -137,7 +137,7 @@ public final class Main extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        controller = null;
+        controller.dispose();
     }
 
     /**
@@ -145,6 +145,11 @@ public final class Main extends Application {
      * @param stage
      */
     void closeApplication(final Stage stage) {
+        try {
+            stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         stage.close();
         Platform.exit();
         System.exit(0);
