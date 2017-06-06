@@ -1,12 +1,11 @@
 package jp.toastkid.jfx.common.control;
 
-import static org.junit.Assert.assertEquals;
-
+import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
-import javafx.stage.Stage;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test of {@link NumberTextField}.
@@ -67,6 +66,25 @@ public class NumberTextFieldTest extends ApplicationTest {
         assertEquals(1, numberTextField.intValue());
         numberTextField.setText("-1");
         assertEquals(-1, numberTextField.intValue());
+    }
+
+    /**
+     * {@link NumberTextField#longValue()}.
+     */
+    @Test
+    public void test_longValue() {
+        numberTextField.setText(null);
+        assertEquals(0L, numberTextField.longValue());
+        numberTextField.setText("");
+        assertEquals(0L, numberTextField.longValue());
+        numberTextField.setText(" ");
+        assertEquals(0L, numberTextField.longValue());
+        numberTextField.setText("0");
+        assertEquals(0L, numberTextField.longValue());
+        numberTextField.setText("1");
+        assertEquals(1L, numberTextField.longValue());
+        numberTextField.setText("-1");
+        assertEquals(-1L, numberTextField.longValue());
     }
 
     /**
