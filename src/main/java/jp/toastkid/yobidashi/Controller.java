@@ -1,23 +1,11 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.yobidashi;
-
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDrawer;
@@ -27,7 +15,6 @@ import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXTextField;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import com.sun.javafx.scene.control.skin.ContextMenuContent.MenuItemContainer;
-
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -125,6 +112,25 @@ import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
 import jp.toastkid.yobidashi.popup.HamburgerPopup;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Yobidashi's primary Controller.
@@ -149,9 +155,6 @@ public final class Controller implements Initializable {
     /** WebView's highliting. */
     private static final String WINDOW_FIND_UP
         = "window.find(\"{0}\", false, true, true, false, true, false)";
-
-    /** For auto backup. */
-    private static final ExecutorService BACKUP = Executors.newSingleThreadExecutor();
 
     /** File watcher. */
     private static final FileWatcherJob FILE_WATCHER = new FileWatcherJob();
@@ -377,9 +380,8 @@ public final class Controller implements Initializable {
      */
     private void launchMemoryJob() {
         final long start = System.currentTimeMillis();
-        Single.create(emitter -> emitter.onSuccess(
-                String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L)
-                )
+        Single.create(emitter
+                -> emitter.onSuccess(String.format("Memory: %,3d[MB]", RuntimeUtil.calcUsedMemorySize() / 1_000_000L))
             )
             .delaySubscription(5L, TimeUnit.SECONDS)
             .repeat()
@@ -458,14 +460,14 @@ public final class Controller implements Initializable {
                 event.setDropCompleted(false);
                 return;
             }
-            board.getFiles().stream().forEach(f -> {
+            board.getFiles().forEach(f -> {
                 if (Article.Extension.MD.text().equals(FileUtil.findExtension(f.toPath()).orElseGet(Strings::empty))) {
                     processEditorTabMessage(EditorTabMessage.make(Paths.get(f.getAbsolutePath())));
                     return;
                 }
                 openWebTabWithContent(
                         f.getAbsolutePath(),
-                        FileUtil.readLines(f.toPath(), Article.ENCODE).makeString(System.lineSeparator()),
+                        FileUtil.readLines(f.toPath(), Article.ENCODE).stream().collect(Collectors.joining(System.lineSeparator())),
                         ContentType.TEXT
                     );
             });
@@ -576,12 +578,7 @@ public final class Controller implements Initializable {
      */
     private void launchBackupJob() {
         final long start = System.currentTimeMillis();
-        BACKUP.submit(FILE_WATCHER);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (BACKUP != null) {
-                BACKUP.shutdownNow();
-            }
-        }));
+        FILE_WATCHER.start();
         progressSender.onNext(
                 Thread.currentThread().getName()
                     + "Ended launching backup job."
@@ -619,7 +616,7 @@ public final class Controller implements Initializable {
     /**
      * Set up searcher and scripter. this method call by FXWikiClient.
      */
-    protected void setupExpandables() {
+    void setupExpandables() {
         hideSearcher();
         final ObservableMap<KeyCombination, Runnable> accelerators
             = stage.getScene().getAccelerators();
@@ -737,8 +734,7 @@ public final class Controller implements Initializable {
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
-    @FXML
-    private final void moveToTop() {
+    private void moveToTop() {
         Optional.ofNullable(getCurrentTab()).ifPresent(ReloadableTab::moveToTop);
     }
 
@@ -747,8 +743,7 @@ public final class Controller implements Initializable {
      * @see <a href="https://community.oracle.com/thread/2595743">
      * How to auto-scroll to the end in WebView?</a>
      */
-    @FXML
-    private final void moveToBottom() {
+    private void moveToBottom() {
         Optional.ofNullable(getCurrentTab()).ifPresent(ReloadableTab::moveToBottom);
     }
 
@@ -756,7 +751,7 @@ public final class Controller implements Initializable {
      * Display specified date's diary.
      */
     @FXML
-    private final void callCalendar() {
+    private void callCalendar() {
         calendar.show();
         final LocalDate value = calendar.getValue();
         if (value == null) {
@@ -788,7 +783,7 @@ public final class Controller implements Initializable {
     /**
      * Show HTML source.
      */
-    private final void showHtmlSource() {
+    private void showHtmlSource() {
         final ReloadableTab tab = getCurrentTab();
 
         if (!(tab instanceof BaseWebTab)) {
@@ -803,7 +798,7 @@ public final class Controller implements Initializable {
     /**
      * Reload tab content.
      */
-    private final void reload() {
+    private void reload() {
         getCurrentTab().reload();
     }
 
@@ -834,7 +829,7 @@ public final class Controller implements Initializable {
      * @return Controller
      * @throws IOException
      */
-    private final jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
+    private jp.toastkid.speed_dial.Controller readSpeedDial() throws IOException {
         final FXMLLoader loader = new FXMLLoader(
                 getClass().getClassLoader().getResource(jp.toastkid.speed_dial.Controller.FXML));
         loader.load();
@@ -1122,7 +1117,7 @@ public final class Controller implements Initializable {
      * Close specified index' pane.
      * @param tab
      */
-    private final void closeTab(final Tab tab) {
+    private void closeTab(final Tab tab) {
         final ObservableList<Tab> tabs = tabPane.getTabs();
         tabs.remove(tab);
         if (tab instanceof ArticleTab) {
@@ -1133,14 +1128,14 @@ public final class Controller implements Initializable {
     /**
      * Close current tab.
      */
-    private final void closeCurrentTab() {
+    private void closeCurrentTab() {
         Optional.ofNullable(getCurrentTab()).ifPresent(tab -> tab.close(this::closeTab));
     }
 
     /**
      * Close all tabs.
      */
-    private final void closeAllTabs() {
+    private void closeAllTabs() {
         tabPane.getTabs().removeAll(tabPane.getTabs());
         setStatus("Close all tabs.");
         openSpeedDialTab();
@@ -1157,7 +1152,7 @@ public final class Controller implements Initializable {
         final CheckBox isAnd = new JFXCheckBox("AND Search"){{setSelected(true);}};
         final Label filterMessage = new Label("Filter article name");
         filterMessage.getStyleClass().add("dialog-message");
-		new AlertDialog.Builder(getParent())
+        new AlertDialog.Builder(getParent())
             .setTitle("All article search").setMessage("This command spend many seconds.")
             .addControl(queryInput, filterMessage, filterInput, isAnd)
             .setOnPositive("OK", () -> {
@@ -1218,7 +1213,7 @@ public final class Controller implements Initializable {
     /**
      * Open home.
      */
-    private final void callHome() {
+    private void callHome() {
         openSpeedDialTab();
     }
 
@@ -1287,9 +1282,11 @@ public final class Controller implements Initializable {
             emitter.onSuccess("");
             })
             .subscribe(
-                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK).readLines()
-                    .collect(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
-                    .each(bookmarks::add)
+                empty -> new BookmarkManager(Defines.PATH_TO_BOOKMARK)
+                    .readLines()
+                    .stream()
+                    .map(line -> Articles.findByTitle(conf.get(Key.ARTICLE_DIR), line))
+                    .forEach(bookmarks::add)
                     );
     }
 
@@ -1297,7 +1294,7 @@ public final class Controller implements Initializable {
      * Add article on the top of history, and register file-watcher.
      * @param article Article Object
      */
-    private final void addHistory(final Article article) {
+    private void addHistory(final Article article) {
         final ObservableList<Article> items = historyList.getItems();
         if (!items.contains(article)) {
             items.add(0, article);
@@ -1309,7 +1306,7 @@ public final class Controller implements Initializable {
      * Clear view history.
      */
     @FXML
-    private final void clearHistory() {
+    private void clearHistory() {
         new AlertDialog.Builder(stage)
             .setTitle("Clear History")
             .setMessage("Does it delete all histories?")
@@ -1323,7 +1320,7 @@ public final class Controller implements Initializable {
     /**
      * Make new Markdown file.
      */
-    private final void makeMarkdown() {
+    private void makeMarkdown() {
         final TextField input = new JFXTextField();
         final String newArticleMessage = "Please could you input new article's title?";
         input.setPromptText("New article name");
@@ -1343,7 +1340,7 @@ public final class Controller implements Initializable {
      * Call copy article。
      */
     @FXML
-    private final void copyArticle() {
+    private void copyArticle() {
         callRenameArticle(true);
     }
 
@@ -1351,7 +1348,7 @@ public final class Controller implements Initializable {
      * Call rename article。
      */
     @FXML
-    private final void renameArticle() {
+    private void renameArticle() {
         callRenameArticle(false);
     }
 
@@ -1360,7 +1357,7 @@ public final class Controller implements Initializable {
      *
      * @param isCopy コピーをするか
      */
-    private final void callRenameArticle(final boolean isCopy) {
+    private void callRenameArticle(final boolean isCopy) {
         String prefix = "";
         if (isCopy) {
             prefix = "Copy_";
@@ -1434,7 +1431,7 @@ public final class Controller implements Initializable {
     /**
      * Delete current article.
      */
-    private final void deleteArticle() {
+    private void deleteArticle() {
         // 削除対象のファイルオブジェクト
         final Optional<Article> ofNullable = getCurrentArticleOfNullable();
         if (!ofNullable.isPresent()) {
@@ -1479,7 +1476,7 @@ public final class Controller implements Initializable {
      * Remove article history.
      * @param deleteTarget remove target Article
      */
-    private final void removeHistory(final Article deleteTarget) {
+    private void removeHistory(final Article deleteTarget) {
         removeItem(deleteTarget, articleList);
         removeItem(deleteTarget, historyList);
         removeItem(deleteTarget, bookmarkList);
@@ -1490,7 +1487,7 @@ public final class Controller implements Initializable {
      * @param deleteTarget
      * @param listView
      */
-    private final void removeItem(final Article deleteTarget, final ListView<Article> listView) {
+    private void removeItem(final Article deleteTarget, final ListView<Article> listView) {
         final ObservableList<Article> items = listView.getItems();
         if (items.indexOf(deleteTarget) != -1) {
             items.remove(deleteTarget);
@@ -1510,7 +1507,7 @@ public final class Controller implements Initializable {
     /**
      * Call editor.
      */
-    private final void edit() {
+    private void edit() {
         editableOr().ifPresent(Editable::edit);
     }
 
@@ -1518,7 +1515,7 @@ public final class Controller implements Initializable {
      * Return Optional&lt;Editable&gt;.
      * @return Optional&lt;Editable&gt;.
      */
-    private final Optional<Editable> editableOr() {
+    private Optional<Editable> editableOr() {
         return Optional.ofNullable(getCurrentTab())
                 .filter(Editable.class::isInstance)
                 .map(Editable.class::cast);
@@ -1528,7 +1525,7 @@ public final class Controller implements Initializable {
      * Return current tab.
      * @return current tab.
      */
-    private final Optional<BaseWebTab> webTabOr() {
+    private Optional<BaseWebTab> webTabOr() {
         return Optional.ofNullable(getCurrentTab())
                 .filter(BaseWebTab.class::isInstance)
                 .map(BaseWebTab.class::cast);
@@ -1538,7 +1535,7 @@ public final class Controller implements Initializable {
      * Return current tab.
      * @return current tab.
      */
-    private final ReloadableTab getCurrentTab() {
+    private ReloadableTab getCurrentTab() {
         final int currentIndex = tabPane.getSelectionModel().getSelectedIndex();
         if (currentIndex == -1) {
             return null;
@@ -1555,7 +1552,7 @@ public final class Controller implements Initializable {
      * Get current tab's article with {@link Optional}.
      * @return
      */
-    private final Optional<Article> getCurrentArticleOfNullable() {
+    private Optional<Article> getCurrentArticleOfNullable() {
         return Optional.ofNullable(getCurrentArticle());
     }
 
@@ -1563,7 +1560,7 @@ public final class Controller implements Initializable {
      * Get current tab's article.
      * @return If tab contains article, its article. else null.
      */
-    private final Article getCurrentArticle() {
+    private Article getCurrentArticle() {
         final ReloadableTab tab = getCurrentTab();
         return tab instanceof ArticleTab ? ((ArticleTab) tab).getArticle() : null;
     }
@@ -1572,7 +1569,7 @@ public final class Controller implements Initializable {
      * Open urlText's value.
      */
     @FXML
-    private final void readUrlText() {
+    private void readUrlText() {
         final String target = titleInput.getText();
         if (StringUtils.isBlank(target)) {
             return;
@@ -1587,7 +1584,7 @@ public final class Controller implements Initializable {
      * 続・JavaFX8の印刷機能によるHTMLのPDF変換</a>
      */
     @FXML
-    private final void callPrinterJob() {
+    private void callPrinterJob() {
         new AlertDialog.Builder(getParent())
             .setTitle("PDF印刷").setMessage("PDFへの印刷を実行しますか？")
             .setOnPositive("OK", () -> {
@@ -1671,7 +1668,7 @@ public final class Controller implements Initializable {
      * @param message message string
      * @param showLog logging and show snackbar
      */
-    private final void setStatus(final String message, final boolean showLog) {
+    private void setStatus(final String message, final boolean showLog) {
         Platform.runLater(() -> status.setText(message));
         if (showLog) {
             LOGGER.info(message);
@@ -1970,4 +1967,10 @@ public final class Controller implements Initializable {
         return stage.getScene().getWindow();
     }
 
+    /**
+     * Explicit closing method.
+     */
+    void dispose() {
+        FILE_WATCHER.stop();
+    }
 }

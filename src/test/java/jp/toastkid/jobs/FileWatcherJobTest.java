@@ -1,10 +1,10 @@
 package jp.toastkid.jobs;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.junit.Test;
 
 /**
  * {@link FileWatcherJob}'s test cases.
@@ -15,7 +15,7 @@ import org.junit.Test;
 public class FileWatcherJobTest {
 
     /**
-     * Check of {@link FileWatcherJob#run()}.
+     * Check of {@link FileWatcherJob#start()}.
      * @throws IOException
      */
     @Test
@@ -26,7 +26,7 @@ public class FileWatcherJobTest {
         final Path removable = Files.createTempFile("temp", ".txt");
         fileWatcherJob.add(removable);
         fileWatcherJob.remove(removable);
-        fileWatcherJob.run();
+        fileWatcherJob.start();
         fileWatcherJob.stop();
         fileWatcherJob.clear();
     }

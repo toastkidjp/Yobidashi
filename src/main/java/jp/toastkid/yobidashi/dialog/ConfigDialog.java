@@ -1,13 +1,13 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.yobidashi.dialog;
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.jfoenix.controls.JFXTextField;
-
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Window;
@@ -15,13 +15,16 @@ import jp.toastkid.dialog.AlertDialog;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
+import org.apache.commons.lang3.StringUtils;
+
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * WikiCliend の設定ダイアログ
- * @author Toast kid
- * @see <a href="http://d.hatena.ne.jp/aoe-tk/20130526/1369577773">
- * JavaFX2.2でダイアログを作る方法</a>
+ * Configuration dialog helper.
  *
+ * @author Toast kid
  */
 public final class ConfigDialog {
 
@@ -100,13 +103,8 @@ public final class ConfigDialog {
     }
 
     /**
-     * 入力を受け付けるダイアログを表示する.
+     * Show and wait dialog.
      * This method is stopping main thread until when the dialog close.
-     * @param title  ダイアログのタイトル
-     * @param msg    ダイアログのメッセージ
-     * @param defaultInput デフォルト入力、null を指定した場合はテキストフィールドを表示しない
-     * @param checkText チェックボックスの文字列、null か空白を指定した時は表示しない
-     * @return input 入力文字列
      */
     public final void showAndWait() {
         dialog.showAndWait();

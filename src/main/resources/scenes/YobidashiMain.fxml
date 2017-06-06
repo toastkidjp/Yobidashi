@@ -39,7 +39,7 @@
     <BorderPane fx:id="header">
       <top>
         <VBox spacing="20">
-          <JFXToolbar onMouseClicked="#moveToTop">
+          <JFXToolbar>
             <leftItems>
               <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
                 <StackPane fx:id="titleBurgerContainer">
@@ -116,7 +116,7 @@
         <JFXButton minWidth="40.0" buttonType="RAISED" onAction="#searchDown" prefHeight="25.0" prefWidth="40.0" text="↓" />
       </children>
     </HBox>
-    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER" onMouseClicked="#moveToBottom">
+    <BorderPane fx:id="footer" prefHeight="25.0" VBox.vgrow="NEVER">
       <left>
         <Label fx:id="status" maxWidth="-1.0" prefHeight="25.0" prefWidth="400.0" BorderPane.alignment="CENTER">
           <font><Font size="14.0" /></font>

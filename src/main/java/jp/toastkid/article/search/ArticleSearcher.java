@@ -1,27 +1,34 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article.search;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.block.predicate.Predicate;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +210,7 @@ public final class ArticleSearcher {
                 try {
                     final long start = System.currentTimeMillis();
                     lastFilenum      = 0;
-                    searchResultMap  = Maps.mutable.empty();
+                    searchResultMap  = new HashMap<>();
                     max = 0;
                     progress = new SimpleDoubleProperty();
                     progress.addListener((prev, next, v) -> {
@@ -213,7 +220,9 @@ public final class ArticleSearcher {
                     dirSearch(dirPath, pQuery);
                     // 検索にかかった時間
                     lastSearchTime   = System.currentTimeMillis() - start;
-                    makeResultTab(pQuery);
+                    if (!searchResultMap.isEmpty()) {
+                        makeResultTab(pQuery);
+                    }
                     final String message = "Done：" + lastSearchTime + "[ms]";
                     updateMessage(message);
                     successAction.accept(message);
@@ -235,16 +244,15 @@ public final class ArticleSearcher {
      * 再帰的に検索するためのメソッドをマルチスレッドで実装
      * <HR>
      * (140202) 作成
-     * @param dirPath フォルダパス
-     * @param pQuery  検索クエリ
-     * @param prog
+     * @param dirPath directory path
+     * @param query   search query
      */
-    private void dirSearch(final String dirPath, final String pQuery) {
+    private void dirSearch(final String dirPath, final String query) {
         final ExecutorService exs = Executors.newFixedThreadPool(getParallel());
-        final Set<Pattern> patterns = convertPatterns(pQuery);
+        final Set<Pattern> patterns = convertPatterns(query);
         final boolean isTitleOnly = patterns.isEmpty();
 
-        final MutableList<Path> paths = Lists.mutable.empty();
+        final List<Path> paths = new ArrayList<>();
         try {
             Files.list(Paths.get(dirPath)).forEach(paths::add);
         } catch (final IOException e) {
@@ -253,19 +261,21 @@ public final class ArticleSearcher {
         }
 
         // 検索の Runnable
-        final MutableList<ArticleSearchTask> runnables = paths
-                .select(path ->
+        final List<ArticleSearchTask> runnables = paths
+                .stream()
+                .filter(path ->
                     StringUtils.isEmpty(this.selectName)
                     || Articles.convertTitle(path.getFileName().toString()).contains(this.selectName)
                 )
-                .collect(path -> new ArticleSearchTask(path.toAbsolutePath().toString(), patterns));
+                .map(path -> new ArticleSearchTask(path.toAbsolutePath().toString(), patterns))
+                .collect(Collectors.toList());
         max = max + runnables.size();
-        final MutableList<Future<?>> futures = Lists.mutable.empty();
+        final List<Future<?>> futures = new ArrayList<>();
         // 検索の Runnable を初期化する
         for (int i = 0; i < runnables.size(); i++) {
             final Path readingPath = paths.get(i);
             if (Files.isDirectory(readingPath)) {
-                dirSearch(readingPath.toAbsolutePath().toString(), pQuery);
+                dirSearch(readingPath.toAbsolutePath().toString(), query);
                 continue;
             }
             lastFilenum++;
@@ -294,25 +304,32 @@ public final class ArticleSearcher {
                 break;
             }
         }
-        final int size = patterns.size();
+        final int patternNum = patterns.size();
         runnables
-            .reject(invalidElement(size))
-            .each(  elem -> searchResultMap.put(elem.getFilePath(), elem.getResult()));
+            .stream()
+            .filter(validElement(patternNum))
+            .forEach(elem -> searchResultMap.put(elem.getFilePath(), elem.getResult()));
         if (searchResultMap.isEmpty()) {
             Platform.runLater(emptyAction::run);
-            return;
         }
     }
 
     /**
-     * Check invalid result.
+     * Check valid result.
      * @param size query num.
-     * @return If it's invalid result, true
+     * @return If it's valid result, true
      */
-    private Predicate<ArticleSearchTask> invalidElement(final int size) {
-        return elem -> elem.getResult().df.isEmpty()
-                && isAnd
-                && elem.getResult().df.size() < size;
+    private Predicate<ArticleSearchTask> validElement(final int size) {
+        return elem -> {
+            final SearchResult result = elem.getResult();
+            if (result.mapIsEmpty()) {
+                return false;
+            }
+            if (!isAnd) {
+                return true;
+            }
+            return result.size() <= size;
+        };
     }
 
     /**
@@ -337,7 +354,7 @@ public final class ArticleSearcher {
         initializer.accept(listView);
         listView.getItems().addAll(
                 searchResultMap.entrySet().stream()
-                    .map(entry -> new Article(Paths.get(entry.getValue().filePath)))
+                    .map(entry -> new Article(Paths.get(entry.getValue().filePath())))
                     .sorted()
                     .collect(Collectors.toList())
                 );
@@ -424,12 +441,12 @@ public final class ArticleSearcher {
         }
 
         if (!query.contains(QUERY_DELIMITER)) {
-            return Sets.fixedSize.of(Pattern.compile(Strings.escapeForRegex(query), Pattern.DOTALL));
+            return new HashSet<Pattern>(){{add(Pattern.compile(Strings.escapeForRegex(query), Pattern.DOTALL));}};
         }
-        return ArrayAdapter.adapt(query.split(QUERY_DELIMITER))
-                .reject(StringUtils::isEmpty)
-                .collect(str -> Pattern.compile(Strings.escapeForRegex(str), Pattern.DOTALL))
-                .toSet();
+        return Stream.of(query.split(QUERY_DELIMITER))
+                .filter(StringUtils::isNotEmpty)
+                .map(str -> Pattern.compile(Strings.escapeForRegex(str), Pattern.DOTALL))
+                .collect(Collectors.toSet());
     }
 
 }

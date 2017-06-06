@@ -6,9 +6,10 @@ package jp.toastkid.libs.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
 /**
@@ -25,7 +26,7 @@ public final class HtmlUtilTest {
     public final void testGetTableHtmlMapOfStringQ() {
         assertEquals(
                 "<table><tr><td>key</td><td>value</td></tr></table>",
-                HtmlUtil.getTableHtml(Maps.fixedSize.of("key", "value"))
+                HtmlUtil.getTableHtml(new HashMap<String, String>() {{put("key", "value");}})
                 );
     }
 
@@ -37,7 +38,7 @@ public final class HtmlUtilTest {
         assertEquals(
                 "<table><th>Key</th><th>Value</th><tr><td>key</td><td>value</td></tr></table>",
                 HtmlUtil.getTableHtml(
-                        Maps.fixedSize.of("key", "value"),
+                        new HashMap<String, String>() {{put("key", "value");}},
                         "<th>Key</th><th>Value</th>"
                         )
                 );
@@ -49,21 +50,20 @@ public final class HtmlUtilTest {
      */
     @Test
     public final void testGetTableHtmlMapOfStringQStringInt() {
-        final Map<String, String> map = Maps.fixedSize.of(
-            "key0", "value",
-            "key1", "value",
-            "key2", "value"
-            );
+        final Map<String, String> map = new LinkedHashMap<>();
+        map.put("key0", "value");
+        map.put("key1", "value");
+        map.put("key2", "value");
         assertEquals(
                 "<table><th>Key</th><th>Value</th><tr><td>key0</td><td>value</td></tr>"
-                + "<tr><td>key1</td><td>value</td></tr></table>",
-                HtmlUtil.getTableHtml(map,"<th>Key</th><th>Value</th>", 2)
+                        + "<tr><td>key1</td><td>value</td></tr></table>",
+                        HtmlUtil.getTableHtml(map,"<th>Key</th><th>Value</th>", 2)
                 );
         assertEquals(
                 "<table><th>Key</th><th>Value</th><tr><td>key0</td><td>value</td></tr>"
-                + "<tr><td>key1</td><td>value</td></tr><tr><td>key2</td><td>value</td></tr>"
-                + "</table>",
-                HtmlUtil.getTableHtml(map,"<th>Key</th><th>Value</th>", -1)
+                        + "<tr><td>key1</td><td>value</td></tr><tr><td>key2</td><td>value</td></tr>"
+                        + "</table>",
+                        HtmlUtil.getTableHtml(map,"<th>Key</th><th>Value</th>", -1)
                 );
         assertEquals(
                 "<table><th>Key</th><th>Value</th></table>",
@@ -97,9 +97,9 @@ public final class HtmlUtilTest {
     public final void testGetTooltip() {
         assertEquals(
                 "<a href=\"#\" class=\"tooltip\">tomato<span class=\"tooltipBody\">"
-                + "stew<span class=\"tooltipAngle\"><span class=\"tooltipAngleInner\" />"
-                + "</span></span></a>",
-                HtmlUtil.getTooltip("tomato", "stew")
+                        + "stew<span class=\"tooltipAngle\"><span class=\"tooltipAngleInner\" />"
+                        + "</span></span></a>",
+                        HtmlUtil.getTooltip("tomato", "stew")
                 );
     }
 
@@ -214,7 +214,8 @@ public final class HtmlUtilTest {
 
     @Test
     public void test_tagScriptRemove() {
-        System.out.println(HtmlUtil.tagScriptRemove("<a href='http://www.yahoo.com'><Script>alert(\"hello\");</Script></a>"));
+        System.out.println(HtmlUtil.tagScriptRemove(
+                "<a href='http://www.yahoo.com'><Script>alert(\"hello\");</Script></a>"));
     }
 
 }

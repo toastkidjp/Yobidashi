@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.jfx.common;
 
 import java.io.IOException;
@@ -12,17 +19,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.set.MutableSet;
-import org.eclipse.collections.impl.collector.Collectors2;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +91,7 @@ public class Style {
      * @return list of css names.
      */
     public static List<String> findFileNamesFromDir() {
-        final MutableSet<String> styles = Sets.mutable.empty();
+        final Set<String> styles = new HashSet<>();
 
         // read from jar resource.
         try {
@@ -109,10 +114,10 @@ public class Style {
         }
 
         // select & toList
-        final MutableList<String> sorted = styles
-                .select(style -> style.contains("."))
-                .collect(style -> style.substring(0, style.lastIndexOf(".")).toUpperCase())
-                .toList();
+        final List<String> sorted = styles.stream()
+                .filter(style -> style.contains("."))
+                .map(style -> style.substring(0, style.lastIndexOf(".")).toUpperCase())
+                .collect(Collectors.toList());
 
         sorted.sort((a, b) -> a.compareTo(b));
         return sorted;
@@ -156,10 +161,10 @@ public class Style {
             // Jar でないならパスから読み込み
             return Files.list(Paths.get(resource))
                      .map(p -> p.getFileName().toString())
-                     .collect(Collectors2.toList());
+                     .collect(Collectors.toList());
         } catch (final URISyntaxException | IOException e) {
             LOGGER.error("Caught error.", e);
         }
-        return Lists.fixedSize.empty();
+        return Collections.emptyList();
     }
 }

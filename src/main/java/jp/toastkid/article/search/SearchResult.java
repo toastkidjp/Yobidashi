@@ -1,14 +1,18 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article.search;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * 記事1件の検索結果.
@@ -17,27 +21,27 @@ import org.eclipse.collections.impl.factory.Maps;
  */
 public final class SearchResult {
 
-    /** ファイルパス. */
-    public String filePath;
+    /** File path. */
+    private String filePath;
 
-    /** 記事名. */
-    public String title;
+    /** Article title. */
+    private String title;
 
-    /** 記事の文字数. */
-    public int length;
+    /** Article length. */
+    private int length;
 
-    /** 記事の最終更新. */
-    public long lastModified;
+    /** Article's last modified ms. */
+    private long lastModified;
 
-    /** 単語頻度マップ. */
-    public Map<String, List<String>> df;
+    /** Term frequency map. */
+    private Map<String, List<String>> df;
 
     /**
      * Constructor.
      * @param pFilePath /path/to/file
      */
     public SearchResult(final String pFilePath) {
-        this.df           = Maps.mutable.withInitialCapacity(20);
+        this.df           = new HashMap<>(20);
         this.filePath     = pFilePath;
         try {
             this.lastModified = Files.getLastModifiedTime(Paths.get(pFilePath)).toMillis();
@@ -47,13 +51,49 @@ public final class SearchResult {
     }
 
     /**
-     * 仮の検索結果オブジェクトを返す.
-     * @return 仮の検索結果オブジェクト
+     * Make empty object.
+     * @return Empty object
      */
-    public static final SearchResult makeSimple(final String pFilePath) {
+    public static SearchResult makeSimple(final String pFilePath) {
         final SearchResult result = new SearchResult(pFilePath);
-        result.df.put("simple", new ArrayList<String>());
+        result.put("simple", new ArrayList<>());
         return result;
+    }
+
+    public boolean mapIsEmpty() {
+        return df.isEmpty();
+    }
+
+    public int size () {
+        return df.size();
+    }
+
+    public String filePath() {
+        return filePath;
+    }
+
+    public String title() {
+        return title;
+    }
+
+    public int length() {
+        return length;
+    }
+
+    public void addLength(int length) {
+        this.length += length;
+    }
+
+    public long lastModified() {
+        return lastModified;
+    }
+
+    public List<String> getOrEmpty(final String key) {
+        return df.getOrDefault(key, new ArrayList<>());
+    }
+
+    public void put(final String key, final List<String> value) {
+        df.put(key, value);
     }
 
     @Override

@@ -133,18 +133,6 @@ public final class MathUtilTest {
     }
 
     /**
-     * check MathUtil#makeRandamNumberArray(max, size)
-     */
-    @Test
-    public final void testMakeRandamNumberArray() {
-        final int size = 5;
-        final int max = 4;
-        final int[] array = MathUtil.makeRandamNumberArray(max, size);
-        assertEquals(size, array.length);
-        assertEquals(max, MathUtil.maxPrim(array));
-    }
-
-    /**
      * Test {@link MathUtil#leastSquare(double[][])}.
      */
     @Test

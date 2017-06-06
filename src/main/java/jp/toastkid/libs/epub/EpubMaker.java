@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.libs.epub;
 
 import java.io.BufferedInputStream;
@@ -13,19 +20,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import groovy.lang.Tuple2;
 import jp.toastkid.article.models.Articles;
 import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.libs.utils.FileUtil;
@@ -36,7 +40,7 @@ import jp.toastkid.libs.utils.Strings;
  *
  * @author Toast kid
  */
-public final class EpubMaker {
+final class EpubMaker {
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(EpubMaker.class);
@@ -61,33 +65,33 @@ public final class EpubMaker {
         = Arrays.asList("content.opf", "navdoc.html", "title_page.xhtml", "toc.ncx");
 
     /** epub に必ず含めるメタファイル名とその参照元の組一覧. */
-    private static final ImmutableList<Pair<String, String>> REQUIRED_METAFILE_PAIRS
-        = Lists.immutable.with(
-                Tuples.pair(Resource.MIMETYPE, ""),
-                Tuples.pair(Resource.CONTAINER_XML, META_DIR),
-                Tuples.pair(Resource.STYLESHEET, CONTENT_DIR),
-                Tuples.pair(Resource.STYLESHEET_VERTICAL, CONTENT_DIR),
-                Tuples.pair("navdoc.html", CONTENT_DIR),
-                Tuples.pair("toc.ncx", CONTENT_DIR),
-                Tuples.pair("content.opf", CONTENT_DIR),
-                Tuples.pair("title_page.xhtml", CONTENT_DIR)
+    private static final List<Tuple2<String, String>> REQUIRED_METAFILE_MAPS
+        = Arrays.asList(
+                new Tuple2<>(Resource.MIMETYPE, ""),
+                new Tuple2<>(Resource.CONTAINER_XML, META_DIR),
+                new Tuple2<>(Resource.STYLESHEET, CONTENT_DIR),
+                new Tuple2<>(Resource.STYLESHEET_VERTICAL, CONTENT_DIR),
+                new Tuple2<>("navdoc.html", CONTENT_DIR),
+                new Tuple2<>("toc.ncx", CONTENT_DIR),
+                new Tuple2<>("content.opf", CONTENT_DIR),
+                new Tuple2<>("title_page.xhtml", CONTENT_DIR)
             );
 
     /**
      * 与えられたメタデータで初期化する.
      * @param meta
      */
-    public EpubMaker(final EpubMetaData meta) {
+    EpubMaker(final EpubMetaData meta) {
         this.meta = meta;
     }
 
     /**
      * ePubを生成する.
      */
-    public final void generateEpub() {
+    void generateEpub() {
         final List<String> cleanTargets = new ArrayList<>(DEFAULT_REMOVE_TARGETS);
-        final List<Pair<String, String>> pairs = new ArrayList<>(REQUIRED_METAFILE_PAIRS.toList());
-        pairs.addAll(prepareContents());
+        final List<Tuple2<String, String>> tuples = REQUIRED_METAFILE_MAPS;
+        tuples.addAll(prepareContents());
         try {
             Files.write(
                 Paths.get("title_page.xhtml"),
@@ -108,7 +112,7 @@ public final class EpubMaker {
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
         }
-        archive(pairs);
+        archive(tuples);
         clean(cleanTargets);
     }
 
@@ -116,17 +120,17 @@ public final class EpubMaker {
      * コンテンツの用意.
      * @return コンテンツ関連のファイルパスのペア
      */
-    private final Collection<Pair<String, String>> prepareContents() {
-        final Collection<Pair<String, String>> pairs = new ArrayList<>();
+    private Collection<Tuple2<String, String>> prepareContents() {
+        final Collection<Tuple2<String, String>> Tuple2s = new ArrayList<>();
         if (contentPaths == null) {
             return null;
         }
-        contentPaths.stream().forEach((path) -> {
+        contentPaths.forEach((path) -> {
             String parent = CONTENT_DIR;
-            if (StringUtils.isNotEmpty(path.dest.toString())) {
-                parent = parent.concat(path.dest.toString());
+            if (StringUtils.isNotEmpty(path.dest)) {
+                parent = parent.concat(path.dest);
             }
-            pairs.add(Tuples.pair(path.source.toString(), parent));
+            Tuple2s.add(new Tuple2<>(path.source, parent));
         });
         // navdoc.html
         generateNavdoc(contentPaths);
@@ -134,14 +138,14 @@ public final class EpubMaker {
         generateTocncx(contentPaths);
         // content.opf
         generateContentOpf(contentPaths);
-        return pairs;
+        return Tuple2s;
     }
 
     /**
      * navdoc.html(3.0用) を生成する.
      * @param fileNames
      */
-    private final void generateNavdoc(final List<ContentMetaData> fileNames) {
+    private void generateNavdoc(final List<ContentMetaData> fileNames) {
         final StringBuilder sb = new StringBuilder();
         for (final ContentMetaData cMeta : fileNames) {
             if (!FileUtil.isImageFile(cMeta.source)) {
@@ -153,12 +157,12 @@ public final class EpubMaker {
             }
         }
         try {
+        	final Map<String, String> map = new HashMap<>(2);
+            map.put("title",   meta.title);
+            map.put("content", sb.toString());
             Files.write(
                     Paths.get("navdoc.html"),
-                    Articles.bindArgs(
-                            Resource.NAVDOC,
-                            Maps.mutable.with("title", meta.title, "content", sb.toString())
-                        ).getBytes(StandardCharsets.UTF_8)
+                    Articles.bindArgs(Resource.NAVDOC, map).getBytes(StandardCharsets.UTF_8)
                     );
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
@@ -169,7 +173,7 @@ public final class EpubMaker {
      * toc.ncx(2.0用) を生成する.
      * @param fileNames
      */
-    private final void generateTocncx(final List<ContentMetaData> fileNames) {
+    private void generateTocncx(final List<ContentMetaData> fileNames) {
         final StringBuilder sb = new StringBuilder();
         int order = 2;
         for (final ContentMetaData cMeta : fileNames) {
@@ -190,15 +194,12 @@ public final class EpubMaker {
             }
         }
         try {
+            final Map<String, String> map = new HashMap<>(2);
+            map.put("title",   meta.title);
+            map.put("content", sb.toString());
             Files.write(
                     Paths.get("toc.ncx"),
-                    Articles.bindArgs(
-                            Resource.TOC_NCX,
-                            Maps.mutable.of(
-                                    "title",   meta.title,
-                                    "content", sb.toString()
-                                    )
-                        ).getBytes(StandardCharsets.UTF_8)
+                    Articles.bindArgs(Resource.TOC_NCX, map).getBytes(StandardCharsets.UTF_8)
                     );
         } catch (final IOException e) {
             LOGGER.error("ERROR!", e);
@@ -207,14 +208,14 @@ public final class EpubMaker {
 
     /**
      * ファイルとタイトルの組から content.opf を生成する.
-     * @param filePairs ファイルとタイトルの組
+     * @param fileTuple2s ファイルとタイトルの組
      */
-    private final void generateContentOpf(final List<ContentMetaData> filePairs) {
+    private void generateContentOpf(final List<ContentMetaData> fileTuple2s) {
         final StringBuilder content = new StringBuilder();
         final StringBuilder idref   = new StringBuilder();
         int contentCount = 1;
         int idrefCount = 1;
-        for (final ContentMetaData cMeta : filePairs) {
+        for (final ContentMetaData cMeta : fileTuple2s) {
             if (FileUtil.isImageFile(cMeta.source)) {
                 //  <item id="imgl" href="images/koma.png" media-type="image/png" />
                 content
@@ -269,17 +270,17 @@ public final class EpubMaker {
      * 渡されたファイルリストの順に圧縮する.
      * @param files
      */
-    private void archive(final List<Pair<String, String>> files) {
+    private void archive(final List<Tuple2<String, String>> files) {
         try {
             final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(meta.zipFilePath));
             // ファイル圧縮処理
-            for (final Pair<String, String> pair : files) {
-                final String path  = pair.getTwo();
-                final Path p = Paths.get(pair.getOne());
+            for (final Tuple2<String, String> tuple : files) {
+                final String path  = tuple.getSecond();
+                final Path p = Paths.get(tuple.getFirst());
                 if (Files.isDirectory(p)) {
                     putEntryDirectory(out, p);
                 } else {
-                    putEntryFile(out, pair.getOne(), path);
+                    putEntryFile(out, tuple.getFirst(), path);
                 }
             }
             // 出力ストリームを閉じる
@@ -294,15 +295,15 @@ public final class EpubMaker {
     /**
      * ZipOutputStreamに対してファイルを登録する.
      * @param out ZipOutputStream
-     * @param stream 登録するファイル
-     * @throws FileNotFoundException
+     * @param name
+     * @param path
      * @throws IOException
      */
     private static void putEntryFile(
             final ZipOutputStream out,
             final String name,
             final String path
-            ) throws FileNotFoundException, IOException {
+            ) throws IOException {
         final byte[] buf = new byte[128];
 
         try (final BufferedInputStream in = new BufferedInputStream(FileUtil.getStream(name));) {
@@ -318,12 +319,8 @@ public final class EpubMaker {
                 out.write(buf, 0, size);
             }
             in.close();
-        } catch (final FileNotFoundException e) {
-            LOGGER.error("Caught FileNotFoundException.", e);
-        } catch (final ZipException e) {
-            LOGGER.error("Caught ZipException.", e);
-        } catch (final Exception e) {
-            LOGGER.error("Caught Error.", e);
+        } catch (final IOException e) {
+            LOGGER.error("Caught Exception.", e);
         }
     }
 
@@ -344,7 +341,7 @@ public final class EpubMaker {
      * 不要となった生成ファイルを削除する.
      * @param pathList ファイルパスの一覧
      */
-    private static final void clean(final List<String> pathList) {
+    private static void clean(final List<String> pathList) {
         pathList.parallelStream()
             .map(Paths::get)
             .filter(Files::exists)
@@ -361,7 +358,7 @@ public final class EpubMaker {
      * contentPaths をセットする.
      * @param contentPaths
      */
-    public final void setContentPairs(final List<ContentMetaData> contentPaths) {
+    void setContentPairs(final List<ContentMetaData> contentPaths) {
         this.contentPaths = contentPaths;
     }
 }

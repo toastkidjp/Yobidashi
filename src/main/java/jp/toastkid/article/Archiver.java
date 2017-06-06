@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article;
 
 import java.io.IOException;
@@ -6,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 
-import org.eclipse.collections.impl.block.factory.Procedures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +41,13 @@ public class Archiver {
             final Zip backup = new Zip(pathToZip);
             Files.list(articleDir)
                 .filter(path -> isBackup(path, offsetMs))
-                .forEach(Procedures.throwing(path -> backup.entry(path.toAbsolutePath())));
+                .forEach(path -> {
+                    try {
+                        backup.entry(path.toAbsolutePath());
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             backup.doZip();
             return pathToZip;
         } catch (final IOException e) {

@@ -1,11 +1,11 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.yobidashi;
-
-import java.net.URL;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.utility.ArrayIterate;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -29,19 +29,31 @@ import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
 import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.libs.temperature.TemperatureConverter;
+import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
+import org.apache.commons.lang3.StringUtils;
+
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 /**
  * Right side tools controller.
- * @author Toast kid
  *
+ * @author Toast kid
  */
-public class ToolsController implements Initializable {
+public final class ToolsController implements Initializable {
 
     /** Zoom increment keyboard shortcut. */
     private static final KeyCodeCombination ZOOM_INCREMENT
@@ -91,12 +103,11 @@ public class ToolsController implements Initializable {
     /** Message sender. */
     private final Subject<Message> messenger = PublishSubject.create();
 
-
     /**
      * Draw chart.
      */
     @FXML
-    private final void drawChart() {
+    private void drawChart() {
         final String title = graphKind.getSelectionModel().getSelectedItem().toString();
         final Config conf = new Config(Defines.CONFIG);
         final Pane content = ChartPane.make(
@@ -111,14 +122,14 @@ public class ToolsController implements Initializable {
      * Set zoom rate 1.
      */
     @FXML
-    private final void callDefaultZoom() {
+    private void callDefaultZoom() {
         zoom.setValue(1.0);;
     }
 
     /**
      * Initialize chart tool.
      */
-    private final void initChartTool() {
+    private void initChartTool() {
         @SuppressWarnings("unused")
         final ObservableList<String> items = month.<String>getItems();
         items.addAll(ChartPane.readMonths());
@@ -139,7 +150,7 @@ public class ToolsController implements Initializable {
     @FXML
     private void changeUserAgent() {
         if (ua == null || ua.getItems().isEmpty()) {
-            ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+            Stream.of(UserAgent.values()).forEach(ua.getItems()::add);
             ua.getSelectionModel().select(0);
         }
         messenger.onNext(UserAgentMessage.make(ua.getValue()));
@@ -149,13 +160,13 @@ public class ToolsController implements Initializable {
      * Set current WebView publisher.
      * @param zoomPublisher
      */
-    public void setFlux(final Observable<DoubleProperty> zoomPublisher) {
+    void setFlux(final Observable<DoubleProperty> zoomPublisher) {
         final Disposable subscribe = zoomPublisher.subscribeOn(Schedulers.newThread())
             .subscribe(z -> {
                 zoom.setValue(z.get());
                 zoom.valueProperty().bindBidirectional(z);
             });
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> subscribe.dispose()));
+        Runtime.getRuntime().addShutdownHook(new Thread(subscribe::dispose));
     }
 
     /**
@@ -179,11 +190,11 @@ public class ToolsController implements Initializable {
      * @return accelerators
      */
     Map<KeyCombination, Runnable> accelerators() {
-        return Maps.fixedSize.of(
-                DRAW_CHART,     this::drawChart,
-                ZOOM_INCREMENT, zoom::increment,
-                ZOOM_DECREMENT, zoom::decrement
-                );
+    	final Map<KeyCombination, Runnable> map = new HashMap<>();
+    	map.put(DRAW_CHART,     this::drawChart);
+    	map.put(ZOOM_INCREMENT, zoom::increment);
+    	map.put(ZOOM_DECREMENT, zoom::decrement);
+        return map;
     }
 
     /**
@@ -202,11 +213,38 @@ public class ToolsController implements Initializable {
         celsius.setText(Double.toString(TemperatureConverter.fToC(fahrenheit.doubleValue())));
     }
 
+    @FXML
+    private NumberTextField timestamp;
+
+    @FXML
+    private TextField date;
+
+    @FXML
+    private void timestampToDate() {
+        date.setText(CalendarUtil.longToStr(timestamp.longValue(), "yyyy/MM/dd HH:mm:ss"));
+    }
+
+    @FXML
+    private void dateToTimestamp() {
+        final String dateText = date.getText();
+        if (StringUtils.isEmpty(dateText)) {
+            return;
+        }
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        final String cleaned = dateText
+                .replace("/", "")
+                .replace("-", "")
+                .replace(" ", "")
+                .replace(":", "");
+        final TemporalAccessor accessor = dateTimeFormatter.parse(cleaned);
+        timestamp.setText(Long.toString(LocalDateTime.from(accessor).toEpochSecond(ZoneOffset.ofHours(9)) * 1000L));
+    }
+
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(final URL location, final ResourceBundle resources) {
         initChartTool();
         initZoom();
-        ArrayIterate.forEach(UserAgent.values(), ua.getItems()::add);
+        Stream.of(UserAgent.values()).forEach(ua.getItems()::add);
         ua.getSelectionModel().select(0);
     }
 

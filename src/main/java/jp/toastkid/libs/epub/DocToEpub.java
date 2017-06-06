@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.libs.epub;
 
 import java.io.IOException;
@@ -6,18 +13,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.impl.block.factory.Procedures;
-import org.eclipse.collections.impl.collector.Collectors2;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +53,12 @@ public final class DocToEpub {
     private static Config conf;
 
     /** 記事名一覧. */
-    private static ImmutableList<Path> articles;
+    private static List<Path> articles;
     static {
         try {
             conf = new Config(Defines.CONFIG);
             articlePath = conf.get(Key.ARTICLE_DIR);
-            articles = Files.list(Paths.get(articlePath)).collect(Collectors2.toImmutableList());
+            articles = Files.list(Paths.get(articlePath)).collect(Collectors.toList());
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -77,20 +81,23 @@ public final class DocToEpub {
      * @param fileNames names of json file
      */
     public static void run(final String[] fileNames) {
-        run(Lists.immutable.of(fileNames));
+        run(Arrays.asList(fileNames));
     }
 
     /**
      * run generator.
      * @param fileNames names of json file
      */
-    public static void run(final Iterable<String> args) {
-        args.forEach(Procedures.throwing(json ->
-            run(Files.readAllLines(Paths.get(json))
-                    .stream()
-                    .collect(Collectors.joining(Strings.LINE_SEPARATOR)))
-            )
-        );
+    public static void run(final Iterable<String> fileNames) {
+        fileNames.forEach(json -> {
+            try {
+                run(Files.readAllLines(Paths.get(json))
+                        .stream()
+                        .collect(Collectors.joining(Strings.LINE_SEPARATOR)));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        });
         clean();
     }
 
@@ -141,9 +148,9 @@ public final class DocToEpub {
             final String  prefix,
             final boolean recursive
         ) {
-        final List<Path> targets = articles.asParallel(Executors.newFixedThreadPool(20), 20)
-                .select(path -> path.getFileName().toString().startsWith(Articles.titleToFileName(prefix)))
-                .toList();
+        final List<Path> targets = articles.stream()
+                .filter(path -> path.getFileName().toString().startsWith(Articles.titleToFileName(prefix)))
+                .collect(Collectors.toList());
         if (recursive) {
             final List<Path> recursiveFiles = new ArrayList<>();
             targets.forEach(path ->{
@@ -210,14 +217,11 @@ public final class DocToEpub {
             final String style = layout.equals(PageLayout.VERTICAL)
                     ? EpubDefine.STYLESHEET_VERTICAL
                     : EpubDefine.STYLESHEET_HORIZONTAL;
-            final String convertedSource = Articles.bindArgs(
-                    Resource.TEMPLATE,
-                    Maps.mutable.of(
-                            "title", title,
-                            "content", content.toString(),
-                            "stylesheet", style
-                            )
-            );
+            final Map<String, String> map = new HashMap<>();
+            map.put("title", title);
+            map.put("content", content.toString());
+            map.put("stylesheet", style);
+            final String convertedSource = Articles.bindArgs(Resource.TEMPLATE, map);
             // img
             final Set<String> imgs = converter.latestImagePaths;
             imgs.parallelStream().filter(p -> Files.exists(Paths.get(imageDir + p))).forEach(p -> {
@@ -255,7 +259,6 @@ public final class DocToEpub {
 
     /**
      * 不要となった生成ファイルを削除する.
-     * @param pathList ファイルパスの一覧
      */
     private static final void clean() {
         cleanTargets.parallelStream()

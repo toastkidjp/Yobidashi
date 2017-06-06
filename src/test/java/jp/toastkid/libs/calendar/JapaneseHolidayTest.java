@@ -7,10 +7,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.collections.api.set.primitive.IntSet;
-import org.eclipse.collections.impl.factory.primitive.IntSets;
 import org.junit.Test;
 
 import jp.toastkid.libs.utils.CalendarUtil;
@@ -27,13 +27,13 @@ public class JapaneseHolidayTest {
     @Test
     public void testDateOfWeekSimple() {
         assertEquals(
-                "Thu",
-                JapaneseHoliday.dateOfWeekSimple(LocalDate.of(2015, 1, 1))
-                );
+                        "Thu",
+                        JapaneseHoliday.dateOfWeekSimple(LocalDate.of(2015, 1, 1))
+                        );
         assertEquals(
-                "Thu",
-                JapaneseHoliday.dateOfWeekSimple(CalendarUtil.localDate2ms(LocalDate.of(2015, 1, 1)))
-                );
+                        "Thu",
+                        JapaneseHoliday.dateOfWeekSimple(CalendarUtil.localDate2ms(LocalDate.of(2015, 1, 1)))
+                        );
     }
     /**
      * dateOfWeekJA() 's test.
@@ -41,13 +41,13 @@ public class JapaneseHolidayTest {
     @Test
     public void testDateOfWeekJA() {
         assertEquals(
-                "木",
-                JapaneseHoliday.dateOfWeekJA(LocalDate.of(2015, 1, 1))
-                );
+                        "木",
+                        JapaneseHoliday.dateOfWeekJA(LocalDate.of(2015, 1, 1))
+                        );
         assertEquals(
-                "木",
-                JapaneseHoliday.dateOfWeekJA(CalendarUtil.localDate2ms(LocalDate.of(2015, 1, 1)))
-                );
+                        "木",
+                        JapaneseHoliday.dateOfWeekJA(CalendarUtil.localDate2ms(LocalDate.of(2015, 1, 1)))
+                        );
     }
     /**
      * getNationalHoliday() 's test.
@@ -64,8 +64,8 @@ public class JapaneseHolidayTest {
     @Test
     public final void testIsHoliday(){
         assertTrue(
-                JapaneseHoliday.isHoliday(LocalDate.of(2015, 1, 1))
-                );
+                        JapaneseHoliday.isHoliday(LocalDate.of(2015, 1, 1))
+                        );
         assertFalse(JapaneseHoliday.isHoliday(LocalDate.of(2015, 1, 2)));
     }
     /**
@@ -99,79 +99,79 @@ public class JapaneseHolidayTest {
     @Test
     public final void testQueryHoliday(){
         assertEquals(
-                "元旦",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 1, 1))
-                );
+                        "元旦",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 1, 1))
+                        );
         assertNull(JapaneseHoliday.queryHoliday(LocalDate.of(2015, 1, 2)));
         assertEquals(
-                "成人の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 1, 12))
-                );
+                        "成人の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 1, 12))
+                        );
         assertEquals(
-                "建国記念日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 2, 11))
-                );
+                        "建国記念日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 2, 11))
+                        );
         assertEquals(
-                "春分の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 3, 21))
-                );
+                        "春分の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 3, 21))
+                        );
         assertEquals(
-                "昭和の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 4, 29))
-                );
+                        "昭和の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 4, 29))
+                        );
         assertEquals(
-                "憲法記念日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 3))
-                );
+                        "憲法記念日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 3))
+                        );
         assertEquals(
-                "みどりの日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 4))
-                );
+                        "みどりの日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 4))
+                        );
         assertEquals(
-                "こどもの日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 5))
-                );
+                        "こどもの日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 5))
+                        );
         assertEquals(
-                "振替休日（憲法記念日）",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 6))
-                );
+                        "振替休日（憲法記念日）",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 5, 6))
+                        );
         assertEquals(
-                "海の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 7, 20))
-                );
+                        "海の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 7, 20))
+                        );
         assertNull(JapaneseHoliday.queryHoliday(LocalDate.of(2015, 8, 11)));
         assertEquals(
-                "山の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2016, 8, 11))
-                );
+                        "山の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2016, 8, 11))
+                        );
         assertEquals(
-                "敬老の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 21))
-                );
+                        "敬老の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 21))
+                        );
         assertEquals(
-                "国民の休日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 22))
-                );
+                        "国民の休日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 22))
+                        );
         assertEquals(
-                "秋分の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 23))
-                );
+                        "秋分の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 9, 23))
+                        );
         assertEquals(
-                "体育の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 10, 12))
-                );
+                        "体育の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 10, 12))
+                        );
         assertEquals(
-                "文化の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 11, 3))
-                );
+                        "文化の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 11, 3))
+                        );
         assertEquals(
-                "勤労感謝の日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 11, 23))
-                );
+                        "勤労感謝の日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 11, 23))
+                        );
         assertEquals(
-                "天皇誕生日",
-                JapaneseHoliday.queryHoliday(LocalDate.of(2015, 12, 23))
-                );
+                        "天皇誕生日",
+                        JapaneseHoliday.queryHoliday(LocalDate.of(2015, 12, 23))
+                        );
     }
 
     /**
@@ -179,18 +179,17 @@ public class JapaneseHolidayTest {
      */
     @Test
     public final void  testFindHolidaysSet() {
-        final IntSet holidays = JapaneseHoliday.findHolidays(2016, 5);
-        assertTrue(holidays instanceof IntSet);
+        final Set<Integer> holidays = JapaneseHoliday.findHolidays(2016, 5);
         assertEquals(3, holidays.size());
-        assertEquals(IntSets.immutable.of(3, 4, 5), holidays);
+        assertEquals(new HashSet<Integer>(Arrays.asList(3, 4, 5)), holidays);
 
         // 6月は null でなく empty が返る.
-        final IntSet empty = JapaneseHoliday.findHolidays(2016, 6);
+        final Set<Integer> empty = JapaneseHoliday.findHolidays(2016, 6);
         assertNotNull(empty);
         assertTrue(empty.isEmpty());
 
         // 1970年より前でもいける模様.
-        final IntSet preEpoch = JapaneseHoliday.findHolidays(1970, 1);
+        final Set<Integer> preEpoch = JapaneseHoliday.findHolidays(1970, 1);
         assertNotNull(preEpoch);
         assertEquals(2, preEpoch.size());
     }
@@ -216,10 +215,9 @@ public class JapaneseHolidayTest {
      */
     @Test
     public final void  testFindHolidaysIntSet() {
-        final IntSet holidays = JapaneseHoliday.findHolidays(2016, 5);
-        assertTrue(holidays instanceof IntSet);
+        final Set<Integer> holidays = JapaneseHoliday.findHolidays(2016, 5);
         assertEquals(3, holidays.size());
-        assertEquals(IntSets.mutable.of(3, 4, 5), holidays);
+        assertEquals(new HashSet<Integer>(Arrays.asList(3, 4, 5)), holidays);
     }
 
     /**
@@ -228,7 +226,7 @@ public class JapaneseHolidayTest {
     @Test
     public void test_listHoliDayDates() {
         final Set<LocalDate> holiDayDates = JapaneseHoliday.listHoliDayDates(2015, 9);
-        assertEquals("[2015-09-21, 2015-09-22, 2015-09-23]", holiDayDates.toString());
+        assertEquals("[2015-09-21, 2015-09-23, 2015-09-22]", holiDayDates.toString());
     }
 
     /**

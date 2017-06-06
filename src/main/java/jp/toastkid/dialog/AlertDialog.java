@@ -1,11 +1,18 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.dialog;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +87,7 @@ public final class AlertDialog extends Application {
         private Runnable neutralAction;
 
         /** Dialog's controls. */
-        private final MutableList<Node> cntrs;
+        private final List<Node> controls;
 
         public Builder() {
             this(null);
@@ -88,7 +95,7 @@ public final class AlertDialog extends Application {
 
         public Builder(final Window parent) {
             this.parent = parent;
-            cntrs = Lists.mutable.empty();
+            controls = new ArrayList<>();
         }
 
         public Builder setTitle(final String title) {
@@ -119,8 +126,8 @@ public final class AlertDialog extends Application {
             return this;
         }
 
-        public Builder addControl(final Node... cntrs) {
-            this.cntrs.withAll(ArrayAdapter.adapt(cntrs));
+        public Builder addControl(final Node... nodes) {
+        	Stream.of(nodes).forEach(controls::add);
             return this;
         }
 
@@ -145,8 +152,8 @@ public final class AlertDialog extends Application {
             controller.setMessage(b.message);
         }
 
-        if (b.cntrs != null && !b.cntrs.isEmpty()) {
-            controller.addAll(b.cntrs);
+        if (b.controls != null && !b.controls.isEmpty()) {
+            controller.addAll(b.controls);
         }
 
         stage.setTitle(b.title);

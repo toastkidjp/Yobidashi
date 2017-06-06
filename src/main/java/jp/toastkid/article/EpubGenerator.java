@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
-import org.eclipse.collections.impl.collector.Collectors2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +77,7 @@ public class EpubGenerator {
                     Files.list(Paths.get(Defines.EPUB_RECIPE_DIR))
                          .map(p -> p.toAbsolutePath().toString())
                          .filter(fileName -> fileName.toLowerCase().endsWith(".json"))
-                         .collect(Collectors2.toList())
+                         .collect(Collectors.toList())
             );
         } catch (final IOException e) {
             LOGGER.error("Error!", e);
