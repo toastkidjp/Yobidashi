@@ -46,10 +46,18 @@ public class NumberTextField extends JFXTextField {
         return Integer.parseInt(text);
     }
 
+    public long longValue() {
+        final String text = getText();
+        if (StringUtils.isBlank(text)) {
+            return 0L;
+        }
+        return Long.parseLong(text);
+    }
+
     public double doubleValue() {
         final String text = getText();
         if (StringUtils.isBlank(text)) {
-            return 0;
+            return 0d;
         }
         return Double.parseDouble(text);
     }

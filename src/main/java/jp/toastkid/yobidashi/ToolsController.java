@@ -29,14 +29,20 @@ import jp.toastkid.chart.ChartPane;
 import jp.toastkid.chart.ChartPane.Category;
 import jp.toastkid.jfx.common.control.NumberTextField;
 import jp.toastkid.libs.temperature.TemperatureConverter;
+import jp.toastkid.libs.utils.CalendarUtil;
 import jp.toastkid.yobidashi.message.ContentTabMessage;
 import jp.toastkid.yobidashi.message.Message;
 import jp.toastkid.yobidashi.message.UserAgentMessage;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -96,7 +102,6 @@ public final class ToolsController implements Initializable {
 
     /** Message sender. */
     private final Subject<Message> messenger = PublishSubject.create();
-
 
     /**
      * Draw chart.
@@ -206,6 +211,33 @@ public final class ToolsController implements Initializable {
     @FXML
     private void fToC() {
         celsius.setText(Double.toString(TemperatureConverter.fToC(fahrenheit.doubleValue())));
+    }
+
+    @FXML
+    private NumberTextField timestamp;
+
+    @FXML
+    private TextField date;
+
+    @FXML
+    private void timestampToDate() {
+        date.setText(CalendarUtil.longToStr(timestamp.longValue(), "yyyy/MM/dd HH:mm:ss"));
+    }
+
+    @FXML
+    private void dateToTimestamp() {
+        final String dateText = date.getText();
+        if (StringUtils.isEmpty(dateText)) {
+            return;
+        }
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        final String cleaned = dateText
+                .replace("/", "")
+                .replace("-", "")
+                .replace(" ", "")
+                .replace(":", "");
+        final TemporalAccessor accessor = dateTimeFormatter.parse(cleaned);
+        timestamp.setText(Long.toString(LocalDateTime.from(accessor).toEpochSecond(ZoneOffset.ofHours(9)) * 1000L));
     }
 
     @Override
