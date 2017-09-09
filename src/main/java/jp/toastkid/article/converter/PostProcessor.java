@@ -148,11 +148,11 @@ public class PostProcessor {
         }
 
         final String bytedStr = Articles.titleToFileName(input);
-        final boolean isExist = Files.exists(Paths.get(articleDir, bytedStr.concat(MD)));
+        final boolean exists = Files.exists(Paths.get(articleDir, bytedStr.concat(MD)));
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
         generatedLink.append("<a ");
-        if (!isExist) {
+        if (!exists) {
             generatedLink.append("class='redLink' ");
         }
         generatedLink
