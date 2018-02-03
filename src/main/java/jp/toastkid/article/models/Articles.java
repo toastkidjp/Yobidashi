@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article.models;
 
 import java.io.IOException;
@@ -12,17 +19,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.eclipse.collections.impl.collector.Collectors2;
-import org.eclipse.collections.impl.factory.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import javafx.scene.control.ListView;
+import jp.toastkid.article.models.Article.Extension;
 import jp.toastkid.libs.utils.FileUtil;
 import jp.toastkid.libs.utils.Strings;
 
@@ -69,7 +76,7 @@ public final class Articles {
             return Files.list(dir)
                     .map(Article::new)
                     .filter( a -> a.isValid())
-                    .collect(Collectors2.toList());
+                    .collect(Collectors.toList());
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -160,7 +167,7 @@ public final class Articles {
         if (!ext.isPresent()) {
             return false;
         }
-        return Article.EXTENSIONS.contains(ext.orElseGet(Strings::empty));
+        return Extension.MD.text().equals(ext.orElseGet(Strings::empty));
     }
 
     /**
@@ -254,8 +261,10 @@ public final class Articles {
     private static final String bindArgsInternal(
             final List<String> strs, final Map<String, String> params) {
         try {
-            return TEMPLATE_ENGINE.createTemplate(
-                    Lists.immutable.ofAll(strs).makeString(LINE_SEPARATOR)).make(params).toString();
+            return TEMPLATE_ENGINE
+            		.createTemplate(strs.stream().collect(Collectors.joining(LINE_SEPARATOR)))
+            		.make(params)
+            		.toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
             LOGGER.error("Caught error.", e);
         }

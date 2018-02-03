@@ -1,26 +1,32 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article.search;
 
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.Interval;
+import java.util.stream.IntStream;
 
 import jp.toastkid.article.models.Article;
 import jp.toastkid.libs.utils.FileUtil;
 
 /**
  * ファイル単位での検索をする.
+ *
  * @author Toast kid
  */
 public final class ArticleSearchTask implements Runnable {
 
-    /** 検索パターンのセット */
+    /** Search pattern. */
     private final Set<Pattern> targetPatterns;
 
-    /** 検索結果 */
+    /** Search result. */
     private final SearchResult result;
 
     /**
@@ -34,7 +40,7 @@ public final class ArticleSearchTask implements Runnable {
      * @return filePath
      */
     public String getFilePath() {
-        return result.filePath;
+        return result.filePath();
     }
 
     /**
@@ -59,19 +65,17 @@ public final class ArticleSearchTask implements Runnable {
      * ファイル単位で文字列を検索する.
      */
     private void strSearchFromFile() {
-        final List<String> contents
-            = FileUtil.readLines(result.filePath, Article.ENCODE);
+        final List<String> contents = FileUtil.readLines(result.filePath(), Article.ENCODE);
 
-        Interval.zeroTo(contents.size()).each(i -> {
+        IntStream.rangeClosed(0, contents.size()).forEach(i -> {
             final String content = contents.get(i);
-            result.length = result.length + content.length();
+            result.addLength(content.length());
             targetPatterns.forEach(pat -> {
                 final Matcher matcher = pat.matcher(content);
                 while (matcher.find()){
-                    final List<String> founds
-                        = result.df.getOrDefault(pat.pattern(), Lists.mutable.empty());
+                    final List<String> founds = result.getOrEmpty(pat.pattern());
                     founds.add(i + " : " + matcher.group(0));
-                    result.df.put(pat.pattern(), founds);
+                    result.put(pat.pattern(), founds);
                 }
             });
         });

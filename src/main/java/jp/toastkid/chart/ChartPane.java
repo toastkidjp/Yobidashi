@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.chart;
 
 import java.time.LocalDateTime;
@@ -6,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.collections.impl.factory.Sets;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -194,8 +199,18 @@ public class ChartPane extends VBox {
         chart.setData(seriesList);
 
         yAxis.setForceZeroInRange(false);
-        yAxis.setLowerBound(Sets.immutable.withAll(dataMap.values()).min().doubleValue());
+        yAxis.setLowerBound(min(dataMap));
         return chart;
+    }
+
+    private static double min(final Map<String, Number> dataMap) {
+        double min = Double.MAX_VALUE;
+        for (final Number n : dataMap.values()) {
+            if (n.doubleValue() < min) {
+                min = n.doubleValue();
+            }
+        }
+        return min;
     }
 
     /**

@@ -1,12 +1,12 @@
 package jp.toastkid.article.search;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Test of {@link SearchResult}.
@@ -24,6 +24,12 @@ public class SearchResultTest {
         final Path path = Files.createTempFile("temp", ".txt");
         final SearchResult searchResult = new SearchResult(path.toString());
         assertNotNull(searchResult.toString());
+        assertNotNull(searchResult.filePath());
+        assertTrue(searchResult.getOrEmpty("").isEmpty());
+        assertTrue(0 < searchResult.lastModified());
+        assertTrue(searchResult.mapIsEmpty());
+        assertSame(0, searchResult.size());
+        assertNull(searchResult.title());
     }
 
     /**

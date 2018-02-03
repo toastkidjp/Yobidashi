@@ -45,8 +45,7 @@ dependencies {
     forJar fileTree(dir: 'javafx_css_generator', include: '*.jar')
     forJar fileTree(dir: 'slide_show', include: '*.jar')
 
-    compile 'org.eclipse.collections:eclipse-collections:8.0.0'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.8'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
     compile 'org.fxmisc.richtext:richtextfx:1.0.0-SNAPSHOT'

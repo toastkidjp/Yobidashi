@@ -2,10 +2,10 @@ package jp.toastkid.libs.comparator;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
 /**
@@ -20,11 +20,10 @@ public class NumberMapComparatorTest {
      */
     @Test
     public final void testCompare() {
-        final Map<String, Integer> map = Maps.fixedSize.of(
-                "tomato", 120,
-                "orange", 100,
-                "apple",  130
-                );
+        final Map<String, Integer> map = new HashMap<>();
+        map.put("tomato", 120);
+        map.put("orange", 100);
+        map.put("apple",  130);
         final NumberMapComparator comparator = new NumberMapComparator(map);
         assertEquals(0,  comparator.compare("tomato", "tomato"));
         assertEquals(-1, comparator.compare("tomato", "orange"));

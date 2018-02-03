@@ -1,4 +1,10 @@
-
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.libs.utils;
 
 import java.awt.AWTException;
@@ -29,14 +35,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.list.primitive.MutableLongList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.primitive.LongLists;
 
 /**
  * ファイル操作に関するユーティリティクラス<BR>
@@ -119,7 +122,7 @@ public final class FileUtil {
      * @param pEncode 指定するファイルの文字コード
      * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
      */
-    public static MutableList<String> readLines(
+    public static List<String> readLines(
             final String pFilePath,
             final String pEncode
             ) {
@@ -134,15 +137,15 @@ public final class FileUtil {
      * @param pEncode 指定するファイルの文字コード
      * @return 指定されたファイルの要素を一行ずつ入れた Set<String>
      */
-    public static MutableList<String> readLines(
+    public static List<String> readLines(
             final Path path,
             final String pEncode
             ) {
         if (path == null || !Files.exists(path) || !Files.isReadable(path)) {
-            return Lists.fixedSize.empty();
+            return Collections.emptyList();
         }
 
-        final MutableList<String> resSet = Lists.mutable.empty();
+        final List<String> resSet = new ArrayList<>();
         try (final BufferedReader fileReader = Files.newBufferedReader(path, Charset.forName(pEncode))) {
             String str = fileReader.readLine();
             while(str != null) {
@@ -233,16 +236,16 @@ public final class FileUtil {
      * @param path
      */
     public static long countCharacters(final Path path) {
-        final MutableLongList total = LongLists.mutable.empty();
+        final AtomicLong total = new AtomicLong();
         try {
             Files.readAllLines(path, StandardCharsets.UTF_8)
                  .stream()
-                 .map(Strings::countLength)
-                 .forEach(total::add);
+                 .mapToLong(Strings::countLength)
+                 .forEach(total::addAndGet);
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        return total.sum();
+        return total.get();
     }
 
     /**
@@ -336,7 +339,7 @@ public final class FileUtil {
         if (!Files.isDirectory(dir)) {
             return Collections.emptyList();
         }
-        final List<String> list = Lists.mutable.empty();
+        final List<String> list = new ArrayList<>();
         try {
             Files.list(dir).filter(path -> {return !Files.isDirectory(path);}).forEach(path -> {
                 try {

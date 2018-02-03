@@ -4,7 +4,6 @@
 
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -26,87 +25,69 @@
         <String fx:value="tool-menu" />
     </styleClass>
     <VBox prefHeight="200.0" prefWidth="200.0">
-        <children>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="WebView">
-            <content>
-              <VBox alignment="CENTER" prefHeight="50.0" prefWidth="450.0">
-                <children>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
-                    <children>
-                      <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="250.0"
-                       showTickLabels="true" showTickMarks="true" value="1.0">
-                        <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
-                      </JFXSlider>
-                      <JFXTextField fx:id="zoomInput" labelFloat="true"
-                        promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
-                        <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
-                      </JFXTextField>
-                      <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
-                        <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
-                      </JFXButton>
-                    </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
-                    <children>
-                      <Label text="User Agent: "/>
-                      <JFXComboBox fx:id="ua" minWidth="160.0" prefWidth="160.0" onAction="#changeUserAgent"/>
-                    </children>
-                  </HBox>
-                </children>
-              </VBox>
-            </content>
-          </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Chart tools">
-            <content>
-              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
-                <children>
-                  <JFXComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
-                    <items>
-                      <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="日記の文字数" />
-                        <String fx:value="出費" />
-                        <String fx:value="日経平均株価" />
-                      </FXCollections>
-                    </items>
-                    <tooltip><Tooltip text="select graph kind." /></tooltip>
-                  </JFXComboBox>
-                  <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
-                  <JFXButton minWidth="70.0" buttonType="RAISED" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
-                    <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
-                  </JFXButton>
-                </children>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="WebView">
+            <VBox alignment="CENTER" prefHeight="50.0" prefWidth="450.0">
+              <HBox alignment="CENTER_RIGHT" prefHeight="25.0" spacing="5.0" VBox.vgrow="NEVER">
+                <JFXSlider fx:id="zoom" blockIncrement="0.25" majorTickUnit="3" max="5.0" min="0.1" prefHeight="30.0" prefWidth="250.0"
+                           showTickLabels="true" showTickMarks="true" value="1.0">
+                  <tooltip><Tooltip text="ズーム率を変更します。" /></tooltip>
+                </JFXSlider>
+                <JFXTextField fx:id="zoomInput" labelFloat="true"
+                              promptText="zoom rate" prefHeight="25.0" prefWidth="150.0">
+                  <tooltip><Tooltip text="input directly zoom rate." /></tooltip>
+                </JFXTextField>
+                <JFXButton minWidth="80.0" buttonType="RAISED" onAction="#callDefaultZoom" prefHeight="25.0" prefWidth="80.0" text="Default">
+                  <tooltip><Tooltip text="ズーム率をデフォルトに戻します。" /></tooltip>
+                </JFXButton>
               </HBox>
-            </content>
+              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+                <Label text="User Agent: "/>
+                <JFXComboBox fx:id="ua" minWidth="160.0" prefWidth="160.0" onAction="#changeUserAgent"/>
+              </HBox>
+            </VBox>
           </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
-            <content>
-              <AnchorPane><children><fx:include fx:id="loto6" source="Loto6.fxml"/></children></AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
-            <content>
-              <AnchorPane><children><fx:include fx:id="bmi" source="Bmi.fxml"/></children></AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Temperature Converter">
-            <content>
-              <AnchorPane>
-                <children>
-                  <HBox prefHeight="35.0" spacing="15.0">
-                    <children>
-                      <NumberTextField fx:id="fahrenheit" prefWidth="100.0" onAction="#fToC" promptText="Fahrenheit [°F]" labelFloat="true"/>
-                      <NumberTextField fx:id="celsius"    prefWidth="100.0" onAction="#cToF" promptText="Celsius [℃]" labelFloat="true"/>
-                     </children>
-                  </HBox>
-                </children>
-              </AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Color Picker">
-            <content>
-              <AnchorPane><children><JFXColorPicker /></children></AnchorPane>
-            </content>
-          </TitledPane>
-        </children>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Chart tools">
+        <HBox alignment="CENTER" prefHeight="25.0" prefWidth="450.0">
+          <JFXComboBox fx:id="graphKind" minWidth="160.0" prefWidth="160.0">
+            <items>
+              <FXCollections fx:factory="observableArrayList">
+                <String fx:value="日記の文字数" />
+                <String fx:value="出費" />
+                <String fx:value="日経平均株価" />
+              </FXCollections>
+            </items>
+            <tooltip><Tooltip text="select graph kind." /></tooltip>
+          </JFXComboBox>
+          <JFXComboBox fx:id="month" minWidth="120.0" prefWidth="120.0" />
+          <JFXButton minWidth="70.0" buttonType="RAISED" onAction="#drawChart" prefHeight="25.0" prefWidth="60.0" text="Draw">
+            <tooltip><Tooltip text="グラフを描画します。" /></tooltip>
+          </JFXButton>
+        </HBox>
+      </TitledPane>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Loto6 Number Generator">
+        <AnchorPane><fx:include fx:id="loto6" source="Loto6.fxml"/></AnchorPane>
+      </TitledPane>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="BMI Calculator">
+        <AnchorPane><fx:include fx:id="bmi" source="Bmi.fxml"/></AnchorPane>
+      </TitledPane>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Timestamp Converter">
+        <AnchorPane>
+          <HBox prefHeight="35.0" spacing="15.0">
+            <NumberTextField fx:id="timestamp" prefWidth="140.0" onAction="#timestampToDate" promptText="Timestamp [ms]" labelFloat="true"/>
+            <JFXTextField fx:id="date"    prefWidth="200.0" onAction="#dateToTimestamp" promptText="yyyy/MM/dd HH:mm:ss" labelFloat="true"/>
+          </HBox>
+        </AnchorPane>
+      </TitledPane>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Temperature Converter">
+        <AnchorPane>
+          <HBox prefHeight="35.0" spacing="15.0">
+            <NumberTextField fx:id="fahrenheit" prefWidth="100.0" onAction="#fToC" promptText="Fahrenheit [°F]" labelFloat="true"/>
+            <NumberTextField fx:id="celsius"    prefWidth="100.0" onAction="#cToF" promptText="Celsius [℃]" labelFloat="true"/>
+          </HBox>
+        </AnchorPane>
+      </TitledPane>
+      <TitledPane animated="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" text="Color Picker">
+        <AnchorPane><JFXColorPicker /></AnchorPane>
+      </TitledPane>
   </VBox>
 </StackPane>

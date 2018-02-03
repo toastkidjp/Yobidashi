@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.libs.calendar;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import org.eclipse.collections.api.set.primitive.IntSet;
+import java.util.Set;
 
 import jp.toastkid.libs.utils.Strings;
 
@@ -64,7 +70,7 @@ public abstract class HtmlCalendar {
         final int year  = ld.getYear();
         final int month = ld.getMonthValue();
         // その月の祝日を取得、祝日のない6月や8月は null が返ってくる.
-        final IntSet holidaySet = JapaneseHoliday.findHolidays(year, month);
+        final Set<Integer> holidaySet = JapaneseHoliday.findHolidays(year, month);
         // 月の初めの曜日を求める
         final int firstDayOfWeek = LocalDate.of(year, month, 1).getDayOfWeek().getValue();
         // 1=日曜..7=土曜

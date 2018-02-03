@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.jfx.common.control;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +46,18 @@ public class NumberTextField extends JFXTextField {
         return Integer.parseInt(text);
     }
 
+    public long longValue() {
+        final String text = getText();
+        if (StringUtils.isBlank(text)) {
+            return 0L;
+        }
+        return Long.parseLong(text);
+    }
+
     public double doubleValue() {
         final String text = getText();
         if (StringUtils.isBlank(text)) {
-            return 0;
+            return 0d;
         }
         return Double.parseDouble(text);
     }

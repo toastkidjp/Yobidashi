@@ -1,14 +1,22 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.article.converter;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 
 import jp.toastkid.article.models.Article;
 import jp.toastkid.article.models.Articles;
@@ -41,7 +49,7 @@ public class PostProcessor {
         = Pattern.compile("<a .*>(.+?)</a>", Pattern.DOTALL);
 
     /** headings. */
-    private MutableList<Subheading> subheadings;
+    private List<Subheading> subheadings;
 
     /** article directory. */
     private final String articleDir;
@@ -61,11 +69,11 @@ public class PostProcessor {
      */
     public String process(final String content) {
 
-        this.subheadings = Lists.mutable.empty();
+        this.subheadings = new ArrayList<>();
 
-        return ArrayAdapter.adapt(content.split("\n"))
-                .collect(this::convertLine)
-                .makeString("");
+        return Stream.of(content.split("\n"))
+                .map(this::convertLine)
+                .collect(Collectors.joining());
     }
 
     /**
@@ -74,7 +82,7 @@ public class PostProcessor {
      * @return converted text.
      */
     private String convertLine(final String line) {
-        String str = new String(line.toString());
+        String str = line.intern();
         Matcher matcher;
         if (str.indexOf("[[") != -1) {
             matcher = INTERNAL_LINK_PATTERN.matcher(str);
@@ -94,7 +102,7 @@ public class PostProcessor {
             if (matcher.find()) {
                 final int depth = Integer.parseInt(matcher.group(1));
                 final String subheading   = matcher.group(2).trim();
-                final String subheadingId = extractSubHeading(subheading).replaceAll("[ \\.\"\\?\\']+", "_");
+                final String subheadingId = extractSubHeading(subheading).replaceAll("[ \\.\"\\?\\'\\(\\)]+", "_");
                 final String subheadTag = String.format(SUBHEAD_FORMAT, subheadingId, subheadingId);
                 str = HtmlUtil.makeHead(depth, subheadTag + subheading);
                 subheadings.add(new Subheading(subheading, subheadingId, depth));
@@ -140,11 +148,11 @@ public class PostProcessor {
         }
 
         final String bytedStr = Articles.titleToFileName(input);
-        final boolean isExist = Files.exists(Paths.get(articleDir, bytedStr.concat(MD)));
+        final boolean exists = Files.exists(Paths.get(articleDir, bytedStr.concat(MD)));
         final StringBuilder generatedLink = new StringBuilder(180);
         // (121010) ソースフォルダをリンクパスに追加
         generatedLink.append("<a ");
-        if (!isExist) {
+        if (!exists) {
             generatedLink.append("class='redLink' ");
         }
         generatedLink
@@ -179,7 +187,8 @@ public class PostProcessor {
         }
 
         if (subheadings != null) {
-            subheadings.each(subheading -> headingHtml
+            subheadings.forEach(subheading ->
+                headingHtml
                     .append("<li>")
                     .append("<a href=\"#")
                     .append(subheading.id).append("\">")

@@ -1,11 +1,14 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.yobidashi;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,9 +21,14 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jp.toastkid.yobidashi.models.Defines;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
- * JavaFX Wiki-Client.
+ * Main class of JavaFX Application.
+ *
  * @author Toast kid
  * @version 0.0.1
  */
@@ -32,7 +40,7 @@ public final class Main extends Application {
     /** Path to icon of this app. */
     private static final String PATH_IMG_ICON = "images/Icon.png";
 
-    /** fxml file. */
+    /** Scene file. */
     private static final String FXML_PATH = Defines.SCENE_DIR + "/YobidashiMain.fxml";
 
     /** Controller. */
@@ -41,37 +49,32 @@ public final class Main extends Application {
     /** Starting ms. */
     private long start;
 
-    /** Stage initializer disposable. */
-    private Disposable stageDisposable;
-
-    /** Controller initializer disposable. */
-    private Disposable controllerDisposable;
+    /** Stage and Controller initializer disposable. */
+    private CompositeDisposable closer;
 
     @Override
     public void start(final Stage stage) {
         start = System.currentTimeMillis();
+        closer = new CompositeDisposable();
 
         try {
             launch(stage);
         } catch (final Throwable e) {
             LOGGER.error("Caught error.", e);
         } finally {
-            if (stageDisposable != null) {
-                stageDisposable.dispose();
-            }
-            if (controllerDisposable != null) {
-                controllerDisposable.dispose();
+            if (closer != null) {
+                closer.dispose();
             }
         }
     }
 
     /**
-     * initialize method.
+     * Initialize method.
      * @param stage
      */
     private void launch(final Stage stage) {
 
-        stageDisposable = readScene().subscribe(scene -> {
+        final Disposable disposable = readScene().subscribe(scene -> {
             controller.setStage(stage);
             stage.getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream(PATH_IMG_ICON)));
@@ -94,13 +97,14 @@ public final class Main extends Application {
                     (System.currentTimeMillis() - start)
                     );
         });
+        closer.add(disposable);
     }
 
     /**
-     * コントローラに stage を渡し、シーンファイルを読み込む.
-     * @return Scene オブジェクト
+     * Read scene file.
+     * @return Scene object
      */
-    private final Single<Scene> readScene() {
+    private Single<Scene> readScene() {
         final long start = System.currentTimeMillis();
         final FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH));
         try {
@@ -133,23 +137,28 @@ public final class Main extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        controller = null;
+        controller.dispose();
     }
 
     /**
      * Close this application.
      * @param stage
      */
-    public final void closeApplication(final Stage stage) {
+    void closeApplication(final Stage stage) {
+        try {
+            stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         stage.close();
         Platform.exit();
         System.exit(0);
     }
 
     /**
+     * Launcher method.
      *
      * @param args
-     *
      */
     public static void main(final String[] args) {
         Application.launch(Main.class);

@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.yobidashi.models;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * 現在稼働中のアプリケーションの情報を表示する画面
@@ -31,8 +37,8 @@ public final class ApplicationState {
      * <HR>
      * (121229) 作成<BR>
      */
-    public static final Map<String, String> getConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(6);
+    public static Map<String, String> getConfigMap() {
+        final Map<String, String> configMap = new HashMap<>(6);
         configMap.putAll(getJavaConfigMap());
         configMap.putAll(getRuntimeConfigMap());
         return configMap;
@@ -43,8 +49,8 @@ public final class ApplicationState {
      * <HR>
      * (121229) 作成<BR>
      */
-    private static final Map<String, String> getJavaConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(2);
+    private static Map<String, String> getJavaConfigMap() {
+        final Map<String, String> configMap = new HashMap<>(2);
         configMap.put("Java Version", System.getProperty("java.version"));
         configMap.put("Java Home",    System.getProperty("java.home"));
         return configMap;
@@ -56,8 +62,8 @@ public final class ApplicationState {
      * (130101) ユーザエージェント情報を追加<BR>
      * (121229) 作成<BR>
      */
-    private static final Map<String, String> getRuntimeConfigMap() {
-        final Map<String, String> configMap = Maps.mutable.withInitialCapacity(4);
+    private static Map<String, String> getRuntimeConfigMap() {
+        final Map<String, String> configMap = new HashMap<>(4);
         final Runtime runtime = Runtime.getRuntime();
         configMap.put("Max Memory",          getFormatNum(runtime.maxMemory() ));
         configMap.put("Free Memory",         getFormatNum(runtime.freeMemory() ));
@@ -74,7 +80,7 @@ public final class ApplicationState {
      * @param l long 値
      * @return 整形済み long 値の文字列表現
      */
-    private static final String getFormatNum(final long l) {
+    private static String getFormatNum(final long l) {
         return NumberFormat.getInstance().format(l / MEGA_BYTE);
     }
 }

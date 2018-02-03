@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017 toastkidjp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompany this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html.
+ */
 package jp.toastkid.rss;
 
 import java.net.URI;
@@ -7,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.collections.impl.factory.Lists;
 
 import jp.toastkid.libs.http.Http;
 import jp.toastkid.libs.utils.HtmlUtil;
@@ -81,7 +87,7 @@ class Parser {
      * @return Rss items.
      */
     public Rss parse(final String rss) {
-        return parse(Lists.immutable.with(rss.split(System.lineSeparator())));
+        return parse(Arrays.asList(rss.split(System.lineSeparator())));
     }
 
     /**
@@ -93,7 +99,7 @@ class Parser {
         if (rss == null) {
             return Rss.empty();
         }
-        Lists.immutable.withAll(rssLines).each(line -> {
+        rssLines.forEach(line -> {
             //System.out.println("" + line);
             if (line.contains("<item")) {
                 init();

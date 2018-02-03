@@ -1,11 +1,9 @@
 package jp.toastkid.jfx.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import org.eclipse.collections.impl.factory.primitive.CharLists;
 import org.junit.Test;
-
-import jp.toastkid.jfx.common.Style;
 
 /**
  * {@link Style}'s test cases.
@@ -33,9 +31,12 @@ public class StyleTest {
         final String result = Style.findFileNamesFromDir().toString();
         System.out.println(result);
         assertTrue(!result.contains(".css"));
-        CharLists.immutable.of(result.toCharArray())
-            .select(c -> {return Character.isAlphabetic(c) || Character.isDigit(c);})
-            .each(c -> {assertTrue(Character.isUpperCase(c));});
+        for (final char c : result.toCharArray()) {
+            if (!Character.isAlphabetic(c) && !Character.isDigit(c)) {
+                continue;
+            }
+            assertTrue(Character.isUpperCase(c));
+        }
     }
 
 }
