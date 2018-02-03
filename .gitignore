@@ -27,4 +27,5 @@ gradlew*
 script.py
 sample
 *.log
-/build_e/
+.idea/
+Yobidashi.iml
