@@ -7,24 +7,9 @@
  */
 package jp.toastkid.article.control.editor;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.sun.javafx.PlatformUtil;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -53,6 +38,19 @@ import jp.toastkid.libs.utils.Strings;
 import jp.toastkid.yobidashi.models.Config;
 import jp.toastkid.yobidashi.models.Config.Key;
 import jp.toastkid.yobidashi.models.Defines;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Markdown editor.
@@ -308,7 +306,7 @@ public class Editor {
      */
     private void moveToTop() {
         area.moveTo(0, 0);
-        area.setEstimatedScrollY(0.0d);
+        area.showParagraphAtTop(0);
     }
 
     /**
@@ -316,7 +314,7 @@ public class Editor {
      */
     private void moveToBottom() {
         area.moveTo(area.getParagraphs().size() - 1, 0);
-        area.setEstimatedScrollY(area.getTotalHeightEstimate());
+        area.showParagraphAtTop(area.getParagraphs().size() - 1);
     }
 
     /**
