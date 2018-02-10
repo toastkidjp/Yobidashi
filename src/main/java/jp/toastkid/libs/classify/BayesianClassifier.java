@@ -40,7 +40,7 @@ public final class BayesianClassifier {
      * Listに入れられた学習データから学習する。
      * なお、正解データは「T\t文章」のように、
      * <PRE>
-     * T	文章
+     * T    文章
      * <PRE>
      * の形式で記述すること
      * <HR>

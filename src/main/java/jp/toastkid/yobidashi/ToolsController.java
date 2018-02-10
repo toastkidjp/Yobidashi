@@ -190,10 +190,10 @@ public final class ToolsController implements Initializable {
      * @return accelerators
      */
     Map<KeyCombination, Runnable> accelerators() {
-    	final Map<KeyCombination, Runnable> map = new HashMap<>();
-    	map.put(DRAW_CHART,     this::drawChart);
-    	map.put(ZOOM_INCREMENT, zoom::increment);
-    	map.put(ZOOM_DECREMENT, zoom::decrement);
+        final Map<KeyCombination, Runnable> map = new HashMap<>();
+        map.put(DRAW_CHART,     this::drawChart);
+        map.put(ZOOM_INCREMENT, zoom::increment);
+        map.put(ZOOM_DECREMENT, zoom::decrement);
         return map;
     }
 

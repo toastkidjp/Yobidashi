@@ -61,8 +61,8 @@ public final class Defines {
     /** path/to/template. */
     public static final String PATH_TO_TEMPLATE   = Defines.TEMPLATE_DIR + "/main.html";
 
-	/** Bookmark file path. */
-	public static final Path PATH_TO_BOOKMARK = Paths.get("user/bookmark.txt");
+    /** Bookmark file path. */
+    public static final Path PATH_TO_BOOKMARK = Paths.get("user/bookmark.txt");
 
     /**
      * Deny make this instance.

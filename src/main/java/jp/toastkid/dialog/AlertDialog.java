@@ -127,7 +127,7 @@ public final class AlertDialog extends Application {
         }
 
         public Builder addControl(final Node... nodes) {
-        	Stream.of(nodes).forEach(controls::add);
+            Stream.of(nodes).forEach(controls::add);
             return this;
         }
 

@@ -157,7 +157,7 @@ final class EpubMaker {
             }
         }
         try {
-        	final Map<String, String> map = new HashMap<>(2);
+            final Map<String, String> map = new HashMap<>(2);
             map.put("title",   meta.title);
             map.put("content", sb.toString());
             Files.write(

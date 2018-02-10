@@ -18,659 +18,659 @@ import java.util.Map;
  * @author Toast kid
  */
 public final class ScoreMap {
-	public final String[] BC1Source = {
-		"HH:6",
-		"II:2461",
-		"KH:406",
-		"OH:-1378"
-	};
-	public final String[] BC2Source = {
-		"AA:-3267",
-		"AI:2744",
-		"AN:-878",
-		"HH:-4070",
-		"HM:-1711",
-		"HN:4012",
-		"HO:3761",
-		"IA:1327",
-		"IH:-1184",
-		"II:-1332",
-		"IK:1721",
-		"IO:5492",
-		"KI:3831",
-		"KK:-8741",
-		"MH:-3132",
-		"MK:3334",
-		"OO:-2920"
-	};
-	public final String[] BC3Source = {
-		"HH:996",
-		"HI:626",
-		"HK:-721",
-		"HN:-1307",
-		"HO:-836",
-		"IH:-301",
-		"KK:2762",
-		"MK:1079",
-		"MM:4034",
-		"OA:-1652",
-		"OH:266"
-	};
-	public final String[] BP1Source = {
-		"BB:295",
-		"OB:304",
-		"OO:-125",
-		"UB:352"
-	};
-	public final String[] BP2Source = {
-		"BO:60",
-		"OO:-1762"
-	};
-	public final String[] BQ1Source = {
-		"BHH:1150",
-		"BHM:1521",
-		"BII:-1158",
-		"BIM:886",
-		"BMH:1208",
-		"BNH:449",
-		"BOH:-91",
-		"BOO:-2597",
-		"OHI:451",
-		"OIH:-296",
-		"OKA:1851",
-		"OKH:-1020",
-		"OKK:904",
-		"OOO:2965"
-	};
-	public final String[] BQ2Source = {
-		"BHH:118",
-		"BHI:-1159",
-		"BHM:466",
-		"BIH:-919",
-		"BKK:-1720",
-		"BKO:864",
-		"OHH:-1139",
-		"OHM:-181",
-		"OIH:153",
-		"UHI:-1146"
-	};
-	public final String[] BQ3Source = {
-		"BHH:-792",
-		"BHI:2664",
-		"BII:-299",
-		"BKI:419",
-		"BMH:937",
-		"BMM:8335",
-		"BNN:998",
-		"BOH:775",
-		"OHH:2174",
-		"OHM:439",
-		"OII:280",
-		"OKH:1798",
-		"OKI:-793",
-		"OKO:-2242",
-		"OMH:-2402",
-		"OOO:11699"
-	};
-	public final String[] BQ4Source = {
-		"BHH:-3895",
-		"BIH:3761",
-		"BII:-4654",
-		"BIK:1348",
-		"BKK:-1806",
-		"BMI:-3385",
-		"BOO:-12396",
-		"OAH:926",
-		"OHH:266",
-		"OHK:-2036",
-		"ONN:-973"
-	};
-	public final String[] BW1Source = {
-		",と:660",
-		",同:727",
-		"B1あ:1404",
-		"B1同:542",
-		"、と:660",
-		"、同:727",
-		"」と:1682",
-		"あっ:1505",
-		"いう:1743",
-		"いっ:-2055",
-		"いる:672",
-		"うし:-4817",
-		"うん:665",
-		"から:3472",
-		"がら:600",
-		"こう:-790",
-		"こと:2083",
-		"こん:-1262",
-		"さら:-4143",
-		"さん:4573",
-		"した:2641",
-		"して:1104",
-		"すで:-3399",
-		"そこ:1977",
-		"それ:-871",
-		"たち:1122",
-		"ため:601",
-		"った:3463",
-		"つい:-802",
-		"てい:805",
-		"てき:1249",
-		"でき:1127",
-		"です:3445",
-		"では:844",
-		"とい:-4915",
-		"とみ:1922",
-		"どこ:3887",
-		"ない:5713",
-		"なっ:3015",
-		"など:7379",
-		"なん:-1113",
-		"にし:2468",
-		"には:1498",
-		"にも:1671",
-		"に対:-912",
-		"の一:-501",
-		"の中:741",
-		"ませ:2448",
-		"まで:1711",
-		"まま:2600",
-		"まる:-2155",
-		"やむ:-1947",
-		"よっ:-2565",
-		"れた:2369",
-		"れで:-913",
-		"をし:1860",
-		"を見:731",
-		"亡く:-1886",
-		"京都:2558",
-		"取り:-2784",
-		"大き:-2604",
-		"大阪:1497",
-		"平方:-2314",
-		"引き:-1336",
-		"日本:-195",
-		"本当:-2423",
-		"毎日:-2113",
-		"目指:-724",
-		"Ｂ１あ:1404",
-		"Ｂ１同:542",
-		"｣と:1682"
-	};
-	public final String[] BW2Source = {
-		"..:-11822",
-		"11:-669",
-		"――:-5730",
-		"??:-13175",
-		"いう:-1609",
-		"うか:2490",
-		"かし:-1350",
-		"かも:-602",
-		"から:-7194",
-		"かれ:4612",
-		"がい:853",
-		"がら:-3198",
-		"きた:1941",
-		"くな:-1597",
-		"こと:-8392",
-		"この:-4193",
-		"させ:4533",
-		"され:13168",
-		"さん:-3977",
-		"しい:-1819",
-		"しか:-545",
-		"した:5078",
-		"して:972",
-		"しな:939",
-		"その:-3744",
-		"たい:-1253",
-		"たた:-662",
-		"ただ:-3857",
-		"たち:-786",
-		"たと:1224",
-		"たは:-939",
-		"った:4589",
-		"って:1647",
-		"っと:-2094",
-		"てい:6144",
-		"てき:3640",
-		"てく:2551",
-		"ては:-3110",
-		"ても:-3065",
-		"でい:2666",
-		"でき:-1528",
-		"でし:-3828",
-		"です:-4761",
-		"でも:-4203",
-		"とい:1890",
-		"とこ:-1746",
-		"とと:-2279",
-		"との:720",
-		"とみ:5168",
-		"とも:-3941",
-		"ない:-2488",
-		"なが:-1313",
-		"など:-6509",
-		"なの:2614",
-		"なん:3099",
-		"にお:-1615",
-		"にし:2748",
-		"にな:2454",
-		"によ:-7236",
-		"に対:-14943",
-		"に従:-4688",
-		"に関:-11388",
-		"のか:2093",
-		"ので:-7059",
-		"のに:-6041",
-		"のの:-6125",
-		"はい:1073",
-		"はが:-1033",
-		"はず:-2532",
-		"ばれ:1813",
-		"まし:-1316",
-		"まで:-6621",
-		"まれ:5409",
-		"めて:-3153",
-		"もい:2230",
-		"もの:-10713",
-		"らか:-944",
-		"らし:-1611",
-		"らに:-1897",
-		"りし:651",
-		"りま:1620",
-		"れた:4270",
-		"れて:849",
-		"れば:4114",
-		"ろう:6067",
-		"われ:7901",
-		"を通:-11877",
-		"んだ:728",
-		"んな:-4115",
-		"一人:602",
-		"一方:-1375",
-		"一日:970",
-		"一部:-1051",
-		"上が:-4479",
-		"会社:-1116",
-		"出て:2163",
-		"分の:-7758",
-		"同党:970",
-		"同日:-913",
-		"大阪:-2471",
-		"委員:-1250",
-		"少な:-1050",
-		"年度:-8669",
-		"年間:-1626",
-		"府県:-2363",
-		"手権:-1982",
-		"新聞:-4066",
-		"日新:-722",
-		"日本:-7068",
-		"日米:3372",
-		"曜日:-601",
-		"朝鮮:-2355",
-		"本人:-2697",
-		"東京:-1543",
-		"然と:-1384",
-		"社会:-1276",
-		"立て:-990",
-		"第に:-1612",
-		"米国:-4268",
-		"１１:-669"
-	};
-	public final String[] BW3Source = {
+    public final String[] BC1Source = {
+        "HH:6",
+        "II:2461",
+        "KH:406",
+        "OH:-1378"
+    };
+    public final String[] BC2Source = {
+        "AA:-3267",
+        "AI:2744",
+        "AN:-878",
+        "HH:-4070",
+        "HM:-1711",
+        "HN:4012",
+        "HO:3761",
+        "IA:1327",
+        "IH:-1184",
+        "II:-1332",
+        "IK:1721",
+        "IO:5492",
+        "KI:3831",
+        "KK:-8741",
+        "MH:-3132",
+        "MK:3334",
+        "OO:-2920"
+    };
+    public final String[] BC3Source = {
+        "HH:996",
+        "HI:626",
+        "HK:-721",
+        "HN:-1307",
+        "HO:-836",
+        "IH:-301",
+        "KK:2762",
+        "MK:1079",
+        "MM:4034",
+        "OA:-1652",
+        "OH:266"
+    };
+    public final String[] BP1Source = {
+        "BB:295",
+        "OB:304",
+        "OO:-125",
+        "UB:352"
+    };
+    public final String[] BP2Source = {
+        "BO:60",
+        "OO:-1762"
+    };
+    public final String[] BQ1Source = {
+        "BHH:1150",
+        "BHM:1521",
+        "BII:-1158",
+        "BIM:886",
+        "BMH:1208",
+        "BNH:449",
+        "BOH:-91",
+        "BOO:-2597",
+        "OHI:451",
+        "OIH:-296",
+        "OKA:1851",
+        "OKH:-1020",
+        "OKK:904",
+        "OOO:2965"
+    };
+    public final String[] BQ2Source = {
+        "BHH:118",
+        "BHI:-1159",
+        "BHM:466",
+        "BIH:-919",
+        "BKK:-1720",
+        "BKO:864",
+        "OHH:-1139",
+        "OHM:-181",
+        "OIH:153",
+        "UHI:-1146"
+    };
+    public final String[] BQ3Source = {
+        "BHH:-792",
+        "BHI:2664",
+        "BII:-299",
+        "BKI:419",
+        "BMH:937",
+        "BMM:8335",
+        "BNN:998",
+        "BOH:775",
+        "OHH:2174",
+        "OHM:439",
+        "OII:280",
+        "OKH:1798",
+        "OKI:-793",
+        "OKO:-2242",
+        "OMH:-2402",
+        "OOO:11699"
+    };
+    public final String[] BQ4Source = {
+        "BHH:-3895",
+        "BIH:3761",
+        "BII:-4654",
+        "BIK:1348",
+        "BKK:-1806",
+        "BMI:-3385",
+        "BOO:-12396",
+        "OAH:926",
+        "OHH:266",
+        "OHK:-2036",
+        "ONN:-973"
+    };
+    public final String[] BW1Source = {
+        ",と:660",
+        ",同:727",
+        "B1あ:1404",
+        "B1同:542",
+        "、と:660",
+        "、同:727",
+        "」と:1682",
+        "あっ:1505",
+        "いう:1743",
+        "いっ:-2055",
+        "いる:672",
+        "うし:-4817",
+        "うん:665",
+        "から:3472",
+        "がら:600",
+        "こう:-790",
+        "こと:2083",
+        "こん:-1262",
+        "さら:-4143",
+        "さん:4573",
+        "した:2641",
+        "して:1104",
+        "すで:-3399",
+        "そこ:1977",
+        "それ:-871",
+        "たち:1122",
+        "ため:601",
+        "った:3463",
+        "つい:-802",
+        "てい:805",
+        "てき:1249",
+        "でき:1127",
+        "です:3445",
+        "では:844",
+        "とい:-4915",
+        "とみ:1922",
+        "どこ:3887",
+        "ない:5713",
+        "なっ:3015",
+        "など:7379",
+        "なん:-1113",
+        "にし:2468",
+        "には:1498",
+        "にも:1671",
+        "に対:-912",
+        "の一:-501",
+        "の中:741",
+        "ませ:2448",
+        "まで:1711",
+        "まま:2600",
+        "まる:-2155",
+        "やむ:-1947",
+        "よっ:-2565",
+        "れた:2369",
+        "れで:-913",
+        "をし:1860",
+        "を見:731",
+        "亡く:-1886",
+        "京都:2558",
+        "取り:-2784",
+        "大き:-2604",
+        "大阪:1497",
+        "平方:-2314",
+        "引き:-1336",
+        "日本:-195",
+        "本当:-2423",
+        "毎日:-2113",
+        "目指:-724",
+        "Ｂ１あ:1404",
+        "Ｂ１同:542",
+        "｣と:1682"
+    };
+    public final String[] BW2Source = {
+        "..:-11822",
+        "11:-669",
+        "――:-5730",
+        "??:-13175",
+        "いう:-1609",
+        "うか:2490",
+        "かし:-1350",
+        "かも:-602",
+        "から:-7194",
+        "かれ:4612",
+        "がい:853",
+        "がら:-3198",
+        "きた:1941",
+        "くな:-1597",
+        "こと:-8392",
+        "この:-4193",
+        "させ:4533",
+        "され:13168",
+        "さん:-3977",
+        "しい:-1819",
+        "しか:-545",
+        "した:5078",
+        "して:972",
+        "しな:939",
+        "その:-3744",
+        "たい:-1253",
+        "たた:-662",
+        "ただ:-3857",
+        "たち:-786",
+        "たと:1224",
+        "たは:-939",
+        "った:4589",
+        "って:1647",
+        "っと:-2094",
+        "てい:6144",
+        "てき:3640",
+        "てく:2551",
+        "ては:-3110",
+        "ても:-3065",
+        "でい:2666",
+        "でき:-1528",
+        "でし:-3828",
+        "です:-4761",
+        "でも:-4203",
+        "とい:1890",
+        "とこ:-1746",
+        "とと:-2279",
+        "との:720",
+        "とみ:5168",
+        "とも:-3941",
+        "ない:-2488",
+        "なが:-1313",
+        "など:-6509",
+        "なの:2614",
+        "なん:3099",
+        "にお:-1615",
+        "にし:2748",
+        "にな:2454",
+        "によ:-7236",
+        "に対:-14943",
+        "に従:-4688",
+        "に関:-11388",
+        "のか:2093",
+        "ので:-7059",
+        "のに:-6041",
+        "のの:-6125",
+        "はい:1073",
+        "はが:-1033",
+        "はず:-2532",
+        "ばれ:1813",
+        "まし:-1316",
+        "まで:-6621",
+        "まれ:5409",
+        "めて:-3153",
+        "もい:2230",
+        "もの:-10713",
+        "らか:-944",
+        "らし:-1611",
+        "らに:-1897",
+        "りし:651",
+        "りま:1620",
+        "れた:4270",
+        "れて:849",
+        "れば:4114",
+        "ろう:6067",
+        "われ:7901",
+        "を通:-11877",
+        "んだ:728",
+        "んな:-4115",
+        "一人:602",
+        "一方:-1375",
+        "一日:970",
+        "一部:-1051",
+        "上が:-4479",
+        "会社:-1116",
+        "出て:2163",
+        "分の:-7758",
+        "同党:970",
+        "同日:-913",
+        "大阪:-2471",
+        "委員:-1250",
+        "少な:-1050",
+        "年度:-8669",
+        "年間:-1626",
+        "府県:-2363",
+        "手権:-1982",
+        "新聞:-4066",
+        "日新:-722",
+        "日本:-7068",
+        "日米:3372",
+        "曜日:-601",
+        "朝鮮:-2355",
+        "本人:-2697",
+        "東京:-1543",
+        "然と:-1384",
+        "社会:-1276",
+        "立て:-990",
+        "第に:-1612",
+        "米国:-4268",
+        "１１:-669"
+    };
+    public final String[] BW3Source = {
 
-		"あた:-2194",
-		"あり:719",
-		"ある:3846",
-		"い.:-1185",
-		"い。:-1185",
-		"いい:5308",
-		"いえ:2079",
-		"いく:3029",
-		"いた:2056",
-		"いっ:1883",
-		"いる:5600",
-		"いわ:1527",
-		"うち:1117",
-		"うと:4798",
-		"えと:1454",
-		"か.:2857",
-		"か。:2857",
-		"かけ:-743",
-		"かっ:-4098",
-		"かに:-669",
-		"から:6520",
-		"かり:-2670",
-		"が,:1816",
-		"が、:1816",
-		"がき:-4855",
-		"がけ:-1127",
-		"がっ:-913",
-		"がら:-4977",
-		"がり:-2064",
-		"きた:1645",
-		"けど:1374",
-		"こと:7397",
-		"この:1542",
-		"ころ:-2757",
-		"さい:-714",
-		"さを:976",
-		"し,:1557",
-		"し、:1557",
-		"しい:-3714",
-		"した:3562",
-		"して:1449",
-		"しな:2608",
-		"しま:1200",
-		"す.:-1310",
-		"す。:-1310",
-		"する:6521",
-		"ず,:3426",
-		"ず、:3426",
-		"ずに:841",
-		"そう:428",
-		"た.:8875",
-		"た。:8875",
-		"たい:-594",
-		"たの:812",
-		"たり:-1183",
-		"たる:-853",
-		"だ.:4098",
-		"だ。:4098",
-		"だっ:1004",
-		"った:-4748",
-		"って:300",
-		"てい:6240",
-		"てお:855",
-		"ても:302",
-		"です:1437",
-		"でに:-1482",
-		"では:2295",
-		"とう:-1387",
-		"とし:2266",
-		"との:541",
-		"とも:-3543",
-		"どう:4664",
-		"ない:1796",
-		"なく:-903",
-		"など:2135",
-		"に,:-1021",
-		"に、:-1021",
-		"にし:1771",
-		"にな:1906",
-		"には:2644",
-		"の,:-724",
-		"の、:-724",
-		"の子:-1000",
-		"は,:1337",
-		"は、:1337",
-		"べき:2181",
-		"まし:1113",
-		"ます:6943",
-		"まっ:-1549",
-		"まで:6154",
-		"まれ:-793",
-		"らし:1479",
-		"られ:6820",
-		"るる:3818",
-		"れ,:854",
-		"れ、:854",
-		"れた:1850",
-		"れて:1375",
-		"れば:-3246",
-		"れる:1091",
-		"われ:-605",
-		"んだ:606",
-		"んで:798",
-		"カ月:990",
-		"会議:860",
-		"入り:1232",
-		"大会:2217",
-		"始め:1681",
-		"市:965",
-		"新聞:-5055",
-		"日,:974",
-		"日、:974",
-		"社会:2024",
-		"ｶ月:990"
-	};
-	public final String[] TC1Source = {
-		"AAA:1093",
-		"HHH:1029",
-		"HHM:580",
-		"HII:998",
-		"HOH:-390",
-		"HOM:-331",
-		"IHI:1169",
-		"IOH:-142",
-		"IOI:-1015",
-		"IOM:467",
-		"MMH:187",
-		"OOI:-1832"
-	};
-	public final String[] TC2Source = {
-		"HHO:2088",
-		"HII:-1023",
-		"HMM:-1154",
-		"IHI:-1965",
-		"KKH:703",
-		"OII:-2649"
-	};
-	public final String[] TC3Source = {
-		"AAA:-294",
-		"HHH:346",
-		"HHI:-341",
-		"HII:-1088",
-		"HIK:731",
-		"HOH:-1486",
-		"IHH:128",
-		"IHI:-3041",
-		"IHO:-1935",
-		"IIH:-825",
-		"IIM:-1035",
-		"IOI:-542",
-		"KHH:-1216",
-		"KKA:491",
-		"KKH:-1217",
-		"KOK:-1009",
-		"MHH:-2694",
-		"MHM:-457",
-		"MHO:123",
-		"MMH:-471",
-		"NNH:-1689",
-		"NNO:662",
-		"OHO:-3393"
-	};
-	public final String[] TC4Source = {
-		"HHH:-203",
-		"HHI:1344",
-		"HHK:365",
-		"HHM:-122",
-		"HHN:182",
-		"HHO:669",
-		"HIH:804",
-		"HII:679",
-		"HOH:446",
-		"IHH:695",
-		"IHO:-2324",
-		"IIH:321",
-		"III:1497",
-		"IIO:656",
-		"IOO:54",
-		"KAK:4845",
-		"KKA:3386",
-		"KKK:3065",
-		"MHH:-405",
-		"MHI:201",
-		"MMH:-241",
-		"MMM:661",
-		"MOM:841"
-	};
-	public final String[] TQ1Source = {
-		"BHHH:-227",
-		"BHHI:316",
-		"BHIH:-132",
-		"BIHH:60",
-		"BIII:1595",
-		"BNHH:-744",
-		"BOHH:225",
-		"BOOO:-908",
-		"OAKK:482",
-		"OHHH:281",
-		"OHIH:249",
-		"OIHI:200",
-		"OIIH:-68"
-	};
-	public final String[] TQ2Source = {
-		"BIHH:-1401",
-		"BIII:-1033",
-		"BKAK:-543",
-		"BOOO:-5591"
-	};
-	public final String[] TQ3Source = {
-		"BHHH:478",
-		"BHHM:-1073",
-		"BHIH:222",
-		"BHII:-504",
-		"BIIH:-116",
-		"BIII:-105",
-		"BMHI:-863",
-		"BMHM:-464",
-		"BOMH:620",
-		"OHHH:346",
-		"OHHI:1729",
-		"OHII:997",
-		"OHMH:481",
-		"OIHH:623",
-		"OIIH:1344",
-		"OKAK:2792",
-		"OKHH:587",
-		"OKKA:679",
-		"OOHH:110",
-		"OOII:-685"
-	};
-	public final String[] TQ4Source = {
-		"BHHH:-721",
-		"BHHM:-3604",
-		"BHII:-966",
-		"BIIH:-607",
-		"BIII:-2181",
-		"OAAA:-2763",
-		"OAKK:180",
-		"OHHH:-294",
-		"OHHI:2446",
-		"OHHO:480",
-		"OHIH:-1573",
-		"OIHH:1935",
-		"OIHI:-493",
-		"OIIH:626",
-		"OIII:-4007",
-		"OKAK:-8156"
-	};
-	public final String[] TW1Source = {
-		"につい:-4681",
-		"東京都:2026"
-	};
-	public final String[] TW2Source = {
-		"ある程:-2049",
-		"いった:-1256",
-		"ころが:-2434",
-		"しょう:3873",
-		"その後:-4430",
-		"だって:-1049",
-		"ていた:1833",
-		"として:-4657",
-		"ともに:-4517",
-		"もので:1882",
-		"一気に:-792",
-		"初めて:-1512",
-		"同時に:-8097",
-		"大きな:-1255",
-		"対して:-2721",
-		"社会党:-3216"
-	};
-	public final String[] TW3Source = {
-		"いただ:-1734",
-		"してい:1314",
-		"として:-4314",
-		"につい:-5483",
-		"にとっ:-5989",
-		"に当た:-6247",
-		"ので,:-727",
-		"ので、:-727",
-		"のもの:-600",
-		"れから:-3752",
-		"十二月:-2287"
-	};
-	public final String[] TW4Source = {
-		"いう.:8576",
-		"いう。:8576",
-		"からな:-2348",
-		"してい:2958",
-		"たが,:1516",
-		"たが、:1516",
-		"ている:1538",
-		"という:1349",
-		"ました:5543",
-		"ません:1097",
-		"ようと:-4258",
-		"よると:5865"
-	};
-	public final String[] UC1Source = {
-		"A:484",
-		"K:93",
-		"M:645",
-		"O:-505"
-	};
-	public final String[] UC2Source = {
-		"A:819",
-		"H:1059",
-		"I:409",
-		"M:3987",
-		"N:5775",
-		"O:646"
-	};
-	public final String[] UC3Source = {
-		"A:-1370",
-		"I:2311"
-	};
-	public final String[] UC4Source = {
-		"A:-2643",
-		"H:1809",
-		"I:-1032",
-		"K:-3450",
-		"M:3565",
-		"N:3876",
-		"O:6646"
-	};
-	public final String[] UC5Source = {
-		"H:313",
-		"I:-1238",
-		"K:-799",
-		"M:539",
-		"O:-831"
-	};
-	public final String[] UC6Source = {
-		"H:-506",
-		"I:-253",
-		"K:87",
-		"M:247",
-		"O:-387"
-	};
-	public final String[] UP1Source = {
-		"O:-214"
-	};
-	public final String[] UP2Source = {
-		"B:69",
-		"O:935"
-	};
-	public final String[] UP3Source = {
-		"B:189"
-	};
-	public final String[] UQ1Source = {
+        "あた:-2194",
+        "あり:719",
+        "ある:3846",
+        "い.:-1185",
+        "い。:-1185",
+        "いい:5308",
+        "いえ:2079",
+        "いく:3029",
+        "いた:2056",
+        "いっ:1883",
+        "いる:5600",
+        "いわ:1527",
+        "うち:1117",
+        "うと:4798",
+        "えと:1454",
+        "か.:2857",
+        "か。:2857",
+        "かけ:-743",
+        "かっ:-4098",
+        "かに:-669",
+        "から:6520",
+        "かり:-2670",
+        "が,:1816",
+        "が、:1816",
+        "がき:-4855",
+        "がけ:-1127",
+        "がっ:-913",
+        "がら:-4977",
+        "がり:-2064",
+        "きた:1645",
+        "けど:1374",
+        "こと:7397",
+        "この:1542",
+        "ころ:-2757",
+        "さい:-714",
+        "さを:976",
+        "し,:1557",
+        "し、:1557",
+        "しい:-3714",
+        "した:3562",
+        "して:1449",
+        "しな:2608",
+        "しま:1200",
+        "す.:-1310",
+        "す。:-1310",
+        "する:6521",
+        "ず,:3426",
+        "ず、:3426",
+        "ずに:841",
+        "そう:428",
+        "た.:8875",
+        "た。:8875",
+        "たい:-594",
+        "たの:812",
+        "たり:-1183",
+        "たる:-853",
+        "だ.:4098",
+        "だ。:4098",
+        "だっ:1004",
+        "った:-4748",
+        "って:300",
+        "てい:6240",
+        "てお:855",
+        "ても:302",
+        "です:1437",
+        "でに:-1482",
+        "では:2295",
+        "とう:-1387",
+        "とし:2266",
+        "との:541",
+        "とも:-3543",
+        "どう:4664",
+        "ない:1796",
+        "なく:-903",
+        "など:2135",
+        "に,:-1021",
+        "に、:-1021",
+        "にし:1771",
+        "にな:1906",
+        "には:2644",
+        "の,:-724",
+        "の、:-724",
+        "の子:-1000",
+        "は,:1337",
+        "は、:1337",
+        "べき:2181",
+        "まし:1113",
+        "ます:6943",
+        "まっ:-1549",
+        "まで:6154",
+        "まれ:-793",
+        "らし:1479",
+        "られ:6820",
+        "るる:3818",
+        "れ,:854",
+        "れ、:854",
+        "れた:1850",
+        "れて:1375",
+        "れば:-3246",
+        "れる:1091",
+        "われ:-605",
+        "んだ:606",
+        "んで:798",
+        "カ月:990",
+        "会議:860",
+        "入り:1232",
+        "大会:2217",
+        "始め:1681",
+        "市:965",
+        "新聞:-5055",
+        "日,:974",
+        "日、:974",
+        "社会:2024",
+        "ｶ月:990"
+    };
+    public final String[] TC1Source = {
+        "AAA:1093",
+        "HHH:1029",
+        "HHM:580",
+        "HII:998",
+        "HOH:-390",
+        "HOM:-331",
+        "IHI:1169",
+        "IOH:-142",
+        "IOI:-1015",
+        "IOM:467",
+        "MMH:187",
+        "OOI:-1832"
+    };
+    public final String[] TC2Source = {
+        "HHO:2088",
+        "HII:-1023",
+        "HMM:-1154",
+        "IHI:-1965",
+        "KKH:703",
+        "OII:-2649"
+    };
+    public final String[] TC3Source = {
+        "AAA:-294",
+        "HHH:346",
+        "HHI:-341",
+        "HII:-1088",
+        "HIK:731",
+        "HOH:-1486",
+        "IHH:128",
+        "IHI:-3041",
+        "IHO:-1935",
+        "IIH:-825",
+        "IIM:-1035",
+        "IOI:-542",
+        "KHH:-1216",
+        "KKA:491",
+        "KKH:-1217",
+        "KOK:-1009",
+        "MHH:-2694",
+        "MHM:-457",
+        "MHO:123",
+        "MMH:-471",
+        "NNH:-1689",
+        "NNO:662",
+        "OHO:-3393"
+    };
+    public final String[] TC4Source = {
+        "HHH:-203",
+        "HHI:1344",
+        "HHK:365",
+        "HHM:-122",
+        "HHN:182",
+        "HHO:669",
+        "HIH:804",
+        "HII:679",
+        "HOH:446",
+        "IHH:695",
+        "IHO:-2324",
+        "IIH:321",
+        "III:1497",
+        "IIO:656",
+        "IOO:54",
+        "KAK:4845",
+        "KKA:3386",
+        "KKK:3065",
+        "MHH:-405",
+        "MHI:201",
+        "MMH:-241",
+        "MMM:661",
+        "MOM:841"
+    };
+    public final String[] TQ1Source = {
+        "BHHH:-227",
+        "BHHI:316",
+        "BHIH:-132",
+        "BIHH:60",
+        "BIII:1595",
+        "BNHH:-744",
+        "BOHH:225",
+        "BOOO:-908",
+        "OAKK:482",
+        "OHHH:281",
+        "OHIH:249",
+        "OIHI:200",
+        "OIIH:-68"
+    };
+    public final String[] TQ2Source = {
+        "BIHH:-1401",
+        "BIII:-1033",
+        "BKAK:-543",
+        "BOOO:-5591"
+    };
+    public final String[] TQ3Source = {
+        "BHHH:478",
+        "BHHM:-1073",
+        "BHIH:222",
+        "BHII:-504",
+        "BIIH:-116",
+        "BIII:-105",
+        "BMHI:-863",
+        "BMHM:-464",
+        "BOMH:620",
+        "OHHH:346",
+        "OHHI:1729",
+        "OHII:997",
+        "OHMH:481",
+        "OIHH:623",
+        "OIIH:1344",
+        "OKAK:2792",
+        "OKHH:587",
+        "OKKA:679",
+        "OOHH:110",
+        "OOII:-685"
+    };
+    public final String[] TQ4Source = {
+        "BHHH:-721",
+        "BHHM:-3604",
+        "BHII:-966",
+        "BIIH:-607",
+        "BIII:-2181",
+        "OAAA:-2763",
+        "OAKK:180",
+        "OHHH:-294",
+        "OHHI:2446",
+        "OHHO:480",
+        "OHIH:-1573",
+        "OIHH:1935",
+        "OIHI:-493",
+        "OIIH:626",
+        "OIII:-4007",
+        "OKAK:-8156"
+    };
+    public final String[] TW1Source = {
+        "につい:-4681",
+        "東京都:2026"
+    };
+    public final String[] TW2Source = {
+        "ある程:-2049",
+        "いった:-1256",
+        "ころが:-2434",
+        "しょう:3873",
+        "その後:-4430",
+        "だって:-1049",
+        "ていた:1833",
+        "として:-4657",
+        "ともに:-4517",
+        "もので:1882",
+        "一気に:-792",
+        "初めて:-1512",
+        "同時に:-8097",
+        "大きな:-1255",
+        "対して:-2721",
+        "社会党:-3216"
+    };
+    public final String[] TW3Source = {
+        "いただ:-1734",
+        "してい:1314",
+        "として:-4314",
+        "につい:-5483",
+        "にとっ:-5989",
+        "に当た:-6247",
+        "ので,:-727",
+        "ので、:-727",
+        "のもの:-600",
+        "れから:-3752",
+        "十二月:-2287"
+    };
+    public final String[] TW4Source = {
+        "いう.:8576",
+        "いう。:8576",
+        "からな:-2348",
+        "してい:2958",
+        "たが,:1516",
+        "たが、:1516",
+        "ている:1538",
+        "という:1349",
+        "ました:5543",
+        "ません:1097",
+        "ようと:-4258",
+        "よると:5865"
+    };
+    public final String[] UC1Source = {
+        "A:484",
+        "K:93",
+        "M:645",
+        "O:-505"
+    };
+    public final String[] UC2Source = {
+        "A:819",
+        "H:1059",
+        "I:409",
+        "M:3987",
+        "N:5775",
+        "O:646"
+    };
+    public final String[] UC3Source = {
+        "A:-1370",
+        "I:2311"
+    };
+    public final String[] UC4Source = {
+        "A:-2643",
+        "H:1809",
+        "I:-1032",
+        "K:-3450",
+        "M:3565",
+        "N:3876",
+        "O:6646"
+    };
+    public final String[] UC5Source = {
+        "H:313",
+        "I:-1238",
+        "K:-799",
+        "M:539",
+        "O:-831"
+    };
+    public final String[] UC6Source = {
+        "H:-506",
+        "I:-253",
+        "K:87",
+        "M:247",
+        "O:-387"
+    };
+    public final String[] UP1Source = {
+        "O:-214"
+    };
+    public final String[] UP2Source = {
+        "B:69",
+        "O:935"
+    };
+    public final String[] UP3Source = {
+        "B:189"
+    };
+    public final String[] UQ1Source = {
 "BH:21",
 "BI:-12",
 "BK:-99",
@@ -681,12 +681,12 @@ public final class ScoreMap {
 "OK:410",
 "OO:-2422"
 };
-	public final String[] UQ2Source = {
+    public final String[] UQ2Source = {
 "BH:216",
 "BI:113",
 "OK:1759"
 };
-	public final String[] UQ3Source = {
+    public final String[] UQ3Source = {
 "BA:-479",
 "BH:42",
 "BI:1913",
@@ -697,7 +697,7 @@ public final class ScoreMap {
 "OI:-827",
 "ON:-3212"
 };
-	public final String[] UW1Source = {
+    public final String[] UW1Source = {
 ",:156",
 "、:156",
 "「:-463",
@@ -737,7 +737,7 @@ public final class ScoreMap {
 "｢:-463",
 "･:-135"
 };
-	public final String[] UW2Source = {
+    public final String[] UW2Source = {
 ",:-829",
 "、:-829",
 "〇:892",
@@ -846,7 +846,7 @@ public final class ScoreMap {
 "ｶ:306",
 "ｷ:568"
 };
-	public final String[] UW3Source = {
+    public final String[] UW3Source = {
 ",:4889",
 "1:-800",
 "?:-1723",
@@ -1065,7 +1065,7 @@ public final class ScoreMap {
 "ﾛ:2201",
 "ﾝ:278"
 };
-	public final String[] UW4Source = {
+    public final String[] UW4Source = {
 ",:3930",
 ".:3508",
 "―:-4841",
@@ -1287,7 +1287,7 @@ public final class ScoreMap {
 "ﾙ:-856",
 "ﾝ:-3637"
 };
-	public final String[] UW5Source = {
+    public final String[] UW5Source = {
 ",:465",
 ".:-299",
 "1:-514",
@@ -1388,285 +1388,285 @@ public final class ScoreMap {
 "ﾙ:451",
 "ﾝ:-343"
 };
-	public final String[] UW6Source = {
-			",:227",
-			".:808",
-			"1:-270",
-			"E1:306",
-			"、:227",
-			"。:808",
-			"あ:-307",
-			"う:189",
-			"か:241",
-			"が:-73",
-			"く:-121",
-			"こ:-200",
-			"じ:1782",
-			"す:383",
-			"た:-428",
-			"っ:573",
-			"て:-1014",
-			"で:101",
-			"と:-105",
-			"な:-253",
-			"に:-149",
-			"の:-417",
-			"は:-236",
-			"も:-206",
-			"り:187",
-			"る:-135",
-			"を:195",
-			"ル:-673",
-			"ン:-496",
-			"一:-277",
-			"中:201",
-			"件:-800",
-			"会:624",
-			"前:302",
-			"区:1792",
-			"員:-1212",
-			"委:798",
-			"学:-960",
-			"市:887",
-			"広:-695",
-			"後:535",
-			"業:-697",
-			"相:753",
-			"社:-507",
-			"福:974",
-			"空:-822",
-			"者:1811",
-			"連:463",
-			"郎:1082",
-			"１:-270",
-			"Ｅ１:306",
-			"ﾙ:-673",
-			"ﾝ:-496"
-	};
-	public final Map<String,Integer> BC1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BC2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BC3 = new HashMap<String,Integer>(30);
+    public final String[] UW6Source = {
+            ",:227",
+            ".:808",
+            "1:-270",
+            "E1:306",
+            "、:227",
+            "。:808",
+            "あ:-307",
+            "う:189",
+            "か:241",
+            "が:-73",
+            "く:-121",
+            "こ:-200",
+            "じ:1782",
+            "す:383",
+            "た:-428",
+            "っ:573",
+            "て:-1014",
+            "で:101",
+            "と:-105",
+            "な:-253",
+            "に:-149",
+            "の:-417",
+            "は:-236",
+            "も:-206",
+            "り:187",
+            "る:-135",
+            "を:195",
+            "ル:-673",
+            "ン:-496",
+            "一:-277",
+            "中:201",
+            "件:-800",
+            "会:624",
+            "前:302",
+            "区:1792",
+            "員:-1212",
+            "委:798",
+            "学:-960",
+            "市:887",
+            "広:-695",
+            "後:535",
+            "業:-697",
+            "相:753",
+            "社:-507",
+            "福:974",
+            "空:-822",
+            "者:1811",
+            "連:463",
+            "郎:1082",
+            "１:-270",
+            "Ｅ１:306",
+            "ﾙ:-673",
+            "ﾝ:-496"
+    };
+    public final Map<String,Integer> BC1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BC2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BC3 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> BP1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BP2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BP1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BP2 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> BQ1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BQ2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BQ3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BQ4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BQ1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BQ2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BQ3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BQ4 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> BW1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BW2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> BW3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BW1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BW2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> BW3 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> TC1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TC2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TC3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TC4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TC1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TC2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TC3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TC4 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> TQ1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TQ2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TQ3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TQ4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TQ1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TQ2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TQ3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TQ4 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> TW1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TW2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TW3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> TW4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TW1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TW2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TW3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> TW4 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> UC1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UC2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UC3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UC4 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UC5 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UC6 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC5 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UC6 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> UP1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UP2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UP3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UP1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UP2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UP3 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> UQ1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UQ2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UQ3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UQ1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UQ2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UQ3 = new HashMap<String,Integer>(30);
 
-	public final Map<String,Integer> UW1 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UW2 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UW3 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UW4 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UW5 = new HashMap<String,Integer>(30);
-	public final Map<String,Integer> UW6 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW1 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW2 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW3 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW4 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW5 = new HashMap<String,Integer>(30);
+    public final Map<String,Integer> UW6 = new HashMap<String,Integer>(30);
 
-	/**
-	 * init maps.
-	 */
-	public ScoreMap(){
-		for (int i = 0; i < this.BC1Source.length; i++) {
-			final String[] pair = this.BC1Source[i].split(":");
-			this.BC1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BC2Source.length; i++) {
-			final String[] pair = this.BC2Source[i].split(":");
-			this.BC2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BC3Source.length; i++) {
-			final String[] pair = this.BC3Source[i].split(":");
-			this.BC3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BP1Source.length; i++) {
-			final String[] pair = this.BP1Source[i].split(":");
-			this.BP1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BP2Source.length; i++) {
-			final String[] pair = this.BP2Source[i].split(":");
-			this.BP2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BQ1Source.length; i++) {
-			final String[] pair = this.BQ1Source[i].split(":");
-			this.BQ1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BQ2Source.length; i++) {
-			final String[] pair = this.BQ2Source[i].split(":");
-			this.BQ2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BQ3Source.length; i++) {
-			final String[] pair = this.BQ3Source[i].split(":");
-			this.BQ3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BQ4Source.length; i++) {
-			final String[] pair = this.BQ4Source[i].split(":");
-			this.BQ4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BW1Source.length; i++) {
-			final String[] pair = this.BW1Source[i].split(":");
-			this.BW1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BW2Source.length; i++) {
-			final String[] pair = this.BW2Source[i].split(":");
-			this.BW2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.BW3Source.length; i++) {
-			final String[] pair = this.BW3Source[i].split(":");
-			this.BW3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TC1Source.length; i++) {
-			final String[] pair = this.TC1Source[i].split(":");
-			this.TC1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TC2Source.length; i++) {
-			final String[] pair = this.TC2Source[i].split(":");
-			this.TC2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TC3Source.length; i++) {
-			final String[] pair = this.TC3Source[i].split(":");
-			this.TC3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TC4Source.length; i++) {
-			final String[] pair = this.TC4Source[i].split(":");
-			this.TC4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TQ1Source.length; i++) {
-			final String[] pair = this.TQ1Source[i].split(":");
-			this.TQ1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TQ2Source.length; i++) {
-			final String[] pair = this.TQ2Source[i].split(":");
-			this.TQ2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TQ3Source.length; i++) {
-			final String[] pair = this.TQ3Source[i].split(":");
-			this.TQ3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TQ4Source.length; i++) {
-			final String[] pair = this.TQ4Source[i].split(":");
-			this.TQ4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TW1Source.length; i++) {
-			final String[] pair = this.TW1Source[i].split(":");
-			this.TW1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TW2Source.length; i++) {
-			final String[] pair = this.TW2Source[i].split(":");
-			this.TW2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TW3Source.length; i++) {
-			final String[] pair = this.TW3Source[i].split(":");
-			this.TW3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.TW4Source.length; i++) {
-			final String[] pair = this.TW4Source[i].split(":");
-			this.TW4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC1Source.length; i++) {
-			final String[] pair = this.UC1Source[i].split(":");
-			this.UC1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC2Source.length; i++) {
-			final String[] pair = this.UC2Source[i].split(":");
-			this.UC2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC3Source.length; i++) {
-			final String[] pair = this.UC3Source[i].split(":");
-			this.UC3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC4Source.length; i++) {
-			final String[] pair = this.UC4Source[i].split(":");
-			this.UC4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC5Source.length; i++) {
-			final String[] pair = this.UC5Source[i].split(":");
-			this.UC5.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UC6Source.length; i++) {
-			final String[] pair = this.UC6Source[i].split(":");
-			this.UC6.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UP1Source.length; i++) {
-			final String[] pair = this.UP1Source[i].split(":");
-			this.UP1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UP2Source.length; i++) {
-			final String[] pair = this.UP2Source[i].split(":");
-			this.UP2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UP3Source.length; i++) {
-			final String[] pair = this.UP3Source[i].split(":");
-			this.UP3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UQ1Source.length; i++) {
-			final String[] pair = this.UQ1Source[i].split(":");
-			this.UQ1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UQ2Source.length; i++) {
-			final String[] pair = this.UQ2Source[i].split(":");
-			this.UQ2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UQ3Source.length; i++) {
-			final String[] pair = this.UQ3Source[i].split(":");
-			this.UQ3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW1Source.length; i++) {
-			final String[] pair = this.UW1Source[i].split(":");
-			this.UW1.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW2Source.length; i++) {
-			final String[] pair = this.UW2Source[i].split(":");
-			this.UW2.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW3Source.length; i++) {
-			final String[] pair = this.UW3Source[i].split(":");
-			this.UW3.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW4Source.length; i++) {
-			final String[] pair = this.UW4Source[i].split(":");
-			this.UW4.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW5Source.length; i++) {
-			final String[] pair = this.UW5Source[i].split(":");
-			this.UW5.put(pair[0], Integer.parseInt(pair[1]));
-		}
-		for (int i = 0; i < this.UW6Source.length; i++) {
-			final String[] pair = this.UW6Source[i].split(":");
-			this.UW6.put(pair[0], Integer.parseInt(pair[1]));
-		}
-	}
+    /**
+     * init maps.
+     */
+    public ScoreMap(){
+        for (int i = 0; i < this.BC1Source.length; i++) {
+            final String[] pair = this.BC1Source[i].split(":");
+            this.BC1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BC2Source.length; i++) {
+            final String[] pair = this.BC2Source[i].split(":");
+            this.BC2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BC3Source.length; i++) {
+            final String[] pair = this.BC3Source[i].split(":");
+            this.BC3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BP1Source.length; i++) {
+            final String[] pair = this.BP1Source[i].split(":");
+            this.BP1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BP2Source.length; i++) {
+            final String[] pair = this.BP2Source[i].split(":");
+            this.BP2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BQ1Source.length; i++) {
+            final String[] pair = this.BQ1Source[i].split(":");
+            this.BQ1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BQ2Source.length; i++) {
+            final String[] pair = this.BQ2Source[i].split(":");
+            this.BQ2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BQ3Source.length; i++) {
+            final String[] pair = this.BQ3Source[i].split(":");
+            this.BQ3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BQ4Source.length; i++) {
+            final String[] pair = this.BQ4Source[i].split(":");
+            this.BQ4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BW1Source.length; i++) {
+            final String[] pair = this.BW1Source[i].split(":");
+            this.BW1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BW2Source.length; i++) {
+            final String[] pair = this.BW2Source[i].split(":");
+            this.BW2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.BW3Source.length; i++) {
+            final String[] pair = this.BW3Source[i].split(":");
+            this.BW3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TC1Source.length; i++) {
+            final String[] pair = this.TC1Source[i].split(":");
+            this.TC1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TC2Source.length; i++) {
+            final String[] pair = this.TC2Source[i].split(":");
+            this.TC2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TC3Source.length; i++) {
+            final String[] pair = this.TC3Source[i].split(":");
+            this.TC3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TC4Source.length; i++) {
+            final String[] pair = this.TC4Source[i].split(":");
+            this.TC4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TQ1Source.length; i++) {
+            final String[] pair = this.TQ1Source[i].split(":");
+            this.TQ1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TQ2Source.length; i++) {
+            final String[] pair = this.TQ2Source[i].split(":");
+            this.TQ2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TQ3Source.length; i++) {
+            final String[] pair = this.TQ3Source[i].split(":");
+            this.TQ3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TQ4Source.length; i++) {
+            final String[] pair = this.TQ4Source[i].split(":");
+            this.TQ4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TW1Source.length; i++) {
+            final String[] pair = this.TW1Source[i].split(":");
+            this.TW1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TW2Source.length; i++) {
+            final String[] pair = this.TW2Source[i].split(":");
+            this.TW2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TW3Source.length; i++) {
+            final String[] pair = this.TW3Source[i].split(":");
+            this.TW3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.TW4Source.length; i++) {
+            final String[] pair = this.TW4Source[i].split(":");
+            this.TW4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC1Source.length; i++) {
+            final String[] pair = this.UC1Source[i].split(":");
+            this.UC1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC2Source.length; i++) {
+            final String[] pair = this.UC2Source[i].split(":");
+            this.UC2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC3Source.length; i++) {
+            final String[] pair = this.UC3Source[i].split(":");
+            this.UC3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC4Source.length; i++) {
+            final String[] pair = this.UC4Source[i].split(":");
+            this.UC4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC5Source.length; i++) {
+            final String[] pair = this.UC5Source[i].split(":");
+            this.UC5.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UC6Source.length; i++) {
+            final String[] pair = this.UC6Source[i].split(":");
+            this.UC6.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UP1Source.length; i++) {
+            final String[] pair = this.UP1Source[i].split(":");
+            this.UP1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UP2Source.length; i++) {
+            final String[] pair = this.UP2Source[i].split(":");
+            this.UP2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UP3Source.length; i++) {
+            final String[] pair = this.UP3Source[i].split(":");
+            this.UP3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UQ1Source.length; i++) {
+            final String[] pair = this.UQ1Source[i].split(":");
+            this.UQ1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UQ2Source.length; i++) {
+            final String[] pair = this.UQ2Source[i].split(":");
+            this.UQ2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UQ3Source.length; i++) {
+            final String[] pair = this.UQ3Source[i].split(":");
+            this.UQ3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW1Source.length; i++) {
+            final String[] pair = this.UW1Source[i].split(":");
+            this.UW1.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW2Source.length; i++) {
+            final String[] pair = this.UW2Source[i].split(":");
+            this.UW2.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW3Source.length; i++) {
+            final String[] pair = this.UW3Source[i].split(":");
+            this.UW3.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW4Source.length; i++) {
+            final String[] pair = this.UW4Source[i].split(":");
+            this.UW4.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW5Source.length; i++) {
+            final String[] pair = this.UW5Source[i].split(":");
+            this.UW5.put(pair[0], Integer.parseInt(pair[1]));
+        }
+        for (int i = 0; i < this.UW6Source.length; i++) {
+            final String[] pair = this.UW6Source[i].split(":");
+            this.UW6.put(pair[0], Integer.parseInt(pair[1]));
+        }
+    }
 }

@@ -44,7 +44,7 @@ public class HamburgerPopupController {
      */
     @FXML
     private void minimize() {
-    	messenger.onNext(ApplicationMessage.makeMinimize());
+        messenger.onNext(ApplicationMessage.makeMinimize());
     }
 
     /**

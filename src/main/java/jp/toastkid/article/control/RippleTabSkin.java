@@ -363,9 +363,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
     }
 
     /**************************************************************************
-     *																		  *
-     * HeaderContainer: tabs headers container 						     	  *
-     *																		  *
+     *                                                                          *
+     * HeaderContainer: tabs headers container                                    *
+     *                                                                          *
      **************************************************************************/
     protected class HeaderContainer extends StackPane {
 
@@ -750,9 +750,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
 
     /**************************************************************************
-     *																		  *
-     * TabHeaderContainer: each tab Container								  *
-     *																		  *
+     *                                                                          *
+     * TabHeaderContainer: each tab Container                                  *
+     *                                                                          *
      **************************************************************************/
 
     protected class TabHeaderContainer extends StackPane {
@@ -950,9 +950,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
 
 
     /**************************************************************************
-     *																		  *
-     * TabContentHolder: each tab content container						      *
-     *																		  *
+     *                                                                          *
+     * TabContentHolder: each tab content container                              *
+     *                                                                          *
      **************************************************************************/
     protected class TabContentHolder extends StackPane {
 
@@ -991,9 +991,9 @@ public class RippleTabSkin extends BehaviorSkinBase<TabPane, TabPaneBehavior> {
     }
 
     /**************************************************************************
-     *																		  *
+     *                                                                          *
      * HeaderControl: left/right controls to interact with HeaderContainer*
-     *																		  *
+     *                                                                          *
      **************************************************************************/
     protected class HeaderControl extends StackPane {
         private StackPane inner;

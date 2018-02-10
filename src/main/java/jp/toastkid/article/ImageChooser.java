@@ -40,13 +40,13 @@ public class ImageChooser {
             .map(Paths::get)
             .filter(p -> Files.exists(p) && Files.isDirectory(p))
             .flatMap(f -> {
-				try {
-					return Files.list(f);
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
-				return Stream.empty();
-			})
+                try {
+                    return Files.list(f);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+                return Stream.empty();
+            })
             .filter(p -> FileUtil.isImageFile(p.getFileName().toString()))
             .map(Path::toUri)
             .collect(Collectors.toList());

@@ -262,9 +262,9 @@ public final class Articles {
             final List<String> strs, final Map<String, String> params) {
         try {
             return TEMPLATE_ENGINE
-            		.createTemplate(strs.stream().collect(Collectors.joining(LINE_SEPARATOR)))
-            		.make(params)
-            		.toString();
+                    .createTemplate(strs.stream().collect(Collectors.joining(LINE_SEPARATOR)))
+                    .make(params)
+                    .toString();
         } catch (final CompilationFailedException | ClassNotFoundException | IOException e) {
             LOGGER.error("Caught error.", e);
         }
