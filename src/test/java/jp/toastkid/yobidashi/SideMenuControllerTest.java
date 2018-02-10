@@ -83,7 +83,7 @@ public class SideMenuControllerTest extends ApplicationTest {
     public void test_fullScreen() {
         Platform.runLater(() -> {
             selectTab(4);
-            final String labelText = "Full screen	|	F11";
+            final String labelText = "Full screen    |    F11";
             fireLabel(labelText);
             assertTrue(stage.isFullScreen());
             fireLabel(labelText);
