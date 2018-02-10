@@ -190,14 +190,14 @@ public final class StringsTest {
         assertEquals(4, set.size());
     }
 
-    private Set<Long> makeSet() {
-        final Set<Long> set = new HashSet<>();
+	private Set<Long> makeSet() {
+		final Set<Long> set = new HashSet<>();
         set.add(Strings.md5Hash("トマト"));
         set.add(Strings.md5Hash("トマト1"));
         set.add(Strings.md5Hash("トマト2"));
         set.add(Strings.md5Hash("トマト "));
-        return set;
-    }
+		return set;
+	}
 
     /**
      * StringUtil#longHash 's test method.

@@ -36,7 +36,7 @@ public class MenuLabelSkinTest extends ApplicationTest {
     public void test() {
         label.setAccelerator(KeyCombination.keyCombination("Ctrl+L"));
         new MenuLabelSkin(label);
-        assertEquals("Test    |    Ctrl+L", label.getText());
+        assertEquals("Test	|	Ctrl+L", label.getText());
     }
 
     @Override
