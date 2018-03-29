@@ -64,7 +64,7 @@ public class BookmarkManager {
                     .setTitle("Edit Bookmark")
                     .setMessage("Would you input article titles.")
                     .addControl(bookmarks)
-                    .setOnPositive("Store", () -> store(bookmarks.getText()))
+                    .setOnPositive("Save", () -> store(bookmarks.getText()))
                     .build();
         }
         dialog.show();
