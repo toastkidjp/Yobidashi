@@ -281,7 +281,7 @@ public class ChartPane extends VBox {
         final String now = LocalDateTime.now().format(pattern);
         LocalDateTime ldt = LocalDateTime.of(2011, 1, 1, 0, 0);
         String month = ldt.format(pattern);
-        while (!now.equals(month) && monthSelector.size() <= 100){
+        while (!now.equals(month)){
             ldt = ldt.plusMonths(1);
             month = ldt.format(pattern);
             monthSelector.add(month);
